@@ -1,0 +1,256 @@
+{
+ "format": "axstudio/2",
+ "name": "Embedded browser",
+ "desc": "A web browser in the window: back, forward, reload, an address bar, bookmarks, and the page filling the rest. A timer keeps the address and the title in step.",
+ "uid": 9,
+ "cur": 1,
+ "vars": "",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "watch | 700ms | start |  | call Watch",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Browser",
+   "width": 1080,
+   "height": 720,
+   "minwidth": 640,
+   "minheight": 420,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E774",
+   "menus": "",
+   "status": "msg | Ready | grow icon=E774\nsecure | | w=90 right",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "goBtn",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "",
+   "states": "",
+   "binds": "",
+   "hotkeys": "",
+   "init": "Go(\"https://www.autohotkey.com\")",
+   "script": "; A web address, a bare name (example.com) or words to look up.\nGo(url := \"\") {\n    global web, addr\n    url := Trim(url != \"\" ? url : addr.Text)\n    if (url = \"\")\n        return\n    if !RegExMatch(url, \"i)^[a-z]+:\")\n        url := (InStr(url, \" \") || !InStr(url, \".\")) ? \"https://www.bing.com/search?q=\" url : \"https://\" url\n    addr.Text := url\n    web.Object.Navigate(url)\n}\n; Where the page is now and what it is called.\nWatch() {\n    global web, addr, g\n    static lastUrl := \"\"\n    try {\n        o := web.Object\n        u := o.LocationURL\n        if (u != \"\" && u != lastUrl)\n            lastUrl := u, addr.Text := u\n        g.Status(\"msg\", o.Busy ? \"Loading...\" : o.LocationName)\n        g.Status(\"secure\", SubStr(u, 1, 6) = \"https:\" ? \"Secure\" : \"\")\n    }\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "Button",
+      "name": "backBtn",
+      "arg": "Back",
+      "layout": {},
+      "props": {
+       "kind": "Subtle",
+       "icon": "E72B"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "try web.Object.GoBack()"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Button",
+      "name": "fwdBtn",
+      "arg": "Forward",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "kind": "Subtle",
+       "icon": "E72A"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "try web.Object.GoForward()"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Button",
+      "name": "reloadBtn",
+      "arg": "Reload",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "kind": "Subtle",
+       "icon": "E72C"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "try web.Object.Refresh()"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Edit",
+      "name": "addr",
+      "arg": "https://www.autohotkey.com",
+      "layout": {
+       "place": "same",
+       "fill": 1
+      },
+      "props": {
+       "placeholder": "An address, or words to look up"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Button",
+      "name": "goBtn",
+      "arg": "Go",
+      "layout": {
+       "place": "same",
+       "w": 70
+      },
+      "props": {
+       "kind": "Accent"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "Go()"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "Chip",
+      "name": "bmAhk",
+      "arg": "AutoHotkey",
+      "layout": {},
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Go(\"https://www.autohotkey.com\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Chip",
+      "name": "bmDocs",
+      "arg": "The v2 docs",
+      "layout": {
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Go(\"https://www.autohotkey.com/docs/v2/\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n8",
+      "type": "Chip",
+      "name": "bmForum",
+      "arg": "The forum",
+      "layout": {
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Go(\"https://www.autohotkey.com/boards/\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n9",
+      "type": "ActiveX",
+      "name": "web",
+      "arg": "\"Shell.Explorer.2\"",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 240
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

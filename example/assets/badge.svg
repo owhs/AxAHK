@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#60cdff"/>
+      <stop offset="1" stop-color="#4a6edc"/>
+    </linearGradient>
+  </defs>
+  <circle cx="80" cy="80" r="72" fill="url(#g)"/>
+  <circle cx="80" cy="80" r="72" fill="none" stroke="#ffffff" stroke-opacity=".45" stroke-width="4"/>
+  <path d="M80 30 L124 118 L36 118 Z" fill="#0a1a30" fill-opacity=".85"/>
+  <circle cx="80" cy="96" r="11" fill="#60cdff"/>
+  <text x="80" y="148" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="15" fill="#0a1a30">vector</text>
+</svg>

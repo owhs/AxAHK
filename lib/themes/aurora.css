@@ -1,0 +1,319 @@
+/* @extends win11 */
+/* ============================================================================
+   aurora.css — a dark-first sheet with depth: a bloom of accent light behind
+   the page, glass-thin panels, and glows instead of borders to say what is
+   focused or active.
+
+   It extends win11.css for the class vocabulary and layout only; every colour,
+   radius, border and shadow below is replaced, so it does not read as Fluent.
+
+   Two things worth knowing before editing:
+
+   1. Every rule is scoped to body.sheet-aurora, and colours to .theme-dark /
+      .theme-light as well. win11.css is dark-first and writes its light rules
+      as "body.theme-light .card", so an unscoped ".card" here would lose to it
+      on specificity and only dark would change.
+
+   2. The bar heights are left alone (menu 28px, status 24px). win11.css
+      reserves them for #shell with hardcoded arithmetic --
+      "body.has-menubar.has-statusbar #shell { height: calc(100% - 84px) }" --
+      so a sheet that changes a bar's height must change those three rules too,
+      or the last row of the page is clipped.
+
+   IE11 bands badly across a large gradient, so the canvas carries a 64x64
+   noise tile over the bloom. It is a real PNG because IE11 has no working
+   feTurbulence, and it is nearly transparent: texture, not visible grain.
+
+   The accent #5b8cff sits in the blue band, so SetAccent recolours the whole
+   sheet through AxSys.RecolourCss like any other.
+   ========================================================================= */
+
+/* ------------------------------------------------------------------ canvas */
+body.sheet-aurora {
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+}
+body.sheet-aurora.theme-dark {
+    color: #e7ecf5;
+    background-color: #0a0c11;
+    background-image:
+        url("data:image/png;base64,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"),
+        radial-gradient(1200px 520px at 18% -12%, rgba(91,140,255,.20) 0%, rgba(91,140,255,0) 62%),
+        radial-gradient(900px 420px at 96% 6%, rgba(138,99,255,.16) 0%, rgba(138,99,255,0) 60%),
+        linear-gradient(#0d1017 0%, #0a0c11 55%, #090a0e 100%);
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+}
+body.sheet-aurora.theme-light {
+    color: #16202e;
+    background-color: #f5f7fc;
+    background-image:
+        url("data:image/png;base64,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"),
+        radial-gradient(1200px 520px at 18% -12%, rgba(91,140,255,.16) 0%, rgba(91,140,255,0) 62%),
+        radial-gradient(900px 420px at 96% 6%, rgba(138,99,255,.12) 0%, rgba(138,99,255,0) 60%),
+        linear-gradient(#ffffff 0%, #f5f7fc 60%, #eef2fa 100%);
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+}
+
+/* the frame floats on the canvas rather than sitting in a bar of its own */
+body.sheet-aurora #titlebar { height: 38px; padding-left: 14px; background: transparent; border: none; }
+/* A taller title bar means #shell must give up more: win11.css works these out
+   by hand from 32px title + 28px menu bar + 24px status bar, so a sheet that
+   changes any of those three heights has to restate all four sums or the page
+   runs past the bottom of the window. Here only the title bar moved, 32 -> 38. */
+body.sheet-aurora #shell { height: calc(100% - 38px); }
+body.sheet-aurora.has-menubar #shell { height: calc(100% - 66px); }
+body.sheet-aurora.has-statusbar #shell { height: calc(100% - 62px); }
+body.sheet-aurora.has-menubar.has-statusbar #shell { height: calc(100% - 90px); }
+body.sheet-aurora #titleText { font-size: 12px; font-weight: 600; letter-spacing: .2px; }
+body.sheet-aurora.theme-dark #titlebar { color: #cfd7e6; }
+body.sheet-aurora.theme-light #titlebar { color: #33415c; }
+body.sheet-aurora #titlebar .app-icon { color: #5b8cff; }
+body.sheet-aurora.inactive #titlebar, body.sheet-aurora.inactive #titlebar .app-icon { color: #6b7488; }
+body.sheet-aurora .winbtn { width: 40px; height: 38px; border-radius: 8px; }
+body.sheet-aurora.theme-dark .winbtn { color: #cfd7e6; }
+body.sheet-aurora.theme-light .winbtn { color: #33415c; }
+body.sheet-aurora.theme-dark .winbtn:hover, body.sheet-aurora.theme-dark .winbtn.hover { background: rgba(255,255,255,.08); }
+body.sheet-aurora.theme-light .winbtn:hover, body.sheet-aurora.theme-light .winbtn.hover { background: rgba(16,24,40,.07); }
+body.sheet-aurora #btnClose:hover, body.sheet-aurora #btnClose.hover { background: #e5484d; color: #ffffff; }
+
+/* --------------------------------------------------------------- task pane */
+body.sheet-aurora #sidebar { width: 216px; padding: 10px 8px; background: transparent; border: none; }
+body.sheet-aurora .nav-item {
+    position: relative; height: 38px; line-height: 38px; margin: 3px 0;
+    padding: 0 12px 0 16px; border-radius: 10px; font-size: 13px;
+}
+body.sheet-aurora.theme-dark .nav-item { color: #aeb9cd; }
+body.sheet-aurora.theme-light .nav-item { color: #48566e; }
+body.sheet-aurora.theme-dark .nav-item:hover { background: rgba(255,255,255,.05); color: #e7ecf5; }
+body.sheet-aurora.theme-light .nav-item:hover { background: rgba(16,24,40,.05); color: #16202e; }
+body.sheet-aurora.theme-dark .nav-item.active {
+    background: rgba(91,140,255,.14); color: #cfe0ff; font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(91,140,255,.30), 0 0 18px rgba(91,140,255,.18);
+}
+body.sheet-aurora.theme-light .nav-item.active {
+    background: rgba(91,140,255,.13); color: #2450c8; font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(91,140,255,.30);
+}
+body.sheet-aurora .nav-item.active:before {
+    content: ""; position: absolute; left: 5px; top: 11px; bottom: 11px;
+    width: 3px; border-radius: 2px; background: #5b8cff;
+}
+
+/* ---------------------------------------------------------------- headings */
+body.sheet-aurora #content { padding: 18px 26px 26px; }
+body.sheet-aurora h1 { font-size: 26px; line-height: 34px; font-weight: 600; letter-spacing: -.2px; margin: 0 0 6px; }
+body.sheet-aurora h2 { font-size: 18px; line-height: 26px; font-weight: 600; margin: 22px 0 8px; }
+body.sheet-aurora h3 { font-size: 15px; line-height: 21px; font-weight: 600; margin: 16px 0 4px; }
+body.sheet-aurora .caption { font-size: 13px; font-weight: 600; letter-spacing: .3px; margin: 20px 0 8px; }
+body.sheet-aurora.theme-dark h1, body.sheet-aurora.theme-dark h2,
+body.sheet-aurora.theme-dark h3, body.sheet-aurora.theme-dark .caption { color: #f2f5fb; }
+body.sheet-aurora.theme-light h1, body.sheet-aurora.theme-light h2,
+body.sheet-aurora.theme-light h3, body.sheet-aurora.theme-light .caption { color: #101828; }
+body.sheet-aurora.theme-dark .hint, body.sheet-aurora.theme-dark .card-row .desc { color: #8592a8; }
+body.sheet-aurora.theme-light .hint, body.sheet-aurora.theme-light .card-row .desc { color: #5a6880; }
+body.sheet-aurora .link, body.sheet-aurora .hyperlink, body.sheet-aurora a { color: #5b8cff; text-decoration: none; }
+body.sheet-aurora .link:hover, body.sheet-aurora .hyperlink:hover, body.sheet-aurora a:hover { text-decoration: underline; }
+body.sheet-aurora .card-row .ico { color: #5b8cff; font-size: 17px; }
+
+/* ------------------------------------------------------- glass-thin panels */
+body.sheet-aurora .card, body.sheet-aurora .expander, body.sheet-aurora .group,
+body.sheet-aurora .tab-panel, body.sheet-aurora .tile, body.sheet-aurora .dropzone,
+body.sheet-aurora .imgbox, body.sheet-aurora .thumb, body.sheet-aurora .filelist,
+body.sheet-aurora .console, body.sheet-aurora .list, body.sheet-aurora .dv-frame {
+    border-radius: 12px;
+}
+body.sheet-aurora .card { padding: 16px; margin-bottom: 12px; }
+body.sheet-aurora .card-row { min-height: 50px; }
+body.sheet-aurora.theme-dark .card, body.sheet-aurora.theme-dark .expander,
+body.sheet-aurora.theme-dark .group, body.sheet-aurora.theme-dark .tab-panel,
+body.sheet-aurora.theme-dark .tile, body.sheet-aurora.theme-dark .dropzone,
+body.sheet-aurora.theme-dark .imgbox, body.sheet-aurora.theme-dark .thumb,
+body.sheet-aurora.theme-dark .filelist, body.sheet-aurora.theme-dark .console,
+body.sheet-aurora.theme-dark .list, body.sheet-aurora.theme-dark .dv-frame {
+    background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07); box-shadow: none;
+}
+body.sheet-aurora.theme-light .card, body.sheet-aurora.theme-light .expander,
+body.sheet-aurora.theme-light .group, body.sheet-aurora.theme-light .tab-panel,
+body.sheet-aurora.theme-light .tile, body.sheet-aurora.theme-light .dropzone,
+body.sheet-aurora.theme-light .imgbox, body.sheet-aurora.theme-light .thumb,
+body.sheet-aurora.theme-light .filelist, body.sheet-aurora.theme-light .console,
+body.sheet-aurora.theme-light .list, body.sheet-aurora.theme-light .dv-frame {
+    background: rgba(255,255,255,.72); border: 1px solid rgba(16,24,40,.08);
+    box-shadow: 0 1px 2px rgba(16,24,40,.04);
+}
+body.sheet-aurora .exp-header { min-height: 44px; background: transparent; font-weight: 600; }
+body.sheet-aurora .group > .legend { background: transparent; font-size: 12px; font-weight: 600; letter-spacing: .3px; }
+body.sheet-aurora.theme-dark .group > .legend { color: #8592a8; }
+body.sheet-aurora.theme-light .group > .legend { color: #5a6880; }
+
+/* ---------------------------------------------------------------- buttons */
+body.sheet-aurora .btn {
+    height: 34px; line-height: 32px; padding: 0 16px; border-radius: 9px;
+    font-size: 13px; font-weight: 600;
+}
+body.sheet-aurora.theme-dark .btn {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10); color: #e7ecf5;
+}
+body.sheet-aurora.theme-dark .btn:hover { background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.16); }
+body.sheet-aurora.theme-dark .btn:active, body.sheet-aurora.theme-dark .btn.pressed { background: rgba(255,255,255,.04); }
+body.sheet-aurora.theme-light .btn {
+    background: rgba(255,255,255,.9); border: 1px solid rgba(16,24,40,.12); color: #16202e;
+}
+body.sheet-aurora.theme-light .btn:hover { background: #ffffff; border-color: rgba(16,24,40,.2); }
+body.sheet-aurora.theme-light .btn:active, body.sheet-aurora.theme-light .btn.pressed { background: #eef1f7; }
+body.sheet-aurora .btn.subtle { background: transparent; border-color: transparent; }
+body.sheet-aurora.theme-dark .btn.subtle:hover { background: rgba(255,255,255,.07); }
+body.sheet-aurora.theme-light .btn.subtle:hover { background: rgba(16,24,40,.06); }
+body.sheet-aurora.theme-dark .btn.disabled { background: rgba(255,255,255,.03); border-color: rgba(255,255,255,.05); color: #5c6678; }
+body.sheet-aurora.theme-light .btn.disabled { background: rgba(16,24,40,.03); border-color: rgba(16,24,40,.06); color: #98a2b3; }
+
+/* the accent button is the one thing that glows at rest */
+body.sheet-aurora .btn.accent, body.sheet-aurora .axdlg-btn.default {
+    background: #5b8cff; border: 1px solid #5b8cff; color: #06090f;
+    box-shadow: 0 0 18px rgba(91,140,255,.35);
+}
+body.sheet-aurora .btn.accent:hover, body.sheet-aurora .axdlg-btn.default:hover {
+    background: #7aa2ff; border-color: #7aa2ff; box-shadow: 0 0 24px rgba(91,140,255,.5);
+}
+body.sheet-aurora .btn.danger { background: #e5484d; border: 1px solid #e5484d; color: #ffffff; box-shadow: 0 0 18px rgba(229,72,77,.3); }
+
+/* ----------------------------------------------------------------- fields */
+body.sheet-aurora input, body.sheet-aurora textarea, body.sheet-aurora .textbox input,
+body.sheet-aurora .textbox textarea, body.sheet-aurora .searchbox input,
+body.sheet-aurora .numberbox input, body.sheet-aurora .passwordbox input,
+body.sheet-aurora .hotkeybox input, body.sheet-aurora .dd-value, body.sheet-aurora #axDlgInput {
+    height: 34px; padding: 0 12px; border-radius: 9px; font-size: 13px;
+}
+body.sheet-aurora textarea, body.sheet-aurora .textbox textarea { height: auto; padding: 9px 12px; }
+body.sheet-aurora.theme-dark input, body.sheet-aurora.theme-dark textarea,
+body.sheet-aurora.theme-dark .textbox input, body.sheet-aurora.theme-dark .textbox textarea,
+body.sheet-aurora.theme-dark .searchbox input, body.sheet-aurora.theme-dark .numberbox input,
+body.sheet-aurora.theme-dark .passwordbox input, body.sheet-aurora.theme-dark .hotkeybox input,
+body.sheet-aurora.theme-dark .dd-value, body.sheet-aurora.theme-dark #axDlgInput {
+    background: rgba(6,9,15,.55); color: #e7ecf5; border: 1px solid rgba(255,255,255,.10);
+}
+body.sheet-aurora.theme-light input, body.sheet-aurora.theme-light textarea,
+body.sheet-aurora.theme-light .textbox input, body.sheet-aurora.theme-light .textbox textarea,
+body.sheet-aurora.theme-light .searchbox input, body.sheet-aurora.theme-light .numberbox input,
+body.sheet-aurora.theme-light .passwordbox input, body.sheet-aurora.theme-light .hotkeybox input,
+body.sheet-aurora.theme-light .dd-value, body.sheet-aurora.theme-light #axDlgInput {
+    background: #ffffff; color: #16202e; border: 1px solid rgba(16,24,40,.14);
+}
+/* focus is a glow, not a heavier border */
+body.sheet-aurora .textbox input:focus, body.sheet-aurora .searchbox input:focus,
+body.sheet-aurora .numberbox input:focus, body.sheet-aurora .passwordbox input:focus,
+body.sheet-aurora .hotkeybox input:focus, body.sheet-aurora #axDlgInput:focus,
+body.sheet-aurora .textbox textarea:focus {
+    border: 1px solid #5b8cff; box-shadow: 0 0 0 3px rgba(91,140,255,.20);
+}
+body.sheet-aurora.theme-dark .searchbox .ico { color: #8592a8; }
+body.sheet-aurora.theme-light .searchbox .ico { color: #5a6880; }
+
+/* ------------------------------------------------------- menus and lists */
+body.sheet-aurora .dd-menu, body.sheet-aurora #axCtx, body.sheet-aurora .axctx { border-radius: 12px; padding: 5px; }
+body.sheet-aurora.theme-dark .dd-menu, body.sheet-aurora.theme-dark #axCtx, body.sheet-aurora.theme-dark .axctx {
+    background: #12161f; border: 1px solid rgba(255,255,255,.09); box-shadow: 0 18px 40px rgba(0,0,0,.55);
+}
+body.sheet-aurora.theme-light .dd-menu, body.sheet-aurora.theme-light #axCtx, body.sheet-aurora.theme-light .axctx {
+    background: #ffffff; border: 1px solid rgba(16,24,40,.10); box-shadow: 0 18px 40px rgba(16,24,40,.16);
+}
+body.sheet-aurora .dd-item, body.sheet-aurora .list-item, body.sheet-aurora .axctx-item {
+    height: 34px; line-height: 34px; border-radius: 8px;
+}
+body.sheet-aurora.theme-dark .dd-item:hover, body.sheet-aurora.theme-dark .list-item:hover,
+body.sheet-aurora.theme-dark .axctx-item:hover, body.sheet-aurora.theme-dark .axctx-item.kb,
+body.sheet-aurora.theme-dark .axmb-item:hover, body.sheet-aurora.theme-dark .axmb-item.open {
+    background: rgba(255,255,255,.07); color: inherit;
+}
+body.sheet-aurora.theme-light .dd-item:hover, body.sheet-aurora.theme-light .list-item:hover,
+body.sheet-aurora.theme-light .axctx-item:hover, body.sheet-aurora.theme-light .axctx-item.kb,
+body.sheet-aurora.theme-light .axmb-item:hover, body.sheet-aurora.theme-light .axmb-item.open {
+    background: rgba(16,24,40,.06); color: inherit;
+}
+body.sheet-aurora .dd-item.selected, body.sheet-aurora .list-item.selected {
+    background: rgba(91,140,255,.16); box-shadow: inset 0 0 0 1px rgba(91,140,255,.28);
+}
+body.sheet-aurora .dd-item.selected:before, body.sheet-aurora .list-item.selected:before { background: #5b8cff; }
+
+/* -------------------------------------------------------- small controls */
+body.sheet-aurora .chip { height: 30px; line-height: 28px; border-radius: 15px; }
+body.sheet-aurora.theme-dark .chip { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.10); }
+body.sheet-aurora.theme-light .chip { background: rgba(255,255,255,.9); border: 1px solid rgba(16,24,40,.12); }
+body.sheet-aurora .chip.on {
+    background: #5b8cff; border-color: #5b8cff; color: #06090f;
+    box-shadow: 0 0 14px rgba(91,140,255,.35);
+}
+body.sheet-aurora .badge.accent { background: #5b8cff; color: #06090f; }
+body.sheet-aurora .switch input:checked + .sw-track { background: #5b8cff; box-shadow: 0 0 12px rgba(91,140,255,.4); }
+body.sheet-aurora .progress { border-radius: 3px; }
+body.sheet-aurora.theme-dark .progress { background: rgba(255,255,255,.07); }
+body.sheet-aurora.theme-light .progress { background: rgba(16,24,40,.08); }
+body.sheet-aurora .progress .bar, body.sheet-aurora .progress.indeterminate .bar {
+    background: #5b8cff; box-shadow: 0 0 12px rgba(91,140,255,.5);
+}
+body.sheet-aurora .rating .star.on { color: #5b8cff; }
+body.sheet-aurora .segmented .seg.active { background: #5b8cff; color: #06090f; }
+/* base.css fills the dialog's default button with its own blue, which is
+   more specific than any plain .axdlg-btn rule. Saying it here instead
+   means it follows the window's accent like the rest of the sheet. */
+body.sheet-aurora .axdlg-btn.primary {
+    background: #5b8cff; border-color: #5b8cff; color: #06090f;
+}
+body.sheet-aurora .axdlg-btn.primary:hover { background: #7ba4ff; border-color: #7ba4ff; }
+body.sheet-aurora .tab { height: 38px; line-height: 36px; border-radius: 0; background: transparent; border: none; font-weight: 600; }
+/* one thin rule and nothing else: no second bar, no glow */
+body.sheet-aurora .tab.active { background: transparent; border-bottom: 1px solid #5b8cff; color: #5b8cff; }
+body.sheet-aurora .tab.active:after { display: none; }
+/* A tab here is a bottom rule, not a box, so the accent focus ring drawing a
+   rectangle round it reads as a mistake -- focus marks the same edge. */
+body.sheet-aurora .tab:focus {
+    outline: none !important; border-bottom: 1px solid #5b8cff; box-shadow: none;
+}
+
+/* --------------------------------------------------------- window bars */
+/* heights stay 28 / 24: see the note at the top about #shell's reserve */
+body.sheet-aurora .axmb { background: transparent; }
+body.sheet-aurora.theme-dark .axmb { border-bottom: 1px solid rgba(255,255,255,.06); }
+body.sheet-aurora.theme-light .axmb { border-bottom: 1px solid rgba(16,24,40,.07); }
+body.sheet-aurora .axmb-item { border-radius: 7px; }
+body.sheet-aurora .axsb { background: transparent; font-size: 12px; }
+body.sheet-aurora.theme-dark .axsb { border-top: 1px solid rgba(255,255,255,.06); color: #8592a8; }
+body.sheet-aurora.theme-light .axsb { border-top: 1px solid rgba(16,24,40,.07); color: #5a6880; }
+body.sheet-aurora .axsb-part { border: none; }
+
+/* ------------------------------------------------------------- dialogs */
+body.sheet-aurora #axDlgOverlay { background: rgba(4,6,10,.55); }
+body.sheet-aurora #axDlg { width: 460px; padding: 24px; border-radius: 16px; }
+body.sheet-aurora.theme-dark #axDlg {
+    background: #12161f; border: 1px solid rgba(255,255,255,.09);
+    box-shadow: 0 30px 70px rgba(0,0,0,.6), 0 0 60px rgba(91,140,255,.10);
+}
+body.sheet-aurora.theme-light #axDlg {
+    background: #ffffff; border: 1px solid rgba(16,24,40,.10);
+    box-shadow: 0 30px 70px rgba(16,24,40,.22);
+}
+body.sheet-aurora #axDlgTitle { font-size: 19px; line-height: 26px; font-weight: 600; }
+body.sheet-aurora #axDlgBtns { margin: 22px 0 0; padding: 0; background: transparent; border: none; justify-content: flex-end; }
+
+/* ------------------------------------------------------------ data grid */
+body.sheet-aurora .dv-hcell { height: 40px; font-size: 12px; font-weight: 600; letter-spacing: .3px; background: transparent; }
+body.sheet-aurora.theme-dark .dv-hcell { color: #8592a8; border-bottom: 1px solid rgba(255,255,255,.08); }
+body.sheet-aurora.theme-light .dv-hcell { color: #5a6880; border-bottom: 1px solid rgba(16,24,40,.08); }
+body.sheet-aurora .dv-cell { height: 42px; border-top: none; }
+body.sheet-aurora.theme-dark .dv-cell { border-bottom: 1px solid rgba(255,255,255,.05); }
+body.sheet-aurora.theme-light .dv-cell { border-bottom: 1px solid rgba(16,24,40,.05); }
+body.sheet-aurora.theme-dark .dv-row:hover > .dv-cell { background: rgba(255,255,255,.04); }
+body.sheet-aurora.theme-light .dv-row:hover > .dv-cell { background: rgba(16,24,40,.03); }
+body.sheet-aurora .dv-row.selected > .dv-cell { background: rgba(91,140,255,.14); }
+body.sheet-aurora .dv-check.on, body.sheet-aurora .dv-check.some {
+    background: #5b8cff; border-color: #5b8cff; color: #06090f;
+}
+
+/* ------------------------------------------- title-bar items and popovers */
+body.sheet-aurora .axtb-item { height: 26px; min-width: 26px; border-radius: 8px; }
+body.sheet-aurora .axtb-item:hover { background: rgba(255,255,255,.07); }
+body.sheet-aurora .axtb-item.on, body.sheet-aurora .axtb-item.open,
+body.sheet-aurora .axtb-item.pop-open { background: rgba(255,255,255,.12); }
+body.sheet-aurora #axPop { border-radius: 12px; padding: 12px 14px; }
+body.sheet-aurora.theme-dark #axPop  { background: #12151d; color: #e7ecf7; border: 1px solid rgba(255,255,255,.09); box-shadow: 0 18px 44px rgba(0,0,0,.6); }
+body.sheet-aurora.theme-light #axPop { background: #ffffff; color: #1b2233; border: 1px solid rgba(20,30,60,.10); box-shadow: 0 18px 44px rgba(30,44,80,.16); }

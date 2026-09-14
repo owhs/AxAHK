@@ -1,0 +1,9 @@
+/* AxSwitch.css -- the shape of the switch.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.switch { align-items: center; display: inline-flex; position: relative; }
+.switch input { position: absolute; }
+.sw-track { flex: none; pointer-events: none; position: relative; }
+.sw-track:before { position: absolute; }

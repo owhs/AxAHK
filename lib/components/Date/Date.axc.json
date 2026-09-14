@@ -1,0 +1,199 @@
+{
+  "name": "Date",
+  "description": "Dates: a date box with a popover calendar, date and time, a time, a month, a range over two months, and a calendar on the page.",
+  "order": 3010,
+  "css": "AxDate.css",
+  "include": "lib\\components\\Date\\AxDate.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Date",
+      "label": "Date box",
+      "icon": "E787",
+      "category": "Input",
+      "prefix": "dt",
+      "arg": {
+        "key": "value",
+        "label": "Value (ISO, or today, +3...)",
+        "kind": "text",
+        "default": ""
+      },
+      "props": [
+        {
+          "key": "mode",
+          "label": "Holds",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "date|datetime|time|range|month",
+          "default": "date"
+        },
+        {
+          "key": "format",
+          "label": "Shown as (FormatTime)",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "placeholder",
+          "label": "Placeholder",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "min",
+          "label": "Earliest (ISO, today, -30...)",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "max",
+          "label": "Latest",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "months",
+          "label": "Months shown",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "|1|2"
+        },
+        {
+          "key": "order",
+          "label": "Typed as",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "|dmy|mdy|ymd"
+        },
+        {
+          "key": "firstday",
+          "label": "Weeks start on",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "|mon|sun"
+        },
+        {
+          "key": "step",
+          "label": "Minutes between times",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "weeks",
+          "label": "Week numbers",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "hour12",
+          "label": "12-hour clock",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "confirm",
+          "label": "A range waits for Apply",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "nopresets",
+          "label": "No range presets",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "plain",
+          "label": "No calendar (typing only)",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "noclear",
+          "label": "No clear button",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    },
+    {
+      "type": "Calendar",
+      "label": "Calendar",
+      "icon": "E787",
+      "category": "Rich",
+      "prefix": "cal",
+      "arg": {
+        "key": "value",
+        "label": "Value (ISO, or today...)",
+        "kind": "text",
+        "default": ""
+      },
+      "props": [
+        {
+          "key": "mode",
+          "label": "Picks",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "date|datetime|time|range|month",
+          "default": "date"
+        },
+        {
+          "key": "months",
+          "label": "Months shown",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "|1|2|3"
+        },
+        {
+          "key": "min",
+          "label": "Earliest",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "max",
+          "label": "Latest",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "firstday",
+          "label": "Weeks start on",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "|mon|sun"
+        },
+        {
+          "key": "weeks",
+          "label": "Week numbers",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "hour12",
+          "label": "12-hour clock",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "nopresets",
+          "label": "No range presets",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

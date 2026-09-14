@@ -1,0 +1,743 @@
+/* @extends win11 */
+/* @accent-hue 160 22 */
+/* ============================================================================
+   precision.css — the micro-chassis. A window built the way a rack instrument
+   is built: a thin machined face, everything divided by a single hairline, and
+   no part of it separated by a box. Sections are told apart by a line and about
+   two percent of luminance — never by a border, a shadow or a corner.
+
+   Rules of the sheet, so later edits do not undo it:
+
+     • Radius is 0. Everywhere, the radio included. A rounded corner in this
+       sheet is a bug.
+     • One line weight, one line colour. Structure is 1px of #2c2f35 (dark) or
+       #ccd1d8 (light) and nothing else. Nothing that is part of the chassis
+       casts a shadow; only menus, dialogs and toasts — which genuinely hang in
+       front of it — are allowed one, and it is a hard shadow, never a bloom.
+     • Chrome, labels, numbers and machine output are monospace. Prose is a
+       tight sans, and only prose.
+     • Emerald is state: what is on, selected, live or running. Cyan is the
+       keyboard, and appears only where a key put it. If emerald starts turning
+       up as decoration, something has been over-painted.
+
+   ------------------------------------------------------------- the caption
+   The caption controls are a minus, a plus and a multiplication sign set in the
+   chrome mono rather than in the icon font, in a bank of three cells ruled
+   apart by the same hairline as everything else. Restored-from-maximised is the
+   one drawn shape: a 7px hairline square, because no mathematical sign reads as
+   "put it back".
+
+   -------------------------------------------------------------- the ruling
+   The workspace carries a 24px ruling. It is an SVG rather than a repeating CSS
+   gradient for a plain reason: it is two straight lines, and SVG draws those
+   pixel-exact where Trident softens and bands them. Every colour inside it is
+   written rgb() plus a -opacity attribute so the data URI carries no "#" at
+   all — a raw "#" terminates the url() as a fragment, and AxSys.RecolourCss
+   rewrites "#rrggbb" literals wherever it finds them.
+
+   ------------------------------------------------------------ the reserves
+   The title bar is 26px, the menu bar 24 and the status bar 20 — not win11.css's
+   32, 28 and 24 — so all four #shell sums have to be restated, and so does the
+   height AxRich.css gives a rich dialog's content. See the notes there.
+
+   The @accent-hue line tells AxSys.RecolourCss that this sheet's accent
+   material is emerald (hue 160) as well as the usual blue band, so SetAccent
+   repaints the emerald and the cyan together. Every structural grey is held
+   under AxSys.BlueMinS (S < 0.22), so the chassis stays neutral however far the
+   accent is moved, and the accent washes are pre-blended to solid hex because
+   RecolourCss rewrites "#rrggbb" literals and not rgba(). Red and amber sit
+   outside both bands and never move: they are signal colours, not decoration.
+   ========================================================================= */
+
+/* ------------------------------------------------------------- the material */
+body.sheet-precision {
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 13px; line-height: 19px;
+}
+body.sheet-precision.theme-dark  { background: #18191c; color: #d9dce1; }
+body.sheet-precision.theme-light { background: #eceef1; color: #17181b; }
+
+/* the chrome mono: chrome, labels, numbers, machine output — and nothing else */
+body.sheet-precision #titleText, body.sheet-precision .winbtn,
+body.sheet-precision .nav-item, body.sheet-precision .caption,
+body.sheet-precision .group > .legend, body.sheet-precision h3,
+body.sheet-precision .btn, body.sheet-precision .tab,
+body.sheet-precision .axmb, body.sheet-precision .axsb,
+body.sheet-precision .badge, body.sheet-precision .hex,
+body.sheet-precision .console, body.sheet-precision .slider .out,
+body.sheet-precision .fl-meta, body.sheet-precision .dv-hcell,
+body.sheet-precision .segmented .seg, body.sheet-precision .axctx-kbd,
+body.sheet-precision .numberbox input, body.sheet-precision .hotkeybox input,
+body.sheet-precision .thumb .thumb-cap, body.sheet-precision .dv-count {
+    font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace;
+}
+
+/* ---------------------------------------------------------------- the case */
+/* One line round the outside: the bezel of the chassis. Fixed rather than a
+   border on body, so it sits over the workspace and the rail alike and
+   #shell's percentages never see it; pointer-events keeps it clear of the
+   resize hotspots underneath, and the z-index puts it above the page but
+   below the library's own overlays. It is drawn a shade stronger than the
+   internal hairline, because an edge that matches every other line stops
+   reading as an edge. */
+body.sheet-precision:before {
+    content: ""; position: fixed; left: 0; top: 0; right: 0; bottom: 0;
+    border: 1px solid #3a3e46; pointer-events: none; z-index: 20000;
+}
+body.sheet-precision.theme-light:before { border-color: #b6bdc7; }
+
+/* --------------------------------------------------------------- the frame */
+/* 26px of machined face. The hairline under it is the same one that divides
+   everything else, and the 2px rule down the left edge is the window's power
+   lamp: emerald while it has the focus, drained when it does not. */
+body.sheet-precision #titlebar {
+    position: relative; height: 26px; padding-left: 14px; background: transparent;
+}
+body.sheet-precision.theme-dark #titlebar  { background: #131417; border-bottom: 1px solid #2c2f35; }
+body.sheet-precision.theme-light #titlebar { background: #e0e3e8; border-bottom: 1px solid #ccd1d8; }
+body.sheet-precision #titlebar:before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #10b981;
+}
+body.sheet-precision.theme-light #titlebar:before { background: #0a7f5c; }
+body.sheet-precision.inactive #titlebar:before { background: #4a4f57; }
+body.sheet-precision.theme-light.inactive #titlebar:before { background: #b0b6bf; }
+body.sheet-precision #titleText {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .16em;
+}
+body.sheet-precision.theme-dark #titleText  { color: #868c96; }
+body.sheet-precision.theme-light #titleText { color: #666d78; }
+body.sheet-precision #titlebar .app-icon { font-size: 11px; margin-right: 9px; color: #10b981; }
+body.sheet-precision.theme-light #titlebar .app-icon { color: #0a7f5c; }
+body.sheet-precision #titlebar .app-icon img { width: 13px; height: 13px; }
+body.sheet-precision.inactive #titleText,
+body.sheet-precision.inactive #titlebar .app-icon { color: #5b6069; }
+
+/* ---------------------------------------------------- the caption controls */
+/* Three ruled cells. The glyph the frame ships with is switched off and the
+   sign is set on :before in the chrome mono, so it stays a mathematical sign at
+   any DPI rather than a pictogram out of the icon font.
+   Scoped under #titlebar on purpose: SetTint paints .winbtn with the workspace
+   colour, and an id in the selector keeps the chassis face intact. */
+body.sheet-precision #titlebar .winbtn {
+    position: relative; width: 34px; height: 26px; line-height: 26px;
+    border-radius: 0; font-size: 0; color: transparent; background: transparent;
+    transition: none;
+}
+body.sheet-precision.theme-dark #titlebar .winbtn  { border-left: 1px solid #2c2f35; }
+body.sheet-precision.theme-light #titlebar .winbtn { border-left: 1px solid #ccd1d8; }
+body.sheet-precision .winbtn span { display: none; }
+body.sheet-precision .winbtn:before {
+    position: absolute; left: 0; right: 0; top: 0;
+    font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace;
+    font-size: 13px; line-height: 26px; text-align: center;
+}
+body.sheet-precision.theme-dark .winbtn:before  { color: #868c96; }
+body.sheet-precision.theme-light .winbtn:before { color: #666d78; }
+body.sheet-precision #btnMin:before   { content: "\2212"; }   /* minus          */
+body.sheet-precision #btnMax:before   { content: "\002B"; }   /* plus           */
+body.sheet-precision #btnClose:before { content: "\00D7"; }   /* multiplication */
+/* restored-from-maximised: a 7px hairline square, drawn rather than typed */
+body.sheet-precision.maximized #btnMax:before {
+    content: ""; left: 13px; right: auto; top: 9px; width: 7px; height: 7px;
+    border: 1px solid #868c96;
+}
+body.sheet-precision.maximized.theme-light #btnMax:before { border-color: #666d78; }
+/* hover is luminance, not colour — except close, which is a signal */
+body.sheet-precision.theme-dark .winbtn:hover, body.sheet-precision.theme-dark .winbtn.hover  { background: #212328; }
+body.sheet-precision.theme-light .winbtn:hover, body.sheet-precision.theme-light .winbtn.hover { background: #f2f4f7; }
+body.sheet-precision .winbtn:hover:before, body.sheet-precision .winbtn.hover:before { color: #10b981; }
+body.sheet-precision.theme-light .winbtn:hover:before,
+body.sheet-precision.theme-light .winbtn.hover:before { color: #0a7f5c; }
+body.sheet-precision #btnClose:hover, body.sheet-precision #btnClose.hover { background: #e5484d; color: transparent; }
+body.sheet-precision #btnClose:hover:before, body.sheet-precision #btnClose.hover:before { color: #ffffff; }
+body.sheet-precision.theme-light #btnClose:hover, body.sheet-precision.theme-light #btnClose.hover { background: #c02c33; }
+
+/* ------------------------------------------------------------ the reserves */
+/* win11.css works these out by hand from 32 + 28 + 24; this chassis is
+   26 + 24 + 20, so all four have to be restated or the page runs past the
+   bottom of the window. */
+body.sheet-precision #shell { height: calc(100% - 26px); }
+body.sheet-precision.has-menubar #shell { height: calc(100% - 50px); }
+body.sheet-precision.has-statusbar #shell { height: calc(100% - 46px); }
+body.sheet-precision.has-menubar.has-statusbar #shell { height: calc(100% - 70px); }
+/* a rich dialog has no shell, so AxRich.css gives #content the height itself —
+   worked out from win11's 32px bar, and needing the same correction */
+body.sheet-precision.axrich-dlg #content { height: calc(100% - 26px); }
+
+/* ---------------------------------------------------------------- the rail */
+/* Channels on a panel: a number, a name, and a lamp against the one that is
+   live. The index is a CSS counter, so it costs no markup; Trident falls back
+   to plain decimal if it does not know decimal-leading-zero, which costs a
+   leading nought and nothing else. */
+body.sheet-precision #sidebar {
+    width: 190px; padding: 6px 0 0 0; counter-reset: axch; background: transparent;
+}
+body.sheet-precision.theme-dark #sidebar  { border-right: 1px solid #2c2f35; }
+body.sheet-precision.theme-light #sidebar { border-right: 1px solid #ccd1d8; }
+body.sheet-precision .nav-item {
+    height: 26px; line-height: 26px; margin: 0; padding: 0 34px 0 14px; border-radius: 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .12em; background: transparent;
+}
+body.sheet-precision .nav-item .ico { width: 18px; font-size: 12px; margin-right: 8px; }
+body.sheet-precision .nav-item:after {
+    counter-increment: axch; content: counter(axch, decimal-leading-zero);
+    position: absolute; right: 12px; top: 0; font-size: 9px; letter-spacing: .06em;
+    font-family: "Cascadia Mono", Consolas, monospace;
+}
+body.sheet-precision.theme-dark .nav-item  { color: #868c96; }
+body.sheet-precision.theme-light .nav-item { color: #666d78; }
+body.sheet-precision.theme-dark .nav-item:after  { color: #4d525b; }
+body.sheet-precision.theme-light .nav-item:after { color: #9aa1ab; }
+body.sheet-precision.theme-dark .nav-item:hover  { background: #1c1d21; color: #d9dce1; }
+body.sheet-precision.theme-light .nav-item:hover { background: #e4e7eb; color: #17181b; }
+/* the live channel: emerald name, emerald lamp, and the workspace tone behind
+   it, so the rail and the page read as one surface across that row */
+body.sheet-precision .nav-item.active { color: #10b981; }
+body.sheet-precision.theme-dark .nav-item.active  { background: #1c1d21; }
+body.sheet-precision.theme-light .nav-item.active { background: #f6f7f9; color: #0a7f5c; }
+body.sheet-precision .nav-item.active:before {
+    left: 0; top: 0; bottom: 0; width: 2px; border-radius: 0; background: #10b981;
+}
+body.sheet-precision.theme-light .nav-item.active:before { background: #0a7f5c; }
+body.sheet-precision .nav-item.active:after { color: #10b981; }
+body.sheet-precision.theme-light .nav-item.active:after { color: #0a7f5c; }
+
+/* ----------------------------------------------------------- the workspace */
+/* Two percent of luminance above the chassis, and the 24px ruling drawn into
+   it. The ruling would look better running all the way to the frame, but the
+   scrollbar has to stay off the resize hotspots -- see the note below. */
+/* The 6px on the right and bottom is not decoration: Trident paints the
+   native scrollbar above everything, z-index included, so a #content that
+   runs to the frame edge buries the .rz resize hotspots under it and the
+   window can no longer be dragged by its right or bottom edge. win11.css
+   keeps the same inset for the same reason. */
+body.sheet-precision #content {
+    margin: 0 6px 6px 0; padding: 16px 22px 24px 18px; border-radius: 0;
+    background-repeat: repeat; background-position: 0 0;
+}
+body.sheet-precision.theme-dark #content {
+    background-color: #1c1d21;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%3E%3Cpath%20d='M23.5%200V24M0%2023.5H24'%20fill='none'%20stroke='rgb(255,255,255)'%20stroke-opacity='.035'%20stroke-width='1'/%3E%3C/svg%3E");
+}
+body.sheet-precision.theme-light #content {
+    background-color: #f6f7f9;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='24'%3E%3Cpath%20d='M23.5%200V24M0%2023.5H24'%20fill='none'%20stroke='rgb(0,0,0)'%20stroke-opacity='.05'%20stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* ----------------------------------------------------------------- writing */
+body.sheet-precision h1 {
+    font-size: 19px; line-height: 26px; font-weight: 600; letter-spacing: -.01em; margin: 0 0 2px;
+}
+body.sheet-precision h2 { font-size: 15px; line-height: 22px; font-weight: 600; margin: 20px 0 8px; }
+body.sheet-precision h3 {
+    font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .16em;
+    margin: 18px 0 6px;
+}
+body.sheet-precision .caption {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .16em; margin: 0 0 14px;
+}
+body.sheet-precision .hint { font-size: 11px; letter-spacing: 0; }
+body.sheet-precision .card-row .title { font-size: 13px; }
+body.sheet-precision .card-row .desc { font-size: 11px; line-height: 15px; }
+body.sheet-precision.theme-dark .caption, body.sheet-precision.theme-dark .hint,
+body.sheet-precision.theme-dark h3, body.sheet-precision.theme-dark .card-row .desc,
+body.sheet-precision.theme-dark .tile .desc, body.sheet-precision.theme-dark .fl-meta,
+body.sheet-precision.theme-dark .dropzone .dz-desc { color: #868c96; }
+body.sheet-precision.theme-light .caption, body.sheet-precision.theme-light .hint,
+body.sheet-precision.theme-light h3, body.sheet-precision.theme-light .card-row .desc,
+body.sheet-precision.theme-light .tile .desc, body.sheet-precision.theme-light .fl-meta,
+body.sheet-precision.theme-light .dropzone .dz-desc { color: #666d78; }
+body.sheet-precision .link, body.sheet-precision .hyperlink, body.sheet-precision a {
+    color: #10b981; text-decoration: none;
+}
+body.sheet-precision.theme-light .link, body.sheet-precision.theme-light .hyperlink,
+body.sheet-precision.theme-light a { color: #0a7f5c; }
+body.sheet-precision .link:hover { text-decoration: underline; }
+
+/* -------------------------------------------------- surfaces, without boxes */
+/* Consecutive cards are a ruled stack, not a row of boxes: no radius, no border
+   but the one above, no gap between them. The run reads as one panel with lines
+   across it. */
+body.sheet-precision .card {
+    border-radius: 0; border: none; margin: 0; padding: 10px 14px;
+}
+body.sheet-precision.theme-dark .card  { background: #212328; border-top: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .card { background: #ffffff; border-top: 1px solid #ccd1d8; }
+body.sheet-precision.theme-dark .card:last-child  { border-bottom: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .card:last-child { border-bottom: 1px solid #ccd1d8; }
+body.sheet-precision .card-row { min-height: 38px; }
+body.sheet-precision .card-row .ico { font-size: 15px; }
+/* a card here has no box, so "hot" lights the hairline above it */
+body.sheet-precision .card.hot { border-top-color: #10b981; }
+body.sheet-precision.theme-light .card.hot { border-top-color: #0a7f5c; }
+/* A .group is a fieldset: its legend hangs at top:-10px over the group's own
+   border, so it cannot be flattened the way a card can. It keeps its box —
+   drawn in the one line weight, with no radius. */
+body.sheet-precision .group { border-radius: 0; padding: 16px 14px 12px; margin: 12px 0; }
+body.sheet-precision.theme-dark .group  { border: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .group { border: 1px solid #ccd1d8; }
+body.sheet-precision .group > .legend { font-size: 10px; text-transform: uppercase; letter-spacing: .16em; }
+body.sheet-precision.theme-dark .group > .legend  { background: #1c1d21; color: #868c96; }
+body.sheet-precision.theme-light .group > .legend { background: #f6f7f9; color: #666d78; }
+body.sheet-precision .expander { border-radius: 0; margin: 0 0 6px; }
+body.sheet-precision.theme-dark .expander  { background: #212328; border: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .expander { background: #ffffff; border: 1px solid #ccd1d8; }
+body.sheet-precision .exp-header { min-height: 38px; padding: 6px 12px; }
+body.sheet-precision .exp-header .chev { border-radius: 0; width: 26px; height: 26px; line-height: 26px; }
+body.sheet-precision.theme-dark .exp-body  { background: #1a1b1f; border-top: 1px solid #2c2f35; padding: 10px 14px 14px; }
+body.sheet-precision.theme-light .exp-body { background: #f6f7f9; border-top: 1px solid #ccd1d8; padding: 10px 14px 14px; }
+
+/* ---------------------------------------------------------------- controls */
+body.sheet-precision .btn {
+    height: 26px; line-height: 24px; min-width: 58px; padding: 0 12px; border-radius: 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .12em; transition: none;
+}
+body.sheet-precision.theme-dark .btn {
+    background: #212328; border: 1px solid #3a3e46; border-bottom-color: #3a3e46; color: #d9dce1;
+}
+body.sheet-precision.theme-light .btn {
+    background: #ffffff; border: 1px solid #ccd1d8; border-bottom-color: #b6bdc7; color: #17181b;
+}
+body.sheet-precision.theme-dark .btn:hover  { background: #282b31; border-color: #4a4f57; }
+body.sheet-precision.theme-light .btn:hover { background: #f2f4f7; border-color: #aeb5c0; }
+body.sheet-precision .btn:active, body.sheet-precision .btn.pressed { border-color: #10b981; }
+body.sheet-precision .btn.icon { width: 26px; min-width: 26px; line-height: 24px; }
+/* the primary action is a lit indicator: solid emerald, dark ink, square */
+body.sheet-precision .btn.accent, body.sheet-precision .axdlg-btn.primary {
+    background: #10b981; border: 1px solid #10b981; color: #06231a;
+}
+body.sheet-precision .btn.accent:hover, body.sheet-precision .axdlg-btn.primary:hover {
+    background: #14cf91; border-color: #14cf91;
+}
+body.sheet-precision.theme-light .btn.accent, body.sheet-precision.theme-light .axdlg-btn.primary {
+    background: #0a7f5c; border-color: #0a7f5c; color: #ffffff;
+}
+body.sheet-precision .btn.subtle { background: transparent; border-color: transparent; }
+body.sheet-precision .btn.danger { background: #e5484d; border-color: #e5484d; color: #ffffff; }
+body.sheet-precision.theme-light .btn.danger { background: #c02c33; border-color: #c02c33; }
+body.sheet-precision.theme-dark .btn.disabled  { background: #1c1d21; border-color: #2c2f35; color: #4d525b; }
+body.sheet-precision.theme-light .btn.disabled { background: #eceef1; border-color: #ccd1d8; color: #9aa1ab; }
+
+/* fields are wells sunk into the panel: one line round them, no radius */
+body.sheet-precision .textbox input, body.sheet-precision .textbox textarea,
+body.sheet-precision .searchbox input, body.sheet-precision .numberbox input,
+body.sheet-precision .passwordbox input, body.sheet-precision .hotkeybox input,
+body.sheet-precision .dd-value, body.sheet-precision #axDlgInput, body.sheet-precision .hex {
+    height: 26px; line-height: 24px; border-radius: 0; font-size: 12px;
+}
+body.sheet-precision.theme-dark .textbox input, body.sheet-precision.theme-dark .textbox textarea,
+body.sheet-precision.theme-dark .searchbox input, body.sheet-precision.theme-dark .numberbox input,
+body.sheet-precision.theme-dark .passwordbox input, body.sheet-precision.theme-dark .hotkeybox input,
+body.sheet-precision.theme-dark .dd-value, body.sheet-precision.theme-dark #axDlgInput,
+body.sheet-precision.theme-dark .hex, body.sheet-precision.theme-dark .list {
+    background: #151619; border: 1px solid #2c2f35; color: #d9dce1;
+}
+body.sheet-precision.theme-light .textbox input, body.sheet-precision.theme-light .textbox textarea,
+body.sheet-precision.theme-light .searchbox input, body.sheet-precision.theme-light .numberbox input,
+body.sheet-precision.theme-light .passwordbox input, body.sheet-precision.theme-light .hotkeybox input,
+body.sheet-precision.theme-light .dd-value, body.sheet-precision.theme-light #axDlgInput,
+body.sheet-precision.theme-light .hex, body.sheet-precision.theme-light .list {
+    background: #ffffff; border: 1px solid #ccd1d8; color: #17181b;
+}
+body.sheet-precision .textbox textarea { height: auto; padding: 5px 8px; }
+/* focus is a full emerald outline rather than a thickened underline: on a
+   chassis, one rule all the way round is the honest way to say "this is live" */
+body.sheet-precision .textbox input:focus, body.sheet-precision .textbox textarea:focus,
+body.sheet-precision .searchbox input:focus, body.sheet-precision .passwordbox input:focus,
+body.sheet-precision .hotkeybox input:focus, body.sheet-precision .hotkeybox.recording input,
+body.sheet-precision #axDlgInput:focus, body.sheet-precision .numberbox.focus input,
+body.sheet-precision .dropdown.open .dd-value {
+    border: 1px solid #10b981; border-bottom-width: 1px;
+}
+body.sheet-precision.theme-dark .textbox input:focus, body.sheet-precision.theme-dark .textbox textarea:focus,
+body.sheet-precision.theme-dark .searchbox input:focus, body.sheet-precision.theme-dark #axDlgInput:focus,
+body.sheet-precision.theme-dark .hotkeybox input:focus { background: #151619; }
+body.sheet-precision.theme-light .textbox input:focus, body.sheet-precision.theme-light .textbox textarea:focus,
+body.sheet-precision.theme-light .searchbox input:focus, body.sheet-precision.theme-light #axDlgInput:focus,
+body.sheet-precision.theme-light .hotkeybox input:focus { background: #ffffff; }
+body.sheet-precision .numberbox .spin { border-radius: 0; height: 11px; line-height: 11px; }
+body.sheet-precision .numberbox .spin.up { top: 2px; } body.sheet-precision .numberbox .spin.down { top: 13px; }
+body.sheet-precision .searchbox .ico, body.sheet-precision .hotkeybox .kb { top: 5px; }
+body.sheet-precision .passwordbox .reveal { top: 3px; height: 20px; line-height: 20px; border-radius: 0; font-size: 10px; }
+
+/* the switch is a rectangular throw, not a pill */
+body.sheet-precision .switch { height: 16px; }
+body.sheet-precision .switch input { width: 34px; height: 16px; }
+body.sheet-precision .sw-track { width: 34px; height: 16px; border-radius: 0; }
+body.sheet-precision.theme-dark .sw-track  { background: #151619; border: 1px solid #3a3e46; }
+body.sheet-precision.theme-light .sw-track { background: #ffffff; border: 1px solid #b6bdc7; }
+body.sheet-precision .sw-track:before, body.sheet-precision .switch:hover .sw-track:before {
+    left: 2px; top: 2px; width: 10px; height: 10px; border-radius: 0;
+}
+body.sheet-precision.theme-dark .sw-track:before  { background: #868c96; }
+body.sheet-precision.theme-light .sw-track:before { background: #666d78; }
+body.sheet-precision .switch input:checked + .sw-track { background: #10b981; border-color: #10b981; }
+body.sheet-precision .switch input:checked + .sw-track:before { left: 20px; background: #06231a; }
+body.sheet-precision.theme-light .switch input:checked + .sw-track { background: #0a7f5c; border-color: #0a7f5c; }
+body.sheet-precision.theme-light .switch input:checked + .sw-track:before { background: #ffffff; }
+body.sheet-precision .sw-label { margin-left: 10px; }
+
+/* the tick is a filled square inside a hairline square: the icon font has no
+   business in a chassis this small */
+body.sheet-precision .check .box {
+    width: 15px; height: 15px; border-radius: 0; line-height: 13px; color: transparent;
+}
+body.sheet-precision.theme-dark .check .box  { background: #151619; border: 1px solid #3a3e46; }
+body.sheet-precision.theme-light .check .box { background: #ffffff; border: 1px solid #b6bdc7; }
+body.sheet-precision .check input:checked + .box { background: transparent; border-color: #10b981; }
+body.sheet-precision .check input:checked + .box:before {
+    content: ""; display: block; width: 7px; height: 7px; margin: 3px auto 0; background: #10b981;
+}
+body.sheet-precision.theme-light .check input:checked + .box { border-color: #0a7f5c; }
+body.sheet-precision.theme-light .check input:checked + .box:before { background: #0a7f5c; }
+/* The radio is squared off like everything else and told apart from the
+   checkbox by the mark inside it: a diamond, not a flush square. A round radio
+   in this chassis read as a stray bubble; a square one with the same mark read
+   as a second tick. */
+body.sheet-precision .radio .ring { width: 15px; height: 15px; border-radius: 0; }
+body.sheet-precision.theme-dark .radio .ring  { background: #151619; border: 1px solid #3a3e46; }
+body.sheet-precision.theme-light .radio .ring { background: #ffffff; border: 1px solid #b6bdc7; }
+body.sheet-precision .radio input:checked + .ring {
+    border-width: 1px; border-color: #10b981; background: transparent;
+}
+body.sheet-precision .radio input:checked + .ring:after {
+    left: 3px; top: 3px; width: 7px; height: 7px; border-radius: 0; background: #10b981;
+    -ms-transform: rotate(45deg); transform: rotate(45deg);
+}
+body.sheet-precision.theme-light .radio input:checked + .ring { border-color: #0a7f5c; }
+body.sheet-precision.theme-light .radio input:checked + .ring:after { background: #0a7f5c; }
+body.sheet-precision .check .lbl, body.sheet-precision .radio .lbl { margin-left: 8px; }
+
+/* the slider is a fader: a 2px travel and a rectangular handle */
+body.sheet-precision input[type=range]::-ms-track { height: 2px; }
+body.sheet-precision input[type=range]::-ms-fill-lower { background: #10b981; border-radius: 0; }
+body.sheet-precision input[type=range]::-ms-fill-upper { background: #3a3e46; border-radius: 0; }
+body.sheet-precision input[type=range]::-ms-thumb {
+    box-sizing: border-box; width: 8px; height: 18px; border-radius: 0; border: none; background: #10b981;
+}
+body.sheet-precision.theme-light input[type=range]::-ms-fill-lower { background: #0a7f5c; }
+body.sheet-precision.theme-light input[type=range]::-ms-fill-upper { background: #b6bdc7; }
+body.sheet-precision.theme-light input[type=range]::-ms-thumb { background: #0a7f5c; }
+body.sheet-precision .slider .out { font-size: 11px; }
+
+/* progress: a 2px travel with square ends */
+body.sheet-precision .progress { height: 2px; border-radius: 0; background: #3a3e46; }
+body.sheet-precision.theme-light .progress { background: #b6bdc7; }
+body.sheet-precision .progress .bar, body.sheet-precision .progress.indeterminate .bar {
+    border-radius: 0; background: #10b981;
+}
+body.sheet-precision.theme-light .progress .bar { background: #0a7f5c; }
+body.sheet-precision .ring-spinner { border-radius: 0; border-color: #3a3e46; border-top-color: #10b981; }
+
+/* tabs, segments, chips, badges: square, mono, emerald when live */
+body.sheet-precision .tabs { margin-bottom: 12px; }
+body.sheet-precision.theme-dark .tabs  { border-bottom: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .tabs { border-bottom: 1px solid #ccd1d8; }
+body.sheet-precision .tab {
+    padding: 6px 12px; margin: 0; border-radius: 0; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .12em; background: transparent;
+}
+body.sheet-precision .tab:hover { background: transparent; }
+body.sheet-precision .tab.active { background: transparent; color: #10b981; }
+body.sheet-precision.theme-light .tab.active { color: #0a7f5c; }
+body.sheet-precision .tab.active:after { left: 0; right: 0; bottom: -1px; height: 1px; border-radius: 0; background: #10b981; }
+body.sheet-precision.theme-light .tab.active:after { background: #0a7f5c; }
+/* a box drawn round a tab that is only a bottom rule looks like a mistake: the
+   keyboard says so in cyan on the same rule instead */
+body.sheet-precision .tab:focus { outline: none; }
+body.sheet-precision .tab:focus:after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: #22d3ee;
+}
+body.sheet-precision .segmented { border-radius: 0; padding: 0; }
+body.sheet-precision.theme-dark .segmented  { background: #151619; border: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .segmented { background: #ffffff; border: 1px solid #ccd1d8; }
+body.sheet-precision .segmented .seg {
+    height: 24px; line-height: 24px; border-radius: 0; padding: 0 12px; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .12em;
+}
+body.sheet-precision .segmented .seg.active { background: #10b981; color: #06231a; }
+body.sheet-precision.theme-light .segmented .seg.active { background: #0a7f5c; color: #ffffff; }
+body.sheet-precision .chip { height: 22px; line-height: 20px; border-radius: 0; padding: 0 10px; font-size: 11px; }
+body.sheet-precision.theme-dark .chip  { background: #212328; border: 1px solid #3a3e46; }
+body.sheet-precision.theme-light .chip { background: #ffffff; border: 1px solid #ccd1d8; }
+body.sheet-precision .chip.on { background: #10b981; border-color: #10b981; color: #06231a; }
+body.sheet-precision.theme-light .chip.on { background: #0a7f5c; border-color: #0a7f5c; color: #ffffff; }
+body.sheet-precision .badge { border-radius: 0; height: 16px; line-height: 16px; font-size: 10px; letter-spacing: .06em; }
+body.sheet-precision .badge.accent { background: #10b981; color: #06231a; }
+body.sheet-precision .rating .star.on { color: #10b981; }
+body.sheet-precision .swatch { border-radius: 0; }
+body.sheet-precision .swatch.selected { border-color: #10b981; box-shadow: none; }
+body.sheet-precision .infobar { border-radius: 0; padding: 7px 10px; }
+body.sheet-precision.theme-dark .infobar  { background: #212328; border: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .infobar { background: #ffffff; border: 1px solid #ccd1d8; }
+body.sheet-precision .infobar .close { border-radius: 0; }
+body.sheet-precision.theme-dark .infobar.success { background: #142720; }
+body.sheet-precision.theme-dark .infobar.warning { background: #2a2318; }
+body.sheet-precision.theme-dark .infobar.error   { background: #2b1a1c; }
+body.sheet-precision .infobar.success .ico { color: #10b981; }
+body.sheet-precision .infobar.warning .ico { color: #f5a524; }
+body.sheet-precision .infobar.error .ico   { color: #e5484d; }
+body.sheet-precision .infobar.info .ico    { color: #22d3ee; }
+body.sheet-precision.theme-light .infobar.success .ico { color: #0a7f5c; }
+body.sheet-precision.theme-light .infobar.warning .ico { color: #b06f00; }
+body.sheet-precision.theme-light .infobar.error .ico   { color: #c02c33; }
+body.sheet-precision.theme-light .infobar.info .ico    { color: #0e7490; }
+
+/* ---------------------------------------------------------- menus and lists */
+/* These genuinely hang in front of the chassis, so they are the only things in
+   the sheet allowed a shadow — and it is a hard one, never a bloom. */
+body.sheet-precision .dd-menu, body.sheet-precision #axCtx, body.sheet-precision .axctx {
+    border-radius: 0; padding: 2px;
+}
+body.sheet-precision.theme-dark .dd-menu, body.sheet-precision.theme-dark #axCtx,
+body.sheet-precision.theme-dark .axctx {
+    background: #1e2024; border: 1px solid #3a3e46; box-shadow: 0 10px 24px rgba(0,0,0,.55); color: #d9dce1;
+}
+body.sheet-precision.theme-light .dd-menu, body.sheet-precision.theme-light #axCtx,
+body.sheet-precision.theme-light .axctx {
+    background: #ffffff; border: 1px solid #ccd1d8; box-shadow: 0 10px 24px rgba(15,20,30,.16); color: #17181b;
+}
+body.sheet-precision .list { border-radius: 0; padding: 2px; }
+body.sheet-precision .dd-item, body.sheet-precision .list-item, body.sheet-precision .axctx-item {
+    height: 26px; line-height: 26px; border-radius: 0; font-size: 12px;
+}
+body.sheet-precision.theme-dark .dd-item:hover, body.sheet-precision.theme-dark .list-item:hover,
+body.sheet-precision.theme-dark .axctx-item:hover, body.sheet-precision.theme-dark .fl-row:hover { background: #26282e; }
+body.sheet-precision.theme-light .dd-item:hover, body.sheet-precision.theme-light .list-item:hover,
+body.sheet-precision.theme-light .axctx-item:hover, body.sheet-precision.theme-light .fl-row:hover { background: #eef0f3; }
+body.sheet-precision .dd-item.selected, body.sheet-precision .list-item.selected {
+    background: transparent; color: #10b981;
+}
+body.sheet-precision.theme-light .dd-item.selected, body.sheet-precision.theme-light .list-item.selected { color: #0a7f5c; }
+body.sheet-precision .dd-item.selected:before, body.sheet-precision .list-item.selected:before {
+    top: 0; bottom: 0; width: 2px; border-radius: 0; background: #10b981;
+}
+body.sheet-precision.theme-light .dd-item.selected:before,
+body.sheet-precision.theme-light .list-item.selected:before { background: #0a7f5c; }
+/* cyan is the keyboard, and only the keyboard */
+body.sheet-precision .list-item.kb { outline: 1px solid #22d3ee; outline-offset: -1px; }
+body.sheet-precision .axctx-item.kb { background: transparent; box-shadow: inset 0 0 0 1px #22d3ee; }
+body.sheet-precision.theme-light .list-item.kb { outline-color: #0e7490; }
+body.sheet-precision.theme-light .axctx-item.kb { box-shadow: inset 0 0 0 1px #0e7490; }
+body.sheet-precision .axctx-sep { margin: 2px; }
+body.sheet-precision.theme-dark .axctx-sep  { background: #2c2f35; }
+body.sheet-precision.theme-light .axctx-sep { background: #ccd1d8; }
+body.sheet-precision .axctx-kbd { font-size: 10px; letter-spacing: .06em; }
+/* the sheet's own ring, used by a window that asks for FocusRing: "contrast" */
+body.sheet-precision .btn:focus, body.sheet-precision .dropdown:focus,
+body.sheet-precision .list:focus, body.sheet-precision .seg:focus,
+body.sheet-precision .chip:focus, body.sheet-precision .swatch:focus,
+body.sheet-precision .axdlg-btn:focus {
+    outline: 1px solid #22d3ee; outline-offset: 0;
+}
+
+/* ------------------------------------------------------------- window bars */
+body.sheet-precision .axmb {
+    height: 24px; padding: 0 4px; font-size: 10px; text-transform: uppercase; letter-spacing: .12em;
+}
+body.sheet-precision.theme-dark .axmb  { background: #131417; border-bottom: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .axmb { background: #e0e3e8; border-bottom: 1px solid #ccd1d8; }
+body.sheet-precision .axmb-item { height: 20px; line-height: 20px; border-radius: 0; padding: 0 10px; }
+body.sheet-precision.theme-dark .axmb-item:hover  { background: #212328; }
+body.sheet-precision.theme-light .axmb-item:hover { background: #f2f4f7; }
+body.sheet-precision .axmb-item.open { background: transparent; color: #10b981; box-shadow: inset 0 -1px 0 #10b981; }
+body.sheet-precision.theme-light .axmb-item.open { color: #0a7f5c; box-shadow: inset 0 -1px 0 #0a7f5c; }
+body.sheet-precision .axsb { height: 20px; padding: 0 0 0 10px; font-size: 10px; letter-spacing: .08em; }
+body.sheet-precision.theme-dark .axsb  { background: #131417; border-top: 1px solid #2c2f35; color: #868c96; }
+body.sheet-precision.theme-light .axsb { background: #e0e3e8; border-top: 1px solid #ccd1d8; color: #666d78; }
+body.sheet-precision.theme-dark .axsb-part  { border-left: 1px solid #2c2f35; padding: 0 10px; }
+body.sheet-precision.theme-light .axsb-part { border-left: 1px solid #ccd1d8; padding: 0 10px; }
+body.sheet-precision .axsb-part:first-child { border-left: 0; padding-left: 0; }
+body.sheet-precision .axsb-part.action { border-radius: 0; }
+body.sheet-precision .axsb-bar { height: 4px; border-radius: 0; }
+body.sheet-precision .axsb-bar > i { background: #10b981; }
+body.sheet-precision.theme-light .axsb-bar > i { background: #0a7f5c; }
+
+/* ----------------------------------------------------------------- dialogs */
+body.sheet-precision #axDlgOverlay { background: rgba(8,9,11,.55); }
+body.sheet-precision #axDlg { width: 430px; padding: 20px 22px; border-radius: 0; }
+body.sheet-precision.theme-dark #axDlg {
+    background: #1e2024; border: 1px solid #3a3e46; border-top: 1px solid #3a3e46;
+    box-shadow: 0 24px 56px rgba(0,0,0,.6);
+}
+body.sheet-precision.theme-light #axDlg {
+    background: #ffffff; border: 1px solid #ccd1d8; border-top: 1px solid #ccd1d8;
+    box-shadow: 0 24px 56px rgba(15,20,30,.20);
+}
+body.sheet-precision #axDlgTitle {
+    font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .16em; margin-bottom: 10px;
+    font-family: "Cascadia Mono", Consolas, monospace;
+}
+body.sheet-precision.theme-dark #axDlgTitle  { color: #868c96; }
+body.sheet-precision.theme-light #axDlgTitle { color: #666d78; }
+body.sheet-precision #axDlgText { font-size: 13px; line-height: 19px; }
+body.sheet-precision #axDlgBtns {
+    margin: 20px -22px -20px; padding: 12px 22px; border-radius: 0; justify-content: flex-end;
+}
+body.sheet-precision.theme-dark #axDlgBtns  { background: #1a1b1f; border-top: 1px solid #2c2f35; }
+body.sheet-precision.theme-light #axDlgBtns { background: #f6f7f9; border-top: 1px solid #ccd1d8; }
+body.sheet-precision .axdlg-btn {
+    flex: none; min-width: 84px; height: 26px; line-height: 24px; border-radius: 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .12em;
+    font-family: "Cascadia Mono", Consolas, monospace;
+}
+body.sheet-precision.theme-dark .axdlg-btn  { background: #212328; border: 1px solid #3a3e46; color: #d9dce1; }
+body.sheet-precision.theme-light .axdlg-btn { background: #ffffff; border: 1px solid #ccd1d8; color: #17181b; }
+body.sheet-precision .axdlg-btn.danger { background: #e5484d; border-color: #e5484d; color: #ffffff; }
+body.sheet-precision #axToast { border-radius: 0; font-size: 12px; padding: 8px 12px; }
+body.sheet-precision.theme-dark #axToast {
+    background: #1e2024; border: 1px solid #3a3e46; border-left: 2px solid #10b981;
+    box-shadow: 0 10px 24px rgba(0,0,0,.55);
+}
+body.sheet-precision.theme-light #axToast {
+    background: #ffffff; border: 1px solid #ccd1d8; border-left: 2px solid #0a7f5c;
+    box-shadow: 0 10px 24px rgba(15,20,30,.16);
+}
+body.sheet-precision #axToast.kind-success { border-left: 2px solid #10b981; }
+body.sheet-precision #axToast.kind-warning { border-left: 2px solid #f5a524; }
+body.sheet-precision #axToast.kind-error   { border-left: 2px solid #e5484d; }
+body.sheet-precision #axToast.kind-info    { border-left: 2px solid #22d3ee; }
+body.sheet-precision #axTip {
+    border-radius: 0; font-size: 11px; box-shadow: none;
+    font-family: "Cascadia Mono", Consolas, monospace;
+}
+body.sheet-precision.theme-dark #axTip  { background: #1e2024; border: 1px solid #3a3e46; color: #d9dce1; }
+body.sheet-precision.theme-light #axTip { background: #17181b; border: 1px solid #17181b; color: #eceef1; }
+
+/* --------------------------------------------------------------- the grid */
+body.sheet-precision .dv-frame { border-radius: 0; }
+body.sheet-precision.theme-dark .dv-frame  { background: #1a1b1f; border: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .dv-frame { background: #ffffff; border: 1px solid #ccd1d8; }
+body.sheet-precision .dv-frame.focus { border-color: #22d3ee; }
+body.sheet-precision.theme-light .dv-frame.focus { border-color: #0e7490; }
+body.sheet-precision .dv-hcell {
+    height: 26px; font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .12em;
+}
+body.sheet-precision.theme-dark .dv-hcell  { background: #212328; color: #868c96; border-bottom: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .dv-hcell { background: #f2f4f7; color: #666d78; border-bottom: 1px solid #ccd1d8; }
+body.sheet-precision .dv-cell { height: 28px; font-size: 12px; border-top: none; }
+body.sheet-precision.theme-dark .dv-cell  { border-bottom: 1px solid #26282e; }
+body.sheet-precision.theme-light .dv-cell { border-bottom: 1px solid #e4e7eb; }
+body.sheet-precision.theme-dark .dv-row:hover > .dv-cell  { background: #212328; }
+body.sheet-precision.theme-light .dv-row:hover > .dv-cell { background: #f2f4f7; }
+body.sheet-precision .dv-row.selected > .dv-cell { background: transparent; color: #10b981; }
+body.sheet-precision.theme-light .dv-row.selected > .dv-cell { color: #0a7f5c; }
+body.sheet-precision .dv-check { border-radius: 0; }
+body.sheet-precision .dv-check.on, body.sheet-precision .dv-check.some {
+    background: transparent; border-color: #10b981; color: #10b981;
+}
+body.sheet-precision .dv-sort { color: #10b981; }
+body.sheet-precision.theme-light .dv-sort { color: #0a7f5c; }
+body.sheet-precision .dv-count { font-size: 10px; letter-spacing: .08em; }
+
+/* ------------------------------------------ pictures, drop zones and files */
+body.sheet-precision .imgbox, body.sheet-precision .thumb,
+body.sheet-precision .filelist, body.sheet-precision .tile { border-radius: 0; }
+body.sheet-precision.theme-dark .imgbox, body.sheet-precision.theme-dark .thumb,
+body.sheet-precision.theme-dark .filelist, body.sheet-precision.theme-dark .tile {
+    background: #212328; border: 1px solid #2c2f35;
+}
+body.sheet-precision.theme-light .imgbox, body.sheet-precision.theme-light .thumb,
+body.sheet-precision.theme-light .filelist, body.sheet-precision.theme-light .tile {
+    background: #ffffff; border: 1px solid #ccd1d8;
+}
+body.sheet-precision .imgbox.round { border-radius: 50%; }
+body.sheet-precision .imgbox.button:hover, body.sheet-precision .thumb:hover { border-color: #10b981; }
+body.sheet-precision.theme-light .imgbox.button:hover, body.sheet-precision.theme-light .thumb:hover { border-color: #0a7f5c; }
+body.sheet-precision .tile { width: 146px; height: 104px; padding: 10px; }
+body.sheet-precision .tile .name { font-size: 12px; }
+body.sheet-precision .tile .remove, body.sheet-precision .thumb .remove,
+body.sheet-precision .fl-row .remove, body.sheet-precision .sort-list .remove { border-radius: 0; }
+body.sheet-precision .sort-list .drag-item { border-radius: 0; margin-bottom: 2px; min-height: 32px; }
+body.sheet-precision.theme-dark .sort-list .drag-item  { background: #212328; border: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .sort-list .drag-item { background: #ffffff; border: 1px solid #ccd1d8; }
+body.sheet-precision .drag-ghost {
+    box-shadow: 0 10px 24px rgba(0,0,0,.5); border-color: #10b981;
+    -ms-transform: none; transform: none;
+}
+body.sheet-precision .fl-row { height: 26px; border-radius: 0; }
+body.sheet-precision .dropzone { border-radius: 0; border-width: 1px; border-style: dashed; }
+body.sheet-precision.theme-dark .dropzone  { background: #1a1b1f; border-color: #3a3e46; }
+body.sheet-precision.theme-light .dropzone { background: #ffffff; border-color: #b6bdc7; }
+/* pre-blended rather than rgba(): RecolourCss rewrites hex literals, so a wash
+   written this way follows SetAccent and one written rgba() would not */
+body.sheet-precision .dropzone.dragover { border-style: solid; border-color: #10b981; background: #16302a; }
+body.sheet-precision.theme-light .dropzone.dragover { border-color: #0a7f5c; background: #a8e0cb; }
+body.sheet-precision .dropzone.reject { border-color: #e5484d; background: #2b1a1c; }
+body.sheet-precision.theme-light .dropzone.reject { border-color: #c02c33; background: #fbecec; }
+
+/* -------------------------------------------------------------- machine out */
+body.sheet-precision .console {
+    border-radius: 0; font-size: 11px; line-height: 15px; background: #111214; color: #7ee2b8;
+}
+body.sheet-precision.theme-dark .console  { border: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .console { border: 1px solid #ccd1d8; }
+
+/* ---------------------------------------------------------- the rich footer */
+body.sheet-precision .axrich-footer { padding: 10px 20px; }
+body.sheet-precision.theme-dark .axrich-footer  { background: #1a1b1f; border-top: 1px solid #2c2f35; }
+body.sheet-precision.theme-light .axrich-footer { background: #f6f7f9; border-top: 1px solid #ccd1d8; }
+body.sheet-precision .axrich-footer .btn { height: 28px; line-height: 26px; min-width: 96px; }
+
+/* -------------------------------------------------------------- scrollbars */
+/* Seven colours is all Trident gives a stylesheet — no width, no radius, no
+   overlay. Setting the four bevel colours to the track switches the 3D off
+   altogether, which leaves a flat thumb in a flat channel: the only scrollbar
+   this chassis could honestly wear. Each scrolling surface is given the track
+   it actually sits on, and the arrows a shade of that track. */
+body.sheet-precision.theme-dark, body.sheet-precision.theme-dark #content,
+body.sheet-precision.theme-dark .thumbs {
+    scrollbar-face-color: #33373e; scrollbar-arrow-color: #262930;
+    scrollbar-track-color: #1c1d21; scrollbar-shadow-color: #1c1d21;
+    scrollbar-highlight-color: #1c1d21; scrollbar-3dlight-color: #1c1d21;
+    scrollbar-darkshadow-color: #1c1d21;
+}
+body.sheet-precision.theme-dark .list, body.sheet-precision.theme-dark .dd-menu,
+body.sheet-precision.theme-dark .filelist, body.sheet-precision.theme-dark .dv-bodywrap,
+body.sheet-precision.theme-dark .console {
+    scrollbar-face-color: #2f333a; scrollbar-arrow-color: #202329;
+    scrollbar-track-color: #151619; scrollbar-shadow-color: #151619;
+    scrollbar-highlight-color: #151619; scrollbar-3dlight-color: #151619;
+    scrollbar-darkshadow-color: #151619;
+}
+body.sheet-precision.theme-light, body.sheet-precision.theme-light #content,
+body.sheet-precision.theme-light .thumbs {
+    scrollbar-face-color: #c3c9d1; scrollbar-arrow-color: #dfe3e8;
+    scrollbar-track-color: #f6f7f9; scrollbar-shadow-color: #f6f7f9;
+    scrollbar-highlight-color: #f6f7f9; scrollbar-3dlight-color: #f6f7f9;
+    scrollbar-darkshadow-color: #f6f7f9;
+}
+body.sheet-precision.theme-light .list, body.sheet-precision.theme-light .dd-menu,
+body.sheet-precision.theme-light .filelist, body.sheet-precision.theme-light .dv-bodywrap {
+    scrollbar-face-color: #ccd1d8; scrollbar-arrow-color: #e8eaee;
+    scrollbar-track-color: #ffffff; scrollbar-shadow-color: #ffffff;
+    scrollbar-highlight-color: #ffffff; scrollbar-3dlight-color: #ffffff;
+    scrollbar-darkshadow-color: #ffffff;
+}
+
+/* ------------------------------------------- title-bar items and popovers */
+/* Ruled cells, like the caption controls they sit beside: square, mono, and
+   lit in emerald rather than filled when they are on. */
+body.sheet-precision .axtb-item {
+    height: 26px; min-width: 26px; margin: 0; padding: 0 8px; border-radius: 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .12em; transition: none;
+}
+body.sheet-precision.theme-dark .axtb-item  { color: #868c96; }
+body.sheet-precision.theme-light .axtb-item { color: #666d78; }
+body.sheet-precision.theme-dark .axtb-item:hover  { background: #212328; color: #10b981; }
+body.sheet-precision.theme-light .axtb-item:hover { background: #f2f4f7; color: #0a7f5c; }
+body.sheet-precision .axtb-item.on, body.sheet-precision .axtb-item.open,
+body.sheet-precision .axtb-item.pop-open { background: transparent; color: #10b981; box-shadow: inset 0 -1px 0 #10b981; }
+body.sheet-precision.theme-light .axtb-item.on, body.sheet-precision.theme-light .axtb-item.open,
+body.sheet-precision.theme-light .axtb-item.pop-open { color: #0a7f5c; box-shadow: inset 0 -1px 0 #0a7f5c; }
+body.sheet-precision.theme-dark .axtb-item.kind-sep,
+body.sheet-precision.theme-dark .axtb-item.kind-sep:hover { background: #2c2f35; height: 26px; margin: 0; }
+body.sheet-precision.theme-light .axtb-item.kind-sep,
+body.sheet-precision.theme-light .axtb-item.kind-sep:hover { background: #ccd1d8; height: 26px; margin: 0; }
+body.sheet-precision .axtb-burger i { height: 1px; }
+body.sheet-precision #axPop {
+    border-radius: 0; padding: 10px 12px; font-size: 12px; line-height: 17px;
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+}
+body.sheet-precision.theme-dark #axPop  { background: #1e2024; color: #d9dce1; border: 1px solid #3a3e46; box-shadow: 0 10px 24px rgba(0,0,0,.55); }
+body.sheet-precision.theme-light #axPop { background: #ffffff; color: #17181b; border: 1px solid #ccd1d8; box-shadow: 0 10px 24px rgba(15,20,30,.16); }

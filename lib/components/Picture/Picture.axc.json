@@ -1,0 +1,30 @@
+{
+  "name": "Picture",
+  "description": "Plain picture",
+  "order": 5001,
+  "include": "lib\\components\\Picture\\AxPicture.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Picture",
+      "label": "Plain picture",
+      "icon": "E91B",
+      "category": "Media",
+      "prefix": "pic",
+      "arg": {
+        "key": "src",
+        "label": "Source",
+        "kind": "text"
+      },
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

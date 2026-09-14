@@ -1,0 +1,41 @@
+# Kept out of the repository -----------------------------------------------
+
+# Old versions parked to one side.
+archive/
+
+# Built or compiled output.
+*.exe
+*.zip
+*.7z
+
+# AxStudio's own state. It normally lives in %AppData%\AxStudio, but a copy
+# run with a different store would drop these beside the source.
+studio.ini
+studio.log
+preview.log
+autosave.axs.json
+
+# Backups the studio writes next to a saved project, and scratch exports.
+*.bak
+_gentest*
+*.tmp
+
+# Runtime state written by the examples (window position, last view).
+example/Todo.ini
+
+# Editors and Windows.
+.vscode/
+.idea/
+*.swp
+*~
+Thumbs.db
+desktop.ini
+.DS_Store
+
+*_bench*.ahk
+*probe*.ahk
+_*
+.*/
+*.txt
+*.ini
+studio/data/

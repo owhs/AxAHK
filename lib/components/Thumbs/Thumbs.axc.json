@@ -1,0 +1,28 @@
+{
+  "name": "Thumbs",
+  "description": "Thumbnail strip",
+  "order": 5003,
+  "css": "AxThumbs.css",
+  "include": "lib\\components\\Thumbs\\AxThumbs.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Thumbs",
+      "label": "Thumbnail strip",
+      "icon": "E8B9",
+      "category": "Media",
+      "prefix": "th",
+      "arg": {
+        "key": "empty",
+        "label": "Empty message",
+        "kind": "text"
+      },
+      "events": [
+        "Select",
+        "Click",
+        "DoubleClick",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

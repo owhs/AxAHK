@@ -1,0 +1,31 @@
+{
+  "name": "Link",
+  "description": "Link",
+  "order": 2002,
+  "include": "lib\\components\\Link\\AxLink.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Link",
+      "label": "Link",
+      "icon": "E71B",
+      "category": "Common",
+      "prefix": "lnk",
+      "arg": {
+        "key": "text",
+        "label": "Text",
+        "kind": "text",
+        "default": "Learn more"
+      },
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

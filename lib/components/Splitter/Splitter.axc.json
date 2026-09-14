@@ -1,0 +1,48 @@
+{
+  "name": "Splitter",
+  "description": "A divider you can drag, between two parts of a page.",
+  "order": 7000,
+  "css": "AxSplitter.css",
+  "include": "lib\\components\\Splitter\\AxSplitter.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Splitter",
+      "label": "Splitter",
+      "icon": "E784",
+      "category": "Rich",
+      "prefix": "sp",
+      "props": [
+        {
+          "key": "target",
+          "label": "Resizes",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "horizontal",
+          "label": "Drag vertically",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "min",
+          "label": "Smallest",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "max",
+          "label": "Largest",
+          "kind": "num",
+          "emit": "kv"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

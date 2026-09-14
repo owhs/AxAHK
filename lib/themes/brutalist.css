@@ -1,0 +1,591 @@
+/* @extends win11 */
+/* @accent-hue 160 22 */
+/* ============================================================================
+   brutalist.css — architectural concrete and a single sheet of hardened
+   glass. The window is a poured slab: a 4px matte slate rim, crisp 1px
+   structural grid lines, and a flat opaque workspace that carries no depth
+   of its own at all. The only optical event in the whole design is the thin
+   glass layer laid over the 28px title bar.
+
+   Rules of the sheet, so later edits do not undo it:
+
+     • Radius is 0. Everywhere, including the caption switches. A rounded
+       corner in this sheet is a bug.
+     • The glass is confined to the title bar and the inner edge of the rim.
+       The workspace is flat, opaque and neutral — the moment a second
+       surface starts to shine, the concrete stops reading as concrete.
+     • Structure is drawn with one weight of line, #3f434a, and nothing else.
+       No shadows on anything that is part of the building; only menus,
+       dialogs and toasts — which genuinely hang in front of it — cast one.
+     • Monospace is restricted to header metadata, the footer telemetry and
+       machine readouts. Body copy is a sans, and is allowed to be large.
+
+   ---------------------------------------------------------------- the glass
+   The sheen is an SVG rather than a CSS gradient because it is a hard-edged
+   diagonal, and a diagonal in a linear-gradient blurs its own edge and bands
+   badly in Trident. It is laid down in two layers so the shape survives any
+   window width: the wedge is an SVG pinned to the right at its natural 240px
+   and the broad vertical sheen is a CSS gradient stretched behind it.
+
+   Every colour inside the SVG is written rgb() + stop-opacity, so the data
+   URI carries no "#" at all. That matters twice: a raw "#" terminates a CSS
+   url() as a fragment, and AxSys.RecolourCss rewrites "#rrggbb" literals
+   wherever it finds them. Written this way the glass stays neutral while the
+   emerald is repainted around it.
+
+   ------------------------------------------------------------- the reserves
+   The title bar is 28px and the footer 16px, not win11.css's 32 and 24, so
+   all four #shell sums have to be restated — see the note there.
+
+   The @accent-hue line tells AxSys.RecolourCss that this sheet's accent
+   material is emerald (hue 160) as well as the usual blue band, so SetAccent
+   repaints the emerald edge sheen too. The signal-red close (hue 0) and the
+   amber warning (hue 42) sit outside both bands and never move: they are
+   safety colours, not decoration.
+   ========================================================================= */
+
+/* ---------------------------------------------------------------- the slab */
+/* The 4px rim is body's own border. Everything is border-box, so it eats into
+   body's 100% rather than adding to it and #shell's percentages resolve
+   against what is left; the inset shadow then draws the emerald optical edge
+   exactly one pixel inside the concrete. */
+body.sheet-brutalist {
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 14px; line-height: 20px; border: 4px solid #222428;
+}
+body.sheet-brutalist.theme-dark { background: #141517; color: #dfe3e8; }
+body.sheet-brutalist.theme-light { background: #f1f2f4; color: #1f2124; border-color: #b9bec6; }
+/* The emerald optical edge along the inner face of the rim. It has to be a
+   fixed overlay rather than an inset shadow on body: an inset shadow paints
+   into body's padding box, and #titlebar and #shell — both opaque and both
+   filling that box — would cover it completely. Fixed positions against the
+   viewport, so 4px on every side lands it exactly on the inside of the 4px
+   concrete; z-index sits above the page but below the library's overlays,
+   and pointer-events keeps it clear of the resize hotspots underneath. */
+body.sheet-brutalist:before {
+    content: ""; position: fixed; left: 4px; top: 4px; right: 4px; bottom: 4px;
+    border: 1px solid #174c40; pointer-events: none; z-index: 20000;
+}
+body.sheet-brutalist.theme-light:before { border-color: #9ecfbf; }
+
+/* monospace is for metadata and machine output only */
+body.sheet-brutalist #titleText, body.sheet-brutalist .axsb,
+body.sheet-brutalist .console, body.sheet-brutalist .hex,
+body.sheet-brutalist .badge, body.sheet-brutalist .fl-meta,
+body.sheet-brutalist .slider .out {
+    font-family: "JetBrains Mono", "Cascadia Mono", Consolas, "Courier New", monospace;
+}
+
+/* ---------------------------------------------------------- the glass layer */
+/* A paper-thin optical sheet on the 28px header: a broad vertical sheen, a
+   hard diagonal wedge pinned to the right, and an emerald-tinted 1px edge. */
+body.sheet-brutalist #titlebar {
+    height: 28px; padding: 0 0 0 14px; border: 1px solid #174c40; border-width: 0 0 1px;
+    background-position: right top, 0 0; background-repeat: no-repeat, repeat-x;
+    background-size: 240px 100%, auto;
+}
+body.sheet-brutalist.theme-dark #titlebar {
+    background-color: #1f2124;
+    background-image:
+        url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='240'%20height='28'%20viewBox='0%200%20240%2028'%20preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient%20id='s'%20x1='0'%20y1='0'%20x2='1'%20y2='0'%3E%3Cstop%20offset='0'%20stop-color='rgb(222,255,244)'%20stop-opacity='0'/%3E%3Cstop%20offset='.62'%20stop-color='rgb(222,255,244)'%20stop-opacity='.05'/%3E%3Cstop%20offset='1'%20stop-color='rgb(222,255,244)'%20stop-opacity='.14'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20d='M0%200H240L182%2028H0Z'%20fill='url(%23s)'/%3E%3C/svg%3E"),
+        linear-gradient(rgba(255,255,255,.075) 0%, rgba(255,255,255,.018) 46%, rgba(0,0,0,.10) 100%);
+}
+body.sheet-brutalist.theme-light #titlebar {
+    background-color: #dcdfe4; border-bottom-color: #9ecfbf;
+    background-image:
+        url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='240'%20height='28'%20viewBox='0%200%20240%2028'%20preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient%20id='s'%20x1='0'%20y1='0'%20x2='1'%20y2='0'%3E%3Cstop%20offset='0'%20stop-color='rgb(255,255,255)'%20stop-opacity='0'/%3E%3Cstop%20offset='.62'%20stop-color='rgb(255,255,255)'%20stop-opacity='.35'/%3E%3Cstop%20offset='1'%20stop-color='rgb(255,255,255)'%20stop-opacity='.75'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20d='M0%200H240L182%2028H0Z'%20fill='url(%23s)'/%3E%3C/svg%3E"),
+        linear-gradient(rgba(255,255,255,.55) 0%, rgba(255,255,255,.12) 46%, rgba(0,0,0,.05) 100%);
+}
+/* the window drops its lens when it loses focus */
+body.sheet-brutalist.inactive #titlebar { background-image: none; }
+body.sheet-brutalist #titleText { font-size: 11px; letter-spacing: .05em; }
+body.sheet-brutalist.theme-dark #titleText { color: #b9c2cc; }
+body.sheet-brutalist.theme-light #titleText { color: #41464c; }
+body.sheet-brutalist #titlebar .app-icon { font-size: 12px; margin-right: 9px; color: #10b981; }
+body.sheet-brutalist.theme-light #titlebar .app-icon { color: #0a7f5c; }
+body.sheet-brutalist.inactive #titleText,
+body.sheet-brutalist.inactive #titlebar .app-icon { color: #5c6470; }
+
+/* ------------------------------------------------ flush-mounted switches */
+/* Miniature square tabs let into the glass. Hover fills flat and hard; the
+   press is one pixel of inset, no travel and no easing. */
+body.sheet-brutalist .winbtn {
+    width: 30px; height: 20px; line-height: 18px; margin: 0 4px 0 0; border-radius: 0;
+    font-size: 9px; border: 1px solid #3f434a; background: rgba(255,255,255,.035);
+    transition: none;
+}
+body.sheet-brutalist.theme-dark .winbtn { color: #b9c2cc; }
+body.sheet-brutalist.theme-light .winbtn { color: #41464c; background: rgba(255,255,255,.55); border-color: #a8afb9; }
+body.sheet-brutalist .winbtn:hover, body.sheet-brutalist .winbtn.hover {
+    background: #10b981; border-color: #10b981; color: #052b20;
+}
+body.sheet-brutalist #btnClose:hover, body.sheet-brutalist #btnClose.hover {
+    background: #d32f2f; border-color: #d32f2f; color: #ffffff;
+}
+body.sheet-brutalist .winbtn:active, body.sheet-brutalist .winbtn.pressed {
+    box-shadow: inset 1px 1px 0 rgba(0,0,0,.45);
+}
+body.sheet-brutalist.inactive .winbtn { color: #5c6470; border-color: #31343a; background: transparent; }
+
+/* ------------------------------------------------------------ the reserves */
+/* win11.css works these out by hand from a 32px title bar and a 24px status
+   bar; here they are 28 and 16, so all four have to be restated or the page
+   runs past the bottom of the window. */
+body.sheet-brutalist #shell { height: calc(100% - 28px); }
+body.sheet-brutalist.has-menubar #shell { height: calc(100% - 56px); }
+body.sheet-brutalist.has-statusbar #shell { height: calc(100% - 44px); }
+body.sheet-brutalist.has-menubar.has-statusbar #shell { height: calc(100% - 72px); }
+
+/* --------------------------------------------------------- structural grid */
+body.sheet-brutalist #sidebar { width: 204px; padding: 0; background: transparent; }
+body.sheet-brutalist.theme-dark #sidebar { border-right: 1px solid #3f434a; }
+body.sheet-brutalist.theme-light #sidebar { border-right: 1px solid #c3c9d1; }
+body.sheet-brutalist .nav-item {
+    position: relative; height: 34px; line-height: 34px; margin: 0;
+    padding: 0 12px 0 16px; border-radius: 0; background: transparent; font-size: 13px;
+}
+body.sheet-brutalist .nav-item .ico { width: 22px; font-size: 15px; margin-right: 10px; }
+body.sheet-brutalist.theme-dark .nav-item { color: #98a1ad; border-bottom: 1px solid rgba(58,64,74,.5); }
+body.sheet-brutalist.theme-light .nav-item { color: #59616c; border-bottom: 1px solid rgba(195,201,209,.7); }
+body.sheet-brutalist.theme-dark .nav-item:hover { background: #1f2124; color: #dfe3e8; }
+body.sheet-brutalist.theme-light .nav-item:hover { background: #e6e8ec; color: #1f2124; }
+body.sheet-brutalist.theme-dark .nav-item.active { background: #1c1e21; color: #6ee7b7; }
+body.sheet-brutalist.theme-light .nav-item.active { background: #e2e5ea; color: #076048; }
+body.sheet-brutalist .nav-item.active:before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 0; background: #10b981;
+}
+
+/* the workspace: flat, opaque, neutral, and carrying no light of its own */
+/* The 6px on the right and bottom is not decoration: Trident paints the
+   native scrollbar above everything, z-index included, so a #content that
+   runs to the frame edge buries the .rz resize hotspots under it and the
+   window can no longer be dragged by its right or bottom edge. win11.css
+   keeps the same inset for the same reason. */
+body.sheet-brutalist #content { margin: 0 6px 6px 0; padding: 18px 24px 24px 18px; border-radius: 0; }
+body.sheet-brutalist.theme-dark #content { background: #141517; }
+body.sheet-brutalist.theme-light #content { background: #f1f2f4; }
+
+/* ----------------------------------------------------------------- writing */
+body.sheet-brutalist h1 { font-size: 26px; line-height: 32px; font-weight: 700; letter-spacing: -.025em; margin: 0 0 14px; }
+body.sheet-brutalist.theme-dark h1 { color: #f2f5f8; }
+body.sheet-brutalist.theme-light h1 { color: #141517; }
+body.sheet-brutalist h2 { font-size: 18px; line-height: 25px; font-weight: 600; margin: 24px 0 10px; }
+body.sheet-brutalist h3 { font-size: 14px; line-height: 20px; font-weight: 600; margin: 18px 0 8px; }
+body.sheet-brutalist .caption {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em;
+    background: transparent; margin: 22px 0 8px;
+}
+/* the legend keeps its absolute placement and the fill that masks the border
+   behind it — only the lettering and that fill's colour change */
+body.sheet-brutalist .group > .legend {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em; padding: 0 8px;
+}
+body.sheet-brutalist.theme-dark .group > .legend { background: #141517; }
+body.sheet-brutalist.theme-light .group > .legend { background: #f1f2f4; }
+body.sheet-brutalist.theme-dark .caption, body.sheet-brutalist.theme-dark .group > .legend { color: #8e97a3; }
+body.sheet-brutalist.theme-light .caption, body.sheet-brutalist.theme-light .group > .legend { color: #59616c; }
+body.sheet-brutalist.theme-dark .hint, body.sheet-brutalist.theme-dark .card-row .desc { color: #8e97a3; }
+body.sheet-brutalist.theme-light .hint, body.sheet-brutalist.theme-light .card-row .desc { color: #5c6470; }
+body.sheet-brutalist .hint { font-size: 12px; line-height: 17px; }
+body.sheet-brutalist .card-row .desc { font-size: 12px; line-height: 17px; }
+body.sheet-brutalist .link, body.sheet-brutalist .hyperlink, body.sheet-brutalist a {
+    color: #10b981; text-decoration: none;
+}
+body.sheet-brutalist.theme-light .link, body.sheet-brutalist.theme-light .hyperlink,
+body.sheet-brutalist.theme-light a { color: #0a7f5c; }
+body.sheet-brutalist .link:hover, body.sheet-brutalist a:hover { text-decoration: underline; }
+body.sheet-brutalist.theme-dark .card-row .ico { color: #8e97a3; }
+body.sheet-brutalist.theme-light .card-row .ico { color: #5c6470; }
+
+/* -------------------------------------------------------- poured surfaces */
+/* Square blocks with one weight of line and no shadow at all. */
+body.sheet-brutalist .card, body.sheet-brutalist .expander, body.sheet-brutalist .tile,
+body.sheet-brutalist .group, body.sheet-brutalist .list, body.sheet-brutalist .filelist,
+body.sheet-brutalist .dv-frame, body.sheet-brutalist .segmented,
+body.sheet-brutalist .sort-list .drag-item, body.sheet-brutalist .imgbox,
+body.sheet-brutalist .thumb, body.sheet-brutalist .infobar, body.sheet-brutalist .dropzone {
+    border-radius: 0; box-shadow: none;
+}
+body.sheet-brutalist .card, body.sheet-brutalist .expander { padding: 14px 16px; margin-bottom: 4px; }
+body.sheet-brutalist .group { padding: 20px 16px 14px; margin: 16px 0; }
+body.sheet-brutalist.theme-dark .card, body.sheet-brutalist.theme-dark .expander,
+body.sheet-brutalist.theme-dark .tile, body.sheet-brutalist.theme-dark .group,
+body.sheet-brutalist.theme-dark .list, body.sheet-brutalist.theme-dark .filelist,
+body.sheet-brutalist.theme-dark .dv-frame, body.sheet-brutalist.theme-dark .sort-list .drag-item,
+body.sheet-brutalist.theme-dark .imgbox, body.sheet-brutalist.theme-dark .thumb {
+    background: #1c1e21; border: 1px solid #3f434a;
+}
+body.sheet-brutalist.theme-light .card, body.sheet-brutalist.theme-light .expander,
+body.sheet-brutalist.theme-light .tile, body.sheet-brutalist.theme-light .group,
+body.sheet-brutalist.theme-light .list, body.sheet-brutalist.theme-light .filelist,
+body.sheet-brutalist.theme-light .dv-frame, body.sheet-brutalist.theme-light .sort-list .drag-item,
+body.sheet-brutalist.theme-light .imgbox, body.sheet-brutalist.theme-light .thumb {
+    background: #f8f9fa; border: 1px solid #c3c9d1;
+}
+body.sheet-brutalist .card.hot { border-color: #10b981; }
+body.sheet-brutalist .card-row { min-height: 42px; }
+/* win11.css lets the control cluster take 70% of the row, which ellipsises a
+   description long before it has to; the text column takes the room back. */
+body.sheet-brutalist .card-row .text { flex: 1 1 260px; min-width: 160px; }
+body.sheet-brutalist .card-row .ctl { max-width: 60%; }
+body.sheet-brutalist .card-row .ctl { padding: 2px 0; }
+body.sheet-brutalist .exp-header { min-height: 44px; padding: 8px 16px; background: transparent; }
+body.sheet-brutalist .exp-header .chev { border-radius: 0; }
+body.sheet-brutalist .exp-body { padding: 12px 16px 16px; }
+body.sheet-brutalist.theme-dark .exp-body { background: #141517; border-top: 1px solid #3f434a; }
+body.sheet-brutalist.theme-light .exp-body { background: #eceef1; border-top: 1px solid #c3c9d1; }
+body.sheet-brutalist .tab-panel { background: transparent; border: none; }
+
+/* ------------------------------------------------------------- flat metal */
+body.sheet-brutalist .btn {
+    height: 30px; line-height: 28px; padding: 0 14px; border-radius: 0;
+    font-size: 13px; box-shadow: none; transition: none;
+}
+body.sheet-brutalist.theme-dark .btn { background: #222428; border: 1px solid #3f434a; border-bottom-color: #3f434a; color: #dfe3e8; }
+body.sheet-brutalist.theme-light .btn { background: #f8f9fa; border: 1px solid #c3c9d1; border-bottom-color: #b3bac3; color: #1f2124; }
+body.sheet-brutalist.theme-dark .btn:hover { background: #2b2e33; border-color: #4f545d; }
+body.sheet-brutalist.theme-light .btn:hover { background: #eceef1; border-color: #adb5bf; }
+/* the press is one pixel of inset — no travel, no easing */
+body.sheet-brutalist .btn:active, body.sheet-brutalist .btn.pressed {
+    box-shadow: inset 1px 1px 0 rgba(0,0,0,.40);
+}
+body.sheet-brutalist .btn.icon { width: 30px; min-width: 30px; line-height: 28px; }
+body.sheet-brutalist .btn .ico { line-height: 28px; }
+body.sheet-brutalist .btn.accent, body.sheet-brutalist .axdlg-btn.primary {
+    background: #10b981; border-color: #10b981; color: #052b20;
+}
+body.sheet-brutalist .btn.accent:hover, body.sheet-brutalist .axdlg-btn.primary:hover {
+    background: #1ecb92; border-color: #1ecb92;
+}
+body.sheet-brutalist .btn.subtle { background: transparent; border-color: transparent; }
+body.sheet-brutalist .btn.danger, body.sheet-brutalist .axdlg-btn.danger {
+    background: #d32f2f; border-color: #d32f2f; color: #fff;
+}
+body.sheet-brutalist .btn.danger:hover, body.sheet-brutalist .axdlg-btn.danger:hover { background: #e04444; border-color: #e04444; }
+body.sheet-brutalist.theme-dark .btn.disabled { background: #1c1e21; color: #5c6470; border-color: #31343a; }
+body.sheet-brutalist.theme-light .btn.disabled { background: #eceef1; color: #9aa2ad; border-color: #d3d8de; }
+
+/* fields are cut into the slab: square, dark, one line */
+body.sheet-brutalist .textbox input, body.sheet-brutalist .textbox textarea,
+body.sheet-brutalist .searchbox input, body.sheet-brutalist .numberbox input,
+body.sheet-brutalist .passwordbox input, body.sheet-brutalist .hotkeybox input,
+body.sheet-brutalist .dd-value, body.sheet-brutalist #axDlgInput, body.sheet-brutalist .hex {
+    height: 30px; line-height: 28px; padding: 0 10px; border-radius: 0; font-size: 13px;
+}
+body.sheet-brutalist.theme-dark .textbox input, body.sheet-brutalist.theme-dark .textbox textarea,
+body.sheet-brutalist.theme-dark .searchbox input, body.sheet-brutalist.theme-dark .numberbox input,
+body.sheet-brutalist.theme-dark .passwordbox input, body.sheet-brutalist.theme-dark .hotkeybox input,
+body.sheet-brutalist.theme-dark .dd-value, body.sheet-brutalist.theme-dark #axDlgInput,
+body.sheet-brutalist.theme-dark .hex {
+    background: #0f1012; border: 1px solid #3f434a; border-bottom-color: #3f434a; color: #dfe3e8;
+}
+body.sheet-brutalist.theme-light .textbox input, body.sheet-brutalist.theme-light .textbox textarea,
+body.sheet-brutalist.theme-light .searchbox input, body.sheet-brutalist.theme-light .numberbox input,
+body.sheet-brutalist.theme-light .passwordbox input, body.sheet-brutalist.theme-light .hotkeybox input,
+body.sheet-brutalist.theme-light .dd-value, body.sheet-brutalist.theme-light #axDlgInput,
+body.sheet-brutalist.theme-light .hex {
+    background: #ffffff; border: 1px solid #c3c9d1; border-bottom-color: #b3bac3; color: #1f2124;
+}
+body.sheet-brutalist .textbox textarea { height: auto; padding: 7px 10px; }
+body.sheet-brutalist .dd-value { padding: 0 34px 0 10px; }
+/* focus is a solid emerald edge on all four sides, not a thickened underline */
+body.sheet-brutalist .textbox input:focus, body.sheet-brutalist .textbox textarea:focus,
+body.sheet-brutalist .searchbox input:focus, body.sheet-brutalist .numberbox.focus input,
+body.sheet-brutalist .passwordbox input:focus, body.sheet-brutalist .hotkeybox input:focus,
+body.sheet-brutalist .hotkeybox.recording input, body.sheet-brutalist #axDlgInput:focus,
+body.sheet-brutalist .dropdown.open .dd-value {
+    border: 1px solid #10b981; border-bottom-width: 1px; background: transparent;
+}
+body.sheet-brutalist.theme-dark .textbox input:focus, body.sheet-brutalist.theme-dark .searchbox input:focus,
+body.sheet-brutalist.theme-dark .textbox textarea:focus { background: #0f1012; }
+body.sheet-brutalist.theme-light .textbox input:focus, body.sheet-brutalist.theme-light .searchbox input:focus,
+body.sheet-brutalist.theme-light .textbox textarea:focus { background: #ffffff; }
+body.sheet-brutalist .numberbox .spin { border-radius: 0; }
+body.sheet-brutalist .passwordbox .reveal { border-radius: 0; }
+body.sheet-brutalist .hotkeybox .clear, body.sheet-brutalist .infobar .close,
+body.sheet-brutalist .fl-row .remove, body.sheet-brutalist .tile .remove,
+body.sheet-brutalist .sort-list .remove, body.sheet-brutalist .thumb .remove { border-radius: 0; }
+
+/* the switch keeps its pill: a square toggle reads as a checkbox, and this
+   sheet already has one of those */
+body.sheet-brutalist.theme-dark .sw-track { background: #0f1012; border-color: #4f545d; }
+body.sheet-brutalist.theme-light .sw-track { background: #e2e5e9; border-color: #a8afb9; }
+body.sheet-brutalist .switch input:checked + .sw-track { background: #10b981; border-color: #10b981; }
+body.sheet-brutalist .switch input:checked + .sw-track:before { background: #052b20; }
+
+/* Checkboxes, radios and sliders are painted by the accent rules the core
+   writes, which fall back to Fluent blue when no accent has been chosen — so
+   in an emerald design they stayed blue. Emerald here instead; because the
+   sheet declares @accent-hue 160, they follow SetAccent like everything. */
+body.sheet-brutalist .check .box { border-radius: 0; }
+body.sheet-brutalist.theme-dark .check .box, body.sheet-brutalist.theme-dark .radio .ring { background: #0f1012; border-color: #4f545d; }
+body.sheet-brutalist.theme-light .check .box, body.sheet-brutalist.theme-light .radio .ring { background: #ffffff; border-color: #a8afb9; }
+body.sheet-brutalist .check input:checked + .box { background: #10b981; border-color: #10b981; color: #052b20; }
+body.sheet-brutalist .radio input:checked + .ring { border-color: #10b981; }
+body.sheet-brutalist .radio input:checked + .ring:after { background: #052b20; }
+body.sheet-brutalist input[type=range]::-ms-track { height: 6px; }
+body.sheet-brutalist input[type=range]::-ms-fill-lower { background: #10b981; border-radius: 0; }
+body.sheet-brutalist input[type=range]::-ms-fill-upper { background: #3f434a; border-radius: 0; }
+body.sheet-brutalist input[type=range]::-ms-thumb { width: 10px; height: 22px; border-radius: 0; background: #10b981; border-width: 0; }
+body.sheet-brutalist .swatch { border-radius: 0; }
+body.sheet-brutalist .swatch.selected { border-color: #10b981; box-shadow: none; }
+body.sheet-brutalist .rating .star.on { color: #10b981; }
+body.sheet-brutalist .progress { height: 6px; border-radius: 0; }
+body.sheet-brutalist.theme-dark .progress { background: #0f1012; border: 1px solid #3f434a; }
+body.sheet-brutalist.theme-light .progress { background: #e2e5e9; border: 1px solid #c3c9d1; }
+body.sheet-brutalist .progress .bar, body.sheet-brutalist .progress.indeterminate .bar { background: #10b981; border-radius: 0; }
+body.sheet-brutalist .ring-spinner { border-radius: 0; border-top-color: #10b981; }
+
+/* ---------------------------------------------------------- chips and tabs */
+body.sheet-brutalist .chip { height: 26px; line-height: 24px; border-radius: 0; }
+body.sheet-brutalist .chip.on { background: #10b981; border-color: #10b981; color: #052b20; }
+body.sheet-brutalist .badge {
+    height: 18px; line-height: 18px; border-radius: 0; font-size: 11px; letter-spacing: .04em;
+}
+body.sheet-brutalist .badge.accent, body.sheet-brutalist .badge.success { background: #10b981; color: #052b20; }
+body.sheet-brutalist .badge.warning { background: #f0b429; color: #2b1d02; }
+body.sheet-brutalist .badge.error { background: #d32f2f; color: #fff; }
+body.sheet-brutalist .segmented { padding: 0; }
+body.sheet-brutalist.theme-dark .segmented { background: #0f1012; border-color: #3f434a; }
+body.sheet-brutalist.theme-light .segmented { background: #e2e5e9; border-color: #c3c9d1; }
+body.sheet-brutalist .segmented .seg { height: 28px; line-height: 28px; border-radius: 0; }
+body.sheet-brutalist .segmented .seg.active { background: #10b981; color: #052b20; }
+body.sheet-brutalist.theme-dark .tabs { border-bottom-color: #3f434a; }
+body.sheet-brutalist.theme-light .tabs { border-bottom-color: #c3c9d1; }
+body.sheet-brutalist .tab { border-radius: 0; padding: 8px 14px; margin-right: 0; }
+body.sheet-brutalist.theme-dark .tab.active { background: #1c1e21; color: #dfe3e8; }
+body.sheet-brutalist.theme-light .tab.active { background: #f8f9fa; color: #1f2124; }
+body.sheet-brutalist .tab.active:after { left: 0; right: 0; height: 2px; border-radius: 0; background: #10b981; }
+/* a box drawn round a tab that is only a bottom rule reads as a mistake */
+body.sheet-brutalist .tab:focus { outline: none !important; }
+body.sheet-brutalist .tab:focus:after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: #22d3ee;
+}
+
+/* --------------------------------------------- what genuinely hangs above */
+body.sheet-brutalist .dd-menu, body.sheet-brutalist #axCtx, body.sheet-brutalist .axctx,
+body.sheet-brutalist #axDlg, body.sheet-brutalist #axToast, body.sheet-brutalist #axTip {
+    border-radius: 0; padding: 4px;
+}
+body.sheet-brutalist.theme-dark .dd-menu, body.sheet-brutalist.theme-dark #axCtx,
+body.sheet-brutalist.theme-dark .axctx, body.sheet-brutalist.theme-dark #axToast,
+body.sheet-brutalist.theme-dark #axTip {
+    background: #1f2124; border: 1px solid #3f434a; box-shadow: 0 12px 28px rgba(0,0,0,.6);
+}
+body.sheet-brutalist.theme-light .dd-menu, body.sheet-brutalist.theme-light #axCtx,
+body.sheet-brutalist.theme-light .axctx, body.sheet-brutalist.theme-light #axToast,
+body.sheet-brutalist.theme-light #axTip {
+    background: #ffffff; border: 1px solid #c3c9d1; box-shadow: 0 12px 28px rgba(0,0,0,.16);
+}
+body.sheet-brutalist #axToast, body.sheet-brutalist #axTip { padding: 8px 12px; }
+body.sheet-brutalist .dd-item, body.sheet-brutalist .list-item, body.sheet-brutalist .axctx-item {
+    height: 30px; line-height: 30px; border-radius: 0;
+}
+/* the checklist tick shares the :before the selection bar also claims, so its
+   line-height has to follow the row height down with it */
+body.sheet-brutalist .list.checklist .list-item:before { line-height: 30px; }
+body.sheet-brutalist.theme-dark .dd-item:hover, body.sheet-brutalist.theme-dark .list-item:hover,
+body.sheet-brutalist.theme-dark .dd-item.hl, body.sheet-brutalist.theme-dark .axctx-item:hover,
+body.sheet-brutalist.theme-dark .axctx-item.kb, body.sheet-brutalist.theme-dark .axmb-item:hover,
+body.sheet-brutalist.theme-dark .axmb-item.open, body.sheet-brutalist.theme-dark .fl-row:hover {
+    background: #2b2e33; color: inherit;
+}
+body.sheet-brutalist.theme-light .dd-item:hover, body.sheet-brutalist.theme-light .list-item:hover,
+body.sheet-brutalist.theme-light .dd-item.hl, body.sheet-brutalist.theme-light .axctx-item:hover,
+body.sheet-brutalist.theme-light .axctx-item.kb, body.sheet-brutalist.theme-light .axmb-item:hover,
+body.sheet-brutalist.theme-light .axmb-item.open, body.sheet-brutalist.theme-light .fl-row:hover {
+    background: #e6e8ec; color: inherit;
+}
+body.sheet-brutalist .dd-item.selected, body.sheet-brutalist .list-item.selected {
+    background: #1b3933; color: #6ee7b7;
+}
+body.sheet-brutalist.theme-light .dd-item.selected, body.sheet-brutalist.theme-light .list-item.selected {
+    background: #b0e6d3; color: #076048;
+}
+body.sheet-brutalist .dd-item.selected:before, body.sheet-brutalist .list-item.selected:before {
+    top: 0; bottom: 0; border-radius: 0; background: #10b981;
+}
+body.sheet-brutalist .fl-row { border-radius: 0; }
+body.sheet-brutalist .dropzone { border-width: 2px; }
+body.sheet-brutalist.theme-dark .dropzone.dragover { border-color: #10b981; background: #1b3933; }
+body.sheet-brutalist.theme-light .dropzone.dragover { border-color: #10b981; background: #b0e6d3; }
+body.sheet-brutalist .dropzone.dragover .dz-ico { color: #10b981; }
+body.sheet-brutalist .dropzone.reject { border-color: #d32f2f; background: rgba(211,47,47,.14); }
+body.sheet-brutalist .drag-ghost { border-color: #10b981; box-shadow: 0 16px 34px rgba(0,0,0,.6); }
+
+/* --------------------------------------------------------------- the bars */
+body.sheet-brutalist .axmb { background: transparent; height: 28px; padding: 0 8px; }
+body.sheet-brutalist .axmb-item { border-radius: 0; height: 24px; line-height: 24px; }
+body.sheet-brutalist.theme-dark .axmb { border-bottom: 1px solid #3f434a; }
+body.sheet-brutalist.theme-light .axmb { border-bottom: 1px solid #c3c9d1; }
+/* the footer: a 16px strip of laser-etched telemetry in low-contrast grey */
+body.sheet-brutalist .axsb {
+    height: 16px; padding: 0 4px 0 12px; font-size: 9px; letter-spacing: .14em;
+    text-transform: uppercase; background: transparent;
+}
+body.sheet-brutalist .axsb-part { padding: 0 8px; }
+body.sheet-brutalist .axsb-part.action { border-radius: 0; }
+body.sheet-brutalist .axsb-part .ico { font-size: 9px; margin-right: 5px; }
+body.sheet-brutalist .axsb-grip { font-size: 8px; }
+body.sheet-brutalist.theme-dark .axsb { border-top: 1px solid #3f434a; color: #5c6470; }
+body.sheet-brutalist.theme-light .axsb { border-top: 1px solid #c3c9d1; color: #7b838d; }
+body.sheet-brutalist.theme-dark .axsb-part { border-left-color: #31343a; }
+body.sheet-brutalist.theme-light .axsb-part { border-left-color: #d3d8de; }
+body.sheet-brutalist.theme-dark .axsb-part.dim { color: #4f545d; }
+body.sheet-brutalist.theme-light .axsb-part.dim { color: #98a1ad; }
+body.sheet-brutalist .axsb-bar { height: 4px; border-radius: 0; }
+body.sheet-brutalist .axsb-bar > i { background: #10b981; }
+
+/* ------------------------------------------------------------- the readout */
+body.sheet-brutalist .console {
+    border-radius: 0; padding: 10px 12px; font-size: 12px; line-height: 18px;
+    background: #0e0f10; color: #cfd6dd;
+}
+body.sheet-brutalist.theme-dark .console { border: 1px solid #3f434a; }
+body.sheet-brutalist.theme-light .console { border: 1px solid #b3bac3; }
+
+/* -------------------------------------------------------------- messages */
+body.sheet-brutalist.theme-dark .infobar { background: #1c1e21; border-color: #3f434a; }
+body.sheet-brutalist.theme-light .infobar { background: #f8f9fa; border-color: #c3c9d1; }
+body.sheet-brutalist .infobar.success { border-color: #10b981; }
+body.sheet-brutalist.theme-dark .infobar.success { background: #1b3933; }
+body.sheet-brutalist.theme-light .infobar.success { background: #b0e6d3; }
+body.sheet-brutalist .infobar.success .ico { color: #10b981; }
+body.sheet-brutalist .infobar.info { border-color: #22d3ee; }
+body.sheet-brutalist.theme-dark .infobar.info { background: #1e363c; }
+body.sheet-brutalist.theme-light .infobar.info { background: #aee2ee; }
+body.sheet-brutalist .infobar.info .ico { color: #22d3ee; }
+body.sheet-brutalist .infobar.warning { background: rgba(240,180,41,.12); border-color: #f0b429; }
+body.sheet-brutalist .infobar.warning .ico { color: #f0b429; }
+body.sheet-brutalist .infobar.error { background: rgba(211,47,47,.14); border-color: #d32f2f; }
+body.sheet-brutalist .infobar.error .ico { color: #ef6f6f; }
+body.sheet-brutalist #axToast.kind-success { border-left: 4px solid #10b981; }
+body.sheet-brutalist #axToast.kind-info { border-left: 4px solid #22d3ee; }
+body.sheet-brutalist #axToast.kind-warning { border-left: 4px solid #f0b429; }
+body.sheet-brutalist #axToast.kind-error { border-left: 4px solid #d32f2f; }
+
+/* ----------------------------------------------------------------- dialogs */
+body.sheet-brutalist #axDlgOverlay { background: rgba(6,7,9,.66); }
+body.sheet-brutalist #axDlg { width: 460px; padding: 24px; }
+body.sheet-brutalist.theme-dark #axDlg {
+    background: #1f2124; border: 1px solid #3f434a; border-top-color: #10b981; border-top-width: 2px;
+    box-shadow: 0 28px 64px rgba(0,0,0,.66);
+}
+body.sheet-brutalist.theme-light #axDlg {
+    background: #ffffff; border: 1px solid #c3c9d1; border-top-color: #10b981; border-top-width: 2px;
+    box-shadow: 0 28px 64px rgba(0,0,0,.22);
+}
+body.sheet-brutalist #axDlg.kind-warning { border-top-color: #f0b429; }
+body.sheet-brutalist #axDlg.kind-error { border-top-color: #d32f2f; }
+body.sheet-brutalist #axDlg.kind-question, body.sheet-brutalist #axDlg.kind-info { border-top-color: #22d3ee; }
+body.sheet-brutalist #axDlgTitle { font-size: 18px; font-weight: 600; letter-spacing: -.01em; margin-bottom: 10px; }
+body.sheet-brutalist #axDlgBtns { margin: 22px -24px -24px; padding: 18px 24px; border-radius: 0; }
+body.sheet-brutalist.theme-dark #axDlgBtns { background: #141517; border-top: 1px solid #3f434a; }
+body.sheet-brutalist.theme-light #axDlgBtns { background: #f1f2f4; border-top: 1px solid #c3c9d1; }
+body.sheet-brutalist .axdlg-btn { flex: none; height: 30px; line-height: 28px; border-radius: 0; }
+
+/* -------------------------------------------------------------- the grid */
+body.sheet-brutalist .dv-hcell {
+    height: 32px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .10em;
+}
+body.sheet-brutalist.theme-dark .dv-hcell { background: #222428; color: #8e97a3; border-bottom: 1px solid #3f434a; }
+body.sheet-brutalist.theme-light .dv-hcell { background: #eceef1; color: #59616c; border-bottom: 1px solid #c3c9d1; }
+body.sheet-brutalist .dv-cell { height: 32px; border-top: none; }
+body.sheet-brutalist.theme-dark .dv-cell { border-bottom: 1px solid #2b2e33; }
+body.sheet-brutalist.theme-light .dv-cell { border-bottom: 1px solid #dde1e6; }
+body.sheet-brutalist .dv-row.selected > .dv-cell { background: #1b3933; color: #6ee7b7; }
+body.sheet-brutalist.theme-light .dv-row.selected > .dv-cell { background: #b0e6d3; color: #076048; }
+body.sheet-brutalist .dv-check { border-radius: 0; }
+body.sheet-brutalist .dv-check.on, body.sheet-brutalist .dv-check.some {
+    background: #10b981; border-color: #10b981; color: #052b20;
+}
+
+/* ---------------------------------------------------------- keyboard focus */
+/* Emerald says state; cyan says the keyboard is here. Square, flush against
+   the element — and !important, because the core writes its own ring the
+   same way and would otherwise leave a Fluent-blue box on the concrete. */
+body.sheet-brutalist .btn:focus, body.sheet-brutalist .dropdown:focus,
+body.sheet-brutalist .list:focus, body.sheet-brutalist .seg:focus,
+body.sheet-brutalist .chip:focus, body.sheet-brutalist .link:focus,
+body.sheet-brutalist .rating:focus, body.sheet-brutalist .swatch:focus,
+body.sheet-brutalist .axdlg-btn:focus, body.sheet-brutalist .imgbox.button:focus,
+body.sheet-brutalist .dropzone:focus {
+    outline: 1px solid #22d3ee !important; outline-offset: 0 !important;
+}
+body.sheet-brutalist .list-item.kb { outline: 1px dashed #22d3ee !important; outline-offset: -1px; }
+
+/* Trident's own scrollbars, matched to the slab */
+body.sheet-brutalist.theme-dark {
+    scrollbar-face-color: #3f434a; scrollbar-track-color: #141517; scrollbar-arrow-color: #98a1ad;
+    scrollbar-shadow-color: #141517; scrollbar-highlight-color: #141517;
+    scrollbar-3dlight-color: #141517; scrollbar-darkshadow-color: #141517;
+}
+body.sheet-brutalist.theme-light {
+    scrollbar-face-color: #c3c9d1; scrollbar-track-color: #f1f2f4; scrollbar-arrow-color: #6b737e;
+    scrollbar-shadow-color: #f1f2f4; scrollbar-highlight-color: #f1f2f4;
+    scrollbar-3dlight-color: #f1f2f4; scrollbar-darkshadow-color: #f1f2f4;
+}
+
+/* ===================================================== state restatements */
+/* win11.css writes its state variants as ".axmb.collapsed", ".btn.icon",
+   ".imgbox.round" and so on -- two classes on one element, specificity
+   (0,2,0). Every rule in this sheet carries "body.sheet-brutalist" in front of it,
+   so a plain ".btn" or ".axmb" here is (0,2,1) and silently OUT-RANKS them:
+   the menu bar would not collapse when it is toggled off, an icon button
+   would take text padding, a round image box would come out square. Any
+   state this sheet steps on has to be restated at this sheet's own weight.
+   Adding a rule above for a bare class means checking win11.css for its
+   variants and adding them here too. */
+
+/* the menu bar has to be able to go away entirely */
+body.sheet-brutalist .axmb.collapsed {
+    height: 0; min-height: 0; padding: 0; margin: 0; overflow: hidden;
+}
+body.sheet-brutalist.theme-dark .axmb.collapsed,
+body.sheet-brutalist.theme-light .axmb.collapsed { border: 0; }
+
+/* an icon button is a square of icon font, not a padded label */
+body.sheet-brutalist .btn.icon {
+    padding: 0; text-align: center;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+}
+body.sheet-brutalist .btn.icon.text { font-family: inherit; font-size: 15px; }
+
+/* round means round */
+body.sheet-brutalist .imgbox.round { border-radius: 50%; }
+
+/* hover feedback the bare-class rules above would have swallowed */
+body.sheet-brutalist.theme-dark .tile:hover, body.sheet-brutalist.theme-dark .sort-list .drag-item:hover {
+    background: #2b2e33;
+}
+body.sheet-brutalist.theme-light .tile:hover, body.sheet-brutalist.theme-light .sort-list .drag-item:hover {
+    background: #e6e8ec;
+}
+body.sheet-brutalist .axmb-item.disabled, body.sheet-brutalist .axctx-item.disabled { opacity: .45; }
+body.sheet-brutalist .axmb-item.disabled:hover, body.sheet-brutalist .axctx-item.disabled:hover {
+    background: none; color: inherit;
+}
+
+/* ------------------------------------------- title-bar items and popovers */
+/* Flush-mounted, like the caption switches: square, one line, hard fill. */
+body.sheet-brutalist .axtb-item {
+    height: 20px; min-width: 22px; margin: 0 4px 0 0; padding: 0 6px; border-radius: 0;
+    border: 1px solid #3f434a; background: rgba(255,255,255,.035); font-size: 11px; transition: none;
+}
+body.sheet-brutalist.theme-dark .axtb-item  { color: #b9c2cc; }
+body.sheet-brutalist.theme-light .axtb-item { color: #41464c; background: rgba(255,255,255,.55); border-color: #a8afb9; }
+body.sheet-brutalist .axtb-item:hover, body.sheet-brutalist .axtb-item.on,
+body.sheet-brutalist .axtb-item.open, body.sheet-brutalist .axtb-item.pop-open {
+    background: #10b981; border-color: #10b981; color: #052b20;
+}
+body.sheet-brutalist .axtb-item.kind-sep, body.sheet-brutalist .axtb-item.kind-sep:hover {
+    border: none; background: #3f434a; height: 16px; width: 1px; min-width: 1px;
+}
+body.sheet-brutalist .axtb-burger { width: 11px; height: 9px; }
+body.sheet-brutalist .axtb-burger i { height: 1px; }
+body.sheet-brutalist .axtb-burger i:nth-child(2) { top: 4px; }
+body.sheet-brutalist .axtb-burger i:nth-child(3) { top: 8px; }
+body.sheet-brutalist #axPop { border-radius: 0; padding: 12px 14px; font-size: 13px; }
+body.sheet-brutalist.theme-dark #axPop  { background: #1f2124; color: #dfe3e8; border: 1px solid #3f434a; box-shadow: 0 12px 28px rgba(0,0,0,.6); }
+body.sheet-brutalist.theme-light #axPop { background: #ffffff; color: #1f2124; border: 1px solid #c3c9d1; box-shadow: 0 12px 28px rgba(0,0,0,.16); }

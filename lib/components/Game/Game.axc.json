@@ -1,0 +1,62 @@
+{
+  "name": "Game",
+  "description": "A small game engine, low-poly 3D or top-down 2D with tiles and sprites: the page runs the frames (movement, collisions, drawing), the script runs the rules.",
+  "order": 7470,
+  "css": "AxGame.css",
+  "include": "lib\\components\\Game\\AxGame.ahk",
+  "requires": [
+    "Canvas"
+  ],
+  "controls": [
+    {
+      "type": "Game",
+      "label": "Game view",
+      "icon": "E7FC",
+      "category": "Rich",
+      "prefix": "game",
+      "props": [
+        {
+          "key": "mode",
+          "label": "World",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "3d:Low-poly 3D|2d:Top-down 2D, tiles and sprites",
+          "default": "3d"
+        },
+        {
+          "key": "tick",
+          "label": "Rule ticks a second",
+          "kind": "num",
+          "emit": "kv",
+          "default": "30"
+        }
+      ],
+      "events": [
+        "Click",
+        {
+          "name": "Tick",
+          "sig": "eng, t",
+          "wire": "OnTick",
+          "help": "About Tick times a second: t.Keys, t.Pressed, t.Hits, t.Time, t.Dt",
+          "word": "ticks (the rules, many times a second)"
+        },
+        {
+          "name": "Hit",
+          "sig": "eng, a, b, tag",
+          "wire": "OnHit",
+          "filter": "tag",
+          "help": "Two things touched: a hit b, whose tag is tag",
+          "word": "has two things touch"
+        },
+        {
+          "name": "Key",
+          "sig": "eng, key",
+          "wire": "OnKey",
+          "filter": "key",
+          "help": "A key was just pressed, by name: space, e, enter, a..z, 0..9",
+          "word": "has a key pressed"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "Svg",
+  "description": "Inline SVG",
+  "order": 5002,
+  "css": "AxSvg.css",
+  "include": "lib\\components\\Svg\\AxSvg.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Svg",
+      "label": "Inline SVG",
+      "icon": "E7C1",
+      "category": "Media",
+      "prefix": "svg",
+      "arg": {
+        "key": "markup",
+        "label": "SVG markup",
+        "kind": "multiline"
+      },
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

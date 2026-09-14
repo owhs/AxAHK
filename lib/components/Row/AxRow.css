@@ -1,0 +1,12 @@
+/* AxRow.css -- the shape of the setting row.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.card-row { align-items: center; display: flex; }
+.card-row .ico { flex: none; }
+.card-row .title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* the control keeps its width (up to the sheet's max-width) and the label
+   gives way first: a shrinking .ctl squeezed a segmented control's last
+   option out of its box and a drop-down past the card's edge */
+.card-row .ctl { align-items: center; display: flex; flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-end; }

@@ -1,0 +1,160 @@
+{
+ "format": "axstudio/2",
+ "name": "Split editor",
+ "desc": "A code editor beside a file list you can resize, both filling the window: open a folder, pick a file, edit with colours and suggestions, Ctrl+S to save. The burger hides the list (a state).",
+ "uid": 3,
+ "cur": 1,
+ "vars": "",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Editor",
+   "width": 1040,
+   "height": 660,
+   "minwidth": 700,
+   "minheight": 420,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E943",
+   "menus": "&File\n    &New | Ctrl+N | NewFile()\n    &Open a folder... | Ctrl+O | PickFolder()\n    &Save | Ctrl+S | SaveFile()\n    -\n    E&xit | Alt+F4 | g.Close()\n&View\n    &Files | Ctrl+B | TogglePane()\n    &Word wrap | Alt+Z | ToggleWrap()",
+   "status": "msg | Ready | grow icon=E943\nlang | AutoHotkey | w=110 right\nsize | | w=100 right",
+   "titleitems": "pane | burger | | tip=\"Files (Ctrl+B)\" class=morph toggle | TogglePane()\nbrand | text | Editor |\ngap | spacer | |\nsave | glyph | E74E | right tip=\"Save (Ctrl+S)\" | SaveFile()",
+   "titleshow": 0,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "",
+   "states": "panes: files.Visible = 1, sp1.Visible = 1\nnopanes: files.Visible = 0, sp1.Visible = 0",
+   "binds": "",
+   "hotkeys": "^s | active | own | SaveFile\n^n | active | own | NewFile\n^o | active | own | PickFolder\n^b | active | own | TogglePane\n!z | active | own | ToggleWrap",
+   "init": "ListFolder()",
+   "script": "Folder := A_ScriptDir\nCurrent := \"\"\nDirty := false\nPaneOn := true\nWrapOn := false\n\n; The text files in the folder, in the list on the left.\nListFolder() {\n    global files, Folder, g\n    files.Delete()\n    names := []\n    loop files Folder \"\\*.*\"\n        if RegExMatch(A_LoopFileExt, \"i)^(ahk|txt|md|js|json|ini|css|html?|py|ps1|sql|xml|log|csv)$\")\n            names.Push(A_LoopFileName)\n    if names.Length\n        files.Add(names)\n    g.Status(\"msg\", Folder)\n}\nOpenFile(name) {\n    global ed, Folder, Current, Dirty, g\n    if (name = \"\")\n        return\n    SaveFile(true)\n    Current := Folder \"\\\" name\n    ed.Load(FileRead(Current, \"UTF-8\"))\n    Dirty := false\n    SplitPath(name, , , &ext)\n    ext := StrLower(ext)\n    langs := Map(\"ahk\", \"ahk\", \"js\", \"js\", \"json\", \"json\", \"md\", \"md\", \"css\", \"css\", \"htm\", \"html\",\n                 \"html\", \"html\", \"xml\", \"xml\", \"ini\", \"ini\", \"ps1\", \"ps1\", \"py\", \"py\", \"sql\", \"sql\")\n    ed.SetLanguage(langs.Has(ext) ? langs[ext] : \"plain\")\n    g.Status(\"lang\", langs.Has(ext) ? StrUpper(ext) : \"Plain text\")\n    g.Status(\"msg\", name)\n}\n; quiet: saving on the way to another file -- only if it changed, and\n; never asking for a name.\nSaveFile(quiet := false) {\n    global ed, Folder, Current, Dirty, g\n    if (quiet && !Dirty)\n        return\n    if (Current = \"\") {\n        if quiet\n            return\n        name := g.Prompt(\"Save it as\", \"Save\", \"untitled.txt\")\n        if (name = \"\")\n            return\n        Current := Folder \"\\\" name\n    }\n    try FileDelete(Current)\n    FileAppend(ed.Value, Current, \"UTF-8\")\n    Dirty := false\n    if !quiet {\n        g.Toast(\"Saved\", 1200, \"success\")\n        ListFolder()\n    }\n}\nNewFile() {\n    global ed, Current, Dirty, g\n    SaveFile(true)\n    Current := \"\", Dirty := false\n    ed.Load(\"\")\n    g.Status(\"msg\", \"A new file -- Ctrl+S names it\")\n}\nPickFolder() {\n    global Folder\n    d := DirSelect(\"*\" Folder, 0, \"Pick a folder of text files\")\n    if (d != \"\") {\n        Folder := d\n        ListFolder()\n    }\n}\nTogglePane() {\n    global PaneOn\n    PaneOn := !PaneOn\n    MainState(PaneOn ? \"panes\" : \"nopanes\")\n}\nToggleWrap() {\n    global ed, WrapOn\n    WrapOn := !WrapOn\n    ed.SetOption(\"wrap\", WrapOn ? 1 : 0)\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "ListBox",
+      "name": "files",
+      "arg": "",
+      "layout": {
+       "w": 220,
+       "grow": 1,
+       "h": 200
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Change",
+        "code": "OpenFile(value)"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Splitter",
+      "name": "sp1",
+      "arg": "",
+      "layout": {
+       "place": "same",
+       "gap": 0
+      },
+      "props": {
+       "target": "files",
+       "min": "140",
+       "max": "460"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "CodeEditor",
+      "name": "ed",
+      "arg": "; Pick a file on the left, or start typing.\n; Ctrl+S saves, Ctrl+B hides the list, Alt+Z wraps.\n",
+      "layout": {
+       "place": "same",
+       "gap": 0,
+       "fill": 1,
+       "grow": 1,
+       "h": 200
+      },
+      "props": {
+       "lang": "ahk",
+       "preset": "ide"
+      },
+      "events": [
+       {
+        "name": "Change",
+        "code": "global Dirty\nDirty := true\ng.Status(\"size\", StrLen(value) \" chars\")"
+       }
+      ],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

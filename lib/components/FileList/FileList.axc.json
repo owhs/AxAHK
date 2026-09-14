@@ -1,0 +1,31 @@
+{
+  "name": "FileList",
+  "description": "File list",
+  "order": 6001,
+  "css": "AxFileList.css",
+  "include": "lib\\components\\FileList\\AxFileList.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "FileList",
+      "label": "File list",
+      "icon": "E8B7",
+      "category": "Files",
+      "prefix": "fl",
+      "arg": {
+        "key": "empty",
+        "label": "Empty text",
+        "kind": "text",
+        "default": "Nothing here yet."
+      },
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

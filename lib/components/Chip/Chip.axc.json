@@ -1,0 +1,39 @@
+{
+  "name": "Chip",
+  "description": "Chip",
+  "order": 4003,
+  "css": "AxChip.css",
+  "include": "lib\\components\\Chip\\AxChip.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Chip",
+      "label": "Chip",
+      "icon": "E8EC",
+      "category": "Display",
+      "prefix": "chip",
+      "arg": {
+        "key": "text",
+        "label": "Text",
+        "kind": "text",
+        "default": "Alpha"
+      },
+      "props": [
+        {
+          "key": "on",
+          "label": "Selected",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

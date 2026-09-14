@@ -1,0 +1,33 @@
+/* AxStepper.css -- a wizard's steps. IE11-safe. */
+.axstep { display: block; min-width: 0; }
+.axstep-r { display: flex; align-items: flex-start; }
+.axstep-s { flex: none; display: flex; align-items: flex-start; max-width: 220px; padding: 4px 6px; border-radius: 6px; cursor: default; }
+.axstep-s.can:hover { background: rgba(255,255,255,.0605); }
+.axstep-dot {
+    flex: none; width: 28px; height: 28px; line-height: 26px; text-align: center; border-radius: 50%; box-sizing: border-box;
+    font-size: 13px; font-weight: 600; border: 1px solid rgba(255,255,255,.35); color: rgba(255,255,255,.75);
+}
+.axstep-dot .ico { font-size: 12px; }
+.axstep-t { display: block; margin-left: 10px; padding-top: 4px; min-width: 0; }
+.axstep-t b { display: block; font-size: 13.5px; line-height: 20px; font-weight: 600; white-space: nowrap; color: rgba(255,255,255,.75); }
+.axstep-t small { display: block; font-size: 12px; line-height: 16px; color: rgba(255,255,255,.55); }
+.axstep-s.cur .axstep-dot { border: 2px solid #60cdff; color: #60cdff; line-height: 24px; }
+.axstep-s.cur .axstep-t b { color: #ffffff; }
+.axstep-s.done .axstep-dot { background: #60cdff; border-color: #60cdff; color: #000000; }
+.axstep-s.done .axstep-t b { color: #ffffff; }
+.axstep-line { flex: 1 1 0%; min-width: 16px; height: 2px; margin: 18px 4px 0; border-radius: 1px; background: rgba(255,255,255,.18); }
+.axstep-line.done { background: #60cdff; }
+
+.axstep.vertical .axstep-r { flex-direction: column; align-items: stretch; }
+.axstep.vertical .axstep-s { max-width: none; }
+.axstep.vertical .axstep-line { flex: none; width: 2px; height: 22px; min-width: 0; margin: 0 0 0 19px; }
+
+body.theme-light .axstep-s.can:hover { background: rgba(0,0,0,.0373); }
+body.theme-light .axstep-dot { border-color: rgba(0,0,0,.35); color: rgba(0,0,0,.6); }
+body.theme-light .axstep-t b { color: rgba(0,0,0,.62); }
+body.theme-light .axstep-t small { color: rgba(0,0,0,.5); }
+body.theme-light .axstep-s.cur .axstep-dot { border-color: #005fb8; color: #005fb8; }
+body.theme-light .axstep-s.cur .axstep-t b, body.theme-light .axstep-s.done .axstep-t b { color: #1b1b1b; }
+body.theme-light .axstep-s.done .axstep-dot { background: #005fb8; border-color: #005fb8; color: #ffffff; }
+body.theme-light .axstep-line { background: rgba(0,0,0,.14); }
+body.theme-light .axstep-line.done { background: #005fb8; }

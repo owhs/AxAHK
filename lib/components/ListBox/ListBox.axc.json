@@ -1,0 +1,51 @@
+{
+  "name": "ListBox",
+  "description": "List box",
+  "order": 2009,
+  "css": "AxListBox.css",
+  "include": "lib\\components\\ListBox\\AxListBox.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "ListBox",
+      "label": "List box",
+      "icon": "E8FD",
+      "category": "Common",
+      "prefix": "lst",
+      "arg": {
+        "key": "options",
+        "label": "Options",
+        "kind": "options",
+        "default": "a:Alpha\nb:Beta\nc:Gamma"
+      },
+      "props": [
+        {
+          "key": "value",
+          "label": "Value",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "multi",
+          "label": "Multi-select (Ctrl)",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "checklist",
+          "label": "Check list",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+/* AxSlider.css -- the shape of the slider.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.slider { align-items: center; display: flex; }
+.slider input[type=range] { flex: 1 1 0px; }
+.slider .out { flex: none; }

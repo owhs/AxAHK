@@ -1,0 +1,6 @@
+/* AxBadge.css -- the shape of the badge.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.badge { display: inline-block; vertical-align: middle; }

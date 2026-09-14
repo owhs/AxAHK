@@ -1,0 +1,186 @@
+{
+ "format": "axstudio/2",
+ "name": "Dialog",
+ "desc": "Rename, the way a real dialog behaves: the check and the hint follow what you type, Rename is off until the name is good, Enter and Escape work -- all bindings.",
+ "uid": 6,
+ "cur": 1,
+ "vars": "newName = \"Quarterly report\"\nnameOk <- (Trim(newName) != \"\" && RegExMatch(newName, \"^[\\w\\- ]+$\")) ? 1 : 0\nnameHint <- nameOk ? \"Looks good.\" : (Trim(newName) = \"\" ? \"It needs a name.\" : \"Letters, digits, spaces and dashes only.\")",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Rename",
+   "width": 460,
+   "height": 216,
+   "minwidth": 0,
+   "minheight": 0,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 1,
+   "resizable": 0,
+   "icon": "E8AC",
+   "menus": "",
+   "status": "",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 0,
+   "minimizebox": 0,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "okBtn",
+   "cancelbtn": "cancelBtn",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "cancelBtn Click -> close",
+   "states": "",
+   "binds": "nameBox <-> newName\nokBtn.Enabled <- nameOk\nhintLbl.Text <- nameHint",
+   "hotkeys": "",
+   "init": "",
+   "script": "",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "Text",
+      "name": "",
+      "arg": "Give it a new name",
+      "layout": {},
+      "props": {
+       "caption": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Edit",
+      "name": "nameBox",
+      "arg": "Quarterly report",
+      "layout": {
+       "fill": 1
+      },
+      "props": {
+       "placeholder": "New name"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Text",
+      "name": "hintLbl",
+      "arg": "Looks good.",
+      "layout": {},
+      "props": {
+       "hint": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Text",
+      "name": "",
+      "arg": "",
+      "layout": {
+       "fill": 1,
+       "top": 6
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Button",
+      "name": "cancelBtn",
+      "arg": "Cancel",
+      "layout": {
+       "place": "same",
+       "w": 100
+      },
+      "props": {
+       "kind": "Subtle"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "Button",
+      "name": "okBtn",
+      "arg": "Rename",
+      "layout": {
+       "place": "same",
+       "w": 110
+      },
+      "props": {
+       "kind": "Accent"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "g.Toast(\"Renamed to \" newName, 1200, \"success\")\nSleep(900)\ng.Close()"
+       }
+      ],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

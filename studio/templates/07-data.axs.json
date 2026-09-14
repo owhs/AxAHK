@@ -1,0 +1,208 @@
+{
+ "format": "axstudio/2",
+ "name": "Data grid",
+ "desc": "A searchable, sortable table that fills the window, a filter, a details panel beside it that follows the picked row, adding a record and exporting to CSV.",
+ "uid": 6,
+ "cur": 1,
+ "vars": "",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Records",
+   "width": 1040,
+   "height": 640,
+   "minwidth": 760,
+   "minheight": 420,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E80A",
+   "menus": "&File\n    &Add a record | Ctrl+N | AddRecord()\n    &Export as CSV... | Ctrl+E | ExportCsv()\n    -\n    E&xit | Alt+F4 | g.Close()",
+   "status": "msg | Click a row to see it; double-click to change its score | grow icon=E80A\nrows | 12 rows | w=100 right",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "#detail{box-sizing:border-box;padding:16px 18px;border-radius:8px;overflow:auto;\n  background:rgba(255,255,255,.0512);border:1px solid rgba(255,255,255,.0698)}\nbody.theme-light #detail{background:#fff;border-color:rgba(0,0,0,.08)}\n.dt-name{font-size:20px;font-weight:600;margin-bottom:14px}\n.dt-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(128,128,128,.15)}\n.dt-row span{opacity:.6}\n.dt-bar{height:6px;border-radius:3px;background:rgba(128,128,128,.25);margin:16px 0 6px}\n.dt-bar i{display:block;height:100%;border-radius:3px;background:#60cdff}\n.dt-empty{opacity:.55;padding-top:40px;text-align:center}",
+   "flows": "addBtn Click -> call AddRecord\nexportBtn Click -> call ExportCsv",
+   "states": "",
+   "binds": "",
+   "hotkeys": "^n | active | own | AddRecord\n^e | active | own | ExportCsv",
+   "init": "ShowPerson(\"\")",
+   "script": "; The panel beside the grid: the picked person, or a word about picking one.\nShowPerson(p) {\n    global g\n    if !IsObject(p)\n        return g.Html(\"detail\", '<div class=\"dt-empty\">Pick someone in the list.</div>')\n    E := (s) => AxTags.E(String(s))\n    g.Html(\"detail\", '<div class=\"dt-name\">' E(p.name) '</div>'\n        . '<div class=\"dt-row\"><span>Team</span>' E(p.team) '</div>'\n        . '<div class=\"dt-row\"><span>City</span>' E(p.city) '</div>'\n        . '<div class=\"dt-row\"><span>Status</span>' E(p.status) '</div>'\n        . '<div class=\"dt-row\"><span>With us since</span>' E(p.since) '</div>'\n        . '<div class=\"dt-bar\"><i style=\"width:' Integer(p.score) '%\"></i></div>'\n        . '<div class=\"dt-row\"><span>Score</span>' E(p.score) ' / 100</div>')\n}\nAddRecord() {\n    global g, grid\n    name := Trim(g.Prompt(\"Who is it?\", \"Add a record\", \"\", \"Full name\"))\n    if (name = \"\")\n        return\n    rows := grid.Component.Rows\n    rows.Push({Key: \"p\" A_TickCount, name: name, team: \"Engineering\", city: \"\",\n               status: \"Active\", since: FormatTime(, \"yyyy\"), score: 50})\n    grid.SetRows(rows)\n    g.Status(\"rows\", rows.Length \" rows\")\n    g.Toast(\"Added \" name, 1500, \"success\")\n}\nExportCsv() {\n    global g, grid\n    f := FileSelect(\"S16\", A_MyDocuments \"\\records.csv\", \"Export as CSV\", \"CSV (*.csv)\")\n    if (f = \"\")\n        return\n    q := (s) => '\"' StrReplace(String(s), '\"', '\"\"') '\"'\n    out := \"Name,Team,City,Status,Since,Score`n\"\n    for r in grid.Component.Rows\n        out .= q(r.name) \",\" q(r.team) \",\" q(r.city) \",\" q(r.status) \",\" r.since \",\" r.score \"`n\"\n    try FileDelete(f)\n    FileAppend(out, f, \"UTF-8\")\n    g.Toast(\"Exported \" grid.Component.Rows.Length \" rows\", 2000, \"success\")\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "Search",
+      "name": "q",
+      "arg": "",
+      "layout": {
+       "fill": 1
+      },
+      "props": {
+       "placeholder": "Search by anything"
+      },
+      "events": [
+       {
+        "name": "Change",
+        "code": "grid.Filter(value)"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Segmented",
+      "name": "who",
+      "arg": "all:Everyone\nActive:Active\nAway:Away",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "value": "all"
+      },
+      "events": [
+       {
+        "name": "Change",
+        "code": "grid.Filter(value = \"all\" ? q.Text : value)"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Button",
+      "name": "addBtn",
+      "arg": "Add",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E710"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Button",
+      "name": "exportBtn",
+      "arg": "Export",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "kind": "Subtle",
+       "icon": "EDE1"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "DataView",
+      "name": "grid",
+      "arg": "{Columns: [{Key: \"name\", Title: \"Name\", Width: 200}, {Key: \"team\", Title: \"Team\", Width: 130},\n            {Key: \"city\", Title: \"City\", Width: 130}, {Key: \"status\", Title: \"Status\", Width: 100},\n            {Key: \"since\", Title: \"Since\", Width: 80, Align: \"right\"},\n            {Key: \"score\", Title: \"Score\", Width: 80, Align: \"right\", Sort: \"number\"}],\n Rows: [{Key: \"p1\", name: \"Ada Lovelace\", team: \"Engineering\", city: \"London\", status: \"Active\", since: \"2019\", score: 92},\n        {Key: \"p2\", name: \"Grace Hopper\", team: \"Engineering\", city: \"New York\", status: \"Active\", since: \"2017\", score: 97},\n        {Key: \"p3\", name: \"Alan Turing\", team: \"Research\", city: \"Manchester\", status: \"Away\", since: \"2018\", score: 95},\n        {Key: \"p4\", name: \"Katherine Johnson\", team: \"Research\", city: \"Hampton\", status: \"Active\", since: \"2020\", score: 94},\n        {Key: \"p5\", name: \"Linus Torvalds\", team: \"Engineering\", city: \"Portland\", status: \"Active\", since: \"2021\", score: 88},\n        {Key: \"p6\", name: \"Margaret Hamilton\", team: \"Engineering\", city: \"Boston\", status: \"Away\", since: \"2016\", score: 96},\n        {Key: \"p7\", name: \"Tim Berners-Lee\", team: \"Design\", city: \"Geneva\", status: \"Active\", since: \"2022\", score: 85},\n        {Key: \"p8\", name: \"Hedy Lamarr\", team: \"Design\", city: \"Vienna\", status: \"Active\", since: \"2023\", score: 83},\n        {Key: \"p9\", name: \"Claude Shannon\", team: \"Research\", city: \"Ann Arbor\", status: \"Away\", since: \"2015\", score: 90},\n        {Key: \"p10\", name: \"Radia Perlman\", team: \"Operations\", city: \"Portland\", status: \"Active\", since: \"2019\", score: 87},\n        {Key: \"p11\", name: \"Barbara Liskov\", team: \"Research\", city: \"Boston\", status: \"Active\", since: \"2018\", score: 91},\n        {Key: \"p12\", name: \"Dennis Ritchie\", team: \"Engineering\", city: \"Murray Hill\", status: \"Away\", since: \"2014\", score: 93}]}",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 200
+      },
+      "props": {
+       "notools": 1,
+       "single": 1
+      },
+      "events": [
+       {
+        "name": "Select",
+        "code": "ShowPerson(rows.Length ? rows[1] : \"\")"
+       },
+       {
+        "name": "Activate",
+        "code": "s := g.Prompt(\"A new score for \" row.name, \"Score\", row.score)\nif IsNumber(s) {\n    row.score := Integer(s)\n    grid.Refresh()\n    ShowPerson(row)\n}"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "Html",
+      "name": "detail",
+      "arg": "",
+      "layout": {
+       "place": "same",
+       "w": 270,
+       "grow": 1,
+       "h": 200
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

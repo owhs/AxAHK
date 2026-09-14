@@ -1,0 +1,78 @@
+{
+  "name": "DropZone",
+  "description": "Drop zone",
+  "order": 6000,
+  "css": "AxDropZone.css",
+  "include": "lib\\components\\DropZone\\AxDropZone.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "DropZone",
+      "label": "Drop zone",
+      "icon": "E896",
+      "category": "Files",
+      "prefix": "dz",
+      "arg": {
+        "key": "title",
+        "label": "Title",
+        "kind": "text",
+        "default": "Drop files here"
+      },
+      "props": [
+        {
+          "key": "desc",
+          "label": "Description",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "accept",
+          "label": "Accept",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "icon",
+          "label": "Icon",
+          "kind": "icon",
+          "emit": "kv"
+        },
+        {
+          "key": "browse",
+          "label": "Click to browse",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "expand",
+          "label": "Unpack folders",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "recurse",
+          "label": "Recurse",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "single",
+          "label": "One file only",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "compact",
+          "label": "Compact",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Drop",
+        "Click",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

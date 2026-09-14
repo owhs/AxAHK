@@ -1,0 +1,26 @@
+{
+  "name": "Console",
+  "description": "Log box",
+  "order": 4004,
+  "css": "AxConsole.css",
+  "include": "lib\\components\\Console\\AxConsole.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Console",
+      "label": "Log box",
+      "icon": "E756",
+      "category": "Display",
+      "prefix": "con",
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

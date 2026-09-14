@@ -1,0 +1,365 @@
+{
+ "format": "axstudio/2",
+ "name": "App shell",
+ "desc": "A notes app: a burger that folds the page rail to icons, a brand, a list of notes and a rich editor that fill the window, notes kept as Markdown files, and settings that are remembered.",
+ "uid": 17,
+ "cur": 1,
+ "vars": "",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "theme | dark | choice | Theme | dark,light\nstartup | 0 | startup | Start with Windows",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Notes",
+   "width": 1000,
+   "height": 640,
+   "minwidth": 700,
+   "minheight": 440,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 1,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E70B",
+   "menus": "&File\n    &New note | Ctrl+N | NewNote()\n    &Delete the note | | DeleteNote()\n    -\n    E&xit | Alt+F4 | g.Close()\n&View\n    &Names and icons | | g.NavMode(\"full\")\n    &Icons only | | g.NavMode(\"compact\")",
+   "status": "msg | Ready | grow icon=E70B\ncount | 0 notes | w=110 right",
+   "titleitems": "menu | burger | | tip=\"Show or hide the names\" class=morph toggle | g.NavMode(\"toggle\")\nbrand | text | Notes |\ngap | spacer | |\nnew | glyph | E710 | right tip=\"New note (Ctrl+N)\" | NewNote()\nacct | glyph | E77B | right tip=\"Account\"",
+   "titleshow": 0,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "newBtn Click -> call NewNote\ndelBtn Click -> call DeleteNote",
+   "states": "",
+   "binds": "themeSeg <-> theme\nswStart <-> startup",
+   "hotkeys": "^n | active | own | NewNote",
+   "init": "g.SetTheme(theme)\nLoadNotes()\nOnExit((*) => (SaveCurrent(), 0))",
+   "script": "; Every note is a Markdown file in the notes folder beside the script.\nNotesDir := A_ScriptDir \"\\notes\"\nCurrent := \"\"\n\nLoadNotes(filter := \"\") {\n    global list, NotesDir, g\n    DirCreate(NotesDir)\n    list.Delete()\n    names := [], n := 0\n    loop files NotesDir \"\\*.md\" {\n        n++\n        name := SubStr(A_LoopFileName, 1, -3)\n        if (filter = \"\" || InStr(name, filter))\n            names.Push(name)\n    }\n    if names.Length\n        list.Add(names)\n    g.Status(\"count\", n \" note\" (n = 1 ? \"\" : \"s\"))\n    g.Status(\"msg\", n ? \"Pick a note, or start a new one\" : \"No notes yet: Ctrl+N starts one\")\n}\nOpenNote(name) {\n    global body, NotesDir, Current, g\n    SaveCurrent()\n    Current := name\n    f := NotesDir \"\\\" name \".md\"\n    body.Value := FileExist(f) ? FileRead(f, \"UTF-8\") : \"\"\n    g.Status(\"msg\", name)\n}\nSaveCurrent(*) {\n    global body, NotesDir, Current\n    if (Current = \"\")\n        return\n    f := NotesDir \"\\\" Current \".md\"\n    try FileDelete(f)\n    FileAppend(body.Value, f, \"UTF-8\")\n}\nNewNote() {\n    global g, list, NotesDir\n    name := Trim(g.Prompt(\"What is it called?\", \"New note\", \"\", \"A name for the note\"))\n    if (name = \"\")\n        return\n    name := RegExReplace(name, '[\\\\/:*?\"<>|]', \"-\")\n    if FileExist(NotesDir \"\\\" name \".md\")\n        return g.Toast(\"There is already a note called \" name, 2500, \"warning\")\n    FileAppend(\"# \" name \"`n`n\", NotesDir \"\\\" name \".md\", \"UTF-8\")\n    LoadNotes()\n    list.Value := name\n    OpenNote(name)\n    g.Toast(\"Added \" name, 1500, \"success\")\n}\nDeleteNote() {\n    global g, body, NotesDir, Current\n    if (Current = \"\")\n        return g.Toast(\"Pick a note first\", 1500, \"warning\")\n    if !g.Confirm(\"Delete \" Current \"?\", \"Notes\", \"Delete\", \"Keep it\")\n        return\n    try FileDelete(NotesDir \"\\\" Current \".md\")\n    Current := \"\", body.Value := \"\"\n    LoadNotes()\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n7",
+      "type": "Page",
+      "name": "notes",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "All notes",
+       "icon": "E8F1"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n1",
+        "type": "Search",
+        "name": "find",
+        "arg": "",
+        "layout": {
+         "fill": 1
+        },
+        "props": {
+         "placeholder": "Search the notes"
+        },
+        "events": [
+         {
+          "name": "Change",
+          "code": "LoadNotes(value)"
+         }
+        ],
+        "kids": []
+       },
+       {
+        "id": "n2",
+        "type": "Button",
+        "name": "newBtn",
+        "arg": "New note",
+        "layout": {
+         "place": "same"
+        },
+        "props": {
+         "kind": "Accent",
+         "icon": "E710"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n3",
+        "type": "ListBox",
+        "name": "list",
+        "arg": "",
+        "layout": {
+         "w": 240,
+         "grow": 1,
+         "h": 200
+        },
+        "props": {},
+        "events": [
+         {
+          "name": "Change",
+          "code": "OpenNote(value)"
+         }
+        ],
+        "kids": []
+       },
+       {
+        "id": "n4",
+        "type": "RichText",
+        "name": "body",
+        "arg": "",
+        "layout": {
+         "fill": 1,
+         "grow": 1,
+         "place": "same",
+         "h": 200
+        },
+        "props": {
+         "format": "md",
+         "placeholder": "Pick a note, or start a new one with Ctrl+N."
+        },
+        "events": [
+         {
+          "name": "Change",
+          "code": "SetTimer(SaveCurrent, -800)"
+         }
+        ],
+        "kids": []
+       },
+       {
+        "id": "n5",
+        "type": "Button",
+        "name": "delBtn",
+        "arg": "Delete",
+        "layout": {},
+        "props": {
+         "kind": "Subtle",
+         "icon": "E74D"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n6",
+        "type": "Text",
+        "name": "",
+        "arg": "Each note is a Markdown file in the notes folder beside the program.",
+        "layout": {
+         "place": "same",
+         "fill": 1
+        },
+        "props": {
+         "hint": 1,
+         "align": "Right"
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     },
+     {
+      "id": "n14",
+      "type": "Page",
+      "name": "settings",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "Settings",
+       "icon": "E713"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n9",
+        "type": "Row",
+        "name": "",
+        "arg": "Theme",
+        "layout": {},
+        "props": {
+         "desc": "Remembered for next time",
+         "icon": "E793"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n8",
+          "type": "Segmented",
+          "name": "themeSeg",
+          "arg": "dark:Dark:E708\nlight:Light:E706",
+          "layout": {},
+          "props": {
+           "value": "dark"
+          },
+          "events": [
+           {
+            "name": "Change",
+            "code": "g.SetTheme(value)"
+           }
+          ],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n11",
+        "type": "Row",
+        "name": "",
+        "arg": "Start with Windows",
+        "layout": {},
+        "props": {
+         "desc": "Open Notes when you sign in",
+         "icon": "E7E8"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n10",
+          "type": "Switch",
+          "name": "swStart",
+          "arg": "",
+          "layout": {},
+          "props": {
+           "nolabel": 1
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n13",
+        "type": "Row",
+        "name": "",
+        "arg": "The notes folder",
+        "layout": {},
+        "props": {
+         "desc": "Plain Markdown files: back them up, sync them, open them anywhere",
+         "icon": "E8B7"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n12",
+          "type": "Button",
+          "name": "folderBtn",
+          "arg": "Open it",
+          "layout": {},
+          "props": {
+           "icon": "E838"
+          },
+          "events": [
+           {
+            "name": "Click",
+            "code": "Run(NotesDir)"
+           }
+          ],
+          "kids": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "n17",
+      "type": "Page",
+      "name": "about",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "About",
+       "icon": "E946"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n15",
+        "type": "Avatar",
+        "name": "",
+        "arg": "Notes",
+        "layout": {},
+        "props": {
+         "size": "64",
+         "named": 1,
+         "sub": "Version 1.0"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n16",
+        "type": "InfoBar",
+        "name": "",
+        "arg": "The burger folds the page rail to its icons. The editor is the library's rich text control: Markdown as you type, a / menu, tables, find and replace.",
+        "layout": {
+         "top": 8
+        },
+        "props": {
+         "title": "About Notes",
+         "kind": "info",
+         "noclose": 1
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

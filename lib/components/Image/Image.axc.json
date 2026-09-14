@@ -1,0 +1,71 @@
+{
+  "name": "Image",
+  "description": "Image",
+  "order": 5000,
+  "css": "AxImage.css",
+  "include": "lib\\components\\Image\\AxImage.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Image",
+      "label": "Image",
+      "icon": "E91B",
+      "category": "Media",
+      "prefix": "img",
+      "arg": {
+        "key": "src",
+        "label": "Source",
+        "kind": "text"
+      },
+      "props": [
+        {
+          "key": "fit",
+          "label": "Fit",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "cover|contain",
+          "default": "cover"
+        },
+        {
+          "key": "caption",
+          "label": "Caption",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "alt",
+          "label": "Alt text",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "icon",
+          "label": "Placeholder icon",
+          "kind": "icon",
+          "emit": "kv"
+        },
+        {
+          "key": "button",
+          "label": "Clickable",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "round",
+          "label": "Round",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

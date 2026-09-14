@@ -1,0 +1,53 @@
+{
+  "name": "Audio",
+  "description": "A sound player: MP3 or AAC through the page's own audio element, with a small player or none.",
+  "order": 7460,
+  "css": "AxAudio.css",
+  "include": "lib\\components\\Audio\\AxAudio.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Audio",
+      "label": "Audio player",
+      "icon": "E8D6",
+      "category": "Rich",
+      "prefix": "audio",
+      "arg": {
+        "key": "src",
+        "label": "Sound file (MP3)",
+        "kind": "text",
+        "default": ""
+      },
+      "props": [
+        {
+          "key": "loop",
+          "label": "Loop",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "autoplay",
+          "label": "Play when the window opens",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "noui",
+          "label": "No player (sound only)",
+          "kind": "flag",
+          "emit": "flag",
+          "word": "NoUi"
+        },
+        {
+          "key": "volume",
+          "label": "Volume (0-100)",
+          "kind": "num",
+          "emit": "kv"
+        }
+      ],
+      "events": [
+        "Click"
+      ]
+    }
+  ]
+}

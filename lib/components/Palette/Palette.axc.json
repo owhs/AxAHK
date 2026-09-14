@@ -1,0 +1,51 @@
+{
+  "name": "Palette",
+  "description": "Colour palette",
+  "order": 3008,
+  "css": "AxPalette.css",
+  "include": "lib\\components\\Palette\\AxPalette.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Palette",
+      "label": "Colour palette",
+      "icon": "E790",
+      "category": "Input",
+      "prefix": "pal",
+      "arg": {
+        "key": "colors",
+        "label": "Colours (one per line)",
+        "kind": "options",
+        "default": "#ffb900\n#f7630c\n#0078d4"
+      },
+      "props": [
+        {
+          "key": "value",
+          "label": "Selected colour",
+          "kind": "color",
+          "emit": "kv"
+        },
+        {
+          "key": "showhex",
+          "label": "Show hex",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "small",
+          "label": "Small swatches",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

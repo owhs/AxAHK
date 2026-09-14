@@ -1,0 +1,7 @@
+/* AxPalette.css -- the shape of the colour palette.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.swatch { display: inline-block; }
+.hex { display: inline-block; }

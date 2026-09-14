@@ -1,0 +1,7 @@
+/* AxConsole.css -- the shape of the log box.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.console { overflow-y: auto; }
+.console div { white-space: pre-wrap; }

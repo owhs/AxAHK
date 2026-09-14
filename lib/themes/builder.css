@@ -1,0 +1,33 @@
+/* builder.css — layout rules for AxGui-built pages (.ax-line rows etc.) */
+.ax-line{display:flex;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.ax-line>*{margin-right:8px;margin-bottom:0}.ax-line>*:last-child{margin-right:0}
+.ax-line>.fill{flex:1 1 0px}
+.ax-text{display:inline-block}.ax-text.right{text-align:right}.ax-text.center{text-align:center}
+.ax-abs{position:absolute}.page,#content{position:relative}
+.ax-hidden{display:none!important}
+.ax-dock{min-height:120px;background:rgba(128,128,128,.08);border-radius:6px}
+.ax-sep{height:1px;background:rgba(128,128,128,.25);margin:10px 0}
+.ax-pic{max-width:100%;border-radius:6px}
+.card .ax-line:last-child,.group .ax-line:last-child,.exp-body .ax-line:last-child{margin-bottom:0}
+/* a tile grid takes its tiles' margin back round the edge (the sheets' -6px),
+   but not underneath, where it would jam what follows against its last row */
+.tile-grid{margin-bottom:4px}
+/* Grow: a control that takes the height its container has left. AxGui's fit
+   script sets its height; these make each control's insides follow that
+   height rather than the one they are drawn at by default. */
+.ax-line.ax-grow{align-items:flex-start}
+.ax-growy{min-height:80px;max-height:none!important}
+.btn.ax-growy{display:-ms-inline-flexbox;display:inline-flex;-ms-flex-align:center;align-items:center;-ms-flex-pack:center;justify-content:center;line-height:normal}
+.textbox.ax-growy>textarea{height:100%;box-sizing:border-box;resize:none}
+.dv.ax-growy{display:-ms-flexbox;display:flex;-ms-flex-direction:column;flex-direction:column}
+.dv.ax-growy>*{-ms-flex:0 0 auto;flex:0 0 auto}
+.dv.ax-growy>.dv-frame{-ms-flex:1 1 0px;flex:1 1 0px;min-height:0;display:-ms-flexbox;display:flex;-ms-flex-direction:column;flex-direction:column}
+.dv.ax-growy .dv-headwrap{-ms-flex:0 0 auto;flex:0 0 auto}
+.dv.ax-growy .dv-bodywrap{-ms-flex:1 1 0px;flex:1 1 0px;min-height:0;max-height:none!important}
+.tabs-frame.ax-growy>.tab-panel{-ms-flex:1 1 0px;flex:1 1 0px;min-height:0;overflow:auto}
+.filelist.ax-growy,.thumbs.ax-growy,.card.ax-growy,.group.ax-growy{overflow:auto}
+/* the page rail folded to its icons, or put away (AxGui.NavMode) */
+body.nav-compact #sidebar{width:52px;min-width:52px;overflow:hidden}
+body.nav-compact .nav-item{font-size:0!important;padding-left:0;padding-right:0;-ms-flex-pack:center;justify-content:center}
+body.nav-compact .nav-item .ico{font-size:16px!important;margin-right:0!important;width:auto}
+body.nav-hidden #sidebar{display:none!important}

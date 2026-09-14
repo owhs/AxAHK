@@ -1,0 +1,40 @@
+{
+  "name": "Rating",
+  "description": "Rating",
+  "order": 3007,
+  "css": "AxRating.css",
+  "include": "lib\\components\\Rating\\AxRating.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Rating",
+      "label": "Rating",
+      "icon": "E734",
+      "category": "Input",
+      "prefix": "rate",
+      "arg": {
+        "key": "value",
+        "label": "Value",
+        "kind": "num",
+        "default": "3"
+      },
+      "props": [
+        {
+          "key": "max",
+          "label": "Stars",
+          "kind": "num",
+          "emit": "kv",
+          "default": "5"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

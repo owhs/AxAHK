@@ -1,0 +1,2563 @@
+/* =========================================================================
+   AxStudio.css -- the studio's own chrome.
+
+   Colours are translucent black or white over whatever the active stylesheet
+   paints, so the studio follows win11, win98, XP, aurora and the rest without
+   a per-theme block. Only the pieces that must read as designer furniture --
+   the canvas mat, the selection, the guides, the syntax colours -- state a
+   colour outright.
+   ========================================================================= */
+
+#content { padding: 0 !important; margin: 0 !important; overflow: hidden !important; }
+
+#axdShell { position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; }
+#axdLeft, #axdRight { position: absolute; top: 40px; bottom: 31px; overflow: hidden; }
+#axdLeft { left: 0; width: 240px; }
+#axdRight { right: 0; width: 312px; }
+#axdMid { position: absolute; top: 40px; bottom: 31px; left: 240px; right: 312px; overflow: hidden; }
+
+.axd-split { position: absolute; top: 40px; bottom: 31px; width: 5px; cursor: col-resize; z-index: 40; }
+.axd-split:hover { background: rgba(96, 160, 255, .45); }
+#axdSplitL { left: 235px; }
+#axdSplitR { right: 307px; }
+/* folded to nothing, the splitter is still the way back */
+.axd-split { min-width: 5px; }
+#axdLeft, #axdRight { min-width: 0; }
+#axdSplitB {
+    position: absolute; left: 0; right: 0; top: auto; bottom: 28px; width: auto; height: 6px;
+    cursor: row-resize; z-index: 40; display: none;
+}
+
+/* ------------------------------------------------------------- panes */
+.axd-pane { position: absolute; left: 0; right: 0; top: 0; bottom: 0; }
+.axd-body {
+    position: absolute; left: 0; right: 0; top: 31px; bottom: 0;
+    overflow-y: auto; overflow-x: hidden; padding: 6px 8px 12px;
+}
+.axd-tabsrow {
+    position: absolute; left: 0; right: 0; top: 0; height: 31px; overflow: hidden;
+    border-bottom: 1px solid rgba(128, 128, 128, .22);
+}
+.axd-tabsrow > div {
+    float: left; height: 30px; line-height: 30px; padding: 0 11px; cursor: pointer;
+    font-size: 12px; opacity: .58; border-bottom: 2px solid transparent;
+}
+.axd-tabsrow > div:hover { opacity: .95; }
+.axd-tabsrow > div.on { opacity: 1; border-bottom-color: #4cc2ff; }
+
+.axd-hbtn {
+    display: inline-block; padding: 0 8px; height: 22px; line-height: 21px; cursor: pointer;
+    border: 1px solid rgba(128, 128, 128, .32); border-radius: 4px; font-size: 11px;
+    white-space: nowrap; vertical-align: middle;
+}
+.axd-hbtn:hover { background: rgba(128, 128, 128, .2); }
+.axd-hbtn.on { background: rgba(96, 160, 255, .3); border-color: rgba(96, 160, 255, .55); }
+.axd-hbtn.axd-go { background: rgba(96, 160, 255, .22); }
+
+/* ------------------------------------------------------------ toolbox */
+.axd-search { margin: 0 0 6px; }
+.axd-search input { width: 100%; }
+.axd-cat {
+    font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .45;
+    margin: 10px 2px 4px;
+}
+.axd-cat:first-child { margin-top: 2px; }
+.axd-tool {
+    display: block; padding: 5px 8px; margin: 1px 0; border-radius: 5px; cursor: move;
+    font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border: 1px solid transparent;
+}
+.axd-tool:hover { background: rgba(128, 128, 128, .2); border-color: rgba(128, 128, 128, .3); }
+.axd-tool .ico { display: inline-block; width: 20px; opacity: .75; font-size: 13px; }
+.axd-tool.axd-box-tool .ico { color: #8ab4ff; }
+/* a denser view for when you know the icons */
+.axd-compact .axd-tool {
+    display: inline-block; width: 46px; height: 40px; padding: 4px 0 0; margin: 2px;
+    text-align: center; overflow: hidden; font-size: 0;
+}
+.axd-compact .axd-tool .ico { display: block; width: 100%; font-size: 16px; margin: 2px 0 0; }
+.axd-compact .axd-cat { margin-top: 12px; }
+
+/* --------------------------------------------------------------- tree */
+.axd-row {
+    padding: 3px 6px; border-radius: 5px; cursor: default; font-size: 12px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.axd-row:hover { background: rgba(128, 128, 128, .18); }
+.axd-row.on { background: rgba(96, 160, 255, .32); }
+.axd-row .ico { display: inline-block; width: 18px; opacity: .7; font-size: 12px; }
+.axd-row .axd-dim { opacity: .5; font-size: 11px; margin-left: 6px; }
+.axd-row.axd-pagerow { font-weight: 600; }
+
+/* The windows list. The line under each row says how big it is and what
+   reaches it, which is the only place an unreachable window shows up. */
+.axd-row.axd-winrow { font-weight: 600; margin-top: 4px; }
+.axd-winmeta {
+    font-size: 10px; opacity: .55; padding: 0 6px 4px 24px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.axd-winmeta .axd-warn { opacity: 1; color: #e0a030; }
+
+/* Test mode: the design grid, the empty-container hints and the pointer
+   cursor all belong to editing, and none of them belong to trying it out. */
+body.axd-testing #axdPaper { background-image: none !important; }
+body.axd-testing .axd-empty, body.axd-testing .axd-blank { display: none; }
+body.axd-testing #axdCanvasWrap { cursor: auto; }
+body.axd-testing .axd-hbtn[data-bar="test"] { background: rgba(96, 200, 120, .35); }
+
+/* ----------------------------------------------------- command palette */
+.axd-pal {
+    display: none; position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, .35); z-index: 900;
+}
+.axd-pal-box {
+    position: absolute; left: 50%; top: 64px; width: 560px; margin-left: -280px;
+    background: #262626; border: 1px solid rgba(128, 128, 128, .35);
+    border-radius: 8px; box-shadow: 0 18px 50px rgba(0, 0, 0, .5); overflow: hidden;
+}
+body.theme-light .axd-pal-box { background: #fbfbfb; }
+.axd-pal-input {
+    width: 100%; box-sizing: border-box; border: 0; outline: 0; background: transparent;
+    color: inherit; font: inherit; font-size: 14px; padding: 11px 13px;
+    border-bottom: 1px solid rgba(128, 128, 128, .28);
+}
+.axd-pal-list { max-height: 320px; overflow-y: auto; padding: 4px; }
+.axd-pal-row {
+    padding: 5px 8px; border-radius: 5px; font-size: 12px; cursor: default;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.axd-pal-row .ico { display: inline-block; width: 20px; opacity: .75; font-size: 12px; }
+.axd-pal-row.on { background: rgba(96, 160, 255, .32); }
+.axd-pal-group { opacity: .45; font-size: 11px; margin-left: 8px; }
+.axd-pal-key { float: right; opacity: .45; font-size: 11px; }
+.axd-pal-none { padding: 14px; opacity: .5; font-size: 12px; }
+.axd-pal-foot {
+    padding: 5px 10px; font-size: 10px; opacity: .45;
+    border-top: 1px solid rgba(128, 128, 128, .22);
+}
+
+/* ------------------------------------------------ the preview's output */
+.axd-out {
+    font-family: Consolas, monospace; font-size: 11px; padding: 2px 6px;
+    border-radius: 4px; white-space: pre-wrap; word-wrap: break-word;
+}
+.axd-outkind {
+    display: inline-block; min-width: 44px; opacity: .45; text-transform: uppercase;
+    font-size: 9px; letter-spacing: .06em;
+}
+.axd-out-error { color: #ff99a4; }
+.axd-out-error .axd-outkind { color: #ff99a4; opacity: .8; }
+.axd-out-up, .axd-out-closed { opacity: .55; }
+.axd-out-pick { opacity: .75; }
+
+/* --------------------------------------------------------- problems */
+.axd-lint {
+    padding: 5px 7px; margin: 0 0 3px; border-radius: 5px; font-size: 12px;
+    cursor: default; border-left: 3px solid transparent;
+}
+.axd-lint:hover { background: rgba(128, 128, 128, .18); }
+.axd-lint .ico { display: inline-block; width: 18px; font-size: 12px; }
+.axd-lint .axd-lintmsg { }
+.axd-linthint { font-size: 10px; opacity: .55; padding-left: 18px; margin-top: 2px; }
+.axd-lint-error { border-left-color: #e05252; }
+.axd-lint-error .ico { color: #e05252; }
+.axd-lint-warn { border-left-color: #e0a030; }
+.axd-lint-warn .ico { color: #e0a030; }
+.axd-lint-info { border-left-color: rgba(128, 128, 128, .5); }
+.axd-lint-info .ico { opacity: .6; }
+
+/* --------------------------------------------------------- properties */
+.axd-grp { margin: 0 0 12px; }
+.axd-grp { border-top: 1px solid rgba(128, 128, 128, .17); padding-top: 7px; }
+.axd-grp:first-child { border-top: 0; padding-top: 0; }
+.axd-grp > .axd-glabel {
+    font-size: 10px; letter-spacing: .07em; text-transform: uppercase; opacity: .62;
+    margin: 0 0 7px; display: block; cursor: pointer; padding: 3px 4px 3px 2px;
+    border-radius: 4px; user-select: none; -ms-user-select: none; font-weight: 600;
+}
+.axd-grp > .axd-glabel:hover { background: rgba(128, 128, 128, .16); opacity: 1; }
+.axd-grp > .axd-glabel:before {
+    content: "\25BE"; display: inline-block; width: 14px; opacity: .8;
+    font-size: 11px; font-weight: normal; line-height: 1;
+}
+.axd-grp.shut > .axd-glabel:before { content: "\25B8"; }
+.axd-grp.shut { padding-bottom: 2px; }
+.axd-grp.shut > .axd-gbody { display: none; }
+/* the header of the current selection, instead of a row that says "Control" */
+.axd-head {
+    padding: 7px 9px; margin: 0 0 10px; border-radius: 6px;
+    background: rgba(96, 160, 255, .14); border: 1px solid rgba(96, 160, 255, .28);
+}
+.axd-head .axd-htype { font-size: 12px; font-weight: 600; }
+.axd-head .axd-hid { font-size: 11px; opacity: .55; font-family: Consolas, monospace; float: right; }
+/* ------------------------------------------------------------------------
+   One row per property. The label sits in a fixed column so the editors line
+   up down the pane; a field that needs the width says so with .axd-tall and
+   puts its label above instead.
+   ------------------------------------------------------------------------ */
+.axd-p { display: flex; align-items: center; min-height: 24px; margin: 0 0 4px; }
+.axd-p > label {
+    flex: 0 0 112px; width: 112px; font-size: 11px; opacity: .62; margin: 0;
+    padding-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.axd-p > .textbox, .axd-p > .numberbox, .axd-p > .dropdown,
+.axd-p > .switch, .axd-p > .axd-static { flex: 1 1 auto; min-width: 0; }
+.axd-p > .switch { flex: none; }
+.axd-p > .axd-static { font-size: 12px; opacity: .75; }
+
+.axd-p.axd-tall { display: block; }
+.axd-p.axd-tall > label { display: block; width: auto; flex: none; margin: 0 0 3px; padding: 0; }
+
+/* Only the boxes you type in stretch. A blanket "input {width:100%}" also
+   caught the hidden checkbox inside a switch, which is what made the switch
+   collapse and its caption land on top of it. border-box, or a 100% width
+   plus padding overflows the pane and puts a scrollbar under everything. */
+.axd-p .textbox, .axd-p .numberbox, .axd-p .dropdown,
+.axd-p .textbox input, .axd-p .searchbox input, .axd-p .passwordbox input,
+.axd-p .numberbox input, .axd-p textarea {
+    width: 100%; box-sizing: border-box; -ms-box-sizing: border-box;
+}
+.axd-p .switch, .axd-p .switch input { width: auto; }
+.axd-p textarea { font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; }
+/* What belongs to a field goes BESIDE it, not under it. Six colours in the
+   theme editor used to be six extra lines of "Pick a colour", all of them
+   indented to the editor column and none of them telling you anything the
+   swatch does not. */
+.axd-p > .axd-pmore { flex: none; margin-left: 7px; white-space: nowrap; }
+.axd-pmore .axd-hbtn { margin: 0; }
+.axd-pswatch {
+    display: inline-block; width: 22px; height: 22px; border-radius: 5px;
+    vertical-align: -6px; cursor: pointer; border: 1px solid rgba(128, 128, 128, .45);
+}
+.axd-pswatch:hover { border-color: rgba(96, 160, 255, .85); }
+/* nothing set: a hatch, so "no colour" does not read as "black" */
+.axd-pswatch.none {
+    background-image: linear-gradient(45deg, rgba(128,128,128,.25) 25%, transparent 25%,
+        transparent 75%, rgba(128,128,128,.25) 75%),
+        linear-gradient(45deg, rgba(128,128,128,.25) 25%, transparent 25%,
+        transparent 75%, rgba(128,128,128,.25) 75%);
+    background-size: 8px 8px; background-position: 0 0, 4px 4px;
+}
+.axd-pglyph { font-size: 15px; margin-right: 7px; opacity: .8; vertical-align: -2px; }
+
+/* the buttons that belong to the field above them, indented to sit under the
+   editor column so the labels stay in one line down the pane */
+.axd-sub { margin: 1px 0 7px 112px; font-size: 11px; }
+.axd-sub .axd-hbtn { margin: 0 3px 3px 0; }
+.axd-p.axd-tall + .axd-sub { margin-left: 0; }
+
+.axd-note { font-size: 11px; opacity: .6; margin: 3px 0 9px; line-height: 1.6; clear: both; }
+.axd-note .axd-hbtn { margin: 2px 3px 2px 0; opacity: 1; }
+.axd-note b { font-weight: 600; opacity: .85; }
+.axd-empty-pane { opacity: .5; font-size: 12px; padding: 18px 8px; text-align: center; line-height: 1.6; }
+.axd-multi { font-size: 11px; opacity: .8; margin: 0 0 10px; padding: 5px 8px;
+    background: rgba(96, 160, 255, .16); border-radius: 5px; }
+.axd-align { margin: 0 0 6px; }
+.axd-align .axd-hbtn { margin: 0 3px 3px 0; }
+
+/* ------------------------------------------------------------- events */
+.axd-ev { border: 1px solid rgba(128, 128, 128, .26); border-radius: 6px; margin: 0 0 6px; padding: 6px 8px; }
+.axd-ev.on { border-color: rgba(96, 160, 255, .55); background: rgba(96, 160, 255, .1); }
+.axd-ev .axd-evname { font-size: 12px; }
+.axd-ev .axd-evsig { font-size: 11px; opacity: .5; font-family: Consolas, monospace; }
+.axd-ev .axd-evgo { float: right; font-size: 11px; opacity: .75; cursor: pointer; margin-left: 8px; }
+.axd-ev .axd-evgo:hover { opacity: 1; text-decoration: underline; }
+
+/* -------------------------------------------------------------- canvas */
+#axdBar {
+    position: absolute; left: 0; right: 0; top: 0; height: 34px; line-height: 34px;
+    border-bottom: 1px solid rgba(128, 128, 128, .22); padding: 0 8px; overflow: hidden;
+    font-size: 12px; white-space: nowrap;
+}
+#axdBar .axd-hbtn { margin: 0 3px 0 0; }
+#axdBar .axd-sep {
+    display: inline-block; width: 1px; height: 16px; margin: 0 7px -3px;
+    background: rgba(128, 128, 128, .3);
+}
+#axdBar .axd-crumb { opacity: .6; margin-left: 10px; font-size: 11px; }
+#axdBar .axd-hbtn.axd-dim { opacity: .38; }
+
+/* The middle is four full-size views, one at a time: the canvas, the code
+   editor, Problems and Output. The code used to be a drawer along the bottom
+   fighting the canvas for height, and the other two were tabs in a 312-pixel
+   column -- the wrong shape for messages with file names in them. */
+/* a tab that is standing on something broken says so without being opened */
+.axd-tabsrow > div.axd-tab-bad { color: #ff99a4; }
+.axd-tabsrow > div.axd-tab-bad.on { border-bottom-color: #e05252; }
+body.theme-light .axd-tabsrow > div.axd-tab-bad { color: #b3202c; }
+.axd-midpanel {
+    position: absolute; left: 0; right: 0; top: 65px; bottom: 0;
+    overflow: auto; display: none;
+}
+#axdCanvasWrap { background: rgba(0, 0, 0, .24); }
+.axd-midbody { padding: 12px 16px; max-width: 900px; }
+.axd-midhead {
+    font-size: 13px; font-weight: 600; margin: 0 0 12px; padding-bottom: 9px;
+    border-bottom: 1px solid rgba(128, 128, 128, .2);
+}
+.axd-midhead .ico { font-size: 14px; opacity: .8; margin-right: 8px; vertical-align: -2px; }
+.axd-midhead .axd-midcount { font-size: 11px; font-weight: normal; opacity: .5; margin-left: 10px; }
+.axd-midhead .axd-hbtn { float: right; margin-left: 5px; font-weight: normal; }
+/* the buttons float, so the rule under the heading has to be told they exist */
+.axd-midhead:after { content: ""; display: block; clear: both; height: 0; }
+.axd-outgo .ico, .axd-lgsub .ico { font-size: 10px; width: auto; margin-right: 2px; }
+.axd-midright { float: right; padding-right: 6px; }
+.axd-midright .axd-hbtn {
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 11px;
+    margin: 4px 0 0 4px; padding: 3px 7px;
+}
+/* Problems and Output have room now, so a finding is a row rather than a
+   squeezed paragraph. */
+.axd-midbody .axd-lint { padding: 8px 11px; font-size: 12.5px; }
+.axd-midbody .axd-linthint { font-size: 11.5px; padding-left: 20px; }
+.axd-midbody .axd-out { font-size: 12.5px; padding: 5px 8px; }
+.axd-midbody .axd-empty-pane { text-align: left; max-width: 620px; font-size: 12.5px; }
+body.theme-light #axdCanvasWrap { background: rgba(0, 0, 0, .1); }
+#axdPaper {
+    position: relative; margin: 22px auto; box-shadow: 0 8px 34px rgba(0, 0, 0, .45);
+    overflow: hidden; border-radius: 6px;
+}
+/* The frame fills the paper; the HUD and the size grip sit outside it so a
+   redraw does not take them with it. */
+#axdFrame { position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: hidden; }
+#axdSizeGrip {
+    position: absolute; right: 0; bottom: 0; width: 16px; height: 16px; z-index: 38;
+    cursor: nwse-resize; background: rgba(76, 194, 255, .35);
+    border-left: 1px solid rgba(76, 194, 255, .7); border-top: 1px solid rgba(76, 194, 255, .7);
+}
+#axdSizeGrip:hover { background: rgba(76, 194, 255, .7); }
+
+/* Everything below is a fallback. The real look comes from MirrorCss, which
+   re-emits the active stylesheet's own #titlebar / #shell / #sidebar / #content
+   rules against these classes, so the canvas follows any theme. */
+.axd-titlebar { display: flex; align-items: center; height: 32px; padding-left: 12px; }
+.axd-titletext { flex: 1; font-size: 12px; }
+.axd-shell { display: flex; height: calc(100% - 32px); }
+.axd-sidebar { width: 200px; flex: none; }
+.axd-content { flex: 1; min-width: 0; overflow: auto; position: relative; }
+#axdPage { min-height: 100%; position: relative; }
+/* the first control's top margin must stay inside the page box: let it
+   through and the box -- a full view tall -- moves down by it, and a page
+   that fits scrolls by that much */
+#axdPage:before, #axdPage:after { content: ""; display: table; }
+.axd-titlebar .winbtn { cursor: default; }
+/* a picture icon is the title bar's size, as base.css has it in the real
+   window (#titlebar .app-icon img) -- the 32px one AutoHotkey hands back
+   was drawn at its own size and hung out of the bar */
+.axd-titlebar .app-icon img { width: 16px; height: 16px; vertical-align: middle; display: block; }
+
+/* A native scrollbar in Trident paints above every popup, so a pane gives its
+   scrollbar up while a menu is open rather than slicing through it. */
+body.axd-menuopen .axd-body,
+body.axd-menuopen #axdCanvasWrap,
+body.axd-menuopen .axd-content { -ms-overflow-style: none; }
+
+.axd-blank, .axd-empty {
+    border: 1px dashed rgba(128, 128, 128, .45); border-radius: 6px; padding: 14px;
+    text-align: center; font-size: 12px; opacity: .55;
+}
+.axd-empty { padding: 8px; margin: 2px 0; }
+.axd-bad { color: #ff99a4; font-family: Consolas, monospace; font-size: 12px; }
+
+/* --------------------------------------------------------------- HUD */
+/* The layer has no size of its own, because Trident has no pointer-events:
+   a full-size overlay would swallow every click on the design surface. Its
+   children are positioned individually and only the grips are meant to be hit. */
+#axdHud { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 30; }
+#axdHud > div { position: absolute; }
+.axd-sel { outline: 2px solid #4cc2ff; }
+.axd-sel2 { outline: 2px solid rgba(76, 194, 255, .55); }
+.axd-off { opacity: .45; }
+.axd-dragging { opacity: .3; }
+.axd-handle {
+    width: 8px; height: 8px; background: #ffffff; border: 1px solid #2b7fd4;
+    border-radius: 2px; z-index: 34;
+}
+.axd-h-n, .axd-h-s { cursor: n-resize; }
+.axd-h-e, .axd-h-w { cursor: e-resize; }
+.axd-h-nw, .axd-h-se { cursor: nw-resize; }
+.axd-h-ne, .axd-h-sw { cursor: ne-resize; }
+.axd-ghost { opacity: .7; z-index: 33; overflow: hidden; }
+.axd-newghost {
+    background: #2b7fd4; color: #ffffff; border-radius: 5px; padding: 5px 11px;
+    font-size: 12px; white-space: nowrap; opacity: .95; box-shadow: 0 4px 14px rgba(0, 0, 0, .45);
+}
+.axd-count {
+    position: absolute; right: -6px; top: -8px; background: #2b7fd4; color: #fff;
+    font-size: 10px; min-width: 16px; height: 16px; line-height: 16px; text-align: center;
+    border-radius: 8px; padding: 0 4px;
+}
+.axd-caret { background: #4cc2ff; z-index: 32; border-radius: 2px; box-shadow: 0 0 6px rgba(76, 194, 255, .95); }
+.axd-guide { background: #ff5c8a; z-index: 32; }
+/* Alt-hover measurements. Thin, warm, and gone the moment Alt is released. */
+.axd-meas { background: #ff9f43; z-index: 33; }
+.axd-measlab { background: #b96412; color: #fff; z-index: 37; padding: 1px 5px; font-size: 10px; }
+.axd-drophi {
+    border: 1px solid rgba(76, 194, 255, .6); background: rgba(76, 194, 255, .09);
+    border-radius: 5px; z-index: 31;
+}
+.axd-marquee {
+    border: 1px dashed #4cc2ff; background: rgba(76, 194, 255, .12); z-index: 32;
+}
+.axd-rez { border: 1px dashed #4cc2ff; z-index: 32; }
+.axd-dock { outline: 1px dashed rgba(255, 176, 76, .55); }
+.axd-tag, .axd-hint {
+    background: #14161c; color: #e9edf5; font-size: 11px; padding: 2px 7px; border-radius: 3px;
+    white-space: nowrap; z-index: 35; font-family: Consolas, monospace;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+}
+.axd-hint { z-index: 36; }
+
+/* ----------------------------------------------------------- code pane */
+#axdCode { overflow: hidden; }
+#axdCodeHdr {
+    position: absolute; left: 0; right: 0; top: 0; height: 31px; line-height: 31px;
+    padding: 0 8px; font-size: 12px; overflow: hidden; white-space: nowrap;
+    border-bottom: 1px solid rgba(128, 128, 128, .18);
+}
+#axdCodeHdr .axd-sig { opacity: .55; font-family: Consolas, monospace; font-size: 11px; margin-left: 8px; }
+#axdCodeHdr .axd-hbtn { float: right; margin: 4px 0 0 4px; }
+#axdCodeMsg { font-size: 11px; margin-left: 12px; opacity: .85; }
+#axdCodeMsg.axd-err { color: #ff99a4; }
+#axdCodeMsg.axd-ok { color: #6ccb8a; }
+#axdCodeBody { position: absolute; left: 0; right: 0; top: 31px; bottom: 0; overflow: hidden; }
+
+/* The editor is a contenteditable, not a textarea: Trident paints the caret in
+   the text colour, so the usual "transparent textarea over a highlight layer"
+   trick would hide the caret, and with no pointer-events an overlay on top
+   would eat every click. One div per line; ::before draws the line number, and
+   generated content is not part of textContent, so it never reaches the file. */
+#axdEditor {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0; overflow: auto;
+    font-family: Consolas, "Cascadia Mono", monospace; font-size: 12.5px; line-height: 19px;
+    background: rgba(0, 0, 0, .26); color: #dfe4ee; padding: 6px 10px 24px 0;
+    white-space: pre; outline: 0; counter-reset: axdln; cursor: text;
+}
+body.theme-light #axdEditor { background: rgba(0, 0, 0, .05); color: #1c2029; }
+/* Not positioned: a positioned block inside an editable area is an object to
+   Trident, and clicking one framed the line in hatching with resize handles.
+   The number is an inline block pulled back into the margin instead. */
+#axdEditor > div { padding-left: 56px; }
+#axdEditor > div:before {
+    counter-increment: axdln; content: counter(axdln);
+    display: inline-block; width: 42px; margin-left: -56px; margin-right: 14px; text-align: right;
+    color: rgba(255, 255, 255, .26); font-size: 11.5px;
+}
+body.theme-light #axdEditor > div:before { color: rgba(0, 0, 0, .3); }
+#axdEditor i { font-style: normal; }
+#axdEditor i.c { color: #6a9955; }
+#axdEditor i.s { color: #ce9178; }
+#axdEditor i.n { color: #b5cea8; }
+#axdEditor i.k { color: #569cd6; }
+#axdEditor i.f { color: #dcdcaa; }
+#axdEditor i.v { color: #4ec9b0; }
+#axdEditor i.d { color: #c586c0; }
+#axdEditor i.o { color: #9aa4b8; }
+body.theme-light #axdEditor i.c { color: #3f7f3f; }
+body.theme-light #axdEditor i.s { color: #a31515; }
+body.theme-light #axdEditor i.n { color: #096b28; }
+body.theme-light #axdEditor i.k { color: #0000c0; }
+body.theme-light #axdEditor i.f { color: #7a5c00; }
+body.theme-light #axdEditor i.v { color: #0a7c72; }
+body.theme-light #axdEditor i.d { color: #8b2f8b; }
+body.theme-light #axdEditor i.o { color: #555f70; }
+#axdEdMirror { position: absolute; left: -4000px; top: 0; width: 10px; height: 10px; }
+
+#axdAc {
+    position: absolute; display: none; z-index: 90; min-width: 200px; max-width: 320px;
+    max-height: 214px; overflow: auto; background: #2b2b2b; border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 7px; box-shadow: 0 10px 28px rgba(0, 0, 0, .55); padding: 4px;
+    font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; color: #e6e6e6;
+}
+body.theme-light #axdAc { background: #ffffff; border-color: rgba(0, 0, 0, .14); color: #1c1c1c;
+                          box-shadow: 0 10px 28px rgba(0, 0, 0, .18); }
+.axd-acitem {
+    position: relative; height: 24px; line-height: 24px; padding: 0 10px 0 12px; border-radius: 4px;
+    cursor: default; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.axd-acitem:hover { background: rgba(128, 128, 128, .16); }
+.axd-acitem.on { background: rgba(128, 128, 128, .28); }
+.axd-acitem.on:before {
+    content: ""; position: absolute; left: 3px; top: 6px; bottom: 6px; width: 3px;
+    border-radius: 2px; background: currentColor; opacity: .8;
+}
+
+/* the bridge: an element AHK can be told about without it being seen */
+#axdBridge { position: absolute; left: -4000px; top: 0; width: 1px; height: 1px; overflow: hidden; }
+
+/* ------------------------------------------------------------ icon picker */
+.axd-icons { margin: 2px 0 8px; }
+.axd-icon {
+    display: inline-block; width: 38px; height: 38px; margin: 2px; text-align: center;
+    line-height: 38px; border-radius: 5px; cursor: pointer;
+    border: 1px solid rgba(128, 128, 128, .22);
+}
+.axd-icon:hover { background: rgba(96, 160, 255, .3); border-color: rgba(96, 160, 255, .55); }
+.axd-icon .ico { font-size: 17px; }
+
+/* ------------------------------------------------- the component viewer */
+/* The preview is the control itself, built by the library, so it is given a
+   plain surface and left alone rather than styled. */
+.axd-prev {
+    padding: 14px 12px; border-radius: 6px; margin: 0 0 4px;
+    background: rgba(128, 128, 128, .1);
+    border: 1px solid rgba(128, 128, 128, .2);
+}
+.axd-code {
+    font-family: Consolas, "Cascadia Mono", monospace; font-size: 11px;
+    padding: 6px 8px; border-radius: 5px; margin: 0 0 2px;
+    background: rgba(128, 128, 128, .13); white-space: pre-wrap; word-wrap: break-word;
+}
+
+/* ===================================================================== forms */
+/* One modal, as many fields as the question needs. It sits above everything
+   except the context menu, and dims what is behind it rather than hiding it:
+   you are nearly always answering a question *about* something on the canvas. */
+.axd-formov {
+    position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 120;
+    background: rgba(6, 8, 12, .58);
+}
+body.theme-light .axd-formov { background: rgba(20, 24, 32, .34); }
+/* Centred the way the library's own dialog is -- Trident does this correctly,
+   and it is the one way that does not need the card's height in advance. The
+   body scrolls, not the card, so the buttons never leave the screen. */
+.axd-form {
+    position: absolute; left: 50%; top: 47%; width: 460px; max-width: 92%;
+    transform: translate(-50%, -50%);
+    background: #1b1f27; color: #e9edf5; border: 1px solid rgba(128, 128, 128, .3);
+    border-radius: 10px; box-shadow: 0 18px 60px rgba(0, 0, 0, .62);
+}
+body.theme-light .axd-form { background: #ffffff; color: #1c2029; box-shadow: 0 18px 60px rgba(0, 0, 0, .3); }
+.axd-fhead {
+    padding: 13px 14px 10px; font-size: 13.5px; font-weight: 600;
+    border-bottom: 1px solid rgba(128, 128, 128, .18);
+}
+.axd-fhead .ico { font-size: 15px; opacity: .8; margin-right: 9px; vertical-align: -2px; }
+.axd-ftitle { vertical-align: -1px; }
+.axd-fx {
+    float: right; font-size: 12px; opacity: .5; cursor: pointer; padding: 2px 5px;
+    border-radius: 4px; font-weight: normal; margin: -2px -3px 0 0;
+}
+.axd-fx:hover { opacity: 1; background: rgba(128, 128, 128, .25); }
+.axd-fintro {
+    padding: 10px 15px 0; font-size: 11.5px; opacity: .62; line-height: 1.55;
+}
+.axd-fbody { padding: 13px 15px 3px; }
+.axd-fbody.axd-fscroll { max-height: 68vh; overflow-y: auto; overflow-x: hidden; }
+.axd-fprev {
+    margin: 0 15px 11px; padding: 7px 9px; border-radius: 6px;
+    background: rgba(96, 160, 255, .11); border: 1px solid rgba(96, 160, 255, .26);
+    font-family: Consolas, "Cascadia Mono", monospace; font-size: 11px; line-height: 1.6;
+    white-space: pre-wrap; word-wrap: break-word; max-height: 92px; overflow: auto;
+}
+.axd-ffoot {
+    padding: 10px 14px 12px; border-top: 1px solid rgba(128, 128, 128, .18);
+    text-align: right; white-space: nowrap;
+}
+.axd-ferr { float: left; font-size: 11px; color: #ffb0b8; max-width: 60%; text-align: left;
+            line-height: 1.45; white-space: normal; padding-top: 3px; }
+body.theme-light .axd-ferr { color: #b3202c; }
+.axd-fbtn {
+    display: inline-block; min-width: 78px; padding: 6px 15px; margin-left: 7px;
+    border-radius: 6px; font-size: 12px; text-align: center; cursor: pointer;
+    border: 1px solid rgba(128, 128, 128, .35);
+}
+.axd-fbtn:hover { background: rgba(128, 128, 128, .2); }
+.axd-fbtn.primary { background: #2b6cb0; border-color: #2b6cb0; color: #ffffff; }
+.axd-fbtn.primary:hover { background: #3579c2; }
+.axd-fbtn.danger { background: #a52b34; border-color: #a52b34; color: #ffffff; }
+.axd-fbtn.danger:hover { background: #bb333d; }
+.axd-fbtn.off { opacity: .4; cursor: default; }
+.axd-fbtn.off:hover { background: #2b6cb0; }
+.axd-fbtn.off.danger:hover { background: #a52b34; }
+
+/* a field: label in a fixed column, editor beside it -- the same shape as the
+   property sheet, so the two do not read as different programs */
+.axd-f { display: flex; align-items: flex-start; min-height: 26px; margin: 0 0 9px; }
+/* Only the form's OWN labels. A check box and a radio are <label> elements
+   themselves, so a bare "> label" here reaches inside the control and
+   flattens it -- which is exactly what it did. */
+.axd-f > .axd-flab {
+    flex: none; width: 118px; font-size: 11.5px; opacity: .72; padding-right: 10px;
+    text-align: right; line-height: 1.35; padding-top: 5px;
+}
+.axd-fctl { flex: 1; min-width: 0; }
+.axd-f-wide { display: block; }
+.axd-f-wide > .axd-flab { display: block; width: auto; text-align: left;
+                          margin: 0 0 4px; padding-top: 0; }
+.axd-fhint { font-size: 10.5px; opacity: .5; margin: 3px 0 0; line-height: 1.5; }
+.axd-fhint-in { margin-left: 24px; margin-top: 1px; }
+.axd-fstatic { font-size: 12px; opacity: .8; padding: 3px 0; }
+.axd-fsec {
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: .8px; opacity: .45;
+    margin: 15px 0 7px; padding-top: 9px; border-top: 1px solid rgba(128, 128, 128, .18);
+}
+.axd-fbody > .axd-fsec:first-child { margin-top: 1px; padding-top: 0; border-top: 0; }
+/* pre-wrap, not pre: a note keeps the line breaks and the columns it was
+   written with, and still wraps when the form is narrower than a line. */
+.axd-fnote { font-size: 11px; opacity: .62; line-height: 1.65; margin: 0 0 10px;
+             white-space: pre-wrap; }
+.axd-fdiv { border-top: 1px solid rgba(128, 128, 128, .18); margin: 12px 0; }
+.axd-fmono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 11.5px;
+             opacity: .72; }
+.axd-fswatch {
+    display: inline-block; width: 22px; height: 22px; border-radius: 5px; margin-left: 6px;
+    vertical-align: -6px; cursor: pointer; border: 1px solid rgba(128, 128, 128, .45);
+    background: rgba(128, 128, 128, .2);
+}
+.axd-fswatch:hover { border-color: rgba(96, 160, 255, .8); }
+/* the editors themselves fill the column they are in */
+.axd-fctl .textbox, .axd-fctl .dropdown, .axd-fctl .numberbox,
+.axd-fctl .searchbox, .axd-fctl .hotkeybox { width: 100%; }
+.axd-fctl .textbox input, .axd-fctl .searchbox input,
+.axd-fctl .numberbox input, .axd-fctl textarea { width: 100%; }
+.axd-fctl .switch, .axd-fctl .check, .axd-fctl .segmented { width: auto; }
+.axd-fctl textarea { font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; }
+.axd-f-color .axd-fctl .textbox { width: auto; display: inline-block; min-width: 60%; }
+.axd-f-flag { margin-bottom: 8px; }
+
+/* the cards. A choice you can read is a choice you do not have to already know. */
+.axd-pick { margin: 0 0 2px; }
+.axd-pickscroll { max-height: 246px; overflow-y: auto; padding-right: 3px; }
+.axd-pickit {
+    padding: 8px 11px; border-radius: 7px; margin: 0 0 5px; cursor: pointer;
+    border: 1px solid rgba(128, 128, 128, .26); font-size: 12px; line-height: 1.45;
+}
+.axd-pickit:hover { background: rgba(128, 128, 128, .16); }
+.axd-pickit.on { border-color: #4c8fe0; background: rgba(96, 160, 255, .16); }
+.axd-pickit .ico { display: inline-block; width: 22px; font-size: 14px; opacity: .8; vertical-align: -1px; }
+.axd-pickit.on .ico { opacity: 1; color: #8ab4ff; }
+.axd-picklab { font-weight: 600; }
+.axd-pickdesc { display: block; font-size: 10.5px; opacity: .55; margin: 2px 0 0 22px; }
+/* many choices: tiles, three to a row, so every one is in view at once */
+.axd-picktiles { line-height: 0; }
+.axd-picktiles .axd-pickit { display: inline-block; vertical-align: top; box-sizing: border-box; width: 32.4%;
+    margin: 0 1.2% 6px 0; min-height: 62px; line-height: 1.4; padding: 7px 9px; }
+.axd-picktiles .axd-pickit:nth-child(3n) { margin-right: 0; }
+.axd-picktiles .axd-pickdesc { margin-left: 22px; font-size: 10.5px; }
+
+/* ------------------------------------------------------------- the Logic pane */
+/* One row per thing the design does. The name first, then what it does, then
+   -- the part a text box could never show -- where it is used and whether it
+   still resolves to anything. */
+.axd-lg {
+    border: 1px solid rgba(128, 128, 128, .22); border-radius: 7px;
+    padding: 6px 9px; margin: 0 0 5px; font-size: 12px; cursor: pointer;
+    border-left-width: 3px; border-left-color: rgba(128, 128, 128, .3);
+}
+.axd-lg:hover { background: rgba(128, 128, 128, .14); border-color: rgba(128, 128, 128, .4); }
+.axd-lg .ico { display: inline-block; width: 19px; font-size: 12px; opacity: .7; }
+.axd-lgname { font-weight: 600; }
+.axd-lgop { opacity: .5; margin: 0 6px; font-family: Consolas, monospace; font-size: 11px; }
+.axd-lgval { opacity: .75; }
+.axd-lgsub {
+    font-size: 10.5px; opacity: .55; margin: 3px 0 0 19px; line-height: 1.5;
+    word-wrap: break-word;
+}
+.axd-lgerr { color: #ff99a4; opacity: 1; }
+body.theme-light .axd-lgerr { color: #b3202c; }
+.axd-lgbad { border-left-color: #e05252; }
+.axd-lgbad .ico { color: #e05252; opacity: 1; }
+.axd-lgempty {
+    border: 1px dashed rgba(128, 128, 128, .35); border-radius: 7px;
+    padding: 11px 12px; margin: 0 0 6px; font-size: 11px; opacity: .55; line-height: 1.6;
+}
+
+/* ------------------------------------------------------------- the toolbar */
+/* The two buttons pressed constantly sit apart from the rest, on the right,
+   and Run carries the accent. Fourteen identical grey buttons in a row told
+   you nothing about which of them you wanted. */
+#axdBar .ico { font-size: 12px; opacity: .8; vertical-align: -1px; }
+#axdBar .axd-hbtn.on .ico { opacity: 1; }
+/* not .axd-caret: that is the canvas's drop marker, a blue bar, and it won */
+.axd-ddarrow { font-size: 8px; opacity: .5; margin-left: 2px; vertical-align: 1px; }
+.axd-barright { float: right; padding-left: 10px; }
+#axdBar .axd-hbtn.axd-run {
+    background: #2b6cb0; border-color: #2b6cb0; color: #ffffff;
+}
+#axdBar .axd-hbtn.axd-run:hover { background: #3579c2; }
+#axdBar .axd-hbtn.axd-run .ico { opacity: 1; }
+
+/* an Output row that knows where it came from */
+.axd-out[data-goto] { cursor: pointer; }
+.axd-out[data-goto]:hover { background: rgba(128, 128, 128, .16); }
+.axd-outgo { font-size: 10.5px; opacity: .6; margin: 3px 0 0 44px; }
+.axd-out[data-goto]:hover .axd-outgo { opacity: 1; }
+
+/* =========================================================== the shell
+   Four workspaces along the top, a panel along the bottom, and the side
+   panes only in Design. AXD.shell places the regions; the rules here are
+   what each one looks like. */
+#axdTop {
+    position: absolute; left: 0; right: 0; top: 0; height: 40px; overflow: hidden;
+    border-bottom: 1px solid rgba(128, 128, 128, .22); white-space: nowrap; font-size: 12px;
+}
+.axd-wstabs { position: absolute; left: 8px; top: 0; height: 40px; }
+.axd-wstab {
+    float: left; height: 28px; line-height: 28px; margin: 6px 3px 0 0; padding: 0 13px;
+    border-radius: 6px; cursor: pointer; opacity: .62; font-size: 12.5px;
+}
+.axd-wstab:hover { opacity: .95; background: rgba(128, 128, 128, .14); }
+.axd-wstab.on { opacity: 1; background: rgba(76, 194, 255, .18); font-weight: 600; }
+.axd-wstab .ico, .axd-cmdbox .ico, .axd-wtab .ico, .axd-chip .ico {
+    font-size: 13px; margin-right: 7px; vertical-align: -2px;
+}
+.axd-cmdbox {
+    position: absolute; top: 7px; height: 24px; line-height: 24px; left: 50%; width: 440px;
+    margin-left: -220px; padding: 0 10px; border: 1px solid rgba(128, 128, 128, .35);
+    border-radius: 6px; cursor: text; opacity: .72; overflow: hidden;
+}
+.axd-cmdbox:hover { opacity: 1; border-color: rgba(76, 194, 255, .7); }
+.axd-cmdbox .axd-kbd { float: right; font-size: 11px; opacity: .6; }
+/* a narrow window: the search box gives way rather than sitting on the tabs */
+@media (max-width: 1320px) {
+    .axd-cmdbox { left: 400px; right: 260px; width: auto; margin-left: 0; }
+}
+.axd-topright { position: absolute; right: 8px; top: 0; height: 40px; line-height: 40px; }
+.axd-topright .axd-hbtn {
+    margin-left: 4px; height: 26px; line-height: 25px; padding: 0 11px; font-size: 12px;
+}
+.axd-topright .ico { font-size: 12px; opacity: .8; vertical-align: -1px; }
+.axd-topright .axd-hbtn.axd-run { background: #2b6cb0; border-color: #2b6cb0; color: #ffffff; }
+.axd-topright .axd-hbtn.axd-run:hover { background: #3579c2; }
+.axd-topright .axd-hbtn.axd-run .ico { opacity: 1; }
+
+/* ------------------------------------------------------- workspaces */
+.axd-ws { position: absolute; left: 0; right: 0; top: 0; bottom: 0; overflow: hidden; display: none; }
+#axdWsDesign { display: block; }
+.axd-wsbody { position: absolute; left: 0; right: 0; top: 0; bottom: 0; overflow-y: auto; overflow-x: hidden; }
+.axd-wsinner { max-width: 1080px; margin: 0 auto; padding: 22px 30px 60px; }
+.axd-wstitle { font-size: 20px; font-weight: 600; }
+.axd-wslead { font-size: 12.5px; opacity: .68; margin: 5px 0 20px; line-height: 1.65; max-width: 780px; }
+.axd-wslead b { font-weight: 600; }
+.axd-cols:after { content: ""; display: block; clear: both; height: 0; }
+.axd-col { float: left; width: 50%; padding-right: 22px; box-sizing: border-box; }
+.axd-col + .axd-col { padding-right: 0; padding-left: 22px; }
+@media (max-width: 1100px) {
+    .axd-col, .axd-col + .axd-col { float: none; width: auto; padding: 0; }
+}
+.axd-wspick { margin: -6px 0 18px; font-size: 12px; }
+.axd-chip {
+    display: inline-block; padding: 2px 11px; margin: 0 5px 5px 0; border-radius: 11px;
+    cursor: pointer; border: 1px solid rgba(128, 128, 128, .3);
+}
+.axd-chip:hover { border-color: rgba(76, 194, 255, .7); }
+.axd-chip.on { background: rgba(76, 194, 255, .18); border-color: rgba(76, 194, 255, .6); font-weight: 600; }
+.axd-kv { font-size: 12px; padding: 3px 0; }
+.axd-kv span { display: inline-block; width: 120px; opacity: .55; }
+
+/* ---------------------------------------------------- the window strip
+   The tab in front is the colour of the canvas mat under it, so it reads
+   as the window the canvas is showing. */
+#axdWinStrip {
+    position: absolute; left: 0; right: 0; top: 34px; height: 32px; padding-left: 10px;
+    overflow: hidden; white-space: nowrap; background: rgba(0, 0, 0, .10);
+}
+.axd-wtab {
+    float: left; height: 27px; line-height: 27px; margin-top: 5px; padding: 0 14px 0 11px;
+    border-radius: 7px 7px 0 0; cursor: pointer; opacity: .62; font-size: 12px;
+}
+.axd-wtab:hover { opacity: .95; background: rgba(128, 128, 128, .12); }
+.axd-wtab.on { opacity: 1; background: rgba(0, 0, 0, .24); font-weight: 600; }
+body.theme-light .axd-wtab.on { background: rgba(0, 0, 0, .1); }
+.axd-wtab.axd-wadd { opacity: .5; font-weight: normal; }
+.axd-wtab.axd-wadd:hover { opacity: .95; }
+#axdCanvasWrap { position: absolute; left: 0; right: 0; top: 66px; bottom: 0; overflow: auto; }
+
+/* ------------------------------------------------ Toolbox or Outline */
+#axdLeftBody { top: 0; bottom: 42%; }
+#axdTreeHead {
+    position: absolute; left: 0; right: 0; top: 58%; height: 30px; line-height: 30px;
+    padding: 0 10px; font-size: 12px; font-weight: 600; overflow: hidden; white-space: nowrap;
+    border-top: 1px solid rgba(128, 128, 128, .28); border-bottom: 1px solid rgba(128, 128, 128, .16);
+}
+#axdTreeHead .ico { font-size: 12px; margin-right: 7px; opacity: .7; }
+#axdTreeHead .axd-dim { font-weight: normal; opacity: .5; margin-left: 8px; font-size: 11px; }
+#axdTreeBody { top: 58%; margin-top: 31px; bottom: 0; }
+
+/* ------------------------------------------------- the inspector's path */
+.axd-rhead {
+    position: absolute; left: 0; right: 0; top: 0; height: 31px; line-height: 31px; padding: 0 10px;
+    border-bottom: 1px solid rgba(128, 128, 128, .22); overflow: hidden; white-space: nowrap;
+    font-size: 12px;
+}
+.axd-rhead b { font-weight: 600; }
+.axd-rcrumb { cursor: pointer; opacity: .62; }
+.axd-rcrumb:hover { opacity: 1; text-decoration: underline; }
+.axd-rcrumb.on { opacity: 1; font-weight: 600; cursor: default; text-decoration: none; }
+.axd-rcrumb .ico { font-size: 12px; margin-right: 6px; vertical-align: -1px; }
+.axd-rsep { opacity: .4; margin: 0 6px; font-size: 9px; }
+.axd-rnote { opacity: .45; margin-left: 8px; font-size: 11px; }
+
+/* ----------------------------------------------------- the bottom panel */
+#axdPanel {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 31px; overflow: hidden;
+    border-top: 1px solid rgba(128, 128, 128, .3); background: rgba(0, 0, 0, .08);
+}
+#axdPanelTabs .ico { font-size: 11px; opacity: .8; margin-right: 5px; vertical-align: -1px; }
+.axd-pbody { position: absolute; left: 0; right: 0; top: 31px; bottom: 0; overflow: auto; display: none; }
+.axd-pbody .axd-midbody { max-width: none; padding: 8px 16px; }
+
+/* ------------------------------------------------------ the Logic page
+   Each section a table: the thing, what it is, where it is used, whether it
+   works. Names that mean a control are chips that go to it. */
+.axd-wsinner .axd-grp { margin: 0 0 22px; padding-top: 12px; }
+.axd-wsinner .axd-grp > .axd-glabel {
+    font-size: 13.5px; letter-spacing: 0; text-transform: none; opacity: .92; margin-bottom: 4px;
+}
+.axd-lglead { font-size: 12px; opacity: .62; margin: 0 0 10px 16px; line-height: 1.6; max-width: 780px; }
+.axd-lgpage .axd-gbody { padding-left: 0; }
+.axd-lgt { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 2px 0 6px; }
+.axd-lgt th {
+    text-align: left; font-weight: 600; font-size: 11px; opacity: .5; padding: 5px 10px;
+    border-bottom: 1px solid rgba(128, 128, 128, .3); white-space: nowrap;
+}
+.axd-lgt td { padding: 6px 10px; border-bottom: 1px solid rgba(128, 128, 128, .12); vertical-align: middle; }
+.axd-lgt tr:hover td { background: rgba(128, 128, 128, .07); }
+.axd-lgt tr.axd-badrow td { background: rgba(224, 82, 82, .10); }
+.axd-lgt tr.axd-warnrow td { background: rgba(224, 160, 48, .07); }
+.axd-lgt .ico { font-size: 12px; opacity: .7; margin-right: 7px; vertical-align: -1px; }
+.axd-lgt td.axd-lgname { font-weight: 600; white-space: nowrap; cursor: pointer; }
+.axd-lgt td.axd-lgname:hover { text-decoration: underline; }
+/* a column that is a name or an arrow takes what it needs and no more */
+.axd-lgt td.axd-lgname, .axd-lgt td.axd-narrow { width: 1%; white-space: nowrap; padding-right: 22px; }
+.axd-lgt .axd-chip { margin: 1px 4px 1px 0; }
+.axd-mono { font-family: Consolas, monospace; font-size: 12px; }
+.axd-lgwarn { color: #e0a030; }
+body.theme-light .axd-lgwarn { color: #9a6200; }
+.axd-chip-plain { cursor: default; opacity: .75; }
+.axd-chip-plain:hover { border-color: rgba(128, 128, 128, .3); }
+.axd-lgcard {
+    display: inline-block; vertical-align: top; width: 300px; margin: 0 12px 12px 16px;
+    padding: 12px 14px; border: 1px solid rgba(128, 128, 128, .25); border-radius: 8px; cursor: pointer;
+}
+.axd-lgcard + .axd-lgcard { margin-left: 0; }
+.axd-lgcard:hover { border-color: rgba(76, 194, 255, .7); background: rgba(76, 194, 255, .05); }
+.axd-lgcard b { font-size: 13px; margin-right: 8px; }
+.axd-lgcard .ico { font-size: 13px; opacity: .7; margin-right: 8px; }
+
+/* --------------------------------------------------- the windows board */
+.axd-wboard { margin: 2px 0 4px 16px; }
+.axd-wcard {
+    display: inline-block; vertical-align: top; width: 250px; min-height: 122px;
+    margin: 0 12px 12px 0; padding: 12px 14px; box-sizing: border-box; cursor: pointer;
+    border: 1px solid rgba(128, 128, 128, .25); border-radius: 8px;
+}
+.axd-wcard:hover { border-color: rgba(76, 194, 255, .6); }
+.axd-wcard.on { border-color: rgba(76, 194, 255, .95); background: rgba(76, 194, 255, .08); }
+.axd-wchead { font-size: 13.5px; font-weight: 600; margin-bottom: 6px; white-space: nowrap; overflow: hidden; }
+.axd-wchead .ico { font-size: 14px; margin-right: 8px; opacity: .8; }
+.axd-wcline { font-size: 12px; margin: 3px 0; line-height: 1.5; }
+.axd-wcline .axd-chip { padding: 0 8px; margin: 0 3px 2px 0; }
+.axd-wcacts { margin-top: 9px; }
+.axd-wcadd { border-style: dashed; cursor: default; }
+.axd-wcadd:hover { border-color: rgba(128, 128, 128, .45); }
+.axd-wboard + .axd-note { margin-left: 16px; }
+
+/* -------------------------------------------------- the code navigator */
+#axdCodeNav {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 240px; box-sizing: border-box;
+    overflow: hidden; font-size: 12px; border-right: 1px solid rgba(128, 128, 128, .22);
+}
+.axd-cnfind {
+    position: absolute; left: 0; right: 0; top: 0; height: 40px; padding: 7px 8px;
+    box-sizing: border-box; border-bottom: 1px solid rgba(128, 128, 128, .16);
+}
+#axdCodeList {
+    position: absolute; left: 0; right: 0; top: 40px; bottom: 0; box-sizing: border-box;
+    overflow-y: auto; overflow-x: hidden; padding: 8px 6px 24px;
+}
+#axdCode #axdCodeHdr, #axdCode #axdCodeBody { left: 240px; }
+.axd-cnwin {
+    font-size: 11.5px; font-weight: 600; opacity: .6; margin: 14px 6px 4px;
+    white-space: nowrap; overflow: hidden;
+}
+.axd-cnwin:first-child { margin-top: 2px; }
+.axd-cnwin .ico { font-size: 11px; margin-right: 7px; }
+.axd-cnitem {
+    padding: 4px 8px 4px 12px; border-radius: 5px; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.axd-cnitem:hover { background: rgba(128, 128, 128, .16); }
+.axd-cnitem.on { background: rgba(76, 194, 255, .2); }
+.axd-cnitem .ico { font-size: 11px; opacity: .65; margin-right: 8px; }
+.axd-cnitem .axd-dim { margin-left: 7px; opacity: .5; font-size: 11px; }
+.axd-cnnone { font-size: 11px; opacity: .5; padding: 2px 8px 6px 12px; line-height: 1.5; }
+
+/* ---------------------------------------------------------- the gallery
+   Adding anything: cards grouped by what the thing is, each saying what it
+   is for and where it will live. */
+#axdGal {
+    display: none; position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index: 850;
+    background: rgba(0, 0, 0, .42);
+}
+.axd-galbox {
+    position: absolute; left: 50%; top: 46px; bottom: 46px; width: 920px; margin-left: -460px;
+    background: #23262d; border: 1px solid rgba(128, 128, 128, .35); border-radius: 10px;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, .55); overflow: hidden;
+}
+body.theme-light .axd-galbox { background: #fbfbfc; }
+@media (max-width: 1000px) { .axd-galbox { left: 16px; right: 16px; width: auto; margin-left: 0; } }
+.axd-galhead {
+    position: absolute; left: 0; right: 0; top: 0; height: 54px; padding: 0 18px;
+    border-bottom: 1px solid rgba(128, 128, 128, .25);
+}
+.axd-galtitle { position: absolute; left: 20px; top: 15px; font-size: 17px; font-weight: 600; }
+.axd-galfind {
+    position: absolute; left: 80px; width: calc(100% - 136px); top: 12px; height: 30px; box-sizing: border-box;
+    padding: 0 12px; font: inherit; font-size: 13.5px; color: inherit; outline: 0;
+    background: rgba(128, 128, 128, .12); border: 1px solid rgba(128, 128, 128, .35); border-radius: 6px;
+}
+.axd-galfind:focus { border-color: rgba(76, 194, 255, .85); }
+.axd-galx {
+    position: absolute; right: 16px; top: 14px; width: 26px; height: 26px; line-height: 26px;
+    text-align: center; cursor: pointer; border-radius: 5px; opacity: .6;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 12px;
+}
+.axd-galx:hover { opacity: 1; background: rgba(128, 128, 128, .2); }
+.axd-gallist {
+    position: absolute; left: 0; right: 0; top: 55px; bottom: 30px; overflow-y: auto;
+    padding: 8px 18px 20px;
+}
+.axd-galfoot {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 29px; line-height: 29px; padding: 0 18px;
+    font-size: 11px; opacity: .5; border-top: 1px solid rgba(128, 128, 128, .2);
+    white-space: nowrap; overflow: hidden;
+}
+.axd-gsec { font-size: 12.5px; font-weight: 600; opacity: .8; margin: 14px 0 8px 2px; }
+.axd-gsec .axd-dim { font-weight: normal; margin-left: 10px; font-size: 11px; opacity: .6; }
+.axd-gbody:after { content: ""; display: block; clear: both; height: 0; }
+.axd-gcard {
+    display: inline-block; vertical-align: top; width: 206px; min-height: 96px; box-sizing: border-box;
+    margin: 0 10px 10px 0; padding: 11px 13px; cursor: pointer;
+    border: 1px solid rgba(128, 128, 128, .25); border-radius: 8px;
+}
+.axd-gcard:hover { border-color: rgba(76, 194, 255, .8); background: rgba(76, 194, 255, .07); }
+.axd-gct { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+.axd-gct .ico { font-size: 14px; margin-right: 8px; opacity: .8; }
+.axd-gcd { font-size: 11.5px; opacity: .68; line-height: 1.5; }
+.axd-gcw { font-size: 10.5px; opacity: .45; margin-top: 6px; }
+.axd-gtile {
+    display: inline-block; width: 160px; box-sizing: border-box; margin: 0 6px 6px 0; padding: 6px 10px;
+    font-size: 12px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border: 1px solid rgba(128, 128, 128, .2); border-radius: 6px;
+}
+.axd-gtile:hover { border-color: rgba(76, 194, 255, .8); background: rgba(76, 194, 255, .07); }
+.axd-gtile .ico { font-size: 12px; margin-right: 8px; opacity: .75; }
+
+/* ------------------------------------------------------- row actions
+   Edit and Remove at the end of every row, quiet until the row is under
+   the pointer -- but always there, so nobody has to know they exist. */
+.axd-racts { white-space: nowrap; }
+.axd-lg .axd-racts { float: right; margin: -1px 0 0 8px; }
+.axd-ract {
+    display: inline-block; font-size: 11px; padding: 1px 8px; margin-left: 4px; cursor: pointer;
+    border: 1px solid rgba(128, 128, 128, .28); border-radius: 4px; opacity: .45;
+}
+.axd-lgt tr:hover .axd-ract, .axd-lg:hover .axd-ract { opacity: .85; }
+.axd-ract:hover { opacity: 1 !important; border-color: rgba(76, 194, 255, .85); }
+.axd-ractdel {
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 9px; padding: 3px 6px 2px;
+}
+.axd-ractdel:hover { border-color: rgba(224, 82, 82, .85) !important; color: #ff99a4; }
+body.theme-light .axd-ractdel:hover { color: #b3202c; }
+.axd-lgt td.axd-lgthen { cursor: pointer; }
+.axd-lgt td.axd-lgthen:hover { text-decoration: underline; }
+
+/* ---------------------------------------------- the bar on the selection */
+.axd-actbar {
+    position: absolute; z-index: 36; height: 26px; padding: 0 3px; white-space: nowrap;
+    background: #2b6cb0; border-radius: 6px; box-shadow: 0 3px 10px rgba(0, 0, 0, .35);
+}
+.axd-actbtn {
+    display: inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center;
+    cursor: pointer; color: #ffffff; border-radius: 4px; vertical-align: top;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 12px;
+}
+.axd-actbtn:hover { background: rgba(255, 255, 255, .22); }
+
+/* the gallery's hint, and the row of events nobody has written yet */
+.axd-galhint { font-size: 12px; opacity: .6; margin: 6px 0 2px 2px; }
+.axd-evadd { margin: 6px 0 4px; line-height: 2; }
+.axd-evadd .axd-dim { font-size: 11px; opacity: .55; margin-right: 4px; }
+.axd-evadd .axd-chip { font-size: 11.5px; padding: 1px 9px; }
+
+/* an empty section: the one thing to do */
+.axd-lgnone { margin: 2px 0 6px 16px; }
+.axd-lgnone .axd-hbtn {
+    height: 26px; line-height: 25px; padding: 0 12px; font-size: 12px;
+    background: rgba(76, 194, 255, .14); border-color: rgba(76, 194, 255, .55);
+}
+.axd-lgnone .axd-hbtn:hover { background: rgba(76, 194, 255, .26); }
+.axd-lgalt { font-size: 11.5px; opacity: .55; margin-left: 10px; cursor: pointer; }
+.axd-lgalt:hover { opacity: 1; text-decoration: underline; }
+
+/* a use that points at nothing */
+.axd-chip.axd-chip-bad { border-color: rgba(224, 82, 82, .7); color: #ff99a4; text-decoration: line-through; cursor: default; }
+body.theme-light .axd-chip.axd-chip-bad { color: #b3202c; }
+/* A placeholder says what a blank field means; it must not look like a value.
+   Trident only answers to its own selector for it. */
+input:-ms-input-placeholder, textarea:-ms-input-placeholder { color: rgba(128, 128, 128, .85) !important; font-style: italic; }
+input::placeholder, textarea::placeholder { color: rgba(128, 128, 128, .85); font-style: italic; }
+
+/* the lit gallery card, and the packs this design does not use */
+.axd-gcard.on, .axd-gtile.on { border-color: rgba(76, 194, 255, .95); background: rgba(76, 194, 255, .12); }
+.axd-packrest { margin: 8px 0 4px; line-height: 2.1; }
+.axd-packrest .axd-dim { font-size: 11px; opacity: .55; margin-right: 6px; }
+.axd-lgt .axd-chip .ico { font-size: 11px; margin-right: 5px; opacity: .75; }
+/* Trident puts its own clear button in a text box: beside the gallery's own
+   close button that was two crosses a few pixels apart, meaning different
+   things. The box is cleared by selecting it and typing. */
+.axd-galfind::-ms-clear { display: none; }
+.axd-packrest .axd-chip { font-size: 11.5px; padding: 1px 9px; margin: 0 4px 3px 0; }
+
+/* the start screen's map of the studio -- in a form note, which is small and
+   faded; its row is put back to full strength (a child cannot undo a parent's
+   opacity, it multiplies) */
+#axfr_tour { opacity: 1; font-size: 12px; }
+.axd-tour:after { content: ""; display: block; clear: both; height: 0; }
+/* five across, in one row: the start screen has to fit a 900px window with
+   its "show this" switch still in sight */
+.axd-touri {
+    float: left; width: 18.4%; box-sizing: border-box; margin: 0 2% 8px 0; padding: 7px 10px;
+    border: 1px solid rgba(128, 128, 128, .3); border-radius: 7px; font-size: 12px; line-height: 1.45;
+}
+.axd-touri:nth-child(5n) { margin-right: 0; }
+.axd-touri .ico { font-size: 13px; margin-right: 7px; opacity: .85; }
+.axd-touri b { font-weight: 600; }
+.axd-tourk { float: right; font-size: 11px; opacity: .6; }
+.axd-touri div { margin-top: 3px; font-size: 11.5px; }
+.axd-tourkeys { font-size: 11.5px; margin-top: 2px; }
+.axd-tourkeys b { font-weight: 600; }
+
+/* In the bottom panel its tab already says Problems or Output, so the head
+   inside is only what is not on the tab: the state and the buttons, on one
+   slim line. And Output is a log: lines packed like one. */
+.axd-pbody .axd-midhead { font-size: 12px; font-weight: normal; margin: 0 0 4px; padding: 0 0 5px; }
+.axd-pbody .axd-midhead > .ico, .axd-pbody .axd-midtitle { display: none; }
+.axd-pbody .axd-midhead .axd-midcount { margin-left: 0; font-size: 11.5px; }
+.axd-pbody .axd-midbody { padding-top: 6px; }
+.axd-pbody .axd-out { padding: 2px 8px; line-height: 1.5; }
+.axd-pbody .axd-outgo { margin: 0 0 2px 44px; }
+
+/* the keys sheet: two columns of small tables, at full strength (it sits in a
+   form note, which is faded, and a child cannot undo its parent's opacity) */
+#axfr_keys { opacity: 1; font-size: 12px; }
+.axd-keycols:after { content: ""; display: block; clear: both; height: 0; }
+.axd-keycol { float: left; width: 50%; box-sizing: border-box; padding-right: 18px; }
+.axd-keycol + .axd-keycol { padding-right: 0; padding-left: 18px; }
+.axd-keyh { font-size: 11px; font-weight: 600; opacity: .6; margin: 8px 0 3px; }
+.axd-keycol .axd-keyh:first-child { margin-top: 0; }
+.axd-keys { border-collapse: collapse; width: 100%; }
+.axd-keys td { padding: 2px 0; font-size: 12px; vertical-align: top; }
+.axd-keys td.axd-kk { width: 45%; padding-right: 10px; font-family: Consolas, monospace; font-size: 11.5px; white-space: nowrap; opacity: .9; }
+
+/* ------------------------------------------------ find a property */
+.axd-rfind {
+    position: absolute; left: 0; right: 0; top: 31px; height: 36px; padding: 5px 8px;
+    box-sizing: border-box; border-bottom: 1px solid rgba(128, 128, 128, .16);
+}
+.axd-rfindbox {
+    width: 100%; height: 26px; box-sizing: border-box; padding: 0 9px; font: inherit; font-size: 12px;
+    color: inherit; background: rgba(128, 128, 128, .12); outline: 0;
+    border: 1px solid rgba(128, 128, 128, .3); border-radius: 5px;
+}
+.axd-rfindbox:focus { border-color: rgba(76, 194, 255, .85); }
+.axd-rfindbox::-ms-clear { display: none; }
+#axdRightBody { top: 67px; }
+.axd-nofind .axd-rfind { display: none; }
+.axd-nofind #axdRightBody { top: 31px; }
+/* a folded group that has what is being looked for opens while it does */
+.axd-grp.axd-found.shut > .axd-gbody { display: block; }
+
+/* the "add a handler" row reads as an action, not as more code */
+.axd-cnitem[data-cn^="add."] { opacity: .7; }
+.axd-cnitem[data-cn^="add."]:hover { opacity: 1; }
+
+/* ------------------------------------------- the last build, on App */
+.axd-bres {
+    margin: 0 0 10px; padding: 8px 10px; border-radius: 6px; font-size: 12px; line-height: 18px;
+    background: rgba(128, 128, 128, .1); border: 1px solid rgba(128, 128, 128, .18);
+}
+.axd-bres .ico {
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; margin-right: 7px; vertical-align: -2px;
+}
+.axd-bres.ok  { background: rgba(108, 203, 95, .12); border-color: rgba(108, 203, 95, .4); }
+.axd-bres.ok .ico { color: #6ccb5f; }
+.axd-bres.bad { background: rgba(255, 153, 164, .12); border-color: rgba(255, 153, 164, .45); }
+.axd-bres.bad .ico { color: #ff99a4; }
+.axd-bresacts { margin-top: 6px; }
+
+/* why the last run did not start: first in Problems, and louder */
+.axd-runblock { border-left: 3px solid #ff99a4; cursor: pointer; }
+.axd-runwhat { font-family: Consolas, "Cascadia Mono", monospace; opacity: .85; }
+
+/* =====================================================================
+   The side panels: margins, air between rows, and a lane on the right
+   for the scrollbar. Trident's scrollbar here is the auto-hiding kind,
+   drawn ON the content rather than beside it -- so the content stops
+   short of it. View > The studio's look > Compact packs them as before.
+   ===================================================================== */
+#axdRightBody { padding: 12px 18px 20px 16px; }
+#axdLeft .axd-body { padding-right: 14px; }
+#axdRight .axd-p { min-height: 30px; margin: 0 0 7px; }
+#axdRight .axd-p > label { font-size: 11.5px; }
+#axdRight .axd-grp { margin: 0 0 16px; padding-top: 12px; }
+#axdRight .axd-grp:first-child { padding-top: 0; }
+#axdRight .axd-grp > .axd-glabel { margin: 0 0 10px; }
+#axdRight .axd-head { margin: 0 0 14px; padding: 9px 11px; }
+#axdRight .axd-note { margin-top: 6px; }
+body.axd-dense #axdRightBody { padding: 6px 16px 12px 8px; }
+body.axd-dense #axdRight .axd-p { min-height: 24px; margin: 0 0 4px; }
+body.axd-dense #axdRight .axd-p > label { font-size: 11px; }
+body.axd-dense #axdRight .axd-grp { margin: 0 0 12px; padding-top: 7px; }
+body.axd-dense #axdRight .axd-grp > .axd-glabel { margin: 0 0 7px; }
+body.axd-dense #axdRight .axd-head { margin: 0 0 10px; padding: 7px 9px; }
+
+/* =====================================================================
+   One palette. The studio's own chrome is neutral: greys, and an
+   off-white for the one button to press. Blue is kept for the canvas --
+   the selection, the caret, where a drop will land -- where it means
+   "this is what you are editing". Everywhere else it read as a web
+   template. The library's accent is put back to neutral inside the
+   studio's own regions only; the design on the canvas keeps its own.
+   ===================================================================== */
+.axd-form {
+    background: #2a2a2a; color: #ececec; border-color: rgba(255, 255, 255, .1);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .6);
+}
+.axd-fhead, .axd-ffoot { border-color: rgba(255, 255, 255, .08); }
+.axd-fprev { background: rgba(255, 255, 255, .045); border-color: rgba(255, 255, 255, .1); }
+.axd-fbtn.primary, .axd-fbtn.off:hover,
+#axdBar .axd-hbtn.axd-run, .axd-topright .axd-hbtn.axd-run {
+    background: #e6e6e6; border-color: #e6e6e6; color: #161616;
+}
+.axd-fbtn.primary:hover, #axdBar .axd-hbtn.axd-run:hover, .axd-topright .axd-hbtn.axd-run:hover {
+    background: #ffffff; border-color: #ffffff;
+}
+body.theme-light .axd-fbtn.primary, body.theme-light .axd-fbtn.off:hover,
+body.theme-light #axdBar .axd-hbtn.axd-run,
+body.theme-light .axd-topright .axd-hbtn.axd-run { background: #1f1f1f; border-color: #1f1f1f; color: #ffffff; }
+body.theme-light .axd-fbtn.primary:hover, body.theme-light #axdBar .axd-hbtn.axd-run:hover,
+body.theme-light .axd-topright .axd-hbtn.axd-run:hover { background: #000000; border-color: #000000; }
+body.theme-light .axd-fprev { background: rgba(0, 0, 0, .04); border-color: rgba(0, 0, 0, .1); }
+
+.axd-hbtn.on { background: rgba(128, 128, 128, .28); border-color: rgba(128, 128, 128, .5); }
+.axd-hbtn.axd-go, .axd-lgnone .axd-hbtn { background: rgba(128, 128, 128, .2); border-color: rgba(128, 128, 128, .42); }
+.axd-lgnone .axd-hbtn:hover { background: rgba(128, 128, 128, .32); }
+.axd-row.on, .axd-pal-row.on, .axd-cnitem.on { background: rgba(128, 128, 128, .26); }
+.axd-head { background: rgba(128, 128, 128, .1); border-color: rgba(128, 128, 128, .22); }
+.axd-ev.on { border-color: rgba(128, 128, 128, .55); background: rgba(128, 128, 128, .1); }
+.axd-tabsrow > div.on { border-bottom-color: currentColor; }
+.axd-wstab.on { background: rgba(128, 128, 128, .22); }
+.axd-chip:hover, .axd-cmdbox:hover, .axd-ract:hover { border-color: rgba(128, 128, 128, .7); }
+.axd-chip.on { background: rgba(128, 128, 128, .22); border-color: rgba(128, 128, 128, .6); }
+.axd-lgcard:hover, .axd-wcard:hover, .axd-gcard:hover, .axd-gtile:hover {
+    border-color: rgba(128, 128, 128, .6); background: rgba(128, 128, 128, .07);
+}
+.axd-wcard.on, .axd-gcard.on, .axd-gtile.on {
+    border-color: rgba(128, 128, 128, .85); background: rgba(128, 128, 128, .12);
+}
+.axd-pickit.on { border-color: rgba(128, 128, 128, .85); background: rgba(128, 128, 128, .14); }
+.axd-pickit.on .ico { color: inherit; }
+.axd-galfind:focus, .axd-rfindbox:focus { border-color: rgba(128, 128, 128, .8); }
+.axd-pswatch:hover, .axd-fswatch:hover { border-color: rgba(128, 128, 128, .9); }
+.axd-icon:hover { background: rgba(128, 128, 128, .22); border-color: rgba(128, 128, 128, .5); }
+.axd-split:hover { background: rgba(128, 128, 128, .35); }
+
+/* the library's accent, inside the studio's own regions */
+.axd-form .textbox input:focus, .axd-form .textbox textarea:focus, .axd-form .searchbox input:focus,
+.axd-form .numberbox.focus input, .axd-form .dropdown.open .dd-value, .axd-form .hotkeybox input:focus,
+#axdLeft .textbox input:focus, #axdLeft .searchbox input:focus,
+#axdRight .textbox input:focus, #axdRight .textbox textarea:focus, #axdRight .searchbox input:focus,
+#axdRight .numberbox.focus input, #axdRight .dropdown.open .dd-value, #axdRight .hotkeybox input:focus,
+#axdLogic .textbox input:focus, #axdLogic .textbox textarea:focus, #axdLogic .dropdown.open .dd-value,
+#axdApp .textbox input:focus, #axdApp .textbox textarea:focus, #axdApp .dropdown.open .dd-value {
+    border-bottom-color: #cfcfcf;
+}
+.axd-form .dd-item.selected:before, #axdRight .dd-item.selected:before,
+#axdLogic .dd-item.selected:before, #axdApp .dd-item.selected:before { background: #cfcfcf; }
+.axd-form .switch input:checked + .sw-track, #axdRight .switch input:checked + .sw-track,
+#axdLogic .switch input:checked + .sw-track, #axdApp .switch input:checked + .sw-track,
+.axd-form .check input:checked + .box, #axdRight .check input:checked + .box,
+.axd-form .segmented .seg.active, #axdRight .segmented .seg.active {
+    background: #d8d8d8; border-color: #d8d8d8; color: #161616;
+}
+.axd-form .radio input:checked + .ring { border-color: #d8d8d8; }
+body.theme-light .axd-form .textbox input:focus, body.theme-light .axd-form .dropdown.open .dd-value,
+body.theme-light #axdRight .textbox input:focus, body.theme-light #axdRight .dropdown.open .dd-value {
+    border-bottom-color: #3a3a3a;
+}
+body.theme-light .axd-form .switch input:checked + .sw-track, body.theme-light #axdRight .switch input:checked + .sw-track,
+body.theme-light .axd-form .check input:checked + .box, body.theme-light .axd-form .segmented .seg.active,
+body.theme-light #axdRight .segmented .seg.active { background: #2a2a2a; border-color: #2a2a2a; color: #ffffff; }
+body.theme-light .axd-form .dd-item.selected:before, body.theme-light #axdRight .dd-item.selected:before { background: #3a3a3a; }
+
+/* Toolbox | Outline, a two-part switch at the top of the left pane; the
+   one picked has the whole height below it. */
+#axdLeftTabs {
+    position: absolute; left: 0; right: 0; top: 0; height: 42px; padding: 7px 8px 0;
+    box-sizing: border-box;
+}
+.axd-lseg {
+    display: flex; height: 30px; padding: 3px; box-sizing: border-box; border-radius: 7px;
+    background: rgba(128, 128, 128, .12); border: 1px solid rgba(128, 128, 128, .16);
+}
+.axd-lseg > span {
+    display: block; flex: 1 1 0%; -ms-flex: 1 1 0%; min-width: 0; text-align: center;
+    line-height: 22px; font-size: 12px;
+    border-radius: 5px; cursor: pointer; opacity: .62; white-space: nowrap; overflow: hidden;
+}
+.axd-lseg > span:hover { opacity: .95; }
+.axd-lseg > span.on { opacity: 1; font-weight: 600; background: rgba(128, 128, 128, .26); }
+.axd-lseg .ico { font-size: 12px; margin-right: 6px; vertical-align: -1px; }
+.axd-lsegn { font-size: 10.5px; font-weight: normal; opacity: .55; margin-left: 6px; }
+#axdLeftBody, #axdTreeBody { top: 42px; bottom: 0; margin-top: 0; }
+#axdTreeHead { display: none; }
+#axdLeft.axd-lt-tree #axdLeftBody { display: none; }
+#axdLeft #axdTreeBody { display: none; }
+#axdLeft.axd-lt-tree #axdTreeBody { display: block; }
+
+/* =====================================================================
+   Logic and App: a rail of sections on the left, the one picked on the
+   right with its heading and buttons along the top.
+   ===================================================================== */
+.axd-rp { position: absolute; left: 0; right: 0; top: 0; bottom: 0; }
+.axd-rprail {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 224px; box-sizing: border-box;
+    padding: 12px 10px 20px; overflow-y: auto; overflow-x: hidden;
+    border-right: 1px solid rgba(128, 128, 128, .18); background: rgba(0, 0, 0, .14);
+}
+body.theme-light .axd-rprail { background: rgba(0, 0, 0, .035); }
+.axd-rphead {
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; font-weight: 600;
+    opacity: .48; padding: 16px 10px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.axd-rprail > .axd-rphead:first-child { padding-top: 4px; }
+.axd-rpitem {
+    position: relative; display: flex; align-items: center; height: 32px; padding: 0 10px;
+    margin: 1px 0; border-radius: 6px; cursor: pointer; font-size: 12.5px; opacity: .8;
+}
+.axd-rpitem:hover { background: rgba(128, 128, 128, .14); opacity: 1; }
+.axd-rpitem.on { background: rgba(128, 128, 128, .24); opacity: 1; font-weight: 600; }
+.axd-rpitem.on:before {
+    content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 3px;
+    border-radius: 2px; background: currentColor; opacity: .85;
+}
+.axd-rpitem .ico {
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; display: inline-block; width: 24px;
+    flex: none; font-size: 13px; opacity: .78; font-weight: normal;
+}
+.axd-rplab { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.axd-rpn { flex: none; font-size: 11px; font-weight: normal; opacity: .5; margin-left: 8px; }
+.axd-rpbad {
+    flex: none; font-size: 10.5px; font-weight: 600; line-height: 17px; padding: 0 7px; margin-left: 8px;
+    border-radius: 9px; color: #ff99a4; background: rgba(255, 153, 164, .14);
+}
+body.theme-light .axd-rpbad { color: #b3202c; background: rgba(179, 32, 44, .1); }
+.axd-rpfoot { font-size: 11px; line-height: 1.6; opacity: .45; padding: 22px 10px 0; }
+.axd-rpmain {
+    position: absolute; left: 224px; right: 0; top: 0; bottom: 0; overflow-y: auto; overflow-x: hidden;
+}
+.axd-rpinner { max-width: 1000px; padding: 24px 36px 48px 32px; }
+.axd-rphd { margin: 0 0 18px; padding: 0 0 14px; border-bottom: 1px solid rgba(128, 128, 128, .18); }
+.axd-rprow { display: flex; align-items: center; }
+/* the first button along the top is the one to press */
+.axd-rptools .axd-hbtn:first-child {
+    background: #e6e6e6; border-color: #e6e6e6; color: #161616; font-weight: 600;
+}
+.axd-rptools .axd-hbtn:first-child:hover { background: #ffffff; border-color: #ffffff; }
+body.theme-light .axd-rptools .axd-hbtn:first-child { background: #1f1f1f; border-color: #1f1f1f; color: #ffffff; }
+.axd-rpht { flex: 1 1 auto; font-size: 20px; font-weight: 600; line-height: 30px; }
+.axd-rptools { flex: none; white-space: nowrap; }
+.axd-rptools .axd-hbtn { margin-left: 6px; }
+.axd-rplead { font-size: 12.5px; opacity: .62; line-height: 1.6; margin-top: 4px; max-width: 760px; }
+.axd-rpsub {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; opacity: .5;
+    margin: 22px 0 8px;
+}
+.axd-rpcontent .axd-note { margin-top: 12px; }
+.axd-rpnote { font-size: 12.5px; opacity: .7; line-height: 1.6; margin: 0 0 12px; max-width: 760px; }
+.axd-rpform { max-width: 720px; }
+#axdApp .axd-rpform .axd-p { min-height: 34px; margin: 0 0 10px; }
+#axdApp .axd-rpform .axd-p > label { flex: 0 0 150px; width: 150px; font-size: 12px; }
+/* a setting that says what it does: name and sentence on the left, the
+   control on the right, a hairline between settings */
+.axd-p.axd-pd { align-items: flex-start; padding: 10px 0 12px; margin: 0; border-bottom: 1px solid rgba(128, 128, 128, .12); }
+.axd-pdt { flex: 1 1 auto; min-width: 0; padding-right: 18px; }
+.axd-pdt > label { display: block; font-size: 12.5px; font-weight: 600; margin: 0 0 3px; }
+.axd-pdesc { font-size: 11.5px; opacity: .62; line-height: 1.55; }
+.axd-pdesc b { font-weight: 600; }
+.axd-p.axd-pd > .dropdown, .axd-p.axd-pd > .textbox { flex: 0 0 270px; width: 270px; margin-top: 2px; }
+.axd-p.axd-pd > .switch { margin-top: 2px; }
+#axdApp .axd-rpform .axd-p.axd-pd { min-height: 0; margin: 0; }
+#axdApp .axd-kv { font-size: 12.5px; padding: 7px 0; border-bottom: 1px solid rgba(128, 128, 128, .1); }
+#axdApp .axd-kv span { width: 150px; }
+.axd-rpempty {
+    text-align: center; padding: 54px 24px 46px; margin-top: 6px;
+    border: 1px dashed rgba(128, 128, 128, .32); border-radius: 10px;
+}
+.axd-rpbig { display: block; font-size: 30px; opacity: .4; margin: 0 0 12px; }
+.axd-rpemptyt { font-size: 14px; font-weight: 600; margin: 0 0 16px; }
+.axd-rpemptyb { margin: 0 0 12px; }
+.axd-rpemptyb .axd-hbtn {
+    background: #e6e6e6; border-color: #e6e6e6; color: #161616; font-weight: 600;
+    height: 32px; line-height: 31px; padding: 0 18px; font-size: 12.5px; border-radius: 6px;
+}
+/* the buttons along a section's top are the section's main actions: sized so */
+.axd-rptools .axd-hbtn { height: 28px; line-height: 27px; padding: 0 12px; font-size: 12px; border-radius: 5px; }
+.axd-rpemptyb .axd-hbtn:hover { background: #ffffff; border-color: #ffffff; }
+body.theme-light .axd-rpemptyb .axd-hbtn { background: #1f1f1f; border-color: #1f1f1f; color: #ffffff; }
+.axd-lgcards:after { content: ""; display: block; clear: both; height: 0; }
+.axd-lgcards .axd-lgcard { float: left; width: 46%; margin: 0 12px 12px 0; box-sizing: border-box; }
+
+/* =====================================================================
+   The list editor in the inspector (AXG, AxStudio.Grid.js)
+   ===================================================================== */
+.axd-ledsrc { display: none; }
+.axd-led { margin-top: 2px; }
+.axd-ledhead { display: flex; align-items: center; font-size: 10.5px; opacity: .5; padding: 0 0 5px; }
+.axd-ledrow { display: flex; align-items: center; margin: 0 0 4px; border-radius: 5px; }
+.axd-ledgrip {
+    flex: none; width: 16px; text-align: center; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+    font-size: 10px; opacity: 0; cursor: move;
+}
+.axd-ledrow:hover .axd-ledgrip { opacity: .5; }
+.axd-ledc {
+    display: flex; align-items: center; flex: 1 1 0%; -ms-flex: 1 1 0%; min-width: 0; padding-right: 4px;
+}
+.axd-ledc-v { flex: 0 0 34%; -ms-flex: 0 0 34%; }
+.axd-ledc-g { flex: 0 0 82px; -ms-flex: 0 0 82px; }
+.axd-ledin {
+    flex: 1 1 auto; min-width: 0; width: 100%; height: 28px; box-sizing: border-box; padding: 0 8px;
+    font: inherit; font-size: 12px; color: inherit; outline: 0; border-radius: 4px;
+    background: rgba(128, 128, 128, .12); border: 1px solid rgba(128, 128, 128, .18);
+}
+.axd-ledin:focus { border-color: rgba(128, 128, 128, .7); background: rgba(128, 128, 128, .16); }
+.axd-ledin::-ms-clear { display: none; }
+.axd-ledc-v .axd-ledin, .axd-ledc-g .axd-ledin { font-family: Consolas, "Cascadia Mono", monospace; font-size: 11.5px; }
+.axd-ledsw {
+    flex: none; width: 18px; height: 18px; border-radius: 4px; margin-right: 6px;
+    border: 1px solid rgba(128, 128, 128, .5);
+}
+.axd-ledglyph {
+    flex: none; width: 18px; margin-right: 4px; text-align: center; font-size: 13px;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+}
+.axd-ledx {
+    flex: none; width: 22px; text-align: center; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+    font-size: 10px; opacity: 0; cursor: pointer;
+}
+.axd-ledrow:hover .axd-ledx { opacity: .55; }
+.axd-ledx:hover { opacity: 1 !important; color: #ff99a4; }
+.axd-ledrow.axd-leddrag { opacity: .45; }
+.axd-ledrow.axd-ledover { box-shadow: 0 -2px 0 rgba(128, 128, 128, .9); }
+.axd-ledempty { font-size: 11.5px; opacity: .55; padding: 6px 0 2px 16px; }
+.axd-ledfoot { display: flex; align-items: center; margin: 6px 0 0 12px; font-size: 11.5px; }
+.axd-ledbtn { cursor: pointer; padding: 3px 8px; border-radius: 4px; opacity: .75; margin-right: 2px; white-space: nowrap; }
+.axd-ledbtn:hover { background: rgba(128, 128, 128, .16); opacity: 1; }
+.axd-ledadd { opacity: .95; font-weight: 600; }
+.axd-ledadd .ico { font-size: 10px; margin-right: 4px; }
+.axd-ledcount { flex: 1 1 auto; opacity: .45; padding: 0 6px; white-space: nowrap; }
+.axd-ledtext {
+    width: 100%; box-sizing: border-box; font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px;
+    color: inherit; background: rgba(128, 128, 128, .12); border: 1px solid rgba(128, 128, 128, .25);
+    border-radius: 4px; padding: 6px 8px; outline: 0;
+}
+
+/* a data grid's content: how much is in it, and the way into the sheet */
+.axd-gridsum {
+    display: flex; align-items: center; padding: 9px 10px; margin: 0 0 8px; border-radius: 6px;
+    background: rgba(128, 128, 128, .1); border: 1px solid rgba(128, 128, 128, .2); font-size: 12px;
+}
+.axd-gridsum > .ico { font-size: 16px; opacity: .7; margin-right: 10px; }
+.axd-gridsay { flex: 1 1 auto; min-width: 0; line-height: 1.4; }
+.axd-gridsum .axd-hbtn { flex: none; height: 26px; line-height: 25px; padding: 0 10px; font-size: 12px;
+                          background: #e6e6e6; border-color: #e6e6e6; color: #161616; font-weight: 600; }
+body.theme-light .axd-gridsum .axd-hbtn { background: #1f1f1f; border-color: #1f1f1f; color: #ffffff; }
+
+/* =====================================================================
+   The data sheet: a spreadsheet over the studio
+   ===================================================================== */
+#axgSheet {
+    position: fixed; left: 0; top: 0; right: 0; bottom: 0; z-index: 115; display: none;
+    background: rgba(6, 8, 12, .6);
+}
+.axg-card {
+    position: absolute; left: 4%; right: 4%; top: 5%; bottom: 5%; display: flex; flex-direction: column;
+    background: #252525; color: #ececec; border: 1px solid rgba(255, 255, 255, .1); border-radius: 10px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, .6); overflow: hidden;
+}
+body.theme-light .axg-card { background: #ffffff; color: #1c1c1c; border-color: rgba(0, 0, 0, .12); }
+.axg-head {
+    flex: none; display: flex; align-items: center; padding: 12px 14px;
+    border-bottom: 1px solid rgba(128, 128, 128, .2);
+}
+.axg-title { font-size: 15px; font-weight: 600; margin-right: 12px; }
+.axg-sub { font-size: 12px; opacity: .55; }
+.axg-sp { flex: 1 1 auto; }
+.axg-btn {
+    display: inline-block; height: 28px; line-height: 27px; padding: 0 12px; margin-left: 6px; font-size: 12px;
+    border-radius: 5px; border: 1px solid rgba(128, 128, 128, .35); cursor: pointer; white-space: nowrap;
+}
+.axg-btn:hover { background: rgba(128, 128, 128, .18); }
+.axg-btn .ico { font-size: 10px; margin-right: 4px; }
+.axg-go { background: #e6e6e6; border-color: #e6e6e6; color: #161616; font-weight: 600; }
+.axg-go:hover { background: #ffffff; }
+body.theme-light .axg-go { background: #1f1f1f; border-color: #1f1f1f; color: #ffffff; }
+.axg-danger:hover { color: #ff99a4; border-color: rgba(255, 153, 164, .6); background: rgba(255, 153, 164, .08); }
+.axg-mini { height: 24px; line-height: 23px; padding: 0 8px; margin: 0; }
+.axg-mini .ico { margin: 0; }
+.axg-gridwrap { flex: 1 1 auto; position: relative; overflow: auto; }
+.axg-grid { border-collapse: collapse; table-layout: fixed; font-size: 12.5px; }
+.axg-grid th {
+    text-align: left; font-weight: 600; padding: 7px 8px 6px; position: relative; cursor: pointer;
+    background: rgba(128, 128, 128, .1); border-right: 1px solid rgba(128, 128, 128, .16);
+    border-bottom: 1px solid rgba(128, 128, 128, .3); white-space: nowrap; overflow: hidden;
+}
+.axg-grid th:hover, .axg-grid th.on { background: rgba(128, 128, 128, .2); }
+.axg-tht { display: block; overflow: hidden; text-overflow: ellipsis; padding-right: 18px; }
+.axg-thk { display: block; font-family: Consolas, monospace; font-size: 10.5px; font-weight: normal; opacity: .5; }
+.axg-thm { position: absolute; right: 6px; top: 9px; font-size: 11px; opacity: .45;
+           font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; }
+.axg-thadd { background: transparent !important; border-right: 0 !important; text-align: center; }
+.axg-grid td { padding: 0; border-right: 1px solid rgba(128, 128, 128, .12); border-bottom: 1px solid rgba(128, 128, 128, .12); }
+.axg-grid td.axg-rn, .axg-grid th.axg-rn {
+    text-align: center; font-size: 11px; opacity: .5; font-weight: normal; cursor: default;
+}
+.axg-kids { display: block; font-size: 9.5px; opacity: .8; }
+.axg-in {
+    display: block; width: 100%; height: 30px; box-sizing: border-box; padding: 0 8px; border: 0;
+    font: inherit; font-size: 12.5px; color: inherit; background: transparent; outline: 0;
+}
+.axg-in:focus { background: rgba(128, 128, 128, .14); box-shadow: inset 0 0 0 1px rgba(128, 128, 128, .8); }
+.axg-in::-ms-clear { display: none; }
+.axg-r { text-align: right; }
+.axg-cen { text-align: center; }
+.axg-rowx { text-align: center; border-right: 0 !important; }
+.axg-rowx span { font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 10px; opacity: 0; cursor: pointer; padding: 6px; }
+.axg-grid tr:hover .axg-rowx span { opacity: .55; }
+.axg-rowx span:hover { opacity: 1 !important; color: #ff99a4; }
+.axg-empty { padding: 26px 18px; font-size: 12.5px; opacity: .75; }
+.axg-foot { flex: none; padding: 8px 14px; font-size: 11px; opacity: .5; border-top: 1px solid rgba(128, 128, 128, .16); }
+.axg-text {
+    flex: 1 1 auto; margin: 12px 14px 14px; padding: 10px 12px; resize: none; outline: 0;
+    font-family: Consolas, "Cascadia Mono", monospace; font-size: 12.5px; line-height: 1.55; color: inherit;
+    background: rgba(0, 0, 0, .22); border: 1px solid rgba(128, 128, 128, .25); border-radius: 6px;
+}
+.axg-why { flex: none; margin: 12px 14px 0; padding: 8px 10px; font-size: 12px; border-radius: 6px;
+           color: #ffc6cc; background: rgba(255, 153, 164, .1); border: 1px solid rgba(255, 153, 164, .35); }
+.axg-pop {
+    position: absolute; right: 18px; top: 62px; width: 260px; z-index: 5; padding: 12px 14px 12px;
+    background: #2e2e2e; border: 1px solid rgba(255, 255, 255, .12); border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .5); font-size: 12px;
+}
+body.theme-light .axg-pop { background: #ffffff; border-color: rgba(0, 0, 0, .14); }
+.axg-poptitle { font-weight: 600; font-size: 13px; margin: 0 0 6px; }
+.axg-pop label { display: block; font-size: 11px; opacity: .65; margin: 9px 0 3px; }
+.axg-dim { opacity: .7; }
+.axg-pin {
+    width: 100%; height: 28px; box-sizing: border-box; padding: 0 8px; font: inherit; font-size: 12px;
+    color: inherit; background: rgba(128, 128, 128, .14); border: 1px solid rgba(128, 128, 128, .25);
+    border-radius: 4px; outline: 0;
+}
+select.axg-pin option { background: #2e2e2e; color: #ececec; }
+body.theme-light select.axg-pin option { background: #ffffff; color: #1c1c1c; }
+.axg-popbtns { margin-top: 12px; white-space: nowrap; }
+.axg-popbtns .axg-btn { margin: 0 4px 0 0; padding: 0 9px; }
+
+/* =====================================================================
+   The start screen
+   ===================================================================== */
+#axfr_home { opacity: 1; font-size: 12.5px; white-space: normal; line-height: 1.45; margin: 0; }
+.axd-home { display: flex; margin: -13px -15px 6px; border-bottom: 1px solid rgba(128, 128, 128, .16); }
+.axd-homel {
+    flex: 0 0 290px; -ms-flex: 0 0 290px; box-sizing: border-box; padding: 20px 18px 18px;
+    border-right: 1px solid rgba(128, 128, 128, .16); background: rgba(0, 0, 0, .14);
+}
+body.theme-light .axd-homel { background: rgba(0, 0, 0, .03); }
+.axd-homebrand { font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
+.axd-homebrand span { font-size: 11px; font-weight: normal; opacity: .45; margin-left: 8px; }
+.axd-homesub { font-size: 12px; opacity: .6; margin: 6px 0 18px; line-height: 1.55; }
+.axd-homeact {
+    position: relative; padding: 9px 10px 9px 42px; margin: 0 0 4px; border-radius: 7px; cursor: pointer;
+    border: 1px solid transparent;
+}
+.axd-homeact .ico { position: absolute; left: 13px; top: 12px; font-size: 16px; opacity: .8; }
+.axd-homeact b { display: block; font-size: 13px; font-weight: 600; }
+.axd-homeact small { display: block; font-size: 11px; opacity: .55; margin-top: 1px; }
+.axd-homeact:hover, .axd-homerec:hover { background: rgba(128, 128, 128, .16); }
+.axd-homehot { background: rgba(128, 128, 128, .12); border-color: rgba(128, 128, 128, .32); }
+.axd-homeh {
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; opacity: .5;
+    margin: 20px 0 6px 2px;
+}
+.axd-homeh1 { margin: 0 0 12px 2px; }
+.axd-homeh1 span { text-transform: none; letter-spacing: 0; font-weight: normal; margin-left: 10px; }
+.axd-homerec { padding: 6px 10px; margin: 0 0 1px; border-radius: 6px; cursor: pointer; }
+.axd-homerec b { font-size: 12.5px; font-weight: 600; }
+.axd-homerec span { float: right; font-size: 11px; opacity: .5; }
+.axd-homerec small {
+    display: block; font-size: 10.5px; opacity: .45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.axd-homenone { font-size: 12px; opacity: .5; padding: 4px 2px; }
+.axd-homekeys { margin-top: 22px; font-size: 11px; opacity: .55; line-height: 1.85; }
+.axd-homekeys b { font-weight: 600; }
+/* The templates take the whole height beside the left column and scroll
+   inside it: laid out absolutely, they add nothing to the row's height, so the
+   left column sets it and they fill it -- a fixed height left a gap under them. */
+.axd-homer { flex: 1 1 auto; -ms-flex: 1 1 auto; min-width: 0; position: relative; min-height: 300px; }
+.axd-homein {
+    position: absolute; top: 0; right: 0; bottom: 0; left: 0; box-sizing: border-box;
+    padding: 20px 14px 10px 20px; overflow-y: auto; overflow-x: hidden;
+}
+.axd-tplgrid:after { content: ""; display: block; clear: both; height: 0; }
+.axd-tpl {
+    display: inline-block; vertical-align: top; width: 31.3%; margin: 0 2% 12px 0; padding: 7px; box-sizing: border-box; cursor: pointer;
+    border-radius: 9px; border: 1px solid transparent;
+}
+.axd-tpl:hover { background: rgba(128, 128, 128, .12); border-color: rgba(128, 128, 128, .32); }
+.axd-tpl b { display: block; font-size: 12.5px; font-weight: 600; margin: 8px 3px 1px; }
+.axd-tpl small { display: block; height: 31px; overflow: hidden; font-size: 11px; line-height: 1.4; opacity: .55; margin: 0 3px; }
+
+/* a template's layout as a small drawing */
+.axd-thumb {
+    height: 104px; overflow: hidden; border-radius: 6px; background: #1b1b1b;
+    border: 1px solid rgba(255, 255, 255, .09); box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
+}
+body.theme-light .axd-thumb { background: #f7f7f7; border-color: rgba(0, 0, 0, .1); box-shadow: 0 2px 8px rgba(0, 0, 0, .08); }
+.axd-tpl:hover .axd-thumb { border-color: rgba(128, 128, 128, .5); }
+.axd-thumb .tb { display: block; height: 9px; background: rgba(128, 128, 128, .16); }
+.axd-thumb .mb { display: block; height: 6px; background: rgba(128, 128, 128, .08); }
+.axd-thumb .bd { display: flex; height: 95px; }
+.axd-thumb .nv { flex: 0 0 26px; -ms-flex: 0 0 26px; padding: 6px 4px; box-sizing: border-box;
+                 border-right: 1px solid rgba(128, 128, 128, .12); }
+.axd-thumb .nv i { display: block; height: 4px; margin: 0 0 4px; border-radius: 2px; background: rgba(128, 128, 128, .3); }
+.axd-thumb .nv i.on { background: rgba(128, 128, 128, .75); }
+.axd-thumb .pg { flex: 1 1 auto; min-width: 0; padding: 6px 7px; overflow: hidden; }
+.axd-thumb .pg i, .axd-thumb .pg b { display: block; margin: 0 0 3px; border-radius: 2px; }
+.axd-thumb .pg .row {
+    position: relative; height: 10px; border-radius: 3px;
+    background: rgba(128, 128, 128, .1); border: 1px solid rgba(128, 128, 128, .16);
+}
+.axd-thumb .row .t { position: absolute; left: 4px; top: 3px; width: 40%; height: 3px; margin: 0; background: rgba(128, 128, 128, .55); }
+.axd-thumb .row .c { position: absolute; right: 4px; top: 2px; width: 12px; height: 5px; margin: 0; border-radius: 3px; background: rgba(128, 128, 128, .7); }
+.axd-thumb .pg .card { padding: 3px; min-height: 12px; border-radius: 3px; background: rgba(128, 128, 128, .06); border: 1px solid rgba(128, 128, 128, .18); }
+.axd-thumb .pg .txt { width: 45%; height: 3px; margin: 3px 0 4px; background: rgba(128, 128, 128, .6); }
+.axd-thumb .pg .in { height: 7px; background: rgba(128, 128, 128, .08); border: 1px solid rgba(128, 128, 128, .35); }
+.axd-thumb .pg .btn {
+    display: inline-block; width: 18px; height: 7px; margin: 0 3px 3px 0; vertical-align: top; border-radius: 3px;
+    background: rgba(128, 128, 128, .7);
+}
+.axd-thumb .pg .box { height: 28px; background: rgba(128, 128, 128, .06); border: 1px solid rgba(128, 128, 128, .28); }
+.axd-thumb .pg .tbl {
+    height: 40px; border: 1px solid rgba(128, 128, 128, .3);
+    background-image: repeating-linear-gradient(to bottom, rgba(128, 128, 128, .3) 0, rgba(128, 128, 128, .3) 1px,
+                                                transparent 1px, transparent 7px);
+}
+.axd-thumb .pg .tbl s { display: none; }
+.axd-thumb .pg .tabs { height: 5px; margin-bottom: 4px; }
+.axd-thumb .tabs s { display: inline-block; width: 16px; height: 3px; margin-right: 3px; border-radius: 1px; background: rgba(128, 128, 128, .55); }
+.axd-thumb .pg .tiles:after { content: ""; display: block; clear: both; height: 0; }
+.axd-thumb .tiles .tile {
+    float: left; width: 29%; height: 16px; margin: 0 4% 3px 0; border-radius: 3px;
+    background: rgba(128, 128, 128, .12); border: 1px solid rgba(128, 128, 128, .2);
+}
+.axd-thumb .pg .bar { height: 3px; background: rgba(128, 128, 128, .45); }
+.axd-thumb .pg .info { height: 8px; background: rgba(128, 128, 128, .14); border-left: 2px solid rgba(128, 128, 128, .7); }
+.axd-thumb .pg .sw { display: inline-block; width: 12px; height: 6px; margin: 0 4px 3px 0; border-radius: 3px; background: rgba(128, 128, 128, .55); }
+/* a template's picture: the window itself, taken running, on a backdrop --
+   centred by its own size, so a dialog and a tall calculator both sit well */
+.axd-thumb.axd-shot { position: relative; height: 150px;
+    background: #262c33; background-image: linear-gradient(135deg, #2c3e50 0%, #1d232a 60%, #232323 100%); }
+body.theme-light .axd-thumb.axd-shot { background: #e4eaf0; background-image: linear-gradient(135deg, #d7e3ee 0%, #eef1f4 60%, #f4f4f4 100%); }
+.axd-shot img {
+    position: absolute; top: 0; right: 0; bottom: 0; left: 0; margin: auto; max-width: 92%; max-height: 88%;
+    border-radius: 4px; box-shadow: 0 4px 14px rgba(0, 0, 0, .5); border: 1px solid rgba(255, 255, 255, .08);
+}
+body.theme-light .axd-shot img { box-shadow: 0 4px 14px rgba(0, 0, 0, .22); border-color: rgba(0, 0, 0, .08); }
+.axd-tpl:hover .axd-shot img { box-shadow: 0 6px 18px rgba(0, 0, 0, .6); }
+/* what it is made with: the studio's no-code parts, as tags */
+.axd-tpltags { margin: 6px 2px 0; }
+.axd-tpltags span {
+    display: inline-block; font-size: 10px; line-height: 16px; padding: 0 6px; margin: 0 3px 3px 0;
+    border-radius: 8px; background: rgba(128, 128, 128, .18); opacity: .85;
+}
+.axd-tpltags span.nc { background: rgba(96, 205, 255, .18); color: #60cdff; opacity: 1; }
+body.theme-light .axd-tpltags span.nc { background: rgba(0, 95, 184, .12); color: #005fb8; }
+
+/* =====================================================================
+   The bottom bar, hidden until the pointer is at the bottom edge
+   ===================================================================== */
+body.axd-ah #axStatusBar { transition: transform .16s ease; -ms-transform: translateY(100%); transform: translateY(100%); }
+body.axd-ah.axd-ahshow #axStatusBar { -ms-transform: none; transform: none; }
+body.axd-ah #axdPanel { transition: bottom .16s ease; z-index: 30; background: #202020; }
+body.axd-ah.axd-ahshow #axdPanel { box-shadow: 0 -8px 24px rgba(0, 0, 0, .35); }
+body.theme-light.axd-ah #axdPanel { background: #f3f3f3; }
+#axdAhHint {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 3px; z-index: 40; display: none;
+    background: rgba(128, 128, 128, .35);
+}
+body.axd-ahshow #axdAhHint { display: none !important; }
+/* over the workspace, the status bar needs a ground of its own */
+body.axd-ah #axStatusBar { background: #202020; }
+body.theme-light.axd-ah #axStatusBar { background: #f3f3f3; }
+
+/* =====================================================================
+   The Look workspace
+   ===================================================================== */
+.axd-rpsw {
+    flex: none; display: inline-block; width: 14px; height: 14px; margin: 0 10px 0 4px; border-radius: 4px;
+    border: 1px solid rgba(128, 128, 128, .55);
+}
+.axd-rpadd { opacity: .7; }
+.axd-lkwrap { display: flex; align-items: flex-start; }
+.axd-lkprev { flex: 1 1 auto; min-width: 0; margin-right: 22px; }
+#axdSpec {
+    position: relative; height: 620px; overflow: hidden; border-radius: 8px; font-size: 14px; line-height: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .45), 0 0 0 1px rgba(128, 128, 128, .25);
+}
+#axdSpec .axd-content { overflow: hidden; }
+/* The page is the pane's whole size and never scrolls as one: the head stays,
+   the window in the middle takes the height left (its own content scrolls),
+   and only the column of settings on the right scrolls. */
+.axd-lkinner { height: 100%; display: flex; flex-direction: column; overflow: hidden; padding-bottom: 20px; }
+.axd-lkinner > .axd-rphd { flex: none; }
+.axd-lkinner .axd-lkwrap { flex: 1 1 0%; -ms-flex: 1 1 0%; min-height: 0; align-items: stretch; }
+.axd-lkinner .axd-lkprev { display: flex; flex-direction: column; }
+.axd-lkinner #axdSpec { flex: 1 1 0%; -ms-flex: 1 1 0%; height: auto; min-height: 0; }
+.axd-lkinner #axdSpec .axd-content { overflow-y: auto; }
+.axd-lked { flex: 0 0 360px; -ms-flex: 0 0 360px; min-width: 0; }
+/* a real scrollbar that takes its own room, not the autohiding one over the fields */
+.axd-lkinner .axd-lked { overflow-y: auto; overflow-x: hidden; padding-right: 6px; -ms-overflow-style: scrollbar; }
+.axd-lked .axd-grp { margin: 0 0 14px; }
+.axd-lkseg { display: inline-block; margin-left: 6px; }
+.axd-lkseg .axd-hbtn { margin-left: 0; border-radius: 0; }
+.axd-lkseg .axd-hbtn:first-child { border-radius: 5px 0 0 5px; background: transparent; color: inherit; font-weight: normal; }
+/* not the head's "first button is the one to press" in the light studio either */
+body.theme-light .axd-lkseg .axd-hbtn:first-child { background: transparent; border-color: rgba(128, 128, 128, .45); color: inherit; }
+.axd-lkseg .axd-hbtn:last-child { border-radius: 0 5px 5px 0; margin-left: -1px; }
+.axd-lkseg .axd-hbtn.on { background: rgba(128, 128, 128, .3) !important; font-weight: 600; }
+.axd-lknote {
+    padding: 10px 12px 10px 38px; position: relative; margin: 0 0 12px; font-size: 12px; line-height: 1.55;
+    border-radius: 7px; background: rgba(128, 128, 128, .1); border: 1px solid rgba(128, 128, 128, .22);
+}
+.axd-lknote .ico { position: absolute; left: 12px; top: 12px; font-size: 14px; opacity: .7; }
+@media (max-width: 1250px) {
+    .axd-lkwrap { display: block; }
+    .axd-lkprev { margin: 0 0 18px; }
+    /* stacked, the page scrolls as one again */
+    .axd-lkinner { height: auto; display: block; overflow: visible; }
+    .axd-lkinner .axd-lkprev { display: block; }
+    .axd-lkinner #axdSpec { height: 560px; }
+    .axd-lkinner .axd-lked { overflow: visible; }
+}
+
+/* the tab order, being set on the canvas */
+.axd-tabno {
+    position: absolute; z-index: 45; min-width: 20px; height: 20px; line-height: 20px; padding: 0 5px;
+    box-sizing: border-box; border-radius: 10px; text-align: center; font-size: 11px; font-weight: 700;
+    font-family: "Segoe UI", sans-serif; color: #ffffff; background: rgba(40, 40, 40, .88);
+    border: 1px solid rgba(255, 255, 255, .6); box-shadow: 0 2px 6px rgba(0, 0, 0, .45); pointer-events: none;
+}
+.axd-tabno.set { background: #4cc2ff; color: #002a3d; border-color: #ffffff; }
+
+/* hidden and locked, from the Outline: the designer's own, never the window's */
+#axdPaper .axd-dhide { display: none !important; }
+.axd-trtools { float: right; white-space: nowrap; }
+.axd-trt {
+    display: inline-block; width: 20px; text-align: center; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+    font-size: 11px; opacity: 0; cursor: pointer; border-radius: 3px;
+}
+.axd-row:hover .axd-trt { opacity: .5; }
+.axd-trt:hover { opacity: 1 !important; background: rgba(128, 128, 128, .22); }
+.axd-trt.on { opacity: .9; }
+.axd-rowhid { opacity: .5; }
+
+/* lining up: the plan, shown on the canvas */
+.axd-alto { position: absolute; z-index: 44; border: 2px dashed #4cc2ff; background: rgba(76, 194, 255, .1); pointer-events: none; }
+.axd-alstay { position: absolute; z-index: 44; border: 2px solid #f0b429; pointer-events: none; }
+.axd-altag { z-index: 46; white-space: nowrap; pointer-events: none; }
+.axd-al-stays { background: #f0b429 !important; color: #2a1d00 !important; }
+.axd-al-moves, .axd-al-resized { background: #4cc2ff !important; color: #002a3d !important; }
+.axd-al-flow { background: #ff99a4 !important; color: #3a0008 !important; }
+.axd-al-there { opacity: .75; }
+/* the inspector's Line them up */
+.axd-alrow { display: flex; align-items: center; margin: 0 0 6px; font-size: 12px; }
+.axd-allab { flex: 0 0 64px; font-size: 11.5px; opacity: .62; }
+.axd-alseg { display: inline-flex; flex-wrap: wrap; }
+.axd-albtn {
+    display: inline-block; height: 26px; line-height: 25px; padding: 0 9px; margin: 0 4px 4px 0; font-size: 12px;
+    border: 1px solid rgba(128, 128, 128, .35); border-radius: 5px; cursor: pointer; white-space: nowrap;
+}
+.axd-albtn:hover { background: rgba(128, 128, 128, .2); border-color: rgba(128, 128, 128, .7); }
+.axd-albtn.on { background: rgba(128, 128, 128, .3); font-weight: 600; }
+.axd-algap {
+    width: 44px; height: 26px; box-sizing: border-box; padding: 0 6px; margin: 0 6px 4px 0; font: inherit; font-size: 12px;
+    color: inherit; background: rgba(128, 128, 128, .12); border: 1px solid rgba(128, 128, 128, .3); border-radius: 4px;
+}
+/* a radio group's partners, when one is selected */
+.axd-mate { position: absolute; z-index: 43; border: 2px dashed rgba(240, 180, 41, .9); border-radius: 4px; pointer-events: none; }
+.axd-matetag { background: #f0b429 !important; color: #2a1d00 !important; z-index: 46; white-space: nowrap; }
+
+/* ---- Macros: the one open, under the list ---------------------------- */
+.axd-lgt tr.axd-rowon td { background: rgba(128, 128, 128, .12); }
+.axd-maced { margin-top: 18px; padding-top: 4px; border-top: 1px solid rgba(128, 128, 128, .16); max-width: 720px; }
+#axdLogic .axd-maced .axd-p { min-height: 34px; margin: 0 0 10px; }
+#axdLogic .axd-maced .axd-p > label { flex: 0 0 110px; width: 110px; font-size: 12px; }
+.axd-maced .axd-align { margin: 8px 0 0; }
+.axd-maced .axd-align .axd-hbtn { margin: 0 4px 6px 0; }
+/* a window with no title bar and edges: its bars stack, the shell takes the rest */
+#axdPaper.axd-noframe #axdFrame { display: -ms-flexbox; display: flex; -ms-flex-direction: column; flex-direction: column; }
+#axdPaper.axd-noframe .axd-shell { -ms-flex: 1 1 0%; flex: 1 1 0%; height: auto !important; min-height: 0; }
+
+/* ---- Bindings: the controls ready to bind, one click each -------------- */
+.axd-bindqs { display: flex; flex-wrap: wrap; margin: 0 -4px; }
+.axd-bindq {
+    display: flex; align-items: center; margin: 0 4px 8px; padding: 7px 10px 7px 12px; border-radius: 6px; cursor: pointer;
+    background: rgba(128, 128, 128, .08); border: 1px solid rgba(128, 128, 128, .16);
+}
+.axd-bindq:hover { background: rgba(128, 128, 128, .16); border-color: rgba(128, 128, 128, .3); }
+.axd-bindq .ico { font-size: 14px; margin-right: 8px; opacity: .8; }
+.axd-bindq b { font-weight: 600; margin-right: 8px; }
+.axd-bindq small { font-size: 11.5px; opacity: .6; margin-right: 10px; }
+.axd-bindq .axd-bindplus { font-size: 11px; margin: 0; opacity: .55; }
+.axd-bindq:hover .axd-bindplus { opacity: 1; }
+/* the canvas scopes the window's sheet under #axdPaper, which outweighs a
+   component's own ".textbox.axdate input" -- restate the date box's room for
+   its icons there */
+#axdPaper .textbox.axdate input { padding-left: 34px !important; padding-right: 56px !important; }
+#axdPaper .textbox.axdate.plain input, #axdPaper .textbox.axdate.noclear input { padding-right: 32px !important; }
+#axdPaper .textbox.axdate.plain.noclear input { padding-right: 10px !important; }
+
+/* thin controls -- a separator, a splitter -- get room to be clicked on the
+   canvas: an invisible margin that belongs to the control */
+#axdPage .axd.ax-sep, #axdPage .axd.axsp { position: relative; }
+#axdPage .axd.ax-sep:after, #axdPage .axd.axsp:after {
+    content: ""; position: absolute; left: -6px; right: -6px; top: -7px; bottom: -7px;
+}
+#axdPage .axd.axsp.vert { min-height: 48px; }
+
+/* what to do about a run that will not start */
+.axd-runacts { margin-top: 8px; }
+.axd-runacts .axd-hbtn { margin: 0 4px 4px 0; }
+
+/* the page scrolls on the canvas, with a scrollbar you can see: the running
+   window's hides until the pointer is on it, which on a design surface reads
+   as "there is nothing below" */
+#axdPaper #axdContent.axd-content { overflow-y: auto !important; overflow-x: hidden !important; -ms-overflow-style: scrollbar !important; }
+#axdPaper.axd-noscroll #axdContent.axd-content { overflow: hidden !important; }
+
+/* A Code block (AxStudio.Import.ahk): code that runs at this point while the
+   window is built. A chip, so it reads as code and not as a control. */
+#axdPaper .axd-code { position: relative; font: 11.5px Consolas, "Cascadia Mono", monospace; line-height: 1.45;
+    padding: 5px 10px 5px 30px; border: 1px dashed rgba(128,128,128,.55); border-radius: 4px;
+    background: rgba(128,128,128,.10); opacity: .9; overflow: hidden; }
+#axdPaper .axd-code .ico { position: absolute; left: 9px; top: 6px; font-size: 13px; opacity: .7; }
+#axdPaper .axd-code pre { margin: 0; white-space: pre; overflow: hidden; font: inherit; }
+#axdPaper .axd-codemore { display: block; opacity: .6; font-size: 11px; margin-top: 2px; }
+
+/* The map (AxStudio.Map.ahk / .js): the program as what starts things, what
+   they do, what that calls, and what it reads and writes. */
+#axdMap { overflow: hidden; }
+.axm { position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: -ms-flexbox; display: flex;
+    -ms-flex-direction: column; flex-direction: column; }
+.axm-bar { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; padding: 8px 12px;
+    border-bottom: 1px solid rgba(128,128,128,.25); -ms-flex: none; flex: none; }
+.axm-bar > * { margin-right: 8px; }
+.axm-title { font-weight: 600; font-size: 15px; margin-right: 14px; white-space: nowrap; }
+.axm-title .ico { margin-right: 6px; }
+.axm-find { width: 240px; }
+.axm-chip, .axm-btn { padding: 3px 10px; border-radius: 12px; border: 1px solid rgba(128,128,128,.4); cursor: default;
+    font-size: 12px; opacity: .55; white-space: nowrap; }
+.axm-chip.on { opacity: 1; background: rgba(96,205,255,.16); border-color: rgba(96,205,255,.6); }
+.axm-btn { border-radius: 4px; opacity: .9; }
+.axm-btn:hover, .axm-chip:hover { background: rgba(128,128,128,.2); }
+.axm-sep { width: 10px; }
+.axm-count { margin-left: auto; opacity: .6; font-size: 12px; white-space: nowrap; }
+.axm-body { -ms-flex: 1 1 0%; flex: 1 1 0%; display: -ms-flexbox; display: flex; min-height: 0; }
+#axmView { -ms-flex: 1 1 0%; flex: 1 1 0%; overflow: auto; position: relative; }
+#axmPlane { position: relative; }
+#axmSvg { position: absolute; left: 0; top: 0; overflow: visible; }
+#axmNodes { position: absolute; left: 0; top: 0; }
+.axm-head { position: absolute; top: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+    opacity: .6; font-weight: 600; white-space: nowrap; }
+.axm-head span { opacity: .6; font-weight: 400; margin-left: 4px; }
+/* a card is solid: a line passing behind it is behind it, not through its words */
+.axm-node { position: absolute; height: 40px; box-sizing: border-box; padding: 2px 8px 2px 32px; border-radius: 6px;
+    border: 1px solid rgba(128,128,128,.35); border-left-width: 3px; background: #2b2b2b;
+    overflow: hidden; white-space: nowrap; cursor: default; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+body.theme-light .axm-node { background: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.axm-node:hover { background: #353535; }
+body.theme-light .axm-node:hover { background: #f3f3f3; }
+.axm-node.cold { opacity: .35; }
+.axm-node { overflow: visible; }
+.axm-node b, .axm-node small { overflow: hidden; }
+/* the dot a connection is dragged from */
+.axm-port { position: absolute; right: -6px; top: 14px; width: 10px; height: 10px; border-radius: 6px; cursor: crosshair;
+    background: #2b2b2b; border: 2px solid rgba(96,205,255,.7); opacity: 0; }
+body.theme-light .axm-port { background: #ffffff; }
+.axm-node:hover .axm-port { opacity: 1; }
+.axm-port:hover { background: #60cdff; }
+.axm-e.axm-drag { stroke: #60cdff; stroke-width: 2.4; stroke-dasharray: 6 4; }
+.axm-e.hot { stroke-width: 2.6; }
+.axm-leg { cursor: pointer; border-radius: 4px; padding: 2px 4px; }
+.axm-leg:hover { background: rgba(128,128,128,.15); }
+.axm-leg.off { opacity: .35; text-decoration: line-through; }
+.axm-ish small { text-transform: none; letter-spacing: 0; font-weight: 400; opacity: .8; margin-left: 4px; }
+.axm-tip { font-size: 12px; opacity: .65; line-height: 1.5; }
+.axm-open.axm-steps { background: #6ccb5f; color: #102010; }
+.axm-open .ico { margin-right: 6px; font-size: 12px; }
+/* the two ways to look */
+.axm-modes { display: inline-block; white-space: nowrap; margin-right: 16px; border: 1px solid rgba(128,128,128,.35);
+    border-radius: 7px; padding: 2px; }
+.axm-mode { display: inline-block; padding: 4px 12px; border-radius: 5px; cursor: pointer; font-size: 12.5px; opacity: .75; }
+.axm-mode .ico { margin-right: 7px; font-size: 12px; }
+.axm-mode:hover { opacity: 1; background: rgba(128,128,128,.14); }
+.axm-mode.on { opacity: 1; font-weight: 600; background: rgba(96,205,255,.18); color: #60cdff; }
+body.theme-light .axm-mode.on { background: rgba(0,95,184,.1); color: #005fb8; }
+.axm-ponly > * { margin-right: 8px; }
+
+/* ---- step by step -------------------------------------------------------
+   The pieces down the left, the flowchart in the middle, the step picked on
+   the right. Blocks are centred on one line that runs down the chart; an
+   "if" opens into a table of branches and closes below it. */
+#axsWrap { -ms-flex: 1 1 0%; flex: 1 1 0%; min-height: 0; outline: 0; display: -ms-flexbox; display: flex; }
+.axs-pieces { width: 230px; -ms-flex: none; flex: none; overflow: auto; padding: 8px 8px 20px; box-sizing: border-box;
+    border-right: 1px solid rgba(128,128,128,.25); background: rgba(0,0,0,.12); }
+body.theme-light .axs-pieces { background: rgba(0,0,0,.03); }
+.axs-lh { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; opacity: .5; padding: 12px 8px 5px; }
+.axs-lw { font-size: 12px; font-weight: 600; padding: 8px 8px 3px; opacity: .8; }
+.axs-pc { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; height: 28px; padding: 0 8px;
+    border-radius: 6px; cursor: pointer; font-size: 12.5px; }
+.axs-pc:hover { background: rgba(128,128,128,.14); }
+.axs-pc.on { background: rgba(96,205,255,.16); color: #60cdff; font-weight: 600; }
+body.theme-light .axs-pc.on { background: rgba(0,95,184,.1); color: #005fb8; }
+.axs-pc.empty { opacity: .55; }
+.axs-pc .ico { width: 22px; -ms-flex: none; flex: none; font-size: 12px; opacity: .75; }
+.axs-pcl { -ms-flex: 1 1 auto; flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.axs-pc i { font-style: normal; font-size: 10.5px; opacity: .5; margin-left: 6px; font-weight: normal; }
+#axsView { -ms-flex: 1 1 0%; flex: 1 1 0%; overflow: auto; padding: 18px 24px 40px; text-align: center; }
+.axs-info { width: 320px; -ms-flex: none; flex: none; overflow: auto; padding: 14px 16px; box-sizing: border-box;
+    border-left: 1px solid rgba(128,128,128,.25); }
+.axs-chart { display: inline-block; text-align: center; min-width: 360px; }
+.axs-empty { opacity: .6; margin: 30px auto; max-width: 420px; line-height: 1.6; }
+.axs-cap { display: inline-block; padding: 6px 18px; border-radius: 16px; font-size: 12.5px; font-weight: 600;
+    background: rgba(128,128,128,.16); border: 1px solid rgba(128,128,128,.3); }
+.axs-cap .ico { margin-right: 7px; font-size: 11px; }
+.axs-top { background: rgba(227,160,8,.16); border-color: rgba(227,160,8,.5); }
+.axs-shared { font-size: 11.5px; opacity: .8; margin: 8px 0 0; }
+.axs-rules { display: inline-block; text-align: left; min-width: 240px; max-width: 420px; padding: 7px 12px 7px 34px; position: relative;
+    border-radius: 8px; border: 1px dashed rgba(108,203,95,.6); background: rgba(108,203,95,.08); cursor: pointer; }
+.axs-rules .ico { position: absolute; left: 11px; top: 9px; font-size: 13px; color: #6ccb5f; }
+.axs-rules b { font-size: 12.5px; }
+.axs-rule { font: 11.5px Consolas, "Cascadia Mono", monospace; opacity: .85; margin-top: 2px; }
+.axs-rulego { font-size: 11px; color: #6ccb5f; margin-top: 4px; }
+.axs-list { text-align: center; }
+/* the line between two steps, with the + on it */
+.axs-ins, .axs-line { position: relative; height: 22px; }
+.axs-ins:before, .axs-line:before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 2px solid rgba(128,128,128,.4); }
+.axs-ins b { position: absolute; left: 50%; top: 3px; margin-left: -8px; width: 16px; height: 16px; line-height: 15px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; background: #60cdff; color: #102030; opacity: 0; cursor: pointer; }
+.axs-ins:hover b { opacity: 1; }
+.axs-ins:hover:before { border-left-color: #60cdff; }
+.axs-else b { opacity: .55; }
+/* a step */
+.axs-b { display: inline-block; position: relative; text-align: left; min-width: 240px; max-width: 420px; box-sizing: border-box;
+    padding: 7px 12px 7px 34px; border-radius: 8px; background: #2b2b2b; border: 1px solid rgba(128,128,128,.35);
+    border-left: 4px solid #4cc2ff; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,.25); vertical-align: top; }
+body.theme-light .axs-b { background: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.axs-b:hover { border-color: rgba(96,205,255,.7); }
+.axs-b.sel { box-shadow: 0 0 0 2px #60cdff; }
+.axs-b .ico { position: absolute; left: 11px; top: 9px; font-size: 13px; opacity: .8; }
+.axs-bt { font-size: 12.5px; font-weight: 600; line-height: 1.4; }
+.axs-bc { font: 11px Consolas, "Cascadia Mono", monospace; opacity: .55; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.axs-uses { margin-top: 5px; line-height: 0; }
+.axs-chip { display: inline-block; line-height: 16px; font-size: 10.5px; padding: 0 6px; margin: 0 4px 2px 0; border-radius: 8px; }
+.axs-chip.c-w { background: rgba(244,127,164,.22); color: #f47fa4; }
+.axs-chip.c-r { border: 1px dashed rgba(244,127,164,.6); color: #f47fa4; line-height: 14px; }
+.axs-chip.c-call { background: rgba(180,140,242,.2); color: #b48cf2; cursor: pointer; }
+.axs-b.k-set { border-left-color: #f47fa4; }
+.axs-b.k-if { border-left-color: #e3a008; }
+.axs-b.k-loop { border-left-color: #b48cf2; }
+.axs-b.k-try { border-left-color: #9a9a9a; }
+.axs-b.k-end { border-left-color: #ff99a4; }
+.axs-b.k-note { border-left-color: transparent; background: transparent; box-shadow: none; border-style: dashed; font-style: italic; }
+.axs-b.k-note .axs-bt { font-weight: 400; opacity: .75; }
+.axs-b.k-code { border-left-color: #8a8a8a; }
+/* an if: its test, then its branches side by side, joined below */
+.axs-fork { display: inline-block; vertical-align: top; }
+.axs-stub { height: 12px; width: 0; margin: 0 auto; border-left: 2px solid rgba(128,128,128,.4); }
+.axs-br { margin: 0 auto; border-collapse: separate; }
+/* each branch draws its own part of the fork above it and the join below
+   it (half a line in the outer ones), and its own line down the middle --
+   background lines, because a table cell will not position anything */
+.axs-col { vertical-align: top; padding: 0 14px; background-repeat: no-repeat;
+    background-image: linear-gradient(rgba(128,128,128,.4), rgba(128,128,128,.4)),
+                      linear-gradient(#e3a008, #e3a008), linear-gradient(#e3a008, #e3a008);
+    background-size: 2px 100%, 100% 2px, 100% 2px; background-position: 50% 0, 0 0, 0 100%; }
+.axs-col.first { background-size: 2px 100%, 50% 2px, 50% 2px; background-position: 50% 0, 100% 0, 100% 100%; }
+.axs-col.last { background-size: 2px 100%, 50% 2px, 50% 2px; background-position: 50% 0, 0 0, 0 100%; }
+.axs-col.only { background-size: 2px 100%, 0 0, 0 0; background-position: 50% 0, 0 0, 0 0; }
+/* a try's lines are grey -- its own columns only, not an if inside it */
+.axs-fork.k-try > table > tbody > tr > .axs-col {
+    background-image: linear-gradient(rgba(128,128,128,.4), rgba(128,128,128,.4)),
+                      linear-gradient(#8a8a8a, #8a8a8a), linear-gradient(#8a8a8a, #8a8a8a); }
+.axs-cend { height: 10px; }
+.axs-bl { display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 600; padding: 1px 9px; border-radius: 9px;
+    background: #3b3217; color: #e3a008; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+body.theme-light .axs-bl { background: #fff1cc; color: #8a5a00; }
+.axs-bl.yes { background: #1f3a1c; color: #6ccb5f; }
+body.theme-light .axs-bl.yes { background: #dff3da; color: #0f7b0f; }
+.axs-col.none .axs-bl { opacity: .75; }
+/* a loop: what it repeats, inside, and the way back up */
+.axs-loop { display: inline-block; vertical-align: top; padding: 0 14px 6px; border: 2px solid rgba(180,140,242,.35);
+    border-radius: 12px; }
+.axs-loop > .axs-b { margin-top: -1px; }
+.axs-lfoot { font-size: 11px; color: #b48cf2; opacity: .8; }
+.axs-lfoot .ico { margin-right: 5px; font-size: 10px; }
+/* the panel */
+.axs-ih { padding: 0 0 8px 10px; border-left: 3px solid rgba(128,128,128,.4); margin-bottom: 8px; }
+.axs-ih b { display: block; font-size: 14px; }
+.axs-ih small { opacity: .6; }
+.axs-ih.k-set { border-left-color: #f47fa4; }
+.axs-ih.k-if { border-left-color: #e3a008; }
+.axs-ih.k-loop { border-left-color: #b48cf2; }
+.axs-ih.k-act { border-left-color: #4cc2ff; }
+.axs-btns { margin: 10px 0 4px; }
+.axs-btns .axd-hbtn { display: block; margin: 0 0 5px; height: 28px; line-height: 27px; padding: 0 10px; }
+.axs-btns .axd-hbtn i { float: right; font-style: normal; opacity: .5; font-size: 11px; }
+.axs-btns .axd-hbtn.axd-danger { color: #ff99a4; }
+body.theme-light .axs-btns .axd-hbtn.axd-danger { color: #b3202c; }
+.axm-node .ico { position: absolute; left: 9px; top: 12px; font-size: 13px; opacity: .8; }
+/* two lines in 40px, borders included: they are sized to fit, not left to the page's line height */
+.axm-node b { display: block; font-size: 12.5px; line-height: 18px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.axm-node small { display: block; font-size: 11px; line-height: 15px; opacity: .65; overflow: hidden; text-overflow: ellipsis; }
+.axm-node.k-event, .axm-node.k-hotkey, .axm-node.k-timer, .axm-node.k-start { border-left-color: #e3a008; }
+.axm-node.k-handler, .axm-node.k-window { border-left-color: #4cc2ff; }
+.axm-node.k-rule { border-left-color: #6ccb5f; }
+.axm-node.k-function, .axm-node.k-method { border-left-color: #b48cf2; }
+.axm-node.k-library { border-left-color: #6ccb5f; }
+.axm-node.k-value, .axm-node.k-control { border-left-color: #f47fa4; }
+.axm-node.picked { box-shadow: 0 0 0 2px #60cdff; }
+.axm-node.fog { opacity: .42; }
+.axm-node.dim { opacity: .12; }
+.axm-node.off { display: none; }
+.axm-e { fill: none; stroke: rgba(128,128,128,.55); stroke-width: 1.4; }
+.axm-e.e-trig { stroke: #e3a008; }
+.axm-e.e-call { stroke: #b48cf2; }
+.axm-e.e-write { stroke: #f47fa4; }
+.axm-e.e-read { stroke: #f47fa4; stroke-dasharray: 4 3; }
+.axm-e.dim { opacity: .07; }
+.axm-e.lit { stroke-width: 2.4; }
+.axm-e.off { display: none; }
+#axmInfo { width: 300px; -ms-flex: none; flex: none; border-left: 1px solid rgba(128,128,128,.25); overflow: auto;
+    padding: 12px 14px; font-size: 12.5px; }
+.axm-hint { opacity: .7; line-height: 1.5; }
+.axm-ih { position: relative; padding-left: 24px; border-left: 3px solid rgba(128,128,128,.4); }
+.axm-ih .ico { position: absolute; left: 6px; top: 4px; }
+.axm-ih b { display: block; font-size: 14px; }
+.axm-ih small { opacity: .65; }
+.axm-ih.k-event, .axm-ih.k-hotkey, .axm-ih.k-timer, .axm-ih.k-start { border-left-color: #e3a008; }
+.axm-ih.k-handler, .axm-ih.k-window { border-left-color: #4cc2ff; }
+.axm-ih.k-rule { border-left-color: #6ccb5f; }
+.axm-ih.k-function, .axm-ih.k-method { border-left-color: #b48cf2; }
+.axm-ih.k-value, .axm-ih.k-control { border-left-color: #f47fa4; }
+.axm-ish { margin: 14px 0 4px; font-size: 11px; text-transform: uppercase; opacity: .6; letter-spacing: .06em; font-weight: 600; }
+.axm-il { padding: 3px 4px; border-radius: 4px; cursor: default; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.axm-il:hover { background: rgba(128,128,128,.15); }
+.axm-il small { opacity: .6; }
+.axm-ik { display: inline-block; width: 16px; height: 0; border-top: 2px solid rgba(128,128,128,.6); vertical-align: middle; margin-right: 6px; }
+.axm-ik.e-trig { border-top-color: #e3a008; }
+.axm-ik.e-call { border-top-color: #b48cf2; }
+.axm-ik.e-write { border-top-color: #f47fa4; }
+.axm-ik.e-read { border-top-color: #f47fa4; border-top-style: dashed; }
+.axm-leg { padding: 2px 0; opacity: .8; }
+.axm-code { font: 11.5px Consolas, "Cascadia Mono", monospace; background: rgba(128,128,128,.10); padding: 8px;
+    border-radius: 4px; white-space: pre; overflow: auto; max-height: 280px; margin: 0; }
+.axm-open { margin-top: 14px; display: inline-block; padding: 5px 16px; border-radius: 4px; background: #60cdff;
+    color: #000; cursor: default; }
+.axm-hops { margin-top: 2px; }
+.axm-hops .axm-chip { margin-right: 6px; }
+.axm-none { position: absolute; left: 20px; top: 50px; opacity: .6; white-space: nowrap; }
+.axm-open.axm-alt { background: transparent; color: inherit; border: 1px solid rgba(128,128,128,.5); margin-left: 8px; }
+
+/* =====================================================================
+   App > Libraries (AxStudio.PkgUi.ahk)
+   ===================================================================== */
+.axd-pkget { display: flex; align-items: flex-start; padding: 16px; margin: 6px 0 14px; border-radius: 8px;
+             background: rgba(128, 128, 128, .08); border: 1px solid rgba(128, 128, 128, .22); line-height: 1.55; }
+.axd-pkget > .ico { font-size: 26px; opacity: .7; margin-right: 14px; }
+.axd-pkbtns { margin: 10px 0 6px; }
+.axd-pkbtns .axd-hbtn { margin: 0 4px 4px 0; }
+.axd-pkwarn { color: #fce100; }
+body.theme-light .axd-pkwarn { color: #9d5d00; }
+.axd-pkbar { display: flex; align-items: center; margin: 4px 0 8px; }
+.axd-pkbar .axd-rfindbox { flex: 1 1 auto; min-width: 0; }
+.axd-pkmine { flex: none; margin-left: 10px; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px;
+              border: 1px solid rgba(128, 128, 128, .3); }
+.axd-pkmine .ico { font-size: 11px; margin-right: 6px; opacity: .35; }
+.axd-pkmine.on { background: rgba(96, 205, 255, .16); border-color: rgba(96, 205, 255, .5); }
+.axd-pkmine.on .ico { opacity: 1; }
+.axd-pkcats { margin: 0 0 10px; line-height: 0; }
+.axd-pkcat { display: inline-block; line-height: 22px; font-size: 11.5px; padding: 0 9px; margin: 0 4px 5px 0;
+             border-radius: 11px; cursor: pointer; background: rgba(128, 128, 128, .12); }
+.axd-pkcat .ico { font-size: 11px; margin-right: 5px; opacity: .7; }
+.axd-pkcat i { font-style: normal; opacity: .5; margin-left: 6px; font-size: 10.5px; }
+.axd-pkcat:hover { background: rgba(128, 128, 128, .22); }
+.axd-pkcat.on { background: rgba(96, 205, 255, .22); color: #60cdff; }
+body.theme-light .axd-pkcat.on { background: rgba(0, 95, 184, .12); color: #005fb8; }
+/* App > Files: one card a file -- what it is, where, how it ships, who uses it */
+.axf-sum { font-size: 12.5px; margin: 0 0 12px; opacity: .85; }
+.axf-sum span { opacity: .4; margin: 0 6px; }
+.axf-bad { color: #ff99a4; }
+body.theme-light .axf-bad { color: #b3202c; }
+.axf-ok { color: #6ccb5f; }
+body.theme-light .axf-ok { color: #0f7b0f; }
+.axf-row { display: -ms-flexbox; display: flex; padding: 12px; margin: 0 0 10px; border-radius: 8px;
+    border: 1px solid rgba(128,128,128,.25); background: rgba(128,128,128,.05); max-width: 980px; }
+.axf-row.bad { border-color: rgba(255,153,164,.45); }
+.axf-pic { width: 64px; height: 64px; -ms-flex: none; flex: none; margin-right: 14px; border-radius: 6px; overflow: hidden;
+    background: rgba(128,128,128,.12); text-align: center; line-height: 64px; }
+.axf-pic img { max-width: 64px; max-height: 64px; vertical-align: middle; }
+.axf-pic .ico { font-size: 26px; opacity: .6; }
+.axf-main { -ms-flex: 1 1 auto; flex: 1 1 auto; min-width: 0; }
+.axf-name b { font-size: 14px; font-weight: 600; }
+.axf-name code { font: 11.5px Consolas, "Cascadia Mono", monospace; margin-left: 10px; padding: 1px 6px; border-radius: 4px;
+    background: rgba(128,128,128,.16); }
+.axf-acts { float: right; }
+.axf-acts .axd-ract { margin-left: 10px; }
+.axf-where { font: 12px Consolas, "Cascadia Mono", monospace; opacity: .85; margin: 4px 0 8px; }
+.axf-where span { font-family: "Segoe UI", sans-serif; margin-left: 6px; }
+.axf-how { display: inline-block; border: 1px solid rgba(128,128,128,.35); border-radius: 6px; padding: 2px; }
+.axf-how span { display: inline-block; padding: 3px 10px; font-size: 11.5px; border-radius: 4px; cursor: pointer; opacity: .75; }
+.axf-how span:hover { background: rgba(128,128,128,.15); opacity: 1; }
+.axf-how span.on { background: rgba(96,205,255,.2); color: #60cdff; opacity: 1; font-weight: 600; }
+body.theme-light .axf-how span.on { background: rgba(0,95,184,.1); color: #005fb8; }
+.axf-why { font-size: 11.5px; opacity: .65; margin: 6px 0 6px; line-height: 1.5; }
+.axf-uses { font-size: 12px; }
+.axf-uses .axd-chip { cursor: pointer; }
+.axf-found { padding: 7px 10px; margin: 0 0 5px; border-radius: 6px; border: 1px dashed rgba(128,128,128,.35); font-size: 12.5px; max-width: 980px; }
+.axf-found .ico { margin-right: 8px; opacity: .7; }
+.axf-found .axf-ok, .axf-found .axf-bad { font-size: 11.5px; margin-left: 6px; }
+/* Libraries: three ways in, as tabs under the heading */
+.axd-lbtabs { border-bottom: 1px solid rgba(128,128,128,.22); margin: -6px 0 14px; white-space: nowrap; }
+.axd-lbtab { display: inline-block; padding: 8px 14px 9px; margin-right: 4px; cursor: pointer; font-size: 13px; opacity: .7;
+    border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.axd-lbtab:hover { opacity: 1; }
+.axd-lbtab.on { opacity: 1; font-weight: 600; border-bottom-color: #60cdff; }
+body.theme-light .axd-lbtab.on { border-bottom-color: #005fb8; }
+.axd-lbtab .ico { margin-right: 7px; font-size: 12px; }
+.axd-lbtab i { font-style: normal; font-size: 10.5px; font-weight: 400; opacity: .6; margin-left: 7px; padding: 0 6px;
+    border-radius: 8px; background: rgba(128,128,128,.18); }
+.axd-lbmine { padding: 10px 12px; margin: 0 0 8px; border-radius: 8px; border: 1px solid rgba(128,128,128,.22); max-width: 900px; }
+.axd-lbsteps { font-size: 12px; margin-top: 6px; color: #6ccb5f; }
+body.theme-light .axd-lbsteps { color: #0f7b0f; }
+.axd-lbsteps .ico { margin-right: 6px; font-size: 11px; }
+.axd-lbacts { margin-top: 7px; }
+.axd-lbacts .axd-ract { margin-right: 12px; }
+.axd-pkmake { float: right; font-size: 11px; opacity: 0; }
+.axd-pkapi:hover .axd-pkmake { opacity: 1; }
+/* .NET */
+.axn-cols { display: flex; align-items: flex-start; }
+.axn-lead { font-size: 12px; opacity: .8; margin: 2px 0 10px 2px; line-height: 1.5; }
+.axn-lead .ico { margin-right: 7px; }
+.axn-type { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; font-weight: 600; opacity: .6; margin: 12px 0 4px 4px; }
+.axn-type .ico { margin-right: 6px; }
+.axn-type span { text-transform: none; letter-spacing: 0; font-weight: 400; margin-left: 8px; opacity: .8; }
+.axn-m { padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12.5px; border: 1px solid transparent; }
+.axn-m:hover { background: rgba(128,128,128,.12); }
+.axn-m.on { background: rgba(96,205,255,.12); border-color: rgba(96,205,255,.4); }
+.axn-m b { font-weight: 600; }
+.axn-sig { opacity: .6; margin-left: 8px; font-size: 11.5px; }
+.axn-ret { float: right; opacity: .55; font-size: 11px; }
+.axn-inst { font-size: 10px; margin-left: 8px; padding: 0 6px; border-radius: 8px; background: rgba(180,140,242,.2); color: #b48cf2; }
+.axn-dl { float: right; font-size: 11px; opacity: .55; }
+.axn-ver { color: #60cdff; font-size: 11px; margin-left: 6px; }
+.axd-pknote.axn-fit { background: rgba(108,203,95,.1); }
+.axd-pknote.axn-fit .ico { color: #6ccb5f; }
+/* a section that is a browser takes the width it is given */
+.axd-rpinner.axd-rpwide { max-width: none; }
+a.axd-link { color: #60cdff; cursor: pointer; text-decoration: none; }
+a.axd-link:hover { text-decoration: underline; }
+body.theme-light a.axd-link { color: #005fb8; }
+.axd-pkbar { position: relative; }
+.axd-pkbar .axd-pkq { position: absolute; left: 11px; top: 9px; font-size: 12px; opacity: .5; }
+.axd-pkbar .axd-rfindbox { height: 34px; padding-left: 32px; font-size: 13px; border-radius: 7px; }
+.axd-pkcols { display: flex; align-items: flex-start; }
+/* the shelves: what to show, then which category, then the order */
+.axd-pkside { flex: 0 0 210px; width: 210px; margin-right: 14px; max-height: calc(100vh - 290px); min-height: 300px; overflow-y: auto; }
+.axd-pkhead { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; opacity: .48; padding: 12px 8px 5px; }
+.axd-pkside > .axd-pkhead:first-child { padding-top: 2px; }
+.axd-pkshelf { display: flex; align-items: center; height: 28px; padding: 0 8px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+.axd-pkshelf:hover { background: rgba(128, 128, 128, .14); }
+.axd-pkshelf.on { background: rgba(96, 205, 255, .16); color: #60cdff; font-weight: 600; }
+body.theme-light .axd-pkshelf.on { background: rgba(0, 95, 184, .1); color: #005fb8; }
+.axd-pkshelf .ico { flex: none; width: 22px; font-size: 12px; opacity: .75; }
+.axd-pkst { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.axd-pkshelf i { flex: none; font-style: normal; opacity: .5; font-size: 10.5px; margin-left: 6px; font-weight: normal; }
+.axd-pksort { padding: 0 8px; }
+.axd-pksort span { display: inline-block; font-size: 11.5px; padding: 3px 9px; margin: 0 4px 4px 0; border-radius: 11px; cursor: pointer;
+    border: 1px solid rgba(128, 128, 128, .3); }
+.axd-pksort span.on { background: rgba(96, 205, 255, .16); border-color: rgba(96, 205, 255, .5); }
+.axd-pklh { padding-left: 10px; }
+.axd-pklist > .axd-pklh:first-child { padding-top: 2px; }
+.axd-pkbs { margin-top: 5px; line-height: 0; }
+.axd-pkb { display: inline-block; line-height: 17px; font-size: 10.5px; padding: 0 7px; margin: 0 4px 2px 0; border-radius: 9px;
+    background: rgba(128, 128, 128, .16); }
+.axd-pkb .ico { font-size: 9px; margin-right: 4px; }
+.axd-pkbrec { background: rgba(252, 225, 0, .14); color: #fce100; }
+body.theme-light .axd-pkbrec { background: rgba(157, 93, 0, .1); color: #9d5d00; }
+.axd-pkbnc { background: rgba(108, 203, 95, .16); color: #6ccb5f; }
+body.theme-light .axd-pkbnc { background: rgba(15, 123, 15, .1); color: #0f7b0f; }
+.axd-pkrow.rec .axd-pkname b { font-size: 13px; }
+.axd-pkwhy { background: rgba(252, 225, 0, .08); }
+.axd-pkwhy .ico { color: #fce100; }
+body.theme-light .axd-pkwhy .ico { color: #9d5d00; }
+.axd-pkstep { padding: 5px 8px; margin: 0 0 3px; border-radius: 5px; background: rgba(108, 203, 95, .08); font-size: 12px; }
+.axd-pkstep .ico { font-size: 10px; margin-right: 7px; color: #6ccb5f; }
+.axd-pkstep code { float: right; font: 11px Consolas, "Cascadia Mono", monospace; opacity: .6; }
+.axd-pklist { flex: 1 1 42%; min-width: 0; margin-right: 14px; max-height: calc(100vh - 290px); min-height: 300px; overflow-y: auto; padding-right: 4px; }
+.axd-pkinfo { flex: 1 1 58%; min-width: 0; max-height: calc(100vh - 290px); min-height: 300px; overflow-y: auto; padding: 12px 14px; border-radius: 8px;
+              background: rgba(128, 128, 128, .06); border: 1px solid rgba(128, 128, 128, .18); }
+.axd-pkrow { padding: 7px 10px; margin: 0 0 3px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; }
+.axd-pkrow:hover { background: rgba(128, 128, 128, .12); }
+.axd-pkrow.on { background: rgba(96, 205, 255, .12); border-color: rgba(96, 205, 255, .4); }
+.axd-pkname b { font-size: 12.5px; font-weight: 600; }
+.axd-pkname span { font-size: 11px; opacity: .5; margin-left: 7px; }
+.axd-pkname .axd-pkcaut { opacity: .9; color: #fce100; font-size: 11px; }
+body.theme-light .axd-pkname .axd-pkcaut { color: #9d5d00; }
+.axd-pkname .axd-pkx { opacity: .6; font-size: 10px; border: 1px solid rgba(128, 128, 128, .4); border-radius: 3px; padding: 0 4px; }
+.axd-pkin, .axd-pkbad { float: right; font-size: 10px; font-weight: 600; padding: 0 6px; line-height: 16px; border-radius: 8px;
+                        background: rgba(108, 203, 95, .18); color: #6ccb5f; }
+.axd-pkbad { background: rgba(255, 153, 164, .18); color: #ff99a4; }
+.axd-pkdesc { font-size: 11.5px; opacity: .65; margin-top: 2px; line-height: 1.4; max-height: 48px; overflow: hidden; }
+.axd-pkhint { opacity: .55; padding: 30px 10px; text-align: center; line-height: 1.6; }
+.axd-pkhint .ico { display: block; font-size: 28px; margin-bottom: 8px; }
+.axd-pkhd b { font-size: 16px; font-weight: 600; }
+.axd-pkhd span { opacity: .55; margin-left: 8px; font-size: 12px; }
+.axd-pktext { margin: 6px 0 8px; line-height: 1.5; }
+.axd-pkchips { line-height: 0; margin: 0 0 8px; }
+.axd-pkchip { display: inline-block; line-height: 18px; font-size: 10.5px; padding: 0 7px; margin: 0 4px 4px 0; border-radius: 9px;
+              cursor: pointer; background: rgba(96, 205, 255, .14); }
+.axd-pkchip.axd-pkkw { background: rgba(128, 128, 128, .16); }
+.axd-pknote { margin: 6px 0; padding: 7px 10px; border-radius: 6px; background: rgba(128, 128, 128, .1); line-height: 1.45; font-size: 12px; }
+.axd-pknote .ico { margin-right: 8px; }
+.axd-pknote.axd-pkwarn { background: rgba(252, 225, 0, .1); }
+.axd-pksnip { margin: 0 0 6px; padding: 6px 9px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(128, 128, 128, .2); }
+.axd-pksnip:hover { background: rgba(96, 205, 255, .1); border-color: rgba(96, 205, 255, .4); }
+.axd-pksnip .ico { font-size: 10px; margin-right: 6px; opacity: .6; }
+.axd-pksnip pre { margin: 4px 0 0; font: 11.5px Consolas, "Cascadia Mono", monospace; white-space: pre-wrap; opacity: .85; }
+.axd-pkapi { padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+.axd-pkapi:hover { background: rgba(96, 205, 255, .1); }
+.axd-pkapi .ico { font-size: 11px; margin-right: 7px; opacity: .6; }
+.axd-pkapi b { font-weight: 600; font-family: Consolas, "Cascadia Mono", monospace; font-size: 11.5px; }
+.axd-pkapi .axd-sig { margin-left: 6px; opacity: .55; font-family: Consolas, "Cascadia Mono", monospace; font-size: 11px; }
+.axd-pkapi div { opacity: .6; font-size: 11px; margin: 1px 0 0 18px; line-height: 1.4; }
+.axd-pk-class { margin-top: 6px; }
+.axd-cnapi { padding-left: 26px !important; font-family: Consolas, "Cascadia Mono", monospace; font-size: 11.5px; }
+
+/* ---- the Steps workspace ------------------------------------------------
+   The bar over it names the piece and flips to its code; the chart has a
+   visible + on every join, the join's meaning written beside it, and an
+   arrow into what comes next. */
+#axdSteps { overflow: hidden; display: -ms-flexbox; display: flex; -ms-flex-direction: column; flex-direction: column; }
+.axd-piecebar { -ms-flex: none; flex: none; display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center;
+    height: 38px; padding: 0 12px; border-bottom: 1px solid rgba(128,128,128,.22); white-space: nowrap; overflow: hidden; }
+.axd-pbcrumbs { font-size: 13px; }
+.axd-pbcrumbs .ico { margin-right: 8px; font-size: 12px; color: #6ccb5f; }
+.axd-pbsep { margin: 0 7px; opacity: .45; }
+.axd-pbwhen { margin-left: 14px; font-size: 12px; opacity: .55; overflow: hidden; text-overflow: ellipsis; -ms-flex: 1 1 auto; flex: 1 1 auto; min-width: 0; }
+.axd-pbright { -ms-flex: none; flex: none; }
+.axd-pbright > * { margin-left: 6px; vertical-align: middle; }
+.axd-pbright .axd-hbtn .ico { font-size: 11px; margin-right: 3px; }
+/* Steps | Code: one piece, two ways to look at it */
+.axd-viewseg { display: inline-block; white-space: nowrap; border: 1px solid rgba(128,128,128,.4); border-radius: 6px;
+    padding: 2px; cursor: pointer; line-height: 20px; font-size: 12px; vertical-align: middle; }
+.axd-viewseg > span { display: inline-block; padding: 0 10px; border-radius: 4px; opacity: .7; }
+.axd-viewseg > span:hover { opacity: 1; background: rgba(128,128,128,.15); }
+.axd-viewseg > span.on { opacity: 1; font-weight: 600; background: rgba(96,205,255,.2); color: #60cdff; }
+body.theme-light .axd-viewseg > span.on { background: rgba(0,95,184,.12); color: #005fb8; }
+.axd-viewseg .ico { font-size: 11px; margin-right: 6px; }
+#axdCodeHdr .axd-viewseg { float: right; margin: 3px 0 0 6px; }
+/* the joins */
+.axs-ins, .axs-line { height: 30px; }
+.axs-ins:after, .axs-line:after { content: ""; position: absolute; left: 50%; bottom: 0; margin-left: -5px; width: 0; height: 0;
+    border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid rgba(128,128,128,.55); }
+.axs-ins b { top: 6px; width: 18px; height: 18px; margin-left: -9px; line-height: 17px; opacity: .38; background: #3a3a3a;
+    color: #e0e0e0; border: 1px solid rgba(128,128,128,.55); box-sizing: border-box; font-size: 13px; text-align: center; }
+body.theme-light .axs-ins b { background: #ffffff; color: #333; }
+.axs-ins:hover b, .axs-ins.drop b { opacity: 1; background: #60cdff; color: #102030; border-color: #60cdff; }
+.axs-insl { position: absolute; left: 50%; top: 7px; margin-left: 14px; font-size: 11px; white-space: nowrap; color: #60cdff;
+    display: none; }
+.axs-ins:hover .axs-insl { display: block; }
+.axs-ins:hover:after, .axs-ins.drop:after { border-top-color: #60cdff; }
+.axs-else b { opacity: .6; }
+/* what a join means: first, then, each time, either way */
+.axs-jl { position: absolute; right: 50%; top: 8px; margin-right: 12px; font-size: 10.5px; font-style: italic; opacity: .55;
+    white-space: nowrap; }
+/* dragging a step */
+.axs-ghost { position: fixed; z-index: 60; padding: 5px 12px; border-radius: 7px; background: #60cdff; color: #102030;
+    font-size: 12px; font-weight: 600; box-shadow: 0 6px 18px rgba(0,0,0,.35); pointer-events: none; white-space: nowrap; }
+.axs-b.axs-moving { opacity: .35; }
+.axs-dragging .axs-ins b { opacity: .8; }
+.axs-dragging .axs-ins.drop b { -ms-transform: scale(1.3); transform: scale(1.3); }
+.axs-dragging, .axs-dragging * { cursor: move !important; }
+/* an empty piece: the first step is one click */
+.axs-quick { display: inline-block; max-width: 460px; padding: 12px 14px 8px; border-radius: 10px; text-align: left;
+    border: 2px dashed rgba(96,205,255,.45); background: rgba(96,205,255,.05); }
+.axs-qh { font-size: 12.5px; font-weight: 600; margin-bottom: 8px; }
+.axs-qk { display: inline-block; margin: 0 6px 6px 0; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+    background: rgba(128,128,128,.14); border: 1px solid rgba(128,128,128,.25); }
+.axs-qk:hover { background: rgba(96,205,255,.2); border-color: rgba(96,205,255,.6); }
+.axs-qk .ico { margin-right: 7px; font-size: 11px; opacity: .8; }
+/* its rules: each one changes where it is */
+.axs-rules { cursor: default; }
+.axs-rulesub { display: block; font-size: 10.5px; font-style: normal; opacity: .55; margin: 1px 0 3px; }
+.axs-rule { cursor: pointer; border-radius: 4px; padding: 1px 4px; margin-left: -4px; }
+.axs-rule:hover { background: rgba(108,203,95,.18); }
+.axs-rulego { cursor: pointer; display: inline-block; }
+.axs-rulego:hover { text-decoration: underline; }
+/* back and forward */
+.axd-navb { display: inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 5px;
+    cursor: pointer; font-size: 12px; vertical-align: middle; }
+.axd-navb:hover { background: rgba(128,128,128,.18); }
+.axd-navb.off { opacity: .3; cursor: default; }
+.axd-navb.off:hover { background: none; }
+
+/* ---- .NET: where the program stands with AHK# ---------------------------- */
+.axn-state { margin: 0 0 12px; padding: 10px 14px 8px; border-radius: 8px; border: 1px solid rgba(252,225,0,.35);
+    background: rgba(252,225,0,.06); }
+.axn-state.ok { border-color: rgba(108,203,95,.45); background: rgba(108,203,95,.07); }
+.axn-sthead { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; margin-bottom: 8px; }
+.axn-sthead > .ico { margin-right: 8px; font-size: 14px; color: #fce100; }
+.axn-state.ok .axn-sthead > .ico { color: #6ccb5f; }
+.axn-sthead b { font-size: 13px; margin-right: auto; }
+.axn-sthead .axd-hbtn { margin-left: 6px; }
+.axn-steps { display: -ms-flexbox; display: flex; }
+.axn-step { -ms-flex: 1 1 0%; flex: 1 1 0%; display: -ms-flexbox; display: flex; margin-right: 14px; opacity: .6; font-size: 12px; line-height: 1.45; }
+.axn-step.now, .axn-step.done { opacity: 1; }
+.axn-num { -ms-flex: none; flex: none; width: 20px; height: 20px; line-height: 20px; border-radius: 10px; text-align: center;
+    margin-right: 8px; font-size: 11px; font-weight: 600; background: rgba(128,128,128,.25); font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets", "Segoe UI"; }
+.axn-step.now .axn-num { background: #60cdff; color: #102030; }
+.axn-step.done .axn-num { background: #6ccb5f; color: #102010; }
+.axn-step b { display: block; }
+.axn-step span { opacity: .75; }
+.axn-stnote { margin-top: 8px; font-size: 11.5px; opacity: .75; }
+.axd-pksnipgo { float: right; font-size: 11px; color: #60cdff; opacity: 0; }
+.axd-pksnip:hover .axd-pksnipgo { opacity: 1; }
+
+/* ---- the studio's title bar (AxStudio.Titlebar.ahk) ----------------------
+   Menus as words, back and forward, the project and the search in the
+   middle, then problems, running it and the studio's own switches. */
+.axtb-item.axd-tbmenu { padding: 0 9px; font-size: 12.5px; }
+.axtb-item.axd-tbproj { padding: 0 8px 0 9px; margin-right: 6px; font-size: 12.5px; }
+.axd-tbproj .ico { font-size: 12px; margin-right: 7px; opacity: .75; }
+.axd-tbproj b { font-weight: 600; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.axd-tbdirty { display: inline-block; width: 7px; height: 7px; border-radius: 4px; background: #fce100; margin-left: 7px; }
+.axd-tbcaret { font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 9px; margin-left: 7px; opacity: .6; }
+.axtb-item.axd-tbcmd { width: 420px; max-width: 34vw; -ms-flex-pack: start; justify-content: flex-start; padding: 0 10px;
+    border: 1px solid rgba(128,128,128,.35); background: rgba(128,128,128,.1); border-radius: 6px; height: 24px; }
+.axtb-item.axd-tbcmd:hover { background: rgba(128,128,128,.2); border-color: rgba(96,205,255,.55); }
+.axd-tbcmd .ico { font-size: 12px; margin-right: 8px; opacity: .7; }
+.axd-tbcmdt { -ms-flex: 1 1 auto; flex: 1 1 auto; opacity: .65; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+.axd-tbcmd .axd-kbd { margin-left: 8px; opacity: .5; font-size: 10.5px; }
+.axtb-item.axd-tbbtn { padding: 0 10px; margin: 0 2px; font-size: 12px; }
+.axd-tbbtn .ico, .axd-tbprob .ico { font-size: 12px; margin-right: 6px; }
+.axtb-item.axd-tbrun { background: #60cdff; color: #102030 !important; font-weight: 600; margin-right: 0; border-radius: 4px 0 0 4px; }
+.axtb-item.axd-tbrun:hover { background: #7ad6ff; }
+body.theme-light .axtb-item.axd-tbrun { background: #005fb8; color: #ffffff !important; }
+body.theme-light .axtb-item.axd-tbrun:hover { background: #1a6fc2; }
+.axtb-item.axd-tbrunmore { min-width: 18px; padding: 0 3px; margin-left: 1px; border-radius: 0 4px 4px 0; background: #60cdff;
+    color: #102030 !important; }
+.axtb-item.axd-tbrunmore .ico { font-size: 9px; }
+body.theme-light .axtb-item.axd-tbrunmore { background: #005fb8; color: #ffffff !important; }
+.axtb-item.axd-tbprob { padding: 0 8px; margin-right: 6px; }
+.axd-tbbad { color: #ff99a4; margin-right: 8px; font-weight: 600; }
+.axd-tbwarn { color: #fce100; font-weight: 600; }
+body.theme-light .axd-tbbad { color: #c42b1c; }
+body.theme-light .axd-tbwarn { color: #9d5d00; }
+/* its cards */
+.axd-tbcard { font-size: 12.5px; line-height: 1.45; }
+.axd-tbch { display: -ms-flexbox; display: flex; margin: 0 0 10px; }
+.axd-tbch > .ico { font-size: 18px; margin: 2px 12px 0 0; color: #60cdff; }
+.axd-tbch b { display: block; font-size: 13.5px; }
+.axd-tbch span { display: block; opacity: .65; font-size: 11.5px; word-break: break-all; }
+.axd-tbfacts { margin: 0 0 10px; }
+.axd-tbfacts span { display: inline-block; margin-right: 12px; font-size: 12px; opacity: .85; }
+.axd-tbfok { color: #6ccb5f; }
+.axd-tbfbad { color: #fce100; }
+.axd-tbrow { margin: 6px 0 2px; }
+.axd-tbpb { display: inline-block; margin: 0 6px 6px 0; padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 12px;
+    background: rgba(128,128,128,.14); border: 1px solid rgba(128,128,128,.25); }
+.axd-tbpb:hover { background: rgba(128,128,128,.24); }
+.axd-tbpb.axd-go { background: #60cdff; color: #102030; border-color: #60cdff; font-weight: 600; }
+body.theme-light .axd-tbpb.axd-go { background: #005fb8; color: #ffffff; border-color: #005fb8; }
+.axd-tbpb .ico { font-size: 11px; margin-right: 6px; }
+.axd-tbsub { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; opacity: .5; margin: 10px 0 4px; }
+.axd-tbli { padding: 5px 8px; margin: 0 -6px; border-radius: 5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.axd-tbli:hover { background: rgba(96,205,255,.14); }
+.axd-tbli .ico { font-size: 12px; margin-right: 8px; opacity: .75; }
+.axd-tbli i { font-style: normal; opacity: .45; margin-left: 8px; font-size: 11px; }
+.axd-tbli-error .ico { color: #ff99a4; opacity: 1; }
+.axd-tbli-warn .ico { color: #fce100; opacity: 1; }
+.axd-tbrun2 { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; white-space: normal; }
+.axd-tbrun2 > div { -ms-flex: 1 1 auto; flex: 1 1 auto; }
+.axd-tbrun2 b { display: block; font-weight: 600; }
+.axd-tbrun2 span { display: block; font-size: 11px; opacity: .6; }
+.axd-tbempty { opacity: .6; padding: 6px 0; }
+.axd-tbkey { display: -ms-flexbox; display: flex; padding: 3px 0; font-size: 12px; }
+.axd-tbkey span { width: 120px; -ms-flex: none; flex: none; font-family: Consolas, "Cascadia Mono", monospace; font-size: 11.5px; opacity: .8; }
+
+/* ---- menus (AxStudio.Menus.ahk): the menu drawn as it will open --------- */
+.axd-mcard { margin: 0 0 18px; padding: 12px 14px 10px; border-radius: 10px; border: 1px solid rgba(128,128,128,.25);
+    background: rgba(128,128,128,.05); }
+.axd-mhead { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; margin-bottom: 10px; }
+.axd-mhead > .ico { margin-right: 8px; color: #60cdff; }
+.axd-mhead b { font-size: 13.5px; margin-right: 12px; }
+.axd-mon { font-size: 12px; opacity: .75; cursor: pointer; padding: 2px 8px; border-radius: 10px; background: rgba(128,128,128,.14); }
+.axd-mon:hover { opacity: 1; background: rgba(96,205,255,.18); }
+.axd-mon.bad { color: #ff99a4; opacity: 1; }
+.axd-mon .ico { font-size: 10px; margin-left: 4px; }
+.axd-mhtools { margin-left: auto; }
+.axd-menued.axctx { position: static !important; display: block !important; max-width: 560px; min-width: 0;
+    -ms-transform: none; transform: none; opacity: 1; box-shadow: 0 6px 18px rgba(0,0,0,.22); }
+.axd-mrow { position: relative; display: -ms-flexbox !important; display: flex !important; -ms-flex-align: center; align-items: center;
+    cursor: pointer !important; }
+.axd-mrow .axctx-mark { -ms-flex: none; flex: none; width: 22px; text-align: center; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+    font-size: 13px; opacity: .85; }
+.axd-mimg { width: 16px; height: 16px; vertical-align: middle; }
+.axd-mrow .axctx-label { -ms-flex: none; flex: none; margin-right: 12px; }
+.axd-mrow .axctx-kbd, .axd-mrow .axctx-sub { -ms-flex: none; flex: none; margin-right: 10px; }
+.axd-mrow .axctx-sub { font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 10px; opacity: .6; }
+.axd-mdoes { -ms-flex: 1 1 auto; flex: 1 1 auto; min-width: 0; font-size: 11px; opacity: .5; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; text-align: right; }
+.axd-mtools { -ms-flex: none; flex: none; margin-left: 8px; visibility: hidden; }
+.axd-mrow:hover .axd-mtools { visibility: visible; }
+.axd-mtool { display: inline-block; width: 22px; height: 22px; line-height: 22px; text-align: center; border-radius: 4px;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 11px; opacity: .7; }
+.axd-mtool:hover { opacity: 1; background: rgba(96,205,255,.25); }
+.axd-mrow.axd-mdef .axctx-label { font-weight: 700; }
+.axd-mrow.disabled .axctx-label { opacity: .45; }
+.axd-mrow.sep { height: 14px; padding-right: 12px; }
+.axd-mline { -ms-flex: 1 1 auto; flex: 1 1 auto; height: 1px; background: rgba(128,128,128,.35); }
+.axd-mempty { padding: 10px 12px; opacity: .6; font-size: 12.5px; }
+.axd-madd { margin: 8px 0 2px; }
+.axd-madd .axd-hbtn { margin-right: 6px; }
+.axd-madd .ico { font-size: 11px; margin-right: 2px; }
+.axd-mcode { margin-top: 8px; font-size: 11px; opacity: .6; }
+.axd-mcode code { font-family: Consolas, "Cascadia Mono", monospace; }
+.axd-mstart { display: -ms-flexbox; display: flex; padding: 14px 16px; border-radius: 10px; border: 2px dashed rgba(96,205,255,.4);
+    background: rgba(96,205,255,.05); margin-bottom: 16px; line-height: 1.5; }
+.axd-mstart > .ico { font-size: 22px; margin-right: 14px; color: #60cdff; }
+.axd-mtpl { margin-top: 10px; }
+.axd-mtpl .axd-hbtn { margin: 0 6px 6px 0; }
+/* the tray's own icon, big enough to see */
+.axd-trayhead { display: -ms-flexbox; display: flex; -ms-flex-align: center; align-items: center; margin: 0 0 14px; }
+.axd-trayicon { width: 44px; height: 44px; border-radius: 10px; margin-right: 14px; cursor: pointer; text-align: center;
+    line-height: 44px; background: rgba(128,128,128,.16); border: 1px solid rgba(128,128,128,.3); }
+.axd-trayicon:hover { border-color: rgba(96,205,255,.7); }
+.axd-trayicon img { width: 32px; height: 32px; vertical-align: middle; }
+.axd-trayicon .ico { font-size: 20px; }
+.axd-traywhat b { display: block; font-size: 13.5px; }
+.axd-traywhat span { font-size: 12px; opacity: .7; }
+/* a picture in a form's tiles (Windows' own icons) */
+.axd-pickimg { width: 20px; height: 20px; margin-right: 8px; vertical-align: middle; }
+/* pictures to pick from: seven to a row, the picture over its name */
+.axd-pickicons { line-height: 0; max-height: 190px; }
+.axd-pickicons .axd-pickit { display: inline-block; vertical-align: top; box-sizing: border-box; width: 13.4%; margin: 0 1% 6px 0;
+    padding: 6px 2px 5px; text-align: center; line-height: 1.3; min-height: 0; }
+.axd-pickicons .axd-pickit .ico { display: block; width: auto; font-size: 18px; margin: 0 0 3px; }
+.axd-pickicons .axd-pickimg { display: block; margin: 0 auto 3px; width: 24px; height: 24px; }
+.axd-pickicons .axd-picklab { font-weight: 400; font-size: 10.5px; opacity: .8; }
+.axd-mdel:hover { border-color: rgba(224, 82, 82, .85) !important; color: #ff99a4; }
+
+/* =====================================================================
+   The inspector as a property grid (AxPanes.ToolsHtml, AXP in the page
+   script): a toolbar by the find box, three tabs, and rows the way a
+   designer's property grid has them -- a label column and a value
+   column with a line between, a band per category, editors flat until
+   they are pointed at. Two ids on every rule, so neither the older
+   spacing above nor Compact's gets in.
+   ===================================================================== */
+#axdRight .axd-rfind { height: 34px; padding: 4px 6px; display: flex; align-items: center; }
+#axdRight .axd-rfindbox { flex: 1 1 auto; width: auto; min-width: 0; height: 24px; }
+.axd-ptools { flex: none; margin-left: 4px; white-space: nowrap; }
+.axd-ptool { display: inline-block; width: 24px; height: 24px; line-height: 24px; text-align: center;
+    border-radius: 4px; cursor: default; opacity: .62; vertical-align: middle; }
+.axd-ptool .ico { font-size: 12px; }
+.axd-ptool:hover { background: rgba(128, 128, 128, .2); opacity: 1; }
+.axd-ptool.on { background: rgba(128, 128, 128, .28); opacity: 1; }
+.axd-ptsep { display: inline-block; width: 1px; height: 16px; margin: 0 3px; vertical-align: middle;
+    background: rgba(128, 128, 128, .3); }
+.axd-ptabs { position: absolute; left: 0; right: 0; top: 65px; height: 28px; padding: 0 4px; box-sizing: border-box;
+    border-bottom: 1px solid rgba(128, 128, 128, .2); white-space: nowrap; overflow: hidden; }
+.axd-ptab { display: inline-block; height: 27px; line-height: 27px; padding: 0 10px; font-size: 12px; opacity: .62;
+    border-bottom: 2px solid transparent; cursor: default; box-sizing: border-box; }
+.axd-ptab:hover { opacity: 1; }
+.axd-ptab.on { opacity: 1; font-weight: 600; border-bottom-color: currentColor; }
+.axd-ptn { font-size: 10px; margin-left: 5px; padding: 0 5px; border-radius: 7px; font-weight: 600;
+    background: rgba(128, 128, 128, .25); }
+.axd-ptn:empty { display: none; }
+#axdRight #axdRightBody { top: 93px; padding: 0 0 18px; }
+#axdRight.axd-nofind #axdRightBody { top: 31px; padding: 10px 14px 18px; }
+#axdRight.axd-nofind .axd-ptabs { display: none; }
+
+/* one tab at a time -- and all of them while finding */
+#axdRight:not(.axd-finding).pt-props .axd-grp[data-tab="layout"],
+#axdRight:not(.axd-finding).pt-props .axd-grp[data-tab="events"],
+#axdRight:not(.axd-finding).pt-layout .axd-grp[data-tab="props"],
+#axdRight:not(.axd-finding).pt-layout .axd-grp[data-tab="events"],
+#axdRight:not(.axd-finding).pt-events .axd-grp[data-tab="props"],
+#axdRight:not(.axd-finding).pt-events .axd-grp[data-tab="layout"],
+#axdRight .axd-grp.axd-emptied { display: none; }
+
+/* the category bands */
+#axdRight #axdRightBody .axd-grp { margin: 0; padding: 0; border-top: 0; }
+#axdRight #axdRightBody .axd-grp > .axd-glabel {
+    display: block; height: 24px; line-height: 24px; margin: 0; padding: 0 6px 0 6px; border-radius: 0;
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0; text-transform: none; opacity: 1;
+    background: rgba(128, 128, 128, .11); border-top: 1px solid rgba(128, 128, 128, .16);
+    border-bottom: 1px solid rgba(128, 128, 128, .09); white-space: nowrap; overflow: hidden;
+}
+#axdRight #axdRightBody .axd-grp:first-child > .axd-glabel { border-top: 0; }
+#axdRight #axdRightBody .axd-grp > .axd-glabel:hover { background: rgba(128, 128, 128, .18); }
+#axdRight #axdRightBody .axd-grp > .axd-glabel:before {
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; content: "\E70D"; font-size: 8px;
+    width: 16px; opacity: .7; vertical-align: 1px;
+}
+#axdRight #axdRightBody .axd-grp.shut > .axd-glabel:before { content: "\E76C"; }
+#axdRight #axdRightBody .axd-azgrp > .axd-glabel:before { content: "\E8CB"; font-size: 10px; }
+#axdRight #axdRightBody .axd-grp > .axd-gbody { padding: 0 0 4px; }
+.axd-ginfo { float: right; font-size: 11px; font-weight: normal; opacity: .45; padding: 0 3px; cursor: pointer; }
+.axd-ginfo:hover { opacity: 1; }
+#axdRight.axd-hints .axd-ginfo { display: none; }
+
+/* what the selection is: one line, not a card */
+#axdRight #axdRightBody .axd-head { margin: 0; padding: 6px 10px; border: 0; border-radius: 0; background: transparent;
+    border-bottom: 1px solid rgba(128, 128, 128, .14); }
+#axdRight #axdRightBody > .axd-multi { margin: 6px 8px; }
+#axdRight #axdRightBody > .axd-empty-pane { padding: 22px 14px; }
+
+/* a row: the name, a line, the value */
+#axdRight #axdRightBody .axd-p { min-height: 26px; margin: 0; padding: 1px 6px 1px 0; box-sizing: border-box;
+    border-bottom: 1px solid rgba(128, 128, 128, .07); align-items: center; }
+#axdRight #axdRightBody .axd-p:hover { background: rgba(128, 128, 128, .06); }
+#axdRight #axdRightBody .axd-p > label {
+    flex: 0 0 42%; width: 42%; box-sizing: border-box; padding: 0 8px 0 22px; margin: 0 6px 0 0;
+    font-size: 12px; opacity: .8; line-height: 24px; align-self: stretch;
+    border-right: 1px solid rgba(128, 128, 128, .14);
+}
+#axdRight #axdRightBody .axd-p.axd-tall { padding: 4px 8px 6px 22px; }
+#axdRight #axdRightBody .axd-p.axd-tall > label { width: auto; border: 0; padding: 0; margin: 0 0 3px; line-height: 18px; }
+#axdRight #axdRightBody .axd-p.axd-pd { padding: 6px 8px 6px 22px; }
+#axdRight #axdRightBody .axd-p.axd-pd .axd-pdt > label { font-size: 12px; }
+#axdRight #axdRightBody .axd-p > .axd-static { font-size: 12px; padding-left: 6px; }
+
+/* everything in a group that is not a row sits under the labels */
+#axdRight #axdRightBody .axd-gbody > :not(.axd-p) { margin: 5px 8px 5px 22px; }
+#axdRight #axdRightBody .axd-gbody > .axd-phint {
+    margin: 3px 8px 6px 22px; padding: 5px 8px; font-size: 11px; line-height: 1.5; opacity: .72;
+    border-left: 2px solid rgba(128, 128, 128, .35); background: rgba(128, 128, 128, .06);
+}
+#axdRight:not(.axd-hints) .axd-phint { display: none; }
+#axdRight #axdRightBody .axd-grp.hints-open .axd-phint { display: block; }
+#axdRight #axdRightBody .axd-hbtn { height: 22px; line-height: 20px; font-size: 11.5px; }
+
+/* the editors: flat, a frame when pointed at, a firmer one when typed in */
+#axdRight #axdRightBody .axd-p .textbox input, #axdRight #axdRightBody .axd-p .numberbox input,
+#axdRight #axdRightBody .axd-p .searchbox input, #axdRight #axdRightBody .axd-p .passwordbox input {
+    height: 22px; padding: 0 6px; font-size: 12px; border: 1px solid transparent; border-radius: 3px;
+    background: transparent; color: inherit;
+}
+#axdRight #axdRightBody .axd-p .textbox input:hover, #axdRight #axdRightBody .axd-p .numberbox:hover input,
+#axdRight #axdRightBody .axd-p .dropdown:hover .dd-value {
+    border-color: rgba(128, 128, 128, .38); background: rgba(128, 128, 128, .07);
+}
+#axdRight #axdRightBody .axd-p .textbox input:focus, #axdRight #axdRightBody .axd-p .numberbox.focus input,
+#axdRight #axdRightBody .axd-p .dropdown.open .dd-value {
+    border: 1px solid rgba(128, 128, 128, .8); background: rgba(0, 0, 0, .22);
+}
+body.theme-light #axdRight #axdRightBody .axd-p .textbox input:focus,
+body.theme-light #axdRight #axdRightBody .axd-p .numberbox.focus input,
+body.theme-light #axdRight #axdRightBody .axd-p .dropdown.open .dd-value { background: #ffffff; }
+#axdRight #axdRightBody .axd-p .textbox textarea {
+    font-size: 12px; padding: 4px 6px; border: 1px solid rgba(128, 128, 128, .3); border-radius: 3px;
+    background: rgba(0, 0, 0, .14);
+}
+body.theme-light #axdRight #axdRightBody .axd-p .textbox textarea { background: #ffffff; }
+#axdRight #axdRightBody .axd-p .textbox textarea:focus { border-color: rgba(128, 128, 128, .8); }
+#axdRight #axdRightBody .axd-p .dropdown { min-width: 0; }
+#axdRight #axdRightBody .axd-p .dd-value {
+    height: 22px; line-height: 20px; padding: 0 22px 0 6px; font-size: 12px;
+    border: 1px solid transparent; border-radius: 3px; background: transparent;
+}
+#axdRight #axdRightBody .axd-p .dd-value:after { right: 6px; font-size: 8px; opacity: .7; }
+#axdRight #axdRightBody .axd-p .dd-menu { top: 24px; padding: 3px; }
+#axdRight #axdRightBody .axd-p .dropdown.up .dd-menu { top: auto; bottom: 24px; }
+#axdRight #axdRightBody .axd-p .dd-item { height: 24px; line-height: 24px; padding: 0 8px; font-size: 12px; }
+#axdRight #axdRightBody .axd-p .dd-item.selected:before { top: 6px; bottom: 6px; }
+#axdRight #axdRightBody .axd-p .numberbox { width: 100%; }
+#axdRight #axdRightBody .axd-p .numberbox .spin { width: 16px; height: 10px; line-height: 10px; font-size: 7px; right: 3px; }
+#axdRight #axdRightBody .axd-p .numberbox .spin.up { top: 1px; }
+#axdRight #axdRightBody .axd-p .numberbox .spin.down { top: 11px; }
+#axdRight #axdRightBody .axd-p .switch { height: 16px; margin-left: 4px; }
+#axdRight #axdRightBody .axd-p .switch input { width: 30px; height: 16px; }
+#axdRight #axdRightBody .axd-p .sw-track { width: 28px; height: 14px; border-radius: 8px; }
+#axdRight #axdRightBody .axd-p .sw-track:before { left: 2px; top: 2px; width: 8px; height: 8px; }
+#axdRight #axdRightBody .axd-p .switch:hover .sw-track:before { width: 10px; height: 10px; top: 1px; }
+#axdRight #axdRightBody .axd-p .switch input:checked + .sw-track:before { left: 16px; }
+#axdRight #axdRightBody .axd-p .axd-pswatch { width: 18px; height: 18px; vertical-align: -5px; border-radius: 3px; }
+#axdRight #axdRightBody .axd-p > .axd-pmore { margin-left: 4px; }
+
+/* events: the written ones as slim cards, the rest a row of chips */
+#axdRight #axdRightBody .axd-gbody > .axd-ev { margin: 4px 8px 4px 22px; padding: 5px 8px; border-radius: 4px; }
+
+/* a table's data as text: under its editor, when asked for */
+#axdRight #axdRightBody .axd-gbody > .axd-rawbox { display: none; margin: 0; }
+#axdRight #axdRightBody .axd-gbody > .axd-rawbox.on { display: block; }
+#axdRight #axdRightBody .axd-rawbox > .axd-p.axd-tall { padding-left: 22px; }
+.axd-gridsum .axd-rawt { margin-right: 6px; }
+
+/* =====================================================================
+   The canvas, closer to the real thing: the window with Windows 11's
+   edge -- a hairline and a deep, soft shadow -- and its corners round or
+   square as the window will have them; a little light on the desk
+   behind it; the grid as dots (AxStudio.GridCss); and a control that is
+   nothing until something is written in it saying so.
+   ===================================================================== */
+#axdCanvasWrap {
+    background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, .05), rgba(255, 255, 255, 0) 65%), rgba(0, 0, 0, .26);
+}
+body.theme-light #axdCanvasWrap {
+    background: radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 65%), rgba(0, 0, 0, .09);
+}
+#axdPaper {
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px rgba(128, 128, 128, .32), 0 2px 5px rgba(0, 0, 0, .26), 0 20px 52px rgba(0, 0, 0, .5);
+}
+body.theme-light #axdPaper {
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, .16), 0 2px 5px rgba(0, 0, 0, .1), 0 20px 52px rgba(0, 0, 0, .22);
+}
+#axdPaper.axd-square { border-radius: 0; }
+#axdPaper [data-axd-hint]:empty { outline: 1px dashed rgba(128, 128, 128, .5); outline-offset: -1px; min-height: 30px; }
+#axdPaper [data-axd-hint]:empty:before {
+    content: attr(data-axd-hint); display: block; padding: 8px 10px; font-size: 11px; font-style: italic;
+    opacity: .55; white-space: normal;
+}
+/* the data's summary on one line; "As text" the quiet button beside the main one */
+#axdRight #axdRightBody .axd-gridsum { padding: 6px 8px; border-radius: 4px; }
+#axdRight #axdRightBody .axd-gridsay { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#axdRight #axdRightBody .axd-gridsum .axd-rawt { background: transparent; border-color: rgba(128, 128, 128, .42);
+    color: inherit; font-weight: normal; }
+#axdRight #axdRightBody .axd-gridsum .axd-rawt.on { background: rgba(128, 128, 128, .28); }
+/* the inspector's scrollbar takes its own room: Trident's auto-hiding kind is
+   drawn over the content, and the grid's rows run to the pane's edge */
+#axdRight #axdRightBody { -ms-overflow-style: scrollbar; overflow-x: hidden; }
+
+/* Check for updates: a library with a newer version, and the rows of the form */
+.axd-pkupd { float: right; font-size: 10px; font-weight: 600; padding: 0 6px; line-height: 16px; border-radius: 8px;
+             background: rgba(96, 205, 255, .18); color: #60cdff; }
+.axd-up-new td .ico, .axd-up-new td:nth-child(3) { color: #60cdff; font-weight: 600; }
+.axd-up-ok td .ico { color: #6ccb5f; }
+.axd-up-offline td .ico, .axd-up-unknown td .ico { opacity: .6; }

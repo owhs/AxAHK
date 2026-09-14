@@ -1,0 +1,66 @@
+{
+  "name": "Slider",
+  "description": "Slider",
+  "order": 3004,
+  "css": "AxSlider.css",
+  "include": "lib\\components\\Slider\\AxSlider.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Slider",
+      "label": "Slider",
+      "icon": "E9E9",
+      "category": "Input",
+      "prefix": "sl",
+      "arg": {
+        "key": "value",
+        "label": "Value",
+        "kind": "num",
+        "default": "50"
+      },
+      "props": [
+        {
+          "key": "min",
+          "label": "Minimum",
+          "kind": "num",
+          "emit": "kv",
+          "default": "0"
+        },
+        {
+          "key": "max",
+          "label": "Maximum",
+          "kind": "num",
+          "emit": "kv",
+          "default": "100"
+        },
+        {
+          "key": "step",
+          "label": "Step",
+          "kind": "num",
+          "emit": "kv",
+          "default": "1"
+        },
+        {
+          "key": "suffix",
+          "label": "Suffix",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "novalue",
+          "label": "Hide the number",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

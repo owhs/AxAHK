@@ -1,0 +1,72 @@
+/* AxChart.css -- bars, a line, an area or a donut. IE11-safe: boxes placed by
+   percentage, and SVG only for the line and the ring. */
+.axchart { position: relative; box-sizing: border-box; height: 220px; padding: 10px 12px 8px; border-radius: 8px;
+    background: rgba(255,255,255,.0512); border: 1px solid rgba(255,255,255,.0698); }
+.axchart-in { position: absolute; left: 12px; right: 12px; top: 10px; bottom: 8px; }
+.axchart-body { position: absolute; left: 0; right: 0; top: 0; bottom: 0; }
+.axchart-body.haslegend { bottom: 24px; }
+.axchart-empty { position: absolute; left: 0; right: 0; top: 50%; margin-top: -9px; text-align: center; font-size: 12px; opacity: .55; }
+
+.axchart-plot { position: absolute; left: 42px; right: 4px; top: 6px; bottom: 20px; }
+.axchart-plot.noaxis { left: 4px; }
+.axchart-plot.nolabels { bottom: 4px; }
+.axchart-axis { position: absolute; left: -42px; top: 0; bottom: 0; width: 36px; }
+.axchart-y { position: absolute; right: 0; margin-bottom: -7px; height: 14px; line-height: 14px; font-size: 11px; opacity: .6; white-space: nowrap; }
+.axchart-grid { position: absolute; left: 0; right: 0; height: 1px; background: rgba(255,255,255,.07); }
+.axchart-grid.zero { background: rgba(255,255,255,.2); }
+.axchart-xs { position: absolute; left: 0; right: 0; bottom: -20px; height: 16px; }
+.axchart-x { position: absolute; top: 2px; width: 80px; margin-left: -40px; text-align: center; font-size: 11px; opacity: .6;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.axchart-marks { position: absolute; left: 0; right: 0; top: 0; bottom: 0; }
+
+/* bars: a group per label, a bar per series in it */
+.axchart-group { position: absolute; top: 0; bottom: 0; }
+.axchart-bar { position: absolute; box-sizing: border-box; border-radius: 3px 3px 0 0; min-height: 1px; }
+.axchart-bar:hover { opacity: .82; }
+.axchart-bar span, .axchart-pt span { position: absolute; left: -20px; right: -20px; top: -17px; text-align: center; font-size: 10.5px; opacity: .8; white-space: nowrap; }
+
+/* a line: the SVG, and a box for each point so it stays round */
+.axchart-svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; }
+.axchart-line { fill: none; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+.axchart-area { stroke: none; fill-opacity: .16; }
+.axchart-pt { position: absolute; width: 8px; height: 8px; margin: 0 0 -4px -4px; border-radius: 50%; box-sizing: border-box; border: 2px solid; background: #202020; }
+.axchart-pt:hover { width: 12px; height: 12px; margin: 0 0 -6px -6px; }
+
+/* a donut: the ring and the total in its middle */
+.axchart-donut { position: absolute; left: 0; right: 0; top: 0; bottom: 0; }
+.axchart-donut svg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.axchart-track { fill: none; stroke: rgba(255,255,255,.06); stroke-width: 16; }
+.axchart-slice { fill: none; stroke-width: 16; }
+.axchart-slice:hover { stroke-width: 19; }
+.axchart-total { position: absolute; left: 0; right: 0; top: 50%; margin-top: -19px; text-align: center; line-height: 20px; }
+.axchart-total b { display: block; font-size: 18px; font-weight: 600; }
+.axchart-total span { font-size: 11px; opacity: .6; }
+
+.axchart-legend { position: absolute; left: 0; right: 0; bottom: 0; height: 20px; overflow: hidden; text-align: center; white-space: nowrap; font-size: 11.5px; }
+.axchart-key { display: inline-block; margin: 0 8px; opacity: .8; }
+.axchart-key i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: 0; }
+
+/* six series colours; the first is the accent */
+.axchart .s1 { background: #60cdff; border-color: #60cdff; stroke: #60cdff; fill: #60cdff; }
+.axchart .s2 { background: #c792ea; border-color: #c792ea; stroke: #c792ea; fill: #c792ea; }
+.axchart .s3 { background: #6ccb5f; border-color: #6ccb5f; stroke: #6ccb5f; fill: #6ccb5f; }
+.axchart .s4 { background: #fce100; border-color: #fce100; stroke: #fce100; fill: #fce100; }
+.axchart .s5 { background: #ff99a4; border-color: #ff99a4; stroke: #ff99a4; fill: #ff99a4; }
+.axchart .s6 { background: #f7a35c; border-color: #f7a35c; stroke: #f7a35c; fill: #f7a35c; }
+.axchart .axchart-pt { background: #202020; }
+.axchart .axchart-line, .axchart .axchart-slice { fill: none; }
+.axchart .axchart-area { stroke: none; }
+
+body.theme-light .axchart { background: #ffffff; border-color: rgba(0,0,0,.0803); }
+body.theme-light .axchart-grid { background: rgba(0,0,0,.07); }
+body.theme-light .axchart-grid.zero { background: rgba(0,0,0,.25); }
+body.theme-light .axchart-track { stroke: rgba(0,0,0,.06); }
+body.theme-light .axchart .axchart-pt { background: #ffffff; }
+body.theme-light .axchart .s1 { background: #005fb8; border-color: #005fb8; stroke: #005fb8; fill: #005fb8; }
+body.theme-light .axchart .s2 { background: #8764b8; border-color: #8764b8; stroke: #8764b8; fill: #8764b8; }
+body.theme-light .axchart .s3 { background: #0f7b0f; border-color: #0f7b0f; stroke: #0f7b0f; fill: #0f7b0f; }
+body.theme-light .axchart .s4 { background: #c19c00; border-color: #c19c00; stroke: #c19c00; fill: #c19c00; }
+body.theme-light .axchart .s5 { background: #c42b1c; border-color: #c42b1c; stroke: #c42b1c; fill: #c42b1c; }
+body.theme-light .axchart .s6 { background: #ca5010; border-color: #ca5010; stroke: #ca5010; fill: #ca5010; }
+body.theme-light .axchart .axchart-line, body.theme-light .axchart .axchart-slice { fill: none; }
+body.theme-light .axchart .axchart-area { stroke: none; }

@@ -1,0 +1,5 @@
+<!-- frame.html: the injected title bar. {icon} is replaced by the app icon (or a glyph).
+     Element ids are the contract with AxWindow (opts.Chrome renames them).
+     axTbLeft / axTbRight are the slots TitleBar() fills; empty they are
+     zero-width flex items and no sheet sees them. -->
+<div id="titlebar">{icon}<div class="axtb-slot" id="axTbLeft"></div><div id="titleText"></div><div class="axtb-slot" id="axTbRight"></div><div class="winbtn ico" id="btnMin" data-tip="Minimize">&#xE921;</div><div class="winbtn ico" id="btnMax"><span class="ico-max">&#xE922;</span><span class="ico-restore">&#xE923;</span></div><div class="winbtn ico" id="btnClose" data-tip="Close">&#xE8BB;</div></div>

@@ -1,0 +1,57 @@
+{
+  "name": "Switch",
+  "description": "Switch",
+  "order": 2005,
+  "css": "AxSwitch.css",
+  "include": "lib\\components\\Switch\\AxSwitch.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Switch",
+      "label": "Switch",
+      "icon": "E8AB",
+      "category": "Common",
+      "prefix": "sw",
+      "arg": {
+        "key": "text",
+        "label": "Label",
+        "kind": "text",
+        "default": ""
+      },
+      "props": [
+        {
+          "key": "checked",
+          "label": "Checked",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "on",
+          "label": "On text",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "off",
+          "label": "Off text",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "nolabel",
+          "label": "No label",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

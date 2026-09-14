@@ -1,0 +1,65 @@
+{
+  "name": "RangeSlider",
+  "description": "A slider with two thumbs: the low end and the high end of a range.",
+  "order": 3012,
+  "css": "AxRangeSlider.css",
+  "include": "lib\\components\\RangeSlider\\AxRangeSlider.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "RangeSlider",
+      "label": "Range slider",
+      "icon": "E9E9",
+      "category": "Input",
+      "prefix": "rs",
+      "arg": {
+        "key": "value",
+        "label": "From, to",
+        "kind": "text",
+        "default": "20,80"
+      },
+      "props": [
+        {
+          "key": "min",
+          "label": "Minimum",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "max",
+          "label": "Maximum",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "step",
+          "label": "Step",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "prefix",
+          "label": "Before the number",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "suffix",
+          "label": "After the number",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "nolabels",
+          "label": "No numbers over the thumbs",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

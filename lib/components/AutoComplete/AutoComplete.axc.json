@@ -1,0 +1,51 @@
+{
+  "name": "AutoComplete",
+  "description": "Autocomplete",
+  "order": 3002,
+  "css": "AxAutoComplete.css",
+  "include": "lib\\components\\AutoComplete\\AxAutoComplete.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "AutoComplete",
+      "label": "Autocomplete",
+      "icon": "E721",
+      "category": "Input",
+      "prefix": "ac",
+      "arg": {
+        "key": "options",
+        "label": "Suggestions (value:Label per line)",
+        "kind": "options",
+        "default": "London\nParis"
+      },
+      "props": [
+        {
+          "key": "value",
+          "label": "Value",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "placeholder",
+          "label": "Placeholder",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "strict",
+          "label": "Listed values only",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

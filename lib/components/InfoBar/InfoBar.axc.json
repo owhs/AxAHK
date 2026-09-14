@@ -1,0 +1,54 @@
+{
+  "name": "InfoBar",
+  "description": "Info bar",
+  "order": 4001,
+  "css": "AxInfoBar.css",
+  "include": "lib\\components\\InfoBar\\AxInfoBar.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "InfoBar",
+      "label": "Info bar",
+      "icon": "E946",
+      "category": "Display",
+      "prefix": "ib",
+      "arg": {
+        "key": "text",
+        "label": "Body",
+        "kind": "multiline",
+        "default": "Details go here."
+      },
+      "props": [
+        {
+          "key": "title",
+          "label": "Title",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "kind",
+          "label": "Kind",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "info|success|warning|error",
+          "default": "info"
+        },
+        {
+          "key": "noclose",
+          "label": "No close",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

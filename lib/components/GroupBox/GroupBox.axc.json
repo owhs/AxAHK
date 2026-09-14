@@ -1,0 +1,33 @@
+{
+  "name": "GroupBox",
+  "description": "Group box",
+  "order": 1001,
+  "css": "AxGroupBox.css",
+  "include": "lib\\components\\GroupBox\\AxGroupBox.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "GroupBox",
+      "label": "Group box",
+      "icon": "E754",
+      "category": "Containers",
+      "prefix": "grp",
+      "box": true,
+      "arg": {
+        "key": "legend",
+        "label": "Legend",
+        "kind": "text",
+        "default": "Options"
+      },
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "name": "Stat",
+  "description": "A stat card: a number that matters, its trend and a sparkline.",
+  "order": 4020,
+  "css": "AxStat.css",
+  "include": "lib\\components\\Stat\\AxStat.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Stat",
+      "label": "Stat card",
+      "icon": "E9D2",
+      "category": "Display",
+      "prefix": "stat",
+      "arg": {
+        "key": "value",
+        "label": "The number",
+        "kind": "text",
+        "default": "$24,300"
+      },
+      "props": [
+        {
+          "key": "label",
+          "label": "Label",
+          "kind": "text",
+          "emit": "kv",
+          "default": "Revenue"
+        },
+        {
+          "key": "icon",
+          "label": "Icon",
+          "kind": "icon",
+          "emit": "kv"
+        },
+        {
+          "key": "trend",
+          "label": "Trend (+12%, -3%)",
+          "kind": "text",
+          "emit": "kv",
+          "default": "+12%"
+        },
+        {
+          "key": "note",
+          "label": "Note",
+          "kind": "text",
+          "emit": "kv",
+          "default": "vs last month"
+        },
+        {
+          "key": "spark",
+          "label": "Sparkline (numbers)",
+          "kind": "text",
+          "emit": "kv",
+          "default": "3,5,4,8,6,9,8,11"
+        },
+        {
+          "key": "good",
+          "label": "Better when it goes",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "|up|down"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

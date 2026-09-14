@@ -1,0 +1,31 @@
+/* AxAudio.css -- the player: a play button, the time, a bar to seek on, the
+   length and a mute button, on one line. The bar's fill carries the class
+   "link" and paints itself in currentColor, so it is the accent colour in
+   every look without the accent needing to know it exists. */
+
+.axau { display: flex; align-items: center; height: 36px; max-width: 100%; }
+.axau.fill { width: 100%; }
+.axau.axau-noui { display: none; }
+.axau audio { display: none; }
+.axau-btn {
+    flex: none; width: 32px; height: 32px; line-height: 32px; text-align: center; font-size: 14px;
+    border-radius: 16px; cursor: default;
+}
+.axau-btn:hover { background: rgba(128, 128, 128, .18); }
+.axau-play { font-size: 16px; }
+.axau-time { flex: none; font-size: 12px; opacity: .75; min-width: 38px; text-align: center; font-variant-numeric: tabular-nums; }
+.axau-bar { position: relative; flex: 1 1 auto; height: 16px; margin: 0 6px; cursor: default; }
+.axau-bar:before {
+    content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 3px; border-radius: 2px;
+    background: rgba(128, 128, 128, .35);
+}
+.axau-fill {
+    position: absolute; left: 0; top: 7px; height: 3px; width: 0; border-radius: 2px;
+    background: currentColor;
+}
+.axau-fill:after {
+    content: ""; position: absolute; right: -6px; top: -4px; width: 11px; height: 11px; border-radius: 6px;
+    background: currentColor;
+}
+.axau-q { display: none; }
+.axau-req { position: absolute; width: 0; height: 0; overflow: hidden; }

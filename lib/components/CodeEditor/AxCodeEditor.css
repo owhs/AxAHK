@@ -1,0 +1,219 @@
+/* =============================================================================
+   AxCodeEditor.css -- the code editor. A theme is a class on the box
+   (axce-t-dark, -light, -monokai, -solarized, -dracula, -contrast, or -auto,
+   which follows the window's own light or dark). Every colour a theme sets is
+   here, in one block per theme, so a new one is a copy of a block.
+   ============================================================================= */
+.axce { position: relative; display: flex; display: -ms-flexbox; flex-direction: column; -ms-flex-direction: column;
+    height: 300px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(128,128,128,.28);
+    font-family: "Cascadia Mono", "Cascadia Code", Consolas, "Courier New", monospace; }
+.axce.fill { width: 100%; }
+/* The numbers, the text and the map are placed, not flexed: a flex item
+   sized from its content makes Trident measure every line of the text
+   (the widest of them) whenever one changes -- 100 ms a key at 3000 lines.
+   The script sets the gutter's width as the numbers grow. */
+.axce-main { position: relative; flex: 1 1 0px; -ms-flex: 1 1 0px; min-height: 0; overflow: hidden; }
+.axce-gut { position: absolute; left: 0; top: 0; bottom: 0; width: 42px; overflow: hidden; text-align: right; padding: 6px 0 60px;
+    -ms-user-select: none; user-select: none; cursor: default; box-sizing: border-box; }
+.axce-ln { position: relative; padding: 0 16px 0 8px; white-space: nowrap; }
+.axce-ln.axce-hid { display: none; }
+.axce-fm { position: absolute; right: 3px; top: 0; width: 11px; text-align: center; cursor: pointer; opacity: 0;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 8px; }
+.axce-fm:before { content: "\E70D"; }
+.axce-fm.shut { opacity: .9; }
+.axce-fm.shut:before { content: "\E76C"; }
+.axce-gut:hover .axce-fm { opacity: .75; }
+.axce-ln.axce-m-error:before, .axce-ln.axce-m-warn:before, .axce-ln.axce-m-info:before {
+    content: ""; position: absolute; left: 3px; top: 50%; margin-top: -3px; width: 6px; height: 6px; border-radius: 3px; }
+.axce-ln.axce-m-error:before { background: #f14c4c; }
+.axce-ln.axce-m-warn:before { background: #cca700; }
+.axce-ln.axce-m-info:before { background: #3794ff; }
+.axce.axce-nogut .axce-gut { display: none; }
+.axce-scroll { position: absolute; left: 42px; top: 0; right: 0; bottom: 0; overflow: auto; }
+.axce.axce-nogut .axce-scroll { left: 0 !important; }
+.axce.axce-mapon .axce-scroll { right: 76px; }
+.axce-under { position: absolute; left: 0; top: 0; right: 0; z-index: 0; }
+.axce-under > div { position: absolute; }
+.axce-ed { position: relative; z-index: 1; min-height: 100%; padding: 6px 12px 40px 8px; box-sizing: border-box;
+    outline: none; white-space: pre; tab-size: 4; background: transparent; cursor: text; }
+.axce.axce-wrap .axce-ed { white-space: pre-wrap; word-wrap: break-word; }
+/* no min-height or width on a line: in Trident that gives it "layout", and a
+   block with layout inside an editable area is picked as an object, hatched frame and all */
+.axce-ed > div.axce-hid { display: none; }
+.axce-ed > div.axce-folded:after { content: " \2026 "; margin-left: 6px; padding: 0 5px; border-radius: 3px;
+    font-size: 11px; background: rgba(128,128,128,.28); }
+/* the placeholder: a class the script sets, not :empty / :only-child -- those
+   make Trident look at every line again whenever one comes or goes */
+.axce.axce-empty .axce-ed:before { content: attr(data-ph); position: absolute; left: 8px; top: 6px; opacity: .45; pointer-events: none; }
+.axce-ed i { font-style: normal; }
+.axce-ed i.bo { font-weight: 700; } .axce-ed i.it { font-style: italic; } .axce-ed i.h { font-weight: 700; }
+/* indent guides: drawn under the text for the lines in view (Trident paints
+   no background behind a run of spaces) */
+.axce-guide { width: 1px; background: rgba(128,128,128,.26); }
+.axce-cur { left: 0; right: 0; }
+.axce-br { border-radius: 2px; }
+.axce-hit, .axce-occ { border-radius: 2px; }
+.axce-uline { border-bottom: 2px dotted; margin-top: -1px; }
+.axce-u-error { border-color: #f14c4c; } .axce-u-warn { border-color: #cca700; } .axce-u-info { border-color: #3794ff; }
+
+/* the map of the whole text, on the right */
+.axce-minibox { position: absolute; top: 0; right: 0; bottom: 0; width: 76px; overflow: hidden; cursor: default;
+    border-left: 1px solid rgba(128,128,128,.14); -ms-user-select: none; user-select: none; }
+.axce-mini { position: absolute; left: 0; top: 0; }
+.axce-mview { position: absolute; left: 0; right: 0; top: 0; height: 20px; background: rgba(128,128,128,.16); }
+.axce-minibox:hover .axce-mview { background: rgba(128,128,128,.26); }
+
+/* the list of suggestions, the hover card, the parameters card */
+.axce-ac { position: absolute; z-index: 20; display: none; min-width: 240px; max-width: 460px; max-height: 230px; overflow-y: auto;
+    border-radius: 6px; padding: 3px; box-shadow: 0 8px 24px rgba(0,0,0,.35); font-size: 12.5px; }
+.axce-aci { padding: 2px 8px 2px 4px; height: 20px; line-height: 20px; border-radius: 4px; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; cursor: default; }
+.axce-aci b { font-weight: 700; color: #3aa0ff; }
+.axce-aci span { float: right; max-width: 55%; overflow: hidden; text-overflow: ellipsis; margin-left: 14px; opacity: .55; font-size: 11px; }
+.axce-ak { display: inline-block; width: 16px; height: 16px; line-height: 16px; margin-right: 7px; border-radius: 3px; text-align: center;
+    vertical-align: -3px; font-size: 10px; font-weight: 700; font-style: normal; font-family: "Segoe UI", sans-serif; color: #fff; background: #6b6b6b; }
+.ak-kw { background: #c586c0; } .ak-fn, .ak-method { background: #b180d7; } .ak-var { background: #3a8ee6; }
+.ak-class { background: #d7a100; } .ak-prop { background: #3aa0a0; } .ak-snippet { background: #6a9955; }
+.ak-heading, .ak-section { background: #569cd6; } .ak-hotkey { background: #ce9178; }
+.axce-tip, .axce-sig { position: absolute; z-index: 21; display: none; max-width: 460px; padding: 7px 10px; border-radius: 6px;
+    font: 12px/1.5 "Segoe UI", sans-serif; white-space: normal; box-shadow: 0 8px 24px rgba(0,0,0,.35); }
+.axce-sig { z-index: 22; padding: 4px 9px; }
+.axce-tip code, .axce-sig code { font-family: "Cascadia Mono", Consolas, monospace; }
+.axce-sig b { color: #3aa0ff; font-weight: 700; text-decoration: underline; }
+.axce-tm { padding-left: 16px; position: relative; margin-bottom: 4px; }
+.axce-tm:before { position: absolute; left: 0; top: 0; font-weight: 700; }
+.axce-tm-error:before { content: "\2716"; color: #f14c4c; } .axce-tm-warn:before { content: "\26A0"; color: #cca700; }
+.axce-tm-info:before { content: "i"; color: #3794ff; }
+
+/* find and replace; ":42" goes to a line, "@name" to what the text defines */
+.axce-find { display: none; position: absolute; z-index: 15; top: 6px; right: 90px; padding: 5px 6px; border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.3); font: 12px "Segoe UI", sans-serif; white-space: nowrap; }
+.axce:not(.axce-mapon) .axce-find { right: 18px; }
+.axce.axce-finding .axce-find { display: block; }
+.axce-find input { width: 220px; height: 24px; box-sizing: border-box; padding: 2px 6px; border-radius: 4px; font: inherit;
+    border: 1px solid rgba(128,128,128,.45); background: transparent; color: inherit; outline: none; vertical-align: middle; }
+.axce-find input:focus { border-color: #3aa0ff; }
+.axce-find .axce-frow { display: block; }
+.axce-find .axce-frep { display: none; margin-top: 4px; padding-left: 24px; }
+.axce.axce-replacing .axce-find .axce-frep { display: block; }
+.axce-find span[data-f] { display: inline-block; min-width: 22px; height: 22px; line-height: 22px; padding: 0 5px; margin-left: 2px;
+    text-align: center; border-radius: 4px; cursor: pointer; vertical-align: middle; }
+.axce-find span[data-f]:hover { background: rgba(128,128,128,.25); }
+.axce-find span.on { background: rgba(58,160,255,.3); outline: 1px solid rgba(58,160,255,.6); }
+.axce-find .axce-ftog { min-width: 14px; margin: 0 4px 0 0; font-size: 15px; transition: transform .1s; }
+.axce.axce-replacing .axce-find .axce-ftog { -ms-transform: rotate(90deg); transform: rotate(90deg); }
+.axce-find .axce-fn { display: inline-block; min-width: 70px; margin: 0 4px 0 6px; opacity: .75; vertical-align: middle; }
+.axce-find .axce-fn.none, .axce-find .axce-fn.bad { color: #f14c4c; opacity: 1; }
+.axce-flist { display: none; margin-top: 4px; max-height: 220px; overflow-y: auto; }
+.axce-flist div { padding: 2px 6px; border-radius: 4px; cursor: pointer; }
+.axce-flist div span { float: right; opacity: .5; margin-left: 14px; }
+.axce-flist div:hover, .axce-flist div.on { background: rgba(58,160,255,.25); }
+.axce-flist .axce-fnone { opacity: .6; cursor: default; }
+
+/* the line at the bottom */
+.axce-stat { flex: 0 0 auto; -ms-flex: 0 0 auto; height: 22px; line-height: 22px; padding: 0 10px; font: 11.5px "Segoe UI", sans-serif;
+    white-space: nowrap; overflow: hidden; }
+.axce-stat span { margin-right: 14px; }
+.axce-stat .axce-sl { float: right; margin: 0 0 0 14px; opacity: .75; }
+.axce-stat .axce-se { color: #f14c4c; cursor: pointer; } .axce-stat .axce-sw { color: #cca700; cursor: pointer; }
+.axce-stat .axce-sb { cursor: pointer; padding: 0 4px; opacity: .5; }
+.axce-stat .axce-sb:hover { opacity: 1; }
+.axce-stat .axce-sb.on { opacity: .9; }
+.axce.axce-nostat .axce-stat { display: none; }
+.axce-val, .axce-q { display: none; }
+.axce-req { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* ------------------------------------------------------------- themes */
+/* dark (and auto on a dark window) */
+.axce-t-dark, .axce-t-auto { background: #1e1e1e; color: #d4d4d4; }
+.axce-t-dark .axce-gut, .axce-t-auto .axce-gut { background: #1e1e1e; color: #6e7681; }
+.axce-t-dark .axce-cur, .axce-t-auto .axce-cur { background: rgba(255,255,255,.045); }
+.axce-t-dark .axce-br, .axce-t-auto .axce-br { background: rgba(0,122,204,.35); outline: 1px solid rgba(0,160,255,.5); }
+.axce-t-dark .axce-hit, .axce-t-auto .axce-hit { background: rgba(234,92,0,.33); }
+.axce-t-dark .axce-hit.on, .axce-t-auto .axce-hit.on { background: rgba(234,160,0,.55); }
+.axce-t-dark .axce-occ, .axce-t-auto .axce-occ { background: rgba(255,255,255,.1); }
+.axce-t-dark .axce-ac, .axce-t-dark .axce-tip, .axce-t-dark .axce-find, .axce-t-dark .axce-sig,
+.axce-t-auto .axce-ac, .axce-t-auto .axce-tip, .axce-t-auto .axce-find, .axce-t-auto .axce-sig { background: #252526; color: #d4d4d4; border: 1px solid #454545; }
+.axce-t-dark .axce-aci.on, .axce-t-auto .axce-aci.on { background: #04395e; }
+.axce-t-dark .axce-stat, .axce-t-auto .axce-stat { background: #181818; color: #9d9d9d; border-top: 1px solid #2b2b2b; }
+.axce-t-dark i.c, .axce-t-auto i.c { color: #6a9955; } .axce-t-dark i.s, .axce-t-auto i.s { color: #ce9178; }
+.axce-t-dark i.k, .axce-t-auto i.k { color: #c586c0; } .axce-t-dark i.n, .axce-t-auto i.n { color: #b5cea8; }
+.axce-t-dark i.f, .axce-t-auto i.f { color: #dcdcaa; } .axce-t-dark i.v, .axce-t-auto i.v { color: #9cdcfe; }
+.axce-t-dark i.d, .axce-t-auto i.d { color: #569cd6; } .axce-t-dark i.o, .axce-t-auto i.o { color: #d4d4d4; }
+.axce-t-dark i.t, .axce-t-auto i.t { color: #4ec9b0; } .axce-t-dark i.p, .axce-t-auto i.p { color: #9cdcfe; }
+.axce-t-dark i.a, .axce-t-auto i.a { color: #9cdcfe; } .axce-t-dark i.b, .axce-t-auto i.b { color: #ffd700; }
+.axce-t-dark i.h, .axce-t-auto i.h { color: #569cd6; } .axce-t-dark i.l, .axce-t-auto i.l { color: #3794ff; }
+
+/* light (and auto on a light window) */
+.axce-t-light, body.theme-light .axce-t-auto { background: #ffffff; color: #1f1f1f; }
+.axce-t-light .axce-gut, body.theme-light .axce-t-auto .axce-gut { background: #ffffff; color: #6e7781; }
+.axce-t-light .axce-cur, body.theme-light .axce-t-auto .axce-cur { background: rgba(0,0,0,.04); }
+.axce-t-light .axce-br, body.theme-light .axce-t-auto .axce-br { background: rgba(0,100,200,.14); outline: 1px solid rgba(0,100,200,.35); }
+.axce-t-light .axce-hit, body.theme-light .axce-t-auto .axce-hit { background: rgba(234,160,0,.28); }
+.axce-t-light .axce-hit.on, body.theme-light .axce-t-auto .axce-hit.on { background: rgba(234,120,0,.5); }
+.axce-t-light .axce-occ, body.theme-light .axce-t-auto .axce-occ { background: rgba(0,0,0,.08); }
+.axce-t-light .axce-ac, .axce-t-light .axce-tip, .axce-t-light .axce-find, .axce-t-light .axce-sig,
+body.theme-light .axce-t-auto .axce-ac, body.theme-light .axce-t-auto .axce-tip, body.theme-light .axce-t-auto .axce-find,
+body.theme-light .axce-t-auto .axce-sig { background: #f8f8f8; color: #1f1f1f; border: 1px solid #c8c8c8; }
+.axce-t-light .axce-aci b, body.theme-light .axce-t-auto .axce-aci b, .axce-t-light .axce-sig b, body.theme-light .axce-t-auto .axce-sig b { color: #0064c8; }
+.axce-t-light .axce-aci.on, body.theme-light .axce-t-auto .axce-aci.on { background: #cce4f7; }
+.axce-t-light .axce-stat, body.theme-light .axce-t-auto .axce-stat { background: #f3f3f3; color: #616161; border-top: 1px solid #e5e5e5; }
+.axce-t-light i.c, body.theme-light .axce-t-auto i.c { color: #008000; } .axce-t-light i.s, body.theme-light .axce-t-auto i.s { color: #a31515; }
+.axce-t-light i.k, body.theme-light .axce-t-auto i.k { color: #af00db; } .axce-t-light i.n, body.theme-light .axce-t-auto i.n { color: #098658; }
+.axce-t-light i.f, body.theme-light .axce-t-auto i.f { color: #795e26; } .axce-t-light i.v, body.theme-light .axce-t-auto i.v { color: #001080; }
+.axce-t-light i.d, body.theme-light .axce-t-auto i.d { color: #0000ff; } .axce-t-light i.o, body.theme-light .axce-t-auto i.o { color: #1f1f1f; }
+.axce-t-light i.t, body.theme-light .axce-t-auto i.t { color: #267f99; } .axce-t-light i.p, body.theme-light .axce-t-auto i.p { color: #001080; }
+.axce-t-light i.a, body.theme-light .axce-t-auto i.a { color: #e50000; } .axce-t-light i.b, body.theme-light .axce-t-auto i.b { color: #0431fa; }
+.axce-t-light i.h, body.theme-light .axce-t-auto i.h { color: #0000ff; } .axce-t-light i.l, body.theme-light .axce-t-auto i.l { color: #0070c1; }
+
+/* monokai */
+.axce-t-monokai, .axce-t-monokai .axce-gut { background: #272822; color: #f8f8f2; }
+.axce-t-monokai .axce-gut { color: #75715e; }
+.axce-t-monokai .axce-cur { background: rgba(255,255,255,.05); }
+.axce-t-monokai .axce-br { outline: 1px solid #a6e22e; } .axce-t-monokai .axce-hit { background: rgba(230,219,116,.3); }
+.axce-t-monokai .axce-hit.on { background: rgba(230,219,116,.55); }
+.axce-t-monokai .axce-occ { background: rgba(255,255,255,.1); }
+.axce-t-monokai .axce-ac, .axce-t-monokai .axce-tip, .axce-t-monokai .axce-find, .axce-t-monokai .axce-sig { background: #3e3d32; color: #f8f8f2; border: 1px solid #75715e; }
+.axce-t-monokai .axce-aci.on { background: #49483e; } .axce-t-monokai .axce-stat { background: #1e1f1c; color: #a59f85; }
+.axce-t-monokai i.c { color: #75715e; } .axce-t-monokai i.s { color: #e6db74; } .axce-t-monokai i.k { color: #f92672; }
+.axce-t-monokai i.n { color: #ae81ff; } .axce-t-monokai i.f { color: #a6e22e; } .axce-t-monokai i.v { color: #66d9ef; }
+.axce-t-monokai i.d { color: #f92672; } .axce-t-monokai i.t { color: #66d9ef; font-style: italic; } .axce-t-monokai i.p { color: #fd971f; }
+.axce-t-monokai i.a { color: #a6e22e; } .axce-t-monokai i.b { color: #f8f8f2; } .axce-t-monokai i.h { color: #a6e22e; } .axce-t-monokai i.l { color: #66d9ef; }
+
+/* solarized (dark) */
+.axce-t-solarized, .axce-t-solarized .axce-gut { background: #002b36; color: #93a1a1; }
+.axce-t-solarized .axce-gut { color: #586e75; } .axce-t-solarized .axce-cur { background: #073642; }
+.axce-t-solarized .axce-br { outline: 1px solid #2aa198; } .axce-t-solarized .axce-hit { background: rgba(181,137,0,.35); }
+.axce-t-solarized .axce-hit.on { background: rgba(203,75,22,.5); }
+.axce-t-solarized .axce-occ { background: rgba(255,255,255,.1); }
+.axce-t-solarized .axce-ac, .axce-t-solarized .axce-tip, .axce-t-solarized .axce-find, .axce-t-solarized .axce-sig { background: #073642; color: #93a1a1; border: 1px solid #586e75; }
+.axce-t-solarized .axce-aci.on { background: #0e4a5a; } .axce-t-solarized .axce-stat { background: #00212b; color: #839496; }
+.axce-t-solarized i.c { color: #586e75; font-style: italic; } .axce-t-solarized i.s { color: #2aa198; } .axce-t-solarized i.k { color: #859900; }
+.axce-t-solarized i.n { color: #d33682; } .axce-t-solarized i.f { color: #268bd2; } .axce-t-solarized i.v { color: #b58900; }
+.axce-t-solarized i.d { color: #cb4b16; } .axce-t-solarized i.t { color: #b58900; } .axce-t-solarized i.p { color: #268bd2; }
+.axce-t-solarized i.a { color: #b58900; } .axce-t-solarized i.h { color: #cb4b16; } .axce-t-solarized i.l { color: #268bd2; }
+
+/* dracula */
+.axce-t-dracula, .axce-t-dracula .axce-gut { background: #282a36; color: #f8f8f2; }
+.axce-t-dracula .axce-gut { color: #6272a4; } .axce-t-dracula .axce-cur { background: #44475a; }
+.axce-t-dracula .axce-br { outline: 1px solid #ff79c6; } .axce-t-dracula .axce-hit { background: rgba(241,250,140,.25); }
+.axce-t-dracula .axce-hit.on { background: rgba(255,184,108,.5); }
+.axce-t-dracula .axce-occ { background: rgba(255,255,255,.1); }
+.axce-t-dracula .axce-ac, .axce-t-dracula .axce-tip, .axce-t-dracula .axce-find, .axce-t-dracula .axce-sig { background: #21222c; color: #f8f8f2; border: 1px solid #44475a; }
+.axce-t-dracula .axce-aci.on { background: #44475a; } .axce-t-dracula .axce-stat { background: #191a21; color: #6272a4; }
+.axce-t-dracula i.c { color: #6272a4; } .axce-t-dracula i.s { color: #f1fa8c; } .axce-t-dracula i.k { color: #ff79c6; }
+.axce-t-dracula i.n { color: #bd93f9; } .axce-t-dracula i.f { color: #50fa7b; } .axce-t-dracula i.v { color: #8be9fd; font-style: italic; }
+.axce-t-dracula i.d { color: #ff79c6; } .axce-t-dracula i.t { color: #8be9fd; } .axce-t-dracula i.p { color: #ffb86c; }
+.axce-t-dracula i.a { color: #50fa7b; } .axce-t-dracula i.h { color: #bd93f9; } .axce-t-dracula i.l { color: #8be9fd; }
+
+/* high contrast */
+.axce-t-contrast, .axce-t-contrast .axce-gut { background: #000000; color: #ffffff; }
+.axce-t-contrast { border-color: #ffffff; } .axce-t-contrast .axce-gut { color: #ffffff; }
+.axce-t-contrast .axce-cur { outline: 1px solid #f38518; } .axce-t-contrast .axce-br { outline: 2px solid #f38518; }
+.axce-t-contrast .axce-hit { outline: 1px dashed #f38518; } .axce-t-contrast .axce-hit.on { outline: 2px solid #f38518; }
+.axce-t-contrast .axce-occ { background: rgba(255,255,255,.1); }
+.axce-t-contrast .axce-ac, .axce-t-contrast .axce-tip, .axce-t-contrast .axce-find, .axce-t-contrast .axce-sig { background: #000; color: #fff; border: 1px solid #6fc3df; }
+.axce-t-contrast .axce-aci.on { outline: 1px dashed #f38518; } .axce-t-contrast .axce-stat { background: #000; color: #fff; border-top: 1px solid #6fc3df; }
+.axce-t-contrast i.c { color: #7ca668; } .axce-t-contrast i.s { color: #ce9178; } .axce-t-contrast i.k { color: #569cd6; }
+.axce-t-contrast i.n { color: #b5cea8; } .axce-t-contrast i.f { color: #dcdcaa; } .axce-t-contrast i.v { color: #9cdcfe; }
+.axce-t-contrast i.d { color: #569cd6; } .axce-t-contrast i.t { color: #4ec9b0; } .axce-t-contrast i.p { color: #d4d4d4; }

@@ -1,0 +1,53 @@
+{
+  "name": "Breadcrumb",
+  "description": "A breadcrumb trail: where you are and the way back, folding its middle into a popover when long.",
+  "order": 2020,
+  "css": "AxBreadcrumb.css",
+  "include": "lib\\components\\Breadcrumb\\AxBreadcrumb.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Breadcrumb",
+      "label": "Breadcrumb",
+      "icon": "E8B7",
+      "category": "Common",
+      "prefix": "bc",
+      "arg": {
+        "key": "items",
+        "label": "Steps (value:Label:Glyph per line)",
+        "kind": "options",
+        "default": "home:Home\ndocs:Documents\nwork:Work"
+      },
+      "props": [
+        {
+          "key": "max",
+          "label": "Steps before folding",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "home",
+          "label": "First step as a house",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "notrim",
+          "label": "Keep the steps after a click",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "sep",
+          "label": "Separator glyph",
+          "kind": "icon",
+          "emit": "kv"
+        }
+      ],
+      "events": [
+        "Change",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

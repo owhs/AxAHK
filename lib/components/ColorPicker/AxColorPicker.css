@@ -1,0 +1,125 @@
+/* =============================================================================
+   rich.css — styles for the rich components in lib/rich.
+   Injected on demand by AxRich.UseCss(win) (SetExtraCss "axrich"), so a window
+   that never uses one carries none of it. Theme-aware the same way the main
+   sheets are: dark by default, body.theme-light overrides.
+   IE11 limits honoured: no CSS variables, no grid, no gap.
+   ============================================================================= */
+
+/* ------------------------------------------------------------ colour picker */
+/* a block, never auto-margined: as a flex item on an .ax-line, margin:auto
+   would centre the whole component and leave it offset from its container */
+.axcp { position: relative; display: block; min-width: 0; -ms-user-select: none; user-select: none; }
+
+/* the two preview panels. The wheel's disc is painted over their lower half,
+   which is what carves the concave bite out of the inner corners. */
+.axcp-top { display: flex; position: relative; z-index: 1; }
+.axcp-sw {
+    position: relative; flex: 1 1 0px; min-width: 0; padding: 14px 16px;
+    border-radius: 10px; overflow: hidden;
+}
+.axcp-sw.axcp-cur { margin-right: 10px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.08); }
+body.theme-light .axcp-sw.axcp-cur { background: #f1f1f1; border-color: rgba(0,0,0,.08); }
+/* the pipette sits opposite the text, and the text reserves its corner */
+.axcp-sw.axcp-new { text-align: right; padding-left: 48px; }
+.axcp-solo .axcp-sw.axcp-new { text-align: left; padding-left: 16px; padding-right: 48px; }
+.axcp-solo .axcp-sw.axcp-new .axcp-eye { left: auto; right: 12px; }
+.axcp-cap { font-size: 17px; line-height: 22px; font-weight: 600; }
+.axcp-hexlbl { font-size: 15px; line-height: 22px; opacity: .95; }
+.axcp-sw.axcp-cur.pickable:hover { border-color: rgba(255,255,255,.35); }
+body.theme-light .axcp-sw.axcp-cur.pickable:hover { border-color: rgba(0,0,0,.3); }
+.axcp-eye {
+    position: absolute; top: 12px; left: 14px; width: 26px; height: 26px; line-height: 26px;
+    text-align: center; font-size: 16px; border-radius: 6px;
+}
+.axcp-sw.axcp-cur .axcp-eye { left: auto; right: 12px; }
+.axcp-eye:hover { background: rgba(255,255,255,.22); }
+.axcp-onlight { color: #101010; }
+.axcp-ondark  { color: #ffffff; }
+
+/* ------------------------------------------------------------------- wheel */
+.axcp-wheel { position: relative; margin-left: auto; margin-right: auto; z-index: 2; }
+.axcp-disc { position: absolute; border-radius: 50%; background: #202020; }
+body.theme-light .axcp-disc { background: #f3f3f3; }
+.axcp-ring { position: absolute; left: 0; top: 0; }
+
+.axcp-knob {
+    position: absolute; border-radius: 50%; border: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.45), 0 2px 5px rgba(0,0,0,.45);
+    margin-left: -9px; margin-top: -9px; width: 18px; height: 18px;
+}
+.axcp-sq { position: absolute; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.45); overflow: visible; }
+.axcp-sq:after {                       /* a hairline so a white corner still reads as an edge */
+    content: ""; position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    border-radius: 8px; border: 1px solid rgba(0,0,0,.35);
+}
+.axcp-track { position: absolute; border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.35); }
+
+/* ------------------------------------------------------------------ fields */
+.axcp-fields { display: flex; margin: 22px -6px 0 -6px; }
+.axcp-f { flex: 1 1 0px; min-width: 0; padding: 0 6px; }
+.axcp-f.wide { flex: 1.6 1 0px; }
+.axcp-flbl { font-size: 15px; line-height: 22px; margin-bottom: 6px; }
+.axcp-fbox {
+    border-radius: 7px; padding: 0 2px;
+    background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.11);
+}
+body.theme-light .axcp-fbox { background: #ffffff; border-color: rgba(0,0,0,.13); }
+.axcp-fbox input {
+    width: 100%; height: 36px; padding: 0 10px; font-family: inherit; font-size: 14px;
+    background: transparent; border: 0; outline: none; color: inherit;
+}
+.axcp-fbox.bad { border-color: #c42b1c; }
+
+/* ----------------------------------------------------------------- swatches */
+.axcp-swgroup { margin-top: 14px; }
+.axcp-swgroup.empty { display: none; }
+.axcp-swlbl { display: block; font-size: 12px; line-height: 16px; margin-bottom: 4px; color: rgba(255,255,255,.6); }
+body.theme-light .axcp-swlbl { color: rgba(0,0,0,.5); }
+.axcp-swrow { display: flex; flex-wrap: wrap; margin: 0 -3px; }
+.axcp-chipc {
+    width: 26px; height: 26px; margin: 3px; border-radius: 6px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.4);
+}
+.axcp-chipc:hover { box-shadow: inset 0 0 0 1px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.5); }
+body.theme-light .axcp-chipc:hover { box-shadow: inset 0 0 0 1px rgba(0,0,0,.4), 0 0 0 2px rgba(0,0,0,.35); }
+
+
+/* ------------------------------------------------- colour button / swatch */
+/* The one-line front end for the picker: a live preview that opens the dialog
+   on click and writes the chosen colour straight back into itself. */
+.axcbtn {
+    display: inline-block; height: 34px; padding: 3px; border-radius: 7px; vertical-align: top;
+    background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.11);
+}
+body.theme-light .axcbtn { background: #fbfbfb; border-color: rgba(0,0,0,.13); }
+.axcbtn:hover { border-color: rgba(255,255,255,.35); }
+body.theme-light .axcbtn:hover { border-color: rgba(0,0,0,.3); }
+.axcbtn:active, .axcbtn.pressed { opacity: .85; }
+.axcbtn .axcbtn-chip {
+    display: inline-block; width: 26px; height: 26px; border-radius: 5px; vertical-align: top;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.45);
+}
+.axcbtn .axcbtn-hex {
+    display: inline-block; height: 26px; line-height: 26px; padding: 0 10px 0 9px;
+    font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; vertical-align: top;
+}
+.axcbtn.nohex .axcbtn-hex { display: none; }
+.axcbtn.wide { display: block; }
+.axcbtn.wide .axcbtn-chip { width: auto; display: block; margin-right: 0; }
+
+
+/* ------------------------------------------- the retro stylesheets ------- */
+body.sheet-win98 .axcp-sw, body.sheet-winxp .axcp-sw,
+body.sheet-win98 .axcp-fbox, body.sheet-winxp .axcp-fbox { border-radius: 3px; }
+body.sheet-win98 .axcp-sw.axcp-cur { background: #c0c0c0; border: 1px solid; border-color: #808080 #fff #fff #808080; }
+body.sheet-winxp .axcp-sw.axcp-cur { background: #fff; border: 1px solid #a1b6dc; }
+body.sheet-win98 .axcp-fbox { background: #fff; border: 1px solid; border-color: #808080 #fff #fff #808080; border-radius: 0; }
+body.sheet-winxp .axcp-fbox { background: #fff; border: 1px solid #7f9db9; border-radius: 0; }
+body.sheet-win98 .axcp-fbox input, body.sheet-winxp .axcp-fbox input { color: #000; height: 22px; }
+body.sheet-win98 .axcp-swlbl, body.sheet-winxp .axcp-swlbl { color: #444; }
+body.sheet-win98.theme-dark .axcp-sw.axcp-cur { background: #4a4a4a; border-color: #101010 #6e6e6e #6e6e6e #101010; }
+body.sheet-winxp.theme-dark .axcp-sw.axcp-cur { background: #444; border-color: #6a6a6a; }
+body.sheet-win98.theme-dark .axcp-fbox, body.sheet-winxp.theme-dark .axcp-fbox { background: #232323; }
+body.sheet-win98.theme-dark .axcp-fbox input, body.sheet-winxp.theme-dark .axcp-fbox input { color: #e8e8e8; }
+body.sheet-win98.theme-dark .axcp-swlbl, body.sheet-winxp.theme-dark .axcp-swlbl { color: #b4b4b4; }

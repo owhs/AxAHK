@@ -1,0 +1,67 @@
+/* AxRangeSlider.css -- two thumbs on one track. IE11-safe. */
+.axrs { display: inline-block; vertical-align: middle; width: 280px; max-width: 100%; padding: 0 10px; box-sizing: border-box; }
+.axrs.fill { display: block; width: auto; }
+.axrs.labels { padding-top: 22px; }
+.axrs-t { position: relative; height: 24px; cursor: default; }
+.axrs-rail { position: absolute; left: 0; right: 0; top: 10px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.5442); }
+.axrs-fill { position: absolute; top: 10px; height: 4px; border-radius: 2px; background: #60cdff; }
+.axrs-th {
+    position: absolute; top: 2px; width: 20px; height: 20px; margin-left: -10px; box-sizing: border-box; border-radius: 50%;
+    background: #60cdff; border: 5px solid #454545; box-shadow: 0 0 0 1px rgba(0,0,0,.3); outline: none;
+}
+.axrs-th:hover { border-width: 4px; }
+.axrs-th:focus { box-shadow: 0 0 0 2px rgba(255,255,255,.8); }
+.axrs-lbl {
+    position: absolute; bottom: 24px; left: 50%; margin-left: -40px; width: 80px; text-align: center;
+    font-size: 12px; line-height: 16px; font-weight: 600; white-space: nowrap; color: #ffffff;
+}
+.axrs-ends { position: relative; height: 16px; margin-top: 2px; font-size: 11.5px; line-height: 16px; color: rgba(255,255,255,.5); }
+.axrs-ends .axrs-hi { position: absolute; right: 0; top: 0; }
+body.theme-light .axrs-rail { background: rgba(0,0,0,.4458); }
+body.theme-light .axrs-fill { background: #005fb8; }
+body.theme-light .axrs-th { background: #005fb8; border-color: #ffffff; box-shadow: 0 0 0 1px rgba(0,0,0,.18); }
+body.theme-light .axrs-th:focus { box-shadow: 0 0 0 2px rgba(0,0,0,.7); }
+body.theme-light .axrs-lbl { color: #1b1b1b; }
+body.theme-light .axrs-ends { color: rgba(0,0,0,.5); }
+
+/* -------------------------------------------------- as each sheet's slider
+   Every stylesheet shapes the browser's own slider (::-ms-thumb, ::-ms-track);
+   these two thumbs are divs, so they are shaped to match here, sheet by sheet.
+   The track is 24px tall: a thumb h pixels high sits at top (24 - h) / 2. */
+body.sheet-cozy .axrs-rail, body.sheet-cozy .axrs-fill { top: 8px; height: 8px; border-radius: 4px; }
+body.sheet-cozy .axrs-th { top: 0; width: 24px; height: 24px; margin-left: -12px; background: #ffffff;
+    border: 3px solid #ff8a5c; box-shadow: 0 2px 4px rgba(0,0,0,.25); }
+body.sheet-cozy .axrs-th:hover { border-width: 3px; }
+
+body.sheet-rpg .axrs-fill { background: #b8912f; }
+body.sheet-rpg .axrs-th { top: 1px; width: 14px; height: 22px; margin-left: -7px; border-radius: 3px;
+    background: #ddcda4; border: 1px solid #8a7146; box-shadow: none; }
+body.sheet-rpg.theme-dark .axrs-th { background: #5c4728; border-color: #12100c; }
+body.sheet-rpg .axrs-th:hover { border-width: 1px; }
+
+body.sheet-win98 .axrs-rail { height: 4px; box-sizing: border-box; border-radius: 0; background: #808080;
+    border: 1px solid; border-color: #808080 #fff #fff #808080; }
+body.sheet-win98 .axrs-fill { border-radius: 0; }
+body.sheet-win98 .axrs-th { top: 2px; width: 11px; height: 19px; margin-left: -5px; border-radius: 0; background: #c0c0c0;
+    border: 1px solid; border-color: #fff #000 #000 #fff; box-shadow: inset -1px -1px #808080; }
+body.sheet-win98 .axrs-th:hover { border-width: 1px; }
+body.sheet-win98 .axrs-lbl, body.sheet-win98 .axrs-ends { font-size: 11px; }
+
+body.sheet-winxp .axrs-rail { box-sizing: border-box; background: #e0dfda; border: 1px solid #9d9da1; }
+body.sheet-winxp .axrs-th { top: 2px; width: 11px; height: 19px; margin-left: -5px; border-radius: 2px;
+    background: #ffffff; background-image: linear-gradient(90deg, #ffffff, #ecebe5); border: 1px solid #003c74; box-shadow: none; }
+body.sheet-winxp .axrs-th:hover { border-width: 1px; }
+
+body.sheet-cyber .axrs-rail, body.sheet-cyber .axrs-fill,
+body.sheet-precision .axrs-rail, body.sheet-precision .axrs-fill { top: 11px; height: 2px; border-radius: 0; }
+body.sheet-cyber .axrs-th, body.sheet-precision .axrs-th { top: 3px; width: 8px; height: 18px; margin-left: -4px;
+    border-radius: 0; border: none; box-shadow: none; }
+
+body.sheet-brutalist .axrs-rail, body.sheet-brutalist .axrs-fill { top: 9px; height: 6px; border-radius: 0; }
+body.sheet-brutalist .axrs-th { top: 1px; width: 10px; height: 22px; margin-left: -5px; border-radius: 0; border: 0; box-shadow: none; }
+
+body.sheet-inset .axrs-th { top: 4px; width: 16px; height: 16px; margin-left: -8px; border-width: 3px; }
+body.sheet-inset .axrs-th:hover { border-width: 3px; }
+
+body.sheet-win365 .axrs-th { border-color: #ffffff; box-shadow: 0 0 0 1px rgba(0,0,0,.14); }
+body.sheet-win365.theme-dark .axrs-th { border-color: #1b1a19; }

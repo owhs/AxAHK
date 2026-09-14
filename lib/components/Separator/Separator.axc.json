@@ -1,0 +1,25 @@
+{
+  "name": "Separator",
+  "description": "Separator",
+  "order": 2003,
+  "include": "lib\\components\\Separator\\AxSeparator.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Separator",
+      "label": "Separator",
+      "icon": "E738",
+      "category": "Common",
+      "prefix": "sep",
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

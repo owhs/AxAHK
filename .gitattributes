@@ -1,0 +1,7 @@
+# Line endings are left exactly as they are on disk.
+#
+# Git is configured to convert here (core.autocrlf), and it must not: an
+# AutoHotkey continuation section and a CSS data: URI both care about the exact
+# bytes, and this tree is a deliberate mix -- most files are LF, some are CRLF,
+# and the tooling that edits them keeps each file the way it found it.
+* -text

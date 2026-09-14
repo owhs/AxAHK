@@ -1,0 +1,22 @@
+/* AxAvatar.css -- a person's picture or initials, a status dot, a name. IE11-safe. */
+.axav { display: inline-block; vertical-align: middle; }
+.axav-r { display: inline-flex; align-items: center; }
+.axav-c {
+    position: relative; display: inline-block; flex: none; border-radius: 50%; text-align: center;
+    color: #ffffff; font-weight: 600; letter-spacing: .02em; overflow: visible; cursor: default;
+}
+.axav-c.square { border-radius: 22%; }
+.axav-c img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: inherit; }
+.axav-st { position: absolute; right: -1px; bottom: -1px; border-radius: 50%; border: 2px solid #202020; background: #8a8a8a; }
+.axav-st.online { background: #6ccb5f; }
+.axav-st.away { background: #fce100; }
+.axav-st.busy { background: #ff6b6b; }
+.axav-st.offline { background: #8a8a8a; }
+.axav-n { display: inline-block; margin-left: 10px; min-width: 0; }
+.axav-n b { display: block; font-size: 14px; line-height: 20px; font-weight: 600; white-space: nowrap; }
+.axav-n small { display: block; font-size: 12px; line-height: 16px; color: rgba(255,255,255,.6); white-space: nowrap; }
+body.theme-light .axav-st { border-color: #f3f3f3; }
+body.theme-light .axav-st.online { background: #13a10e; }
+body.theme-light .axav-st.away { background: #eaa300; }
+body.theme-light .axav-st.busy { background: #c42b1c; }
+body.theme-light .axav-n small { color: rgba(0,0,0,.55); }

@@ -1,0 +1,43 @@
+{
+  "name": "Gauge",
+  "description": "A dial that shows one number. The worked example for a component pack.",
+  "order": 7400,
+  "css": "AxGauge.css",
+  "include": "lib\\components\\Gauge\\AxGauge.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Gauge",
+      "label": "Gauge",
+      "icon": "E9D9",
+      "category": "Rich",
+      "prefix": "gauge",
+      "arg": {
+        "key": "value",
+        "label": "Value",
+        "kind": "num",
+        "default": "50"
+      },
+      "props": [
+        {
+          "key": "max",
+          "label": "Maximum",
+          "kind": "num",
+          "emit": "kv",
+          "default": "100"
+        },
+        {
+          "key": "ticks",
+          "label": "Show ticks",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

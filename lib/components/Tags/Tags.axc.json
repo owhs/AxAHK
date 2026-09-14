@@ -1,0 +1,73 @@
+{
+  "name": "Tags",
+  "description": "Tags typed into a box, each a chip; suggestions as you type.",
+  "order": 3011,
+  "css": "AxTagBox.css",
+  "include": "lib\\components\\Tags\\AxTagBox.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Tags",
+      "label": "Tags",
+      "icon": "E8EC",
+      "category": "Input",
+      "prefix": "tags",
+      "arg": {
+        "key": "value",
+        "label": "Tags (with | between)",
+        "kind": "text",
+        "default": "design|urgent"
+      },
+      "props": [
+        {
+          "key": "suggest",
+          "label": "Suggestions (with | between)",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "placeholder",
+          "label": "Placeholder",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "max",
+          "label": "At most",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "strict",
+          "label": "Only the suggestions",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "split",
+          "label": "Split at (comma space ; or the characters)",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "pastesplit",
+          "label": "Cut pasted text at",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "clear",
+          "label": "Clear-all button",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Focus",
+        "Blur",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

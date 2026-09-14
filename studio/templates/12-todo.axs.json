@@ -1,0 +1,249 @@
+{
+ "format": "axstudio/2",
+ "name": "To-do list",
+ "desc": "Tasks with a due date and a priority in a ticked list that fills the window. Adding, removing, ticking, saving and loading are all rules; the count and the bar are bindings.",
+ "uid": 10,
+ "cur": 1,
+ "vars": "newText = \"\"\ntotal = 0\ndoneCount = 0\npct <- total ? Round(100 * doneCount / total) : 0\nsummary <- total ? doneCount \" of \" total \" done\" : \"Nothing to do. Nice.\"\nhasText <- Trim(newText) != \"\"",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "To-do",
+   "width": 680,
+   "height": 620,
+   "minwidth": 480,
+   "minheight": 400,
+   "theme": "light",
+   "stylesheet": "cozy",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E73E",
+   "menus": "",
+   "status": "msg | Enter adds a task; tick them off as you go | grow icon=E73E\ncount | | w=100 right",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "addBtn",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "addBtn Click -> addrow tasks {newTask} | {due} | {prio}\naddBtn Click -> assign newText \"\"\naddBtn Click -> saverows tasks tasks.txt\naddBtn Click -> call Recount\ndelBtn Click -> removerow tasks\ndelBtn Click -> saverows tasks tasks.txt\ndelBtn Click -> call Recount\nallBtn Click -> tickall tasks\nallBtn Click -> saverows tasks tasks.txt\nallBtn Click -> call Recount\ntasks ItemCheck -> saverows tasks tasks.txt\ntasks ItemCheck -> call Recount",
+   "states": "",
+   "binds": "newTask <-> newText\naddBtn.Enabled <- hasText\nprogBar.Value <- pct\nsumLbl.Text <- summary",
+   "hotkeys": "",
+   "init": "if FileExist(A_ScriptDir \"\\tasks.txt\")\n    tasks.LoadFrom(A_ScriptDir \"\\tasks.txt\")\ntasks.ModifyCol(1, 320)\nRecount()",
+   "script": "; How many there are and how many are ticked: the bar and the words\n; under the list are bound to these two.\nRecount() {\n    global g, tasks, total, doneCount\n    total := tasks.GetCount(), doneCount := 0, r := 0\n    while (r := tasks.GetNext(r, \"C\"))\n        doneCount++\n    AxBindSync()\n    g.Status(\"count\", total \" task\" (total = 1 ? \"\" : \"s\"))\n}\nClearDone() {\n    global tasks\n    r := tasks.GetCount()\n    while (r > 0) {\n        if (tasks.GetNext(r - 1, \"C\") = r)\n            tasks.Delete(r)\n        r--\n    }\n    tasks.SaveTo(A_ScriptDir \"\\tasks.txt\")\n    Recount()\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "Edit",
+      "name": "newTask",
+      "arg": "",
+      "layout": {
+       "fill": 1
+      },
+      "props": {
+       "placeholder": "What needs doing?"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Date",
+      "name": "due",
+      "arg": "today",
+      "layout": {
+       "place": "same",
+       "w": 170
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "DDL",
+      "name": "prio",
+      "arg": "High\nNormal\nLow",
+      "layout": {
+       "place": "same",
+       "w": 110
+      },
+      "props": {
+       "value": "Normal"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Button",
+      "name": "addBtn",
+      "arg": "Add",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "kind": "Accent",
+       "icon": "E710"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "ListView",
+      "name": "tasks",
+      "arg": "Task | Due | Priority\nWrite the README | 2026-09-20 | High\nBuy milk | 2026-09-14 | Normal\nWater the plants | 2026-09-15 | Low",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 180
+      },
+      "props": {
+       "checked": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "Progress",
+      "name": "progBar",
+      "arg": "0",
+      "layout": {
+       "fill": 1
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Text",
+      "name": "sumLbl",
+      "arg": "0 of 3 done",
+      "layout": {
+       "place": "same",
+       "w": 150
+      },
+      "props": {
+       "hint": 1,
+       "align": "Right"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n8",
+      "type": "Button",
+      "name": "allBtn",
+      "arg": "Tick them all",
+      "layout": {},
+      "props": {
+       "kind": "Subtle",
+       "icon": "E73A"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n9",
+      "type": "Button",
+      "name": "doneBtn",
+      "arg": "Clear the ticked ones",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "kind": "Subtle",
+       "icon": "E894"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "ClearDone()"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n10",
+      "type": "Button",
+      "name": "delBtn",
+      "arg": "Remove the picked one",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "kind": "Danger",
+       "icon": "E74D"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

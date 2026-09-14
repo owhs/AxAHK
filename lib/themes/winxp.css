@@ -1,0 +1,568 @@
+/* =============================================================================
+   winxp.css — Windows XP "Luna" look for AxWindow pages (IE11 / Trident)
+   Same class contract as win11.css: swap the sheet, keep the markup.
+   ============================================================================= */
+* { box-sizing: border-box; cursor: default; }
+input[type=text], input[type=password], textarea, [data-selectable], [data-selectable] * { cursor: text; }
+html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+    font-family: Tahoma, "MS Sans Serif", sans-serif; font-size: 11px; line-height: 14px;
+    color: #000; background: #ece9d8;
+}
+.ico { font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-style: normal; }
+#titlebar, .winbtn, .nav-item, .btn, .switch, .check, .radio, .tab, .dd-value, .dd-item, .list-item, .swatch, .spin, .exp-header, .chip { -ms-user-select: none; user-select: none; }
+
+/* ---------------------------------------------------------------- caption */
+body { padding: 0 3px 3px; }
+body:before { content: ""; position: fixed; left: 0; top: 0; right: 0; bottom: 0; border: 3px solid #0831d9; border-top: none; pointer-events: none; z-index: 20000; }
+/* Luna's caption is eight stops, not a fade: a bright rim along the very top,
+   a long almost-flat body, then a HARD dark band in the last four percent.
+   That band is most of what makes it read as XP rather than as "a blue
+   gradient" -- soften it and the whole window stops looking like 2001.
+   The 1px light line under the top rim is the second half of the trick.
+   Every colour here is a blue in AxSys's band, so SetAccent repaints the
+   caption, the buttons and the frame together and the chrome stays in period
+   whatever colour is chosen. */
+#titlebar {
+    height: 30px; display: flex; align-items: center; padding: 0 3px 0 5px; margin: 0 -3px 3px;
+    background: #0053ee;
+    background-image: linear-gradient(#0997ff 0%, #0060fa 3%, #0053ee 8%, #0050ee 40%,
+        #0066ff 88%, #0066ff 93%, #005bff 95%, #003dd7 96%, #003dd7 100%);
+    border-radius: 7px 7px 0 0; color: #fff;
+    font: bold 13px "Trebuchet MS", Tahoma, sans-serif; text-shadow: 1px 1px 2px #0f1089;
+}
+body.inactive #titlebar {
+    background-image: linear-gradient(#94b8f7 0%, #7ea4ee 3%, #7099eb 8%, #6d95e9 40%,
+        #7fa5f0 88%, #7fa5f0 93%, #6f95e6 95%, #4f74c8 96%, #4f74c8 100%);
+    color: #dbe6f9; text-shadow: 1px 1px 2px #40598f;
+}
+body.inactive:before { border-color: #6f8ee6; }
+/* the icon is a 16px slot with the caption text hard against it, the way the
+   real one is -- not a glyph floating in the middle of the bar */
+#titlebar .app-icon {
+    width: 16px; height: 16px; line-height: 16px; flex: none; text-align: center;
+    font-size: 14px; margin: 0 4px 0 0; color: #fff; text-shadow: none;
+}
+#titlebar .app-icon img { width: 16px; height: 16px; }
+#titleText { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* The caption buttons are lighter than the bar they sit on, glassy across the
+   top half and cut off sharply at the middle -- a Luna button is two gradients
+   meeting at a hard line, not one smooth ramp. The ring is a single
+   1px border and nothing else: a second, lighter ring just inside it stacks
+   into what reads as a 2px white outline. */
+.winbtn {
+    position: relative; width: 21px; height: 21px; margin-left: 1px; font-size: 0;
+    color: transparent; border-radius: 3px; text-align: center; line-height: 19px;
+    border: 1px solid #ffffff;
+    background: #2f6fea;
+    background-image: linear-gradient(#7cb2fc 0%, #4c8df6 47%, #1f5fdd 53%, #1a4fc0 100%);
+}
+.winbtn span { display: none; }
+.winbtn:before { font-family: Marlett; font-size: 10px; color: #fff; text-shadow: none; }
+#btnMin:before { content: "0"; }
+#btnMax:before { content: "1"; }
+body.maximized #btnMax:before { content: "2"; }
+#btnClose:before { content: "r"; }
+/* red, and set a little apart from the other two, as it is on the real thing */
+#btnClose {
+    margin-left: 3px; background: #e0523a;
+    background-image: linear-gradient(#f7a98f 0%, #e8603e 47%, #d33f1d 53%, #b32f10 100%);
+}
+/* hover lightens the plastic (XP does not draw a halo round it) */
+.winbtn:hover, .winbtn.hover {
+    background-image: linear-gradient(#a5cdfe 0%, #74aaf9 47%, #3f7bea 53%, #2f66cf 100%);
+}
+#btnClose:hover, #btnClose.hover {
+    background-image: linear-gradient(#ffc9b4 0%, #f1815f 47%, #e05730 53%, #c2401c 100%);
+}
+/* and pressing it pushes the light to the bottom */
+.winbtn:active, .winbtn.pressed {
+    background-image: linear-gradient(#1a4fc0 0%, #1f5fdd 47%, #4c8df6 53%, #7cb2fc 100%);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.30);
+}
+#btnClose:active, #btnClose.pressed {
+    background-image: linear-gradient(#b32f10 0%, #d33f1d 47%, #e8603e 53%, #f7a98f 100%);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.30);
+}
+body.inactive .winbtn {
+    background-image: linear-gradient(#b9d2f8 0%, #93b3ef 47%, #7396dd 53%, #6486c8 100%);
+}
+body.inactive #btnClose {
+    background-image: linear-gradient(#f3c3b3 0%, #dfa08c 47%, #cc8571 53%, #b86f5c 100%);
+}
+body.maximized #titlebar { border-radius: 0; }
+
+/* resize hotspots */
+.rz { position: fixed; z-index: 9999; }
+.rz-n, .rz-s { left: 6px; right: 6px; height: 4px; cursor: ns-resize; }
+.rz-n { top: 0; } .rz-s { bottom: 0; }
+.rz-w, .rz-e { top: 6px; bottom: 6px; width: 4px; cursor: ew-resize; }
+.rz-w { left: 0; } .rz-e { right: 0; }
+.rz-nw, .rz-ne, .rz-sw, .rz-se { width: 8px; height: 8px; }
+.rz-nw { top: 0; left: 0; cursor: nwse-resize; } .rz-se { bottom: 0; right: 0; cursor: nwse-resize; }
+.rz-ne { top: 0; right: 0; cursor: nesw-resize; } .rz-sw { bottom: 0; left: 0; cursor: nesw-resize; }
+body.maximized .rz { display: none; }
+
+/* ------------------------------------------------------------------ layout */
+#shell { display: flex; height: calc(100% - 36px); }
+#sidebar { width: 170px; flex: none; margin-right: 8px; padding: 6px; border-radius: 3px; background: #6089d8; background-image: linear-gradient(#6089d8, #4a5cbe); color: #fff; overflow: hidden; }
+.nav-item { display: flex; align-items: center; height: 22px; padding: 0 6px; margin-bottom: 2px; border-radius: 3px; color: #fff; white-space: nowrap; overflow: hidden; }
+.nav-item .ico { width: 18px; flex: none; font-size: 13px; margin-right: 6px; }
+.nav-item:hover { text-decoration: underline; color: #fff; }
+.nav-item.active { background: #fff; color: #215dc6; }
+#content { flex: 1; min-width: 0; padding: 4px 6px 6px 2px; overflow-y: auto; overflow-x: hidden; }
+h1 { font-size: 18px; line-height: 22px; font-weight: bold; color: #0046d5; margin: 2px 0 10px; font-family: "Trebuchet MS", Tahoma, sans-serif; }
+h2 { font-size: 13px; font-weight: bold; color: #0046d5; margin: 0 0 8px; }
+h3 { font-size: 11px; font-weight: bold; margin: 10px 0 4px; color: #0046d5; }
+.caption { color: #000; } .hint { color: #555; margin-top: 4px; }
+
+.card { background: #fff; border: 1px solid #a1b6dc; border-radius: 3px; padding: 8px 10px; margin-bottom: 8px; }
+.card-row {min-height: 26px;}
+.card-row .ico {width: 20px; font-size: 16px; margin-right: 8px; text-align: center; color: #215dc6;}
+.card-row .text { flex: 1 1 120px; min-width: 100px; overflow: hidden; }
+.card-row .title {font-weight: bold;}
+.card-row .desc { color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-row .ctl {min-width: 0; max-width: 70%; margin-left: 12px;}
+.card-row .ctl > * + * { margin-left: 6px; }
+.group { position: relative; border: 1px solid #d0d0bf; border-radius: 4px; padding: 12px 8px 8px; margin: 10px 0; }
+.group > .legend { position: absolute; top: -8px; left: 8px; padding: 0 3px; background: #ece9d8; color: #0046d5; }
+.row { display: flex; align-items: center; margin-bottom: 6px; } .row:last-child { margin-bottom: 0; }
+.row > .label { width: 130px; flex: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row > .fill { flex: 1; }
+.cols { display: flex; } .cols > * { flex: 1; } .cols > * + * { margin-left: 10px; }
+.spacer { flex: 1; }
+
+/* ---------------------------------------------------------------- buttons */
+.btn {
+    display: inline-block; height: 23px; line-height: 21px; padding: 0 12px; min-width: 75px; max-width: 100%;
+    font-family: inherit; font-size: inherit; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: top;
+    color: #000; border: 1px solid #003c74; border-radius: 3px;
+    background: #f4f3ee; background-image: linear-gradient(#fff, #ecebe5 85%, #d8d0c4); box-shadow: inset 1px 1px #fff, inset -1px -1px #dcd6c8;
+}
+.btn + .btn { margin-left: 6px; }
+.btn:hover { box-shadow: inset 0 0 0 1px #fff0cf, inset 0 0 0 2px #fbc26f, inset 0 0 0 3px #f8b45e; }
+.btn:active, .btn.pressed { background-image: linear-gradient(#e0dfda, #ecebe5); box-shadow: inset 1px 1px #c9c4b4; }
+.btn.accent, .axdlg-btn.primary { box-shadow: inset 0 0 0 1px #cee7ff, inset 0 0 0 2px #98b8f0, inset 0 0 0 3px #7daaea; }
+.btn.subtle { background: transparent; border-color: transparent; box-shadow: none; }
+.btn.subtle:hover { border-color: #003c74; background-image: linear-gradient(#fff, #ecebe5); }
+.btn.danger { color: #b00; font-weight: bold; }
+.btn.disabled { color: #a7a6aa; border-color: #c9c7ba; background-image: none; background: #f5f4ea; box-shadow: none; }
+.btn.icon { min-width: 23px; width: 23px; padding: 0; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 12px; }
+.btn.icon.text { font-family: inherit; font-size: 14px; }
+.btn .ico { font-size: 12px; line-height: 21px; vertical-align: top; }
+.link, .hyperlink { color: #0046d5; text-decoration: underline; }
+
+/* ------------------------------------------------------ switch / check / radio */
+.switch {height: 18px;}
+.switch input {left: 0; top: 0; width: 36px; height: 18px; margin: 0; opacity: 0;}
+.sw-track {width: 36px; height: 18px; border-radius: 9px; background: #fff; border: 1px solid #7f9db9;}
+.sw-track:before {content: ""; left: 1px; top: 1px; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(#fff, #d8d0c4); border: 1px solid #003c74;}
+.switch input:checked + .sw-track { background: linear-gradient(#5b9cf9, #2a62dd); border-color: #003c74; }
+.switch input:checked + .sw-track:before { left: 19px; }
+.sw-label { margin-left: 6px; }
+.check, .radio {min-height: 14px; margin-right: 12px;}
+.check input, .radio input {left: 0; top: 0; width: 13px; height: 13px; margin: 0; opacity: 0;}
+.check .box {width: 13px; height: 13px; background: linear-gradient(135deg, #dcdcd7, #fff); border: 1px solid #1c5180; border-radius: 2px; text-align: center; line-height: 11px; font-family: Marlett; font-size: 9px; color: transparent;}
+.check:hover .box { box-shadow: inset 0 0 0 1px #fbc26f; }
+.check input:checked + .box { color: #21a121; }
+.check input:checked + .box:before { content: "a"; }
+.radio .ring {width: 13px; height: 13px; border-radius: 50%; background: linear-gradient(135deg, #dcdcd7, #fff); border: 1px solid #1c5180;}
+.radio:hover .ring { box-shadow: inset 0 0 0 1px #fbc26f; }
+.radio input:checked + .ring:after {content: ""; left: 3px; top: 3px; width: 5px; height: 5px; border-radius: 50%; background: #21a121;}
+.check .lbl, .radio .lbl { margin-left: 5px; }
+
+/* ------------------------------------------------------------- text inputs */
+.textbox input, .textbox textarea, .searchbox input, .numberbox input, .passwordbox input, .hotkeybox input, #axDlgInput {
+    width: 100%; height: 21px; padding: 0 3px; font: inherit; color: #000; outline: none; background: #fff; border: 1px solid #7f9db9; border-radius: 0;
+}
+.textbox textarea { height: auto; padding: 2px 3px; resize: none; }
+.searchbox, .passwordbox, .numberbox, .hotkeybox { position: relative; }
+.searchbox input { padding-right: 20px; }
+.searchbox .ico { position: absolute; right: 4px; top: 4px; font-size: 11px; pointer-events: none; color: #215dc6; }
+.passwordbox input { padding-right: 58px; }
+.passwordbox .reveal {right: 2px; top: 2px; height: 17px; line-height: 15px; padding: 0 5px; border: 1px solid #003c74; border-radius: 2px; background: linear-gradient(#fff, #ecebe5); font-size: 10px;}
+.passwordbox .reveal .ico { display: none; }
+.numberbox {width: 90px;}
+.numberbox input { padding-right: 18px; }
+.numberbox .spin {right: 2px; width: 15px; height: 9px; background: linear-gradient(#c8d6f3, #6e91d9); border: 1px solid #4d6185; font-family: Marlett; font-size: 7px; line-height: 7px; text-align: center; color: #fff;}
+.numberbox .spin.up { top: 2px; border-radius: 2px 2px 0 0; } .numberbox .spin.down { top: 11px; border-radius: 0 0 2px 2px; }
+.numberbox .spin.up:before { content: "5"; } .numberbox .spin.down:before { content: "6"; }
+
+
+.slider input[type=range] {width: 100%; min-width: 0; height: 26px; margin: 0; padding: 0; background: transparent; border: none; outline: none;}
+input[type=range]::-ms-track { height: 4px; background: #e0dfda; border: 1px solid #9d9da1; border-radius: 2px; color: transparent; }
+input[type=range]::-ms-fill-lower, input[type=range]::-ms-fill-upper { background: transparent; }
+input[type=range]::-ms-thumb { width: 11px; height: 19px; border-radius: 2px; background: linear-gradient(90deg, #fff, #ecebe5); border: 1px solid #003c74; }
+input[type=range]::-ms-tooltip { display: none; }
+.slider .out {width: 40px; text-align: right; margin-left: 6px;}
+
+/* dropdown / list */
+.dropdown {min-width: 120px; max-width: 100%;}
+.dd-value {height: 21px; line-height: 19px; padding: 0 20px 0 3px; background: #fff; border: 1px solid #7f9db9;}
+.dd-value:after {content: "6"; font-family: Marlett; font-size: 9px; color: #fff; right: 2px; top: 2px; width: 16px; height: 17px; line-height: 15px; text-align: center; background: linear-gradient(#c8d6f3, #6e91d9); border: 1px solid #4d6185; border-radius: 2px;}
+.dd-menu { display: none; position: absolute; left: 0; right: 0; top: 21px; z-index: 5000; background: #fff; border: 1px solid #000; }
+.dropdown.open .dd-menu { display: block; }
+.autocomplete {min-width: 160px; max-width: 100%;}
+.autocomplete input { width: 100%; }
+.autocomplete.open .dd-menu { display: block; }
+.ac-menu {max-height: 200px;}
+.ac-menu .dd-item.hide { display: none; }
+.dd-item.hl { background: #316ac5; color: #fff; }
+.dd-item, .list-item { height: 16px; line-height: 16px; padding: 0 3px; white-space: nowrap; }
+.dd-item:hover, .list-item:hover, .dd-item.selected, .list-item.selected { background: #316ac5; color: #fff; }
+.list.checklist .list-item { padding-left: 20px; position: relative; }
+.list.checklist .list-item:before { content: ""; position: absolute; left: 3px; top: 1px; width: 13px; height: 13px; background: linear-gradient(135deg, #dcdcd7, #fff); border: 1px solid #1c5180; border-radius: 2px; font-family: Marlett; font-size: 9px; line-height: 11px; text-align: center; color: #21a121; }
+.list.checklist .list-item.selected { background: none; color: #000; }
+.list.checklist .list-item.selected:before { content: "a"; }
+.list-item.kb { outline: 1px dotted #000; outline-offset: -1px; }
+.btn:focus, .dropdown:focus, .list:focus, .tab:focus, .seg:focus, .chip:focus, .link:focus, .rating:focus, .swatch:focus { outline: 1px dotted #000; outline-offset: -3px; }
+.dropdown.disabled .dd-value { color: #a7a6aa; background: #f5f4ea; border-color: #c9c7ba; }
+.dropdown.disabled .dd-value:after { background: #e5e5dd; border-color: #c9c7ba; }
+.list {padding: 1px; max-height: 140px; background: #fff; border: 1px solid #7f9db9;}
+
+/* tabs */
+.tabs {align-items: flex-end; border-bottom: 1px solid #919b9c; margin-bottom: 0; position: relative; z-index: 1;}
+.tab { padding: 3px 10px; margin-right: 2px; background: linear-gradient(#fff, #f0f0ea 70%, #e5e5dd); border: 1px solid #919b9c; border-bottom: none; border-radius: 3px 3px 0 0; }
+.tab .ico { margin-right: 4px; font-size: 11px; }
+.tab:hover { box-shadow: inset 0 2px #ffc73c; }
+.tab.active { padding-bottom: 5px; margin-bottom: -1px; background: #fcfcfe; box-shadow: inset 0 2px #e68b2c; position: relative; z-index: 2; }
+.tab-panel {padding: 10px; background: #fcfcfe; border: 1px solid #919b9c; border-top: none;}
+.tab-panel.visible { display: block; }
+
+/* expander */
+.expander { border: 1px solid #a1b6dc; border-radius: 3px; background: #fff; margin-bottom: 6px; overflow: hidden; }
+.exp-header {min-height: 25px; padding: 3px 8px; background: linear-gradient(90deg, #fff, #c6d3f7); color: #215dc6; font-weight: bold;}
+.exp-header .text { flex: 1; } .exp-header .desc { font-weight: normal; color: #555; }
+.exp-header .chev { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 1px solid #a1b6dc; font-family: Marlett; font-size: 8px; line-height: 16px; text-align: center; color: #215dc6; }
+.exp-header .chev:before { content: "6"; }
+.expander.open .exp-header .chev:before { content: "5"; }
+.exp-body {padding: 8px 10px 10px; background: #d6dff7;}
+
+
+/* progress */
+.progress {height: 16px; background: #fff; border: 1px solid #686868; border-radius: 3px; padding: 2px;}
+.progress .bar { height: 100%; width: 0; border-radius: 1px; background: repeating-linear-gradient(90deg, #2fd12f 0, #7dff7d 4px, #2fd12f 8px, #fff 8px, #fff 10px); }
+.progress.indeterminate .bar { position: absolute; width: 33%; animation: axslide 1.4s infinite; }
+@keyframes axslide { from { left: -33%; } to { left: 100%; } }
+.ring-spinner {width: 16px; height: 16px; border: 2px solid #c6d3f7; border-top-color: #215dc6; border-radius: 50%; animation: axspin .8s linear infinite;}
+@keyframes axspin { to { transform: rotate(360deg); } }
+
+/* infobar / badge / chip */
+.infobar {padding: 5px 8px; margin-bottom: 6px; background: #fff; border: 1px solid #a1b6dc; border-radius: 3px;}
+.infobar .ico { font-size: 14px; margin-right: 8px; color: #215dc6; }
+.infobar .text { flex: 1; } .infobar .text b { font-weight: bold; margin-right: 4px; }
+.infobar .close {
+    width: 16px; height: 16px; font-size: 0; border: 1px solid #a1b6dc; border-radius: 2px;
+    text-align: center; line-height: 14px; padding: 0;
+}
+.infobar .close:before {
+    content: "r"; font-family: Marlett; font-size: 9px; color: #215dc6;
+    display: inline-block; vertical-align: top; line-height: 14px;
+}
+.infobar.error { background: #ffe1e1; border-color: #d55; } .infobar.success { background: #e6ffe0; border-color: #3a3; } .infobar.warning { background: #fff7d6; border-color: #e6b400; }
+.badge {min-width: 16px; height: 15px; line-height: 13px; padding: 0 5px; border-radius: 8px; border: 1px solid #7f9db9; background: #fff; font-size: 10px; text-align: center;}
+.badge.accent { background: #316ac5; color: #fff; border-color: #003c74; } .badge.success { background: #3a3; color: #fff; } .badge.warning { background: #ffc73c; } .badge.error { background: #d33; color: #fff; }
+.chip {height: 20px; line-height: 18px; padding: 0 9px; margin: 0 4px 4px 0; border-radius: 10px; background: linear-gradient(#fff, #ecebe5); border: 1px solid #003c74;}
+.chip.on { background: linear-gradient(#5b9cf9, #2a62dd); color: #fff; }
+
+/* palette / rating / segmented / hotkey */
+.swatch {width: 18px; height: 18px; margin: 0 2px 2px 0; border: 1px solid #003c74; border-radius: 2px;}
+.swatch.big { width: 24px; height: 24px; }
+.swatch.selected { box-shadow: 0 0 0 2px #f8b45e; }
+.hex {height: 21px; line-height: 19px; padding: 0 4px; font-family: "Courier New", monospace; background: #fff; border: 1px solid #7f9db9;}
+.rating .star {font-size: 16px; margin-right: 2px; color: #b5b5b5; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets";}
+.rating .star:before { content: "\E734"; } .rating .star.on:before { content: "\E735"; } .rating .star.on { color: #ffc73c; }
+
+.segmented .seg { height: 23px; line-height: 21px; padding: 0 10px; margin-right: -1px; border: 1px solid #003c74; background: linear-gradient(#fff, #ecebe5 85%, #d8d0c4); }
+.segmented .seg:first-child { border-radius: 3px 0 0 3px; } .segmented .seg:last-child { border-radius: 0 3px 3px 0; }
+.segmented .seg:hover { box-shadow: inset 0 0 0 2px #fbc26f; }
+.segmented .seg.active { background: linear-gradient(#5b9cf9, #2a62dd); color: #fff; }
+.hotkeybox {width: 220px;}
+.hotkeybox input { padding-left: 22px; padding-right: 20px; }
+.hotkeybox .kb {left: 4px; top: 4px; font-size: 12px; color: #215dc6;}
+.hotkeybox .clear {right: 2px; top: 2px; width: 16px; height: 17px; font-size: 0; border: 1px solid #4d6185; border-radius: 2px; background: linear-gradient(#c8d6f3, #6e91d9);}
+.hotkeybox .clear:before { content: "r"; font-family: Marlett; font-size: 10px; color: #fff; line-height: 15px; }
+.hotkeybox.has-value .clear { display: block; }
+
+/* tiles / sortable */
+.tile-grid {margin: -3px;}
+.tile {width: 120px; height: 80px; margin: 3px; padding: 6px; background: #fff; border: 1px solid #a1b6dc; border-radius: 3px;}
+.tile:hover { box-shadow: 0 0 0 2px #fbc26f; }
+.tile .ico { font-size: 20px; display: block; margin-bottom: 4px; color: #215dc6; }
+.tile .name { font-weight: bold; } .tile .desc { color: #555; }
+.tile .remove {right: 3px; top: 3px; width: 14px; height: 14px; font-size: 0; border: 1px solid #a1b6dc; border-radius: 2px; opacity: 0;}
+.tile .remove:before { content: "r"; font-family: Marlett; font-size: 9px; color: #215dc6; line-height: 12px; }
+.tile:hover .remove { opacity: 1; }
+.sort-list .drag-item { display: flex; align-items: center; min-height: 22px; padding: 2px 4px; margin-bottom: 2px; background: #fff; border: 1px solid #a1b6dc; border-radius: 2px; }
+.sort-list .drag-handle { width: 16px; text-align: center; font-size: 11px; color: #7f9db9; }
+.sort-list .text { flex: 1; }
+.sort-list .remove { width: 16px; height: 14px; font-size: 0; border: 1px solid #a1b6dc; border-radius: 2px; }
+.sort-list .remove:before { content: "r"; font-family: Marlett; font-size: 9px; color: #215dc6; line-height: 12px; }
+[data-role=sortable] .drag-item, .drag-handle { cursor: move; }
+.drag-placeholder { opacity: .3; } .drag-ghost { opacity: .9; box-shadow: 0 0 0 2px #fbc26f; }
+body.dragging * { transition: none !important; }
+
+/* ------------------------------------------------------- library overlays */
+#axCtx, .axctx { background: #fff; border: 1px solid #aca899; border-radius: 0; padding: 2px; font-size: 11px; color: #000; min-width: 150px; box-shadow: 2px 2px 3px rgba(0,0,0,.3); }
+.axctx-item { height: 18px; line-height: 18px; padding: 0 20px; border-radius: 0; }
+.axctx-item:hover { background: #316ac5; color: #fff; }
+.axctx-item.disabled { color: #aca899; }
+.axctx-kbd { color: inherit; font-size: 11px; }
+.axctx-sep { height: 1px; background: #aca899; margin: 3px 2px; }
+#axDlgOverlay { background: transparent; }
+#axDlg { width: 380px; padding: 0; border-radius: 6px 6px 0 0; background: #ece9d8; border: 3px solid #0831d9; border-top: none; box-shadow: 2px 2px 6px rgba(0,0,0,.4); overflow: hidden; }
+#axDlg.kind-warning, #axDlg.kind-error, #axDlg.kind-question, #axDlg.kind-success, #axDlg.kind-info { border-top: none; }
+#axDlgTitle { height: 26px; line-height: 26px; margin: 0 -3px 12px; padding: 0 32px 0 8px; font: bold 12px "Trebuchet MS", Tahoma, sans-serif; color: #fff; text-shadow: 1px 1px #0f1089; background-image: linear-gradient(#0997ff 0%, #0053ee 8%, #0050ee 40%, #0066ff 88%, #003fdd 100%); }
+/* the close button is Luna's red one, in the caption bar */
+#axDlgClose { top: 3px; right: 3px; width: 21px; height: 21px; line-height: 21px; font-size: 10px; border-radius: 3px; opacity: 1;
+    color: #fff; border: 1px solid #fff; box-sizing: border-box; background: #e0523a;
+    background-image: linear-gradient(#f7a98f 0%, #e8603e 47%, #d33f1d 53%, #b32f10 100%); }
+#axDlgClose:before { content: "r"; font-family: Marlett; }
+#axDlgClose:hover { background-image: linear-gradient(#ffc9b4 0%, #f1815f 47%, #e05730 53%, #c2401c 100%); }
+#axDlgClose:active { background-image: linear-gradient(#b32f10 0%, #d33f1d 47%, #e8603e 53%, #f7a98f 100%); }
+#axDlgText { padding: 0 14px; font-size: 11px; line-height: 14px; color: #000; }
+/* width:auto on an <input> is its intrinsic size, not the box it is in */
+#axDlgInput { display: none; width: calc(100% - 28px); margin: 10px 14px 0; }
+#axDlgBtns { margin: 14px 0 0; padding: 0 10px 12px; background: transparent; border: none; justify-content: center; }
+.axdlg-btn { flex: none; min-width: 75px; height: 23px; line-height: 21px; padding: 0 10px; margin: 0 4px; font-size: 11px; border-radius: 3px; color: #000; border: 1px solid #003c74; background: linear-gradient(#fff, #ecebe5 85%, #d8d0c4); }
+.axdlg-btn:hover { box-shadow: inset 0 0 0 2px #fbc26f; background: linear-gradient(#fff, #ecebe5 85%, #d8d0c4); }
+.axdlg-btn:active, .axdlg-btn.pressed { background: #e0dfda; }
+.axdlg-btn.danger { color: #b00; }
+#axToast { font-size: 11px; padding: 6px 10px; border-radius: 3px; background: #ffffe1; color: #000; border: 1px solid #000; box-shadow: 2px 2px 3px rgba(0,0,0,.3); }
+#axToast.kind-success, #axToast.kind-warning, #axToast.kind-error, #axToast.kind-info { border-left: 1px solid #000; }
+#axTip { font-size: 11px; padding: 2px 4px; border-radius: 0; background: #ffffe1; color: #000; border: 1px solid #000; box-shadow: none; }
+
+.console {height: 200px; padding: 4px; font-family: "Lucida Console", "Courier New", monospace; font-size: 12px; line-height: 14px; background: #000; color: #c0c0c0; border: 1px solid #7f9db9;}
+
+.page { display: none; } .page.visible { display: block; }
+
+/* luna scrollbars */
+body { scrollbar-face-color: #c7d3f7; scrollbar-track-color: #f0f0ea; scrollbar-arrow-color: #4d6185; scrollbar-shadow-color: #7f9db9; scrollbar-highlight-color: #fff; scrollbar-3dlight-color: #fff; scrollbar-darkshadow-color: #7f9db9; }
+
+/* --------------------------------------------- pictures / drops / lists */
+.imgbox { position: relative; display: inline-block; vertical-align: top; overflow: hidden; min-width: 56px; min-height: 56px; text-align: center; background: #fff; border: 1px solid #a1b6dc; border-radius: 3px; }
+.imgbox .img { display: block; visibility: hidden; }
+.imgbox.loaded .img { visibility: visible; }
+.imgbox.fit-cover .img { width: 100%; height: auto; }
+.imgbox.fit-contain .img { max-width: 100%; max-height: 100%; margin: 0 auto; }
+.imgbox .img-overlay { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: table; width: 100%; }
+.imgbox.loaded .img-overlay { display: none; }
+.imgbox .img-inner { display: table-cell; vertical-align: middle; padding: 8px; }
+.imgbox .img-badge { display: block; font-size: 22px; margin-bottom: 4px; color: #7f9db9; }
+.imgbox .img-alt, .imgbox .img-fail { display: block; color: #555; }
+.imgbox .img-fail, .imgbox .ring-spinner { display: none; }
+.imgbox.loading .ring-spinner { display: inline-block; }
+.imgbox.loading .img-badge { display: none; }
+.imgbox.failed .img-alt { display: none; }
+.imgbox.failed .img-fail, .imgbox.failed .img-badge { display: block; color: #c00; }
+.imgbox .img-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 5px; background: rgba(0,0,0,.6); color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.imgbox.round { border-radius: 50%; }
+.imgbox.button:hover { box-shadow: 0 0 0 2px #fbc26f; }
+.imgbox.button:active, .imgbox.button.pressed { opacity: .85; }
+.ax-svg {line-height: 0; max-width: 100%;}
+.ax-svg svg {max-width: 100%;}
+
+.dropzone {padding: 18px 14px; min-height: 88px; text-align: center; border: 2px dashed #a1b6dc; border-radius: 4px; background: #fbfbf8;}
+.dropzone .dz-ico {font-size: 24px; margin-bottom: 6px; color: #215dc6;}
+.dropzone .dz-title { font-weight: bold; }
+.dropzone .dz-desc { color: #555; margin-top: 3px; }
+.dropzone.compact { padding: 8px 12px; min-height: 0; text-align: left; }
+.dropzone.compact .dz-ico { display: inline-block; font-size: 15px; margin: 0 8px 0 0; vertical-align: middle; }
+.dropzone.compact .dz-title, .dropzone.compact .dz-desc { display: inline-block; vertical-align: middle; margin: 0 0 0 8px; }
+body.ax-dragging .dropzone { border-color: #7f9db9; }
+.dropzone.dragover { border-style: solid; border-color: #215dc6; background: #eaf1fb; }
+.dropzone.reject { border-style: solid; border-color: #c00; background: #fbeaea; }
+.dropzone.reject .dz-ico { color: #c00; }
+
+.filelist {max-height: 260px; padding: 2px; background: #fff; border: 1px solid #7f9db9;}
+.fl-row { display: flex; align-items: center; height: 22px; padding: 0 5px; border-radius: 2px; }
+.fl-row:hover { background: #316ac5; color: #fff; }
+.fl-ico { width: 20px; flex: none; font-size: 14px; text-align: center; color: #215dc6; }
+.fl-row:hover .fl-ico { color: #fff; }
+.fl-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fl-meta { flex: none; margin-left: 12px; color: #555; }
+.fl-row:hover .fl-meta { color: #dfe8fb; }
+.fl-row .remove { width: 16px; height: 14px; margin-left: 6px; font-size: 0; border: 1px solid #a1b6dc; border-radius: 2px; opacity: 0; }
+.fl-row .remove:before { content: "r"; font-family: Marlett; font-size: 9px; color: #215dc6; line-height: 12px; }
+.fl-row:hover .remove { opacity: 1; }
+.fl-empty { padding: 12px; text-align: center; color: #7f9db9; }
+
+.thumbs {margin: -3px; max-height: 320px;}
+.thumbs .fl-empty { flex: 1; }
+.thumb { position: relative; display: inline-block; vertical-align: top; margin: 3px; overflow: hidden; background: #fff; border: 1px solid #a1b6dc; border-radius: 3px; }
+.thumb:hover { box-shadow: 0 0 0 2px #fbc26f; }
+.thumb .thumb-img { display: block; overflow: hidden; text-align: center; background: #ece9d8; }
+.thumb .thumb-img img { display: block; width: 100%; height: auto; }
+.thumb .thumb-cap { display: block; padding: 3px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.thumb .remove { position: absolute; right: 3px; top: 3px; width: 14px; height: 14px; font-size: 0; background: #fff; border: 1px solid #a1b6dc; border-radius: 2px; opacity: 0; }
+.thumb .remove:before { content: "r"; font-family: Marlett; font-size: 9px; color: #215dc6; line-height: 12px; }
+.thumb:hover .remove { opacity: 1; }
+
+
+/* =========================================================== window bars */
+/* Menu bar under the title bar and status bar along the bottom. Both keep
+   their box in the layout, so #shell simply loses their height. */
+.axmb { display: flex; align-items: center; -ms-user-select: none; user-select: none; }
+/* collapsed: out of the layout entirely, so the page takes the space back */
+.axmb.collapsed { height: 0; min-height: 0; padding: 0; margin: 0;
+    border: 0; overflow: hidden; }
+.axmb-item { position: relative; white-space: nowrap; }
+.axmb-item.disabled { opacity: .45; }
+.axmb-key { text-decoration: none; }
+body.axmb-keys .axmb-key { text-decoration: underline; }
+.axsb { display: flex; align-items: center; white-space: nowrap; }
+.axsb-part { overflow: hidden; text-overflow: ellipsis; }
+.axsb-part.grow { flex: 1 1 auto; min-width: 0; }
+.axsb-part.right { margin-left: auto; }
+.axsb-part .ico { margin-right: 6px; vertical-align: -1px; }
+.axsb-bar { display: inline-block; width: 110px; height: 6px; vertical-align: middle; overflow: hidden; }
+.axsb-bar > i { display: block; height: 100%; width: 0; }
+.axsb-grip {
+    width: 14px; flex: none; text-align: center; cursor: nwse-resize;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 10px; opacity: .55;
+}
+body.maximized .axsb-grip, body.noresize .axsb-grip { display: none; }
+body.has-menubar #shell { height: calc(100% - 58px); }
+body.has-statusbar #shell { height: calc(100% - 58px); }
+body.has-menubar.has-statusbar #shell { height: calc(100% - 80px); }
+
+.axmb { height: 22px; padding: 0 4px; background: #ece9d8; border-bottom: 1px solid #d4d0c8; }
+.axmb-item { height: 20px; line-height: 20px; padding: 0 9px; }
+.axmb-item:hover, .axmb-item.open { background: #316ac5; color: #fff; }
+.axmb-item.disabled:hover { background: none; color: #808080; }
+.axsb {
+    height: 22px; padding: 0 2px 0 8px; background: #ece9d8; color: #000;
+    border-top: 1px solid #fff;
+}
+.axsb-part { padding: 0 8px; border-left: 1px solid #d4d0c8; }
+.axsb-part:first-child { border-left: 0; padding-left: 0; }
+.axsb-part.action:hover { background: #f5f3ea; }
+.axsb-part.dim { color: #555; }
+.axsb-bar { border: 1px solid #7f9db9; border-radius: 2px; background: #fff; }
+.axsb-bar > i { background: #4b8ae8; }
+
+
+/* menu marks (a tick, a radio dot or a glyph) and submenu arrows */
+#axCtx.hasmarks .axctx-item, .axctx.hasmarks .axctx-item { padding-left: 4px; }
+.axctx-mark {
+    display: inline-block; width: 22px; flex: none; text-align: center;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 11px;
+}
+.axctx-item.checked .axctx-mark { opacity: 1; }
+.axctx-mark.radio { font-family: inherit; font-size: 15px; line-height: 1; }
+.axctx-sub {
+    margin-left: auto; padding-left: 18px; flex: none;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 9px; opacity: .7;
+}
+.axctx-item.kb { background: #4c6ef5; color: #fff; }
+
+.axctx-item.kb { background: #316ac5; color: #fff; }
+#axCtx.hasmarks .axctx-item, .axctx.hasmarks .axctx-item { padding-left: 2px; }
+.axctx-mark { width: 18px; }
+
+
+
+/* ------------------------------------------------------- the dialog, finished
+   base.css styles .axdlg-btn.primary, .axdlg-btn.danger and #axDlgInput, all of
+   which outweigh the bare .axdlg-btn this sheet overrides, so without saying
+   them again the dialog keeps a Fluent blue OK button and a dark rounded input.
+   And width:auto on an <input> is its intrinsic size, not the box it sits in,
+   so the field has to be told the dialog's width less its two margins. */
+.axdlg-btn.primary, .axdlg-btn.primary:hover,
+.axdlg-btn.danger, .axdlg-btn.danger:hover {
+    color: #000; border-color: #003c74;
+    background: linear-gradient(#fff, #ecebe5 85%, #d8d0c4);
+}
+.axdlg-btn.danger, .axdlg-btn.danger:hover { color: #b00; }
+.axdlg-btn:active, .axdlg-btn.pressed, .axdlg-btn.primary:active {
+    transform: none; background: #e0dfda;
+}
+#axDlgInput {
+    padding: 2px 4px; font: 11px Tahoma, sans-serif;
+    background: #fff; color: #000; border-radius: 0; border: 1px solid #7f9db9;
+    box-shadow: none;
+}
+#axDlgInput:focus { border-color: #7f9db9; }
+
+/* ---------------------------------------------------------- dark scheme */
+/* Luna after dark: the blue chrome stays, the beige and white surfaces go
+   graphite. Everything the light sheet paints white is restated, or the text
+   colour flips onto a surface that never moved. */
+body.theme-dark { color: #eaeaea; background: #3a3a3a;
+    scrollbar-face-color: #4d4d4d; scrollbar-track-color: #333; scrollbar-arrow-color: #eaeaea;
+    scrollbar-shadow-color: #2a2a2a; scrollbar-highlight-color: #6a6a6a;
+    scrollbar-3dlight-color: #5a5a5a; scrollbar-darkshadow-color: #1a1a1a; }
+body.theme-dark #sidebar { background: #34518c; background-image: linear-gradient(#3d5c9e, #2b3f74); }
+
+/* panels and fields */
+body.theme-dark .card, body.theme-dark .tile, body.theme-dark .expander,
+body.theme-dark .infobar, body.theme-dark .exp-header .chev, body.theme-dark .imgbox,
+body.theme-dark .thumb, body.theme-dark .thumb .remove {
+    background: #444444; color: #eaeaea; border-color: #5a5a5a; }
+body.theme-dark .group > .legend, body.theme-dark .axmb, body.theme-dark .axsb,
+body.theme-dark #axCtx, body.theme-dark .axctx, body.theme-dark #axDlg,
+body.theme-dark .dropzone, body.theme-dark .tab-panel {
+    background: #3a3a3a; color: #eaeaea; border-color: #5a5a5a; }
+body.theme-dark input, body.theme-dark textarea, body.theme-dark .textbox input,
+body.theme-dark .textbox textarea, body.theme-dark .searchbox input, body.theme-dark .numberbox input,
+body.theme-dark .passwordbox input, body.theme-dark .hotkeybox input, body.theme-dark .list,
+body.theme-dark .dd-value, body.theme-dark .dd-menu, body.theme-dark .progress,
+body.theme-dark .sw-track, body.theme-dark .sort-list .drag-item, body.theme-dark .filelist,
+body.theme-dark .badge, body.theme-dark .hex, body.theme-dark .axsb-bar {
+    background: #262626; color: #eaeaea; border-color: #6a6a6a; }
+body.theme-dark .thumb .thumb-img { background: #1e1e1e; }
+body.theme-dark .btn, body.theme-dark .axdlg-btn, body.theme-dark .tab, body.theme-dark .chip {
+    background: #4d4d4d; background-image: none; border-color: #6a6a6a; color: #eaeaea; }
+body.theme-dark .btn:hover, body.theme-dark .axdlg-btn:hover { background: #585858; }
+body.theme-dark .tab.active { background: #3a3a3a; }
+body.theme-dark .btn.disabled, body.theme-dark .axctx-item.disabled { color: #a8a8a8; }
+body.theme-dark .axmb-item.disabled { opacity: .62; }
+body.theme-dark .axmb-item.disabled:hover { background: none; color: #a8a8a8; }
+body.theme-dark .numberbox .spin, body.theme-dark .dd-value:after {
+    background: #4d4d4d; background-image: linear-gradient(#5f5f5f, #414141); color: #eaeaea; }
+
+/* text */
+body.theme-dark h1, body.theme-dark h2, body.theme-dark h3,
+body.theme-dark .group > .legend, body.theme-dark .exp-header .chev { color: #8ab4ff; }
+body.theme-dark .caption { color: #eaeaea; }
+body.theme-dark .hint, body.theme-dark .card-row .desc, body.theme-dark .tile .desc,
+body.theme-dark .fl-meta, body.theme-dark .axsb-part.dim { color: #b8b8b8; }
+body.theme-dark .link, body.theme-dark .hyperlink, body.theme-dark a { color: #8ab4ff; }
+body.theme-dark .list.checklist .list-item.selected { color: #eaeaea; }
+body.theme-dark #axToast, body.theme-dark #axTip { background: #4a4636; color: #f0e8c0; }
+body.theme-dark #axDlgText { color: #eaeaea; }
+body.theme-dark .axctx-sep { background: #5a5a5a; }
+body.theme-dark .axsb-part { border-left-color: #5a5a5a; }
+body.theme-dark .axsb-grip { color: #b8b8b8; }
+body.theme-dark .axsb { color: #eaeaea; }
+
+/* state classes need the theme prefix too, or "body.theme-dark .chip" wins on
+   specificity and an enabled chip looks exactly like a disabled one */
+body.theme-dark .chip.on { background: #316ac5; background-image: none; color: #fff; border-color: #316ac5; }
+body.theme-dark .badge.accent { background: #316ac5; color: #fff; }
+body.theme-dark .badge.success { background: #2f7d32; color: #fff; }
+body.theme-dark .badge.warning { background: #8a6d00; color: #fff; }
+body.theme-dark .badge.error { background: #a33; color: #fff; }
+body.theme-dark .segmented .seg.active { background: #316ac5; color: #fff; }
+
+/* ------------------------------------ title-bar items and popovers (Luna) */
+/* On the caption these are white-on-blue like the caption text itself, and
+   they light up with the same translucent wash the caption buttons use. */
+.axtb-item { height: 20px; min-width: 22px; padding: 0 6px; border-radius: 3px; font-size: 11px; color: #fff; }
+.axtb-item:hover { background: rgba(255,255,255,.28); }
+.axtb-item.on, .axtb-item.open, .axtb-item.pop-open { background: rgba(0,0,0,.18); }
+.axtb-item.kind-sep, .axtb-item.kind-sep:hover { background: rgba(255,255,255,.45); height: 13px; }
+body.inactive .axtb-item { color: #d8e4f8; }
+.axtb-burger i { height: 2px; }
+#axPop { border-radius: 0; padding: 8px 10px; font-size: 11px; background: #fff; color: #000; border: 1px solid #aca899; box-shadow: 2px 2px 3px rgba(0,0,0,.3); font-family: Tahoma, sans-serif; }
+body.theme-dark #axPop { background: #3a3a3a; color: #fff; border-color: #5a5a5a; }
+
+/* the dialog after dark */
+body.theme-dark .axdlg-btn.primary, body.theme-dark .axdlg-btn.primary:hover,
+body.theme-dark .axdlg-btn.danger, body.theme-dark .axdlg-btn.danger:hover {
+    background: #4d4d4d; background-image: none; border-color: #6a6a6a; color: #eaeaea;
+}
+body.theme-dark .axdlg-btn.danger, body.theme-dark .axdlg-btn.danger:hover { color: #ff9c9c; }
+body.theme-dark #axDlgInput { background: #2a2a2a; color: #eaeaea; border-color: #555; }
+body.theme-dark #axDlgInput:focus { border-color: #6a6a6a; }

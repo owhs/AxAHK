@@ -1,0 +1,38 @@
+/* AxStat.css -- one number, where it is heading, and a sparkline. IE11-safe. */
+.axstat {
+    display: inline-block; vertical-align: top; width: 220px; max-width: 100%; box-sizing: border-box; padding: 14px 16px 12px;
+    border-radius: 8px; background: rgba(255,255,255,.0512); border: 1px solid rgba(255,255,255,.0698);
+}
+.axstat.fill { display: block; width: auto; }
+.axstat-top { display: flex; align-items: center; min-height: 22px; }
+.axstat-lbl { flex: 1 1 0%; min-width: 0; font-size: 12.5px; color: rgba(255,255,255,.72); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.axstat-lbl .ico { font-size: 13px; margin-right: 7px; vertical-align: -2px; }
+.axstat-tr {
+    flex: none; margin-left: 8px; height: 20px; line-height: 20px; padding: 0 8px 0 6px; border-radius: 10px;
+    font-size: 11.5px; font-weight: 600; white-space: nowrap; background: rgba(255,255,255,.08); color: rgba(255,255,255,.8);
+}
+.axstat-tr .ico { font-size: 9px; margin-right: 4px; vertical-align: 0; }
+.axstat-tr.good { background: #1f3a22; color: #6ccb5f; }
+.axstat-tr.bad { background: #44272b; color: #ff99a4; }
+.axstat-v { font-size: 28px; line-height: 36px; font-weight: 600; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.axstat-note { font-size: 12px; line-height: 16px; color: rgba(255,255,255,.55); }
+.axstat-sp { margin: 8px -2px 0; height: 36px; }
+.axstat-svg { display: block; overflow: visible; }
+.axstat-line { fill: none; stroke: #60cdff; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.axstat-area { fill: #60cdff; fill-opacity: .14; stroke: none; }
+.axstat-svg.good .axstat-line { stroke: #6ccb5f; }
+.axstat-svg.good .axstat-area { fill: #6ccb5f; }
+.axstat-svg.bad .axstat-line { stroke: #ff99a4; }
+.axstat-svg.bad .axstat-area { fill: #ff99a4; }
+body.theme-light .axstat { background: #ffffff; border-color: rgba(0,0,0,.0803); }
+body.theme-light .axstat-lbl { color: rgba(0,0,0,.6); }
+body.theme-light .axstat-tr { background: rgba(0,0,0,.06); color: rgba(0,0,0,.7); }
+body.theme-light .axstat-tr.good { background: #dff6dd; color: #0f7b0f; }
+body.theme-light .axstat-tr.bad { background: #fde7e9; color: #c42b1c; }
+body.theme-light .axstat-note { color: rgba(0,0,0,.5); }
+body.theme-light .axstat-line { stroke: #005fb8; }
+body.theme-light .axstat-area { fill: #005fb8; }
+body.theme-light .axstat-svg.good .axstat-line { stroke: #0f7b0f; }
+body.theme-light .axstat-svg.good .axstat-area { fill: #0f7b0f; }
+body.theme-light .axstat-svg.bad .axstat-line { stroke: #c42b1c; }
+body.theme-light .axstat-svg.bad .axstat-area { fill: #c42b1c; }

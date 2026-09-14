@@ -1,0 +1,69 @@
+{
+  "name": "Number",
+  "description": "Number box",
+  "order": 3003,
+  "css": "AxNumber.css",
+  "include": "lib\\components\\Number\\AxNumber.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Number",
+      "label": "Number box",
+      "icon": "E8EF",
+      "category": "Input",
+      "prefix": "num",
+      "arg": {
+        "key": "value",
+        "label": "Value",
+        "kind": "num",
+        "default": "0"
+      },
+      "props": [
+        {
+          "key": "min",
+          "label": "Minimum",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "max",
+          "label": "Maximum",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "step",
+          "label": "Step",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "bigstep",
+          "label": "Step with Shift",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "smallstep",
+          "label": "Step with Ctrl",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "suffix",
+          "label": "Suffix",
+          "kind": "text",
+          "emit": "kv"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

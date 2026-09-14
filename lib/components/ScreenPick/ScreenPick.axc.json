@@ -1,0 +1,8 @@
+{
+  "name": "ScreenPick",
+  "description": "Screen eyedropper with a magnifier. Used by the colour picker.",
+  "order": 7300,
+  "include": "lib\\components\\ScreenPick\\AxScreenPick.ahk",
+  "requires": [],
+  "controls": []
+}

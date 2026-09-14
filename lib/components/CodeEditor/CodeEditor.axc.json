@@ -1,0 +1,45 @@
+{
+  "name": "CodeEditor",
+  "description": "A code editor: colours, line numbers, folding, suggestions, find and replace, problems, themes and presets, and a language service behind it -- AutoHotkey's own, a language server, or your functions.",
+  "order": 7300,
+  "css": "AxCodeEditor.css",
+  "include": "lib\\components\\CodeEditor\\AxCodeEditor.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "CodeEditor",
+      "label": "Code editor",
+      "icon": "E943",
+      "category": "Rich",
+      "prefix": "code",
+      "arg": {
+        "key": "text",
+        "label": "Its text to begin with",
+        "kind": "multiline",
+        "default": "; Ctrl+Space for suggestions, Ctrl+F to find\nGreet(name) {\n    MsgBox(\"Hello, \" name)\n}\nGreet(\"World\")"
+      },
+      "props": [
+        { "key": "lang", "label": "Language", "kind": "choice", "emit": "kv", "word": "Lang",
+          "options": "ahk:AutoHotkey|js:JavaScript|json:JSON|css:CSS|html:HTML|xml:XML|ini:INI|md:Markdown|ps1:PowerShell|py:Python|sql:SQL|plain:Plain text",
+          "default": "ahk" },
+        { "key": "preset", "label": "Made for", "kind": "choice", "emit": "kv", "word": "Preset",
+          "options": "ide:Code, with everything|notes:Notes (Markdown, wrapped)|log:A log to read|config:A settings file (INI)|snippet:A small piece of code",
+          "default": "ide" },
+        { "key": "theme", "label": "Theme", "kind": "choice", "emit": "kv", "word": "Theme",
+          "options": "auto:As the window|dark:Dark|light:Light|monokai:Monokai|solarized:Solarized|dracula:Dracula|contrast:High contrast",
+          "default": "auto" },
+        { "key": "fontsize", "label": "Text size", "kind": "num", "emit": "kv", "word": "FontSize" },
+        { "key": "placeholder", "label": "When empty, it says", "kind": "text", "emit": "kv", "word": "Placeholder" },
+        { "key": "wrap", "label": "Wrap long lines", "kind": "flag", "emit": "flag", "word": "Wrap" },
+        { "key": "readonly", "label": "Read only", "kind": "flag", "emit": "flag", "word": "ReadOnly" },
+        { "key": "nogutter", "label": "No line numbers", "kind": "flag", "emit": "flag", "word": "NoGutter" },
+        { "key": "nofold", "label": "No folding", "kind": "flag", "emit": "flag", "word": "NoFold" },
+        { "key": "nosuggest", "label": "No suggestions", "kind": "flag", "emit": "flag", "word": "NoSuggest" },
+        { "key": "nostatus", "label": "No status line", "kind": "flag", "emit": "flag", "word": "NoStatus" },
+        { "key": "nominimap", "label": "No map of the text", "kind": "flag", "emit": "flag", "word": "NoMinimap" },
+        { "key": "noguides", "label": "No indent guides", "kind": "flag", "emit": "flag", "word": "NoGuides" }
+      ],
+      "events": ["Change", "Focus", "Blur", "KeyDown", "KeyUp"]
+    }
+  ]
+}

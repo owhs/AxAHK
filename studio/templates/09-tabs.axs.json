@@ -1,0 +1,312 @@
+{
+ "format": "axstudio/2",
+ "name": "Tabbed window",
+ "desc": "A text workbench in tabs that fill the window: paste, process, copy. Its options are settings bound to their switches, so they are remembered.",
+ "uid": 14,
+ "cur": 1,
+ "vars": "",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "caseMode | keep | choice | Case | keep,upper,lower,title\ntrimLines | 1 | onoff | Trim each line\ndedupe | 0 | onoff | Drop repeated lines\nsortLines | 0 | onoff | Sort the lines",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Workbench",
+   "width": 880,
+   "height": 600,
+   "minwidth": 600,
+   "minheight": 420,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E8F1",
+   "menus": "&File\n    &Paste into the input | Ctrl+Shift+V | PasteIn()\n    -\n    E&xit | Alt+F4 | g.Close()\n&Text\n    &Process | F5 | Process()\n    &Copy the output | Ctrl+Shift+C | CopyOut()\n&Help\n    &About | | g.Alert(\"Workbench 1.0 -- built with AxStudio.\", \"About\")",
+   "status": "msg | Paste some text and press Process (F5) | grow icon=E930\nlen | 0 characters | w=140 right",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "goBtn Click -> call Process\npasteBtn Click -> call PasteIn\ncopyBtn Click -> call CopyOut",
+   "states": "",
+   "binds": "caseSeg <-> caseMode\ntrimSw <-> trimLines\ndedupeSw <-> dedupe\nsortSw <-> sortLines",
+   "hotkeys": "F5 | active | own | Process\n^+v | active | own | PasteIn\n^+c | active | own | CopyOut",
+   "init": "",
+   "script": "; The input, line by line, through the options -- into the output.\nProcess() {\n    global g, input, output, tabs, caseMode, trimLines, dedupe, sortLines\n    seen := Map(), out := \"\", n := 0\n    for line in StrSplit(StrReplace(input.Text, \"`r\", \"\"), \"`n\") {\n        if trimLines\n            line := Trim(line)\n        switch caseMode {\n        case \"upper\": line := StrUpper(line)\n        case \"lower\": line := StrLower(line)\n        case \"title\": line := StrTitle(line)\n        }\n        if dedupe {\n            if seen.Has(line)\n                continue\n            seen[line] := true\n        }\n        out .= (n++ ? \"`n\" : \"\") line\n    }\n    if sortLines\n        out := Sort(out)\n    output.Text := out\n    tabs.Value := 2\n    g.Status(\"msg\", n \" lines processed\")\n    g.Status(\"len\", StrLen(out) \" characters\")\n}\nPasteIn() {\n    global input, tabs\n    input.Text := A_Clipboard\n    tabs.Value := 1\n}\nCopyOut() {\n    global g, output\n    A_Clipboard := output.Text\n    g.Toast(\"Copied\", 1200, \"success\")\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n14",
+      "type": "Tab",
+      "name": "tabs",
+      "arg": "Input:E70F\nOutput:E8A5\nOptions:E713",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 240
+      },
+      "props": {},
+      "events": [],
+      "kids": [
+       {
+        "id": "n1",
+        "type": "Edit",
+        "name": "input",
+        "arg": "",
+        "layout": {
+         "fill": 1,
+         "grow": 1,
+         "tab": 1
+        },
+        "props": {
+         "placeholder": "Paste text here",
+         "rows": 6
+        },
+        "events": [
+         {
+          "name": "Change",
+          "code": "g.Status(\"len\", StrLen(value) \" characters\")"
+         }
+        ],
+        "kids": []
+       },
+       {
+        "id": "n2",
+        "type": "Button",
+        "name": "goBtn",
+        "arg": "Process",
+        "layout": {
+         "tab": 1
+        },
+        "props": {
+         "kind": "Accent",
+         "icon": "E768"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n3",
+        "type": "Button",
+        "name": "pasteBtn",
+        "arg": "Paste",
+        "layout": {
+         "tab": 1,
+         "place": "same"
+        },
+        "props": {
+         "kind": "Subtle",
+         "icon": "E77F"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n4",
+        "type": "Edit",
+        "name": "output",
+        "arg": "",
+        "layout": {
+         "fill": 1,
+         "grow": 1,
+         "tab": 2
+        },
+        "props": {
+         "readonly": 1,
+         "rows": 6
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n5",
+        "type": "Button",
+        "name": "copyBtn",
+        "arg": "Copy",
+        "layout": {
+         "tab": 2
+        },
+        "props": {
+         "icon": "E8C8"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n7",
+        "type": "Row",
+        "name": "",
+        "arg": "Case",
+        "layout": {
+         "tab": 3
+        },
+        "props": {
+         "desc": "Leave it, or change every line",
+         "icon": "E8D2"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n6",
+          "type": "Segmented",
+          "name": "caseSeg",
+          "arg": "keep:As it is\nupper:UPPER\nlower:lower\ntitle:Title",
+          "layout": {},
+          "props": {
+           "value": "keep"
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n9",
+        "type": "Row",
+        "name": "",
+        "arg": "Trim each line",
+        "layout": {
+         "tab": 3
+        },
+        "props": {
+         "desc": "Spaces and tabs off both ends",
+         "icon": "E8E4"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n8",
+          "type": "Switch",
+          "name": "trimSw",
+          "arg": "",
+          "layout": {},
+          "props": {
+           "nolabel": 1,
+           "checked": 1
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n11",
+        "type": "Row",
+        "name": "",
+        "arg": "Drop repeated lines",
+        "layout": {
+         "tab": 3
+        },
+        "props": {
+         "desc": "Keep the first of each",
+         "icon": "E8C8"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n10",
+          "type": "Switch",
+          "name": "dedupeSw",
+          "arg": "",
+          "layout": {},
+          "props": {
+           "nolabel": 1
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n13",
+        "type": "Row",
+        "name": "",
+        "arg": "Sort the lines",
+        "layout": {
+         "tab": 3
+        },
+        "props": {
+         "desc": "A to Z",
+         "icon": "E8CB"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n12",
+          "type": "Switch",
+          "name": "sortSw",
+          "arg": "",
+          "layout": {},
+          "props": {
+           "nolabel": 1
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

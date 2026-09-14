@@ -1,0 +1,223 @@
+{
+ "format": "axstudio/2",
+ "name": "Tool window",
+ "desc": "Find files: a search, a folder, a filter, and results that fill the window. The gear folds the options away (a state); double-click a result to open it.",
+ "uid": 8,
+ "cur": 1,
+ "vars": "",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Find files",
+   "width": 680,
+   "height": 560,
+   "minwidth": 480,
+   "minheight": 380,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E721",
+   "menus": "",
+   "status": "msg | Pick a folder and press Find | grow icon=E721\ncount | | w=110 right",
+   "titleitems": "opts | glyph | E713 | right tip=\"Show or hide the options\" toggle | MainState(optsCard.Visible ? \"compact\" : \"full\")",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "findBtn",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "findBtn Click -> call Find",
+   "states": "full: optsCard.Visible = 1\ncompact: optsCard.Visible = 0",
+   "binds": "",
+   "hotkeys": "",
+   "init": "folderBox.Text := A_MyDocuments",
+   "script": "; Everything under the folder whose name has the words in it, of the kind\n; picked -- the first 500, so a whole drive does not stop the window.\nFind() {\n    global g, query, folderBox, kindSeg, subSw, results\n    results.Delete()\n    kinds := Map(\"docs\", \"txt,md,doc,docx,pdf,rtf,odt\", \"pics\", \"png,jpg,jpeg,gif,bmp,webp,ico\",\n                 \"code\", \"ahk,js,py,ps1,json,ini,css,html\")\n    want := kinds.Has(kindSeg.Value) ? \",\" kinds[kindSeg.Value] \",\" : \"\"\n    q := Trim(query.Text), n := 0\n    g.Status(\"msg\", \"Looking...\")\n    loop files folderBox.Text \"\\*.*\", subSw.Checked ? \"FR\" : \"F\" {\n        if (q != \"\" && !InStr(A_LoopFileName, q))\n            continue\n        if (want != \"\" && !InStr(want, \",\" StrLower(A_LoopFileExt) \",\"))\n            continue\n        results.Add(\"\", A_LoopFileName, A_LoopFileDir, Format(\"{:.1f} KB\", A_LoopFileSize / 1024),\n                    FormatTime(A_LoopFileTimeModified, \"yyyy-MM-dd HH:mm\"))\n        if (++n >= 500)\n            break\n    }\n    results.ModifyCol()                 ; every column fitted to what it holds\n    g.Status(\"msg\", n ? \"Double-click one to open it\" : \"Nothing matched\")\n    g.Status(\"count\", n (n >= 500 ? \"+\" : \"\") \" found\")\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n6",
+      "type": "Search",
+      "name": "query",
+      "arg": "",
+      "layout": {
+       "fill": 1
+      },
+      "props": {
+       "placeholder": "Part of the name"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Button",
+      "name": "findBtn",
+      "arg": "Find",
+      "layout": {
+       "place": "same",
+       "w": 100
+      },
+      "props": {
+       "kind": "Accent",
+       "icon": "E721"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Card",
+      "name": "optsCard",
+      "arg": "Where to look",
+      "layout": {},
+      "props": {},
+      "events": [],
+      "kids": [
+       {
+        "id": "n1",
+        "type": "Edit",
+        "name": "folderBox",
+        "arg": "",
+        "layout": {
+         "fill": 1
+        },
+        "props": {
+         "placeholder": "A folder"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n2",
+        "type": "Button",
+        "name": "browseBtn",
+        "arg": "Browse...",
+        "layout": {
+         "place": "same"
+        },
+        "props": {
+         "icon": "E838"
+        },
+        "events": [
+         {
+          "name": "Click",
+          "code": "d := DirSelect(\"*\" folderBox.Text, 0, \"Pick a folder\")\nif (d != \"\")\n    folderBox.Text := d"
+         }
+        ],
+        "kids": []
+       },
+       {
+        "id": "n3",
+        "type": "Segmented",
+        "name": "kindSeg",
+        "arg": "all:Everything\ndocs:Documents\npics:Pictures\ncode:Scripts",
+        "layout": {},
+        "props": {
+         "value": "all"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n4",
+        "type": "Switch",
+        "name": "subSw",
+        "arg": "Look in the folders inside it too",
+        "layout": {
+         "place": "same",
+         "gap": 16
+        },
+        "props": {
+         "checked": 1
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     },
+     {
+      "id": "n8",
+      "type": "ListView",
+      "name": "results",
+      "arg": "Name | Folder | Size | Modified",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 160,
+       "top": 4
+      },
+      "props": {
+       "single": 1
+      },
+      "events": [
+       {
+        "name": "DoubleClick",
+        "code": "if (r := results.GetNext())\n    try Run(results.GetText(r, 2) \"\\\" results.GetText(r, 1))"
+       }
+      ],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

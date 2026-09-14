@@ -1,0 +1,8 @@
+/* AxDDL.css -- the shape of the drop-down.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.dropdown { display: inline-block; position: relative; }
+.dd-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dd-value:after { position: absolute; }

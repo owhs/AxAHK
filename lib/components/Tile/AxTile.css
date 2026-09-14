@@ -1,0 +1,7 @@
+/* AxTile.css -- the shape of the tile.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.tile { position: relative; }
+.tile .remove { position: absolute; }

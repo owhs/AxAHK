@@ -1,0 +1,6 @@
+/* AxThumbs.css -- the shape of the thumbnail strip.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.thumbs { display: flex; flex-wrap: wrap; overflow-x: hidden; overflow-y: auto; }

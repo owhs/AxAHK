@@ -1,0 +1,75 @@
+{
+  "name": "ColorPicker",
+  "description": "Hue-ring colour picker: an inline component, a swatch button and a dialog.",
+  "order": 7100,
+  "css": "AxColorPicker.css",
+  "include": "lib\\components\\ColorPicker\\AxColorPicker.ahk",
+  "requires": [
+    "ScreenPick"
+  ],
+  "controls": [
+    {
+      "type": "ColorButton",
+      "label": "Colour button",
+      "icon": "E790",
+      "category": "Rich",
+      "prefix": "col",
+      "arg": {
+        "key": "value",
+        "label": "Colour",
+        "kind": "color",
+        "default": "#0078d4"
+      },
+      "events": [
+        "Change",
+        "Preview",
+        "Click",
+        "ContextMenu"
+      ]
+    },
+    {
+      "type": "ColorPicker",
+      "label": "Colour picker",
+      "icon": "E790",
+      "category": "Rich",
+      "prefix": "cp",
+      "arg": {
+        "key": "value",
+        "label": "Colour",
+        "kind": "color",
+        "default": "#0078d4"
+      },
+      "props": [
+        {
+          "key": "size",
+          "label": "Wheel size",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "swatches",
+          "label": "Swatches",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "recent",
+          "label": "Recent colours",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "fields",
+          "label": "Numeric fields",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

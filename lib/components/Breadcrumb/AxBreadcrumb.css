@@ -1,0 +1,28 @@
+/* AxBreadcrumb.css -- a trail of steps; the last is where you are. IE11-safe. */
+.axcrumb { display: block; min-width: 0; font-size: 14px; line-height: 20px; }
+.axcrumb-r { display: flex; align-items: center; flex-wrap: nowrap; min-width: 0; overflow: hidden; }
+.axcrumb-i {
+    flex: none; display: inline-block; height: 28px; line-height: 28px; padding: 0 8px; border-radius: 4px;
+    color: rgba(255,255,255,.786); white-space: nowrap; cursor: default;
+}
+.axcrumb-i .ico { font-size: 13px; margin-right: 6px; vertical-align: -1px; }
+.axcrumb-i.icon .ico { margin-right: 0; }
+.axcrumb-i[data-i]:hover, .axcrumb-more:hover { background: rgba(255,255,255,.0605); color: #ffffff; }
+.axcrumb-i.cur { color: #ffffff; font-weight: 600; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; }
+.axcrumb-more { font-weight: 600; letter-spacing: .06em; }
+.axcrumb-more.pop-open { background: rgba(255,255,255,.0837); }
+.axcrumb-sep { flex: none; font-size: 9px; margin: 0 2px; color: rgba(255,255,255,.45); }
+body.theme-light .axcrumb-i { color: rgba(0,0,0,.62); }
+body.theme-light .axcrumb-i[data-i]:hover, body.theme-light .axcrumb-more:hover { background: rgba(0,0,0,.0373); color: #1b1b1b; }
+body.theme-light .axcrumb-i.cur { color: #1b1b1b; }
+body.theme-light .axcrumb-more.pop-open { background: rgba(0,0,0,.0578); }
+body.theme-light .axcrumb-sep { color: rgba(0,0,0,.4); }
+
+/* the folded steps, as a popover under the "..." */
+#axPop.axcrumb-pop { padding: 4px; }
+.axcrumb-menu { min-width: 180px; }
+.axcrumb-pi { height: 32px; line-height: 32px; padding: 0 12px 0 10px; border-radius: 4px; white-space: nowrap; cursor: default; }
+.axcrumb-pi .ico { font-size: 14px; margin-right: 10px; vertical-align: -2px; color: rgba(255,255,255,.7); }
+.axcrumb-pi:hover { background: rgba(255,255,255,.0605); }
+body.theme-light .axcrumb-pi .ico { color: rgba(0,0,0,.55); }
+body.theme-light .axcrumb-pi:hover { background: rgba(0,0,0,.0373); }

@@ -1,0 +1,29 @@
+{
+  "name": "Tab",
+  "description": "Tabs",
+  "order": 1004,
+  "css": "AxTab.css",
+  "include": "lib\\components\\Tab\\AxTab.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Tab",
+      "label": "Tabs",
+      "icon": "E71D",
+      "category": "Containers",
+      "prefix": "tabs",
+      "box": true,
+      "arg": {
+        "key": "names",
+        "label": "Tab names (Label or Label:Glyph, one per line)",
+        "kind": "options",
+        "default": "First\nSecond"
+      },
+      "events": [
+        "Change",
+        "Click",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

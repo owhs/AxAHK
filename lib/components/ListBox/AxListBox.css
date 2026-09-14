@@ -1,0 +1,6 @@
+/* AxListBox.css -- the shape of the list box.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.list { overflow-y: auto; }

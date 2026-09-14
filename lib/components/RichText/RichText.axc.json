@@ -1,0 +1,35 @@
+{
+  "name": "RichText",
+  "description": "A rich text editor -- bold, headings, lists, alignment, links, pictures, tables, colours -- that gives its text back as HTML, Markdown or plain text.",
+  "order": 7310,
+  "css": "AxRichText.css",
+  "include": "lib\\components\\RichText\\AxRichText.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "RichText",
+      "label": "Rich text editor",
+      "icon": "E8D2",
+      "category": "Rich",
+      "prefix": "doc",
+      "arg": {
+        "key": "content",
+        "label": "Its text to begin with (Markdown, or HTML)",
+        "kind": "multiline",
+        "default": "# Notes\n\nWrite **here** -- the toolbar does the rest.\n\n- one\n- two\n\n| Item | Count |\n| --- | --- |\n| Apples | 3 |"
+      },
+      "props": [
+        { "key": "tools", "label": "Toolbar", "kind": "choice", "emit": "kv", "word": "Tools",
+          "options": "standard:Standard|minimal:A few|full:Everything|none:None", "default": "standard" },
+        { "key": "format", "label": "Its value is", "kind": "choice", "emit": "kv", "word": "Format",
+          "options": "html:HTML|md:Markdown|text:Plain text", "default": "html" },
+        { "key": "placeholder", "label": "When empty, it says", "kind": "text", "emit": "kv", "word": "Placeholder" },
+        { "key": "paper", "label": "A white page", "kind": "flag", "emit": "flag", "word": "Paper" },
+        { "key": "readonly", "label": "Read only", "kind": "flag", "emit": "flag", "word": "ReadOnly" },
+        { "key": "pasteplain", "label": "Paste as plain text", "kind": "flag", "emit": "flag", "word": "PastePlain" },
+        { "key": "nostatus", "label": "No word count", "kind": "flag", "emit": "flag", "word": "NoStatus" }
+      ],
+      "events": ["Change", "Focus", "Blur", "KeyDown", "KeyUp"]
+    }
+  ]
+}

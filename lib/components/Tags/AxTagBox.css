@@ -1,0 +1,58 @@
+/* AxTagBox.css -- tags as chips in a box. IE11-safe. */
+.axtags { display: inline-block; vertical-align: middle; width: 320px; max-width: 100%; }
+.axtags.fill { display: block; width: auto; }
+.axtags-w {
+    display: flex; flex-wrap: wrap; align-items: center; min-height: 32px; box-sizing: border-box; padding: 3px 4px;
+    border-radius: 4px; cursor: text;
+    background: rgba(255,255,255,.0605); border: 1px solid rgba(255,255,255,.0698); border-bottom-color: rgba(255,255,255,.5442);
+}
+.axtags-w:hover { background: rgba(255,255,255,.0837); }
+.axtags-r { display: inline; }
+.axtags-c {
+    display: inline-block; height: 24px; line-height: 24px; margin: 1px 4px 1px 0; padding: 0 4px 0 10px;
+    border-radius: 12px; font-size: 12.5px; white-space: nowrap; color: #ffffff;
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.08);
+}
+.axtags-x { display: inline-block; width: 18px; height: 18px; line-height: 18px; margin-left: 4px; text-align: center; font-size: 8px; border-radius: 50%; vertical-align: 1px; cursor: default; }
+.axtags-x:hover { background: rgba(255,255,255,.18); }
+.axtags-w input {
+    flex: 1 1 60px; min-width: 60px; height: 24px; margin: 1px 0; padding: 0 6px; border: none; outline: none;
+    background: transparent; color: #ffffff; font: inherit;
+}
+.axtags-w input::-ms-clear { display: none; }
+.axtags.full .axtags-in { display: none; }
+.axtags-c { cursor: default; }
+
+/* a chip being edited: a small box of its own, in the chip's place */
+.axtags-w input.axtags-ed {
+    flex: none; min-width: 0; height: 24px; margin: 1px 4px 1px 0; padding: 0 9px; box-sizing: border-box;
+    border-radius: 12px; border: 1px solid #60cdff; background: rgba(255,255,255,.08); font-size: 12.5px;
+}
+/* Ctrl+A: every chip taken */
+.axtags.allsel .axtags-c { background: #60cdff; border-color: #60cdff; color: #000000; }
+.axtags.allsel .axtags-x:hover { background: rgba(0,0,0,.14); }
+
+/* the clear-all x: only there while there is something to clear */
+.axtags-clr {
+    display: none; flex: none; width: 24px; height: 24px; line-height: 24px; margin-left: 2px; text-align: center;
+    font-size: 10px; border-radius: 4px; opacity: .7; cursor: default;
+}
+.axtags.has .axtags-clr { display: inline-block; }
+.axtags-clr:hover { opacity: 1; background: rgba(255,255,255,.1); }
+body.theme-light .axtags-w { background: #fbfbfb; border-color: rgba(0,0,0,.0578); border-bottom-color: rgba(0,0,0,.4458); }
+body.theme-light .axtags-w:hover { background: #f6f6f6; }
+body.theme-light .axtags-c { color: #1b1b1b; background: rgba(0,0,0,.06); border-color: rgba(0,0,0,.06); }
+body.theme-light .axtags-x:hover { background: rgba(0,0,0,.1); }
+body.theme-light .axtags-w input { color: #1b1b1b; }
+body.theme-light .axtags-w input.axtags-ed { border-color: #005fb8; background: #ffffff; }
+body.theme-light .axtags.allsel .axtags-c { background: #005fb8; border-color: #005fb8; color: #ffffff; }
+body.theme-light .axtags.allsel .axtags-x:hover { background: rgba(255,255,255,.2); }
+body.theme-light .axtags-clr:hover { background: rgba(0,0,0,.07); }
+
+#axPop.axtags-pop { padding: 4px; }
+.axtags-sg { min-width: 180px; }
+.axtags-si { height: 30px; line-height: 30px; padding: 0 10px; border-radius: 4px; white-space: nowrap; cursor: default; }
+.axtags-si:hover { background: rgba(255,255,255,.0605); }
+.axtags-si.hi { background: rgba(255,255,255,.0837); box-shadow: inset 3px 0 0 #60cdff; }
+body.theme-light .axtags-si:hover { background: rgba(0,0,0,.0373); }
+body.theme-light .axtags-si.hi { background: rgba(0,0,0,.0578); box-shadow: inset 3px 0 0 #005fb8; }

@@ -1,0 +1,450 @@
+{
+ "format": "axstudio/2",
+ "name": "Form",
+ "desc": "A contact form that checks itself as you type: a progress bar, a live summary, an email check and a Save that turns on when it may -- bindings, no validation code.",
+ "uid": 25,
+ "cur": 1,
+ "vars": "fullName = \"\"\nemail = \"\"\nphone = \"\"\nteam = \"eng\"\nskills = \"\"\nyears = 3\nnotes = \"\"\nemailOk <- RegExMatch(email, \"i)^[^@\\s]+@[^@\\s]+\\.[a-z]{2,}$\") ? 1 : 0\nnameOk <- StrLen(Trim(fullName)) >= 2 ? 1 : 0\ndone <- Round(100 * (nameOk + emailOk + (Trim(phone) != \"\") + (skills != \"\") + (Trim(notes) != \"\")) / 5)\ndoneText <- done \"% filled in\"\ncanSave <- nameOk && emailOk\nemailHint <- email = \"\" ? \"The welcome note goes here.\" : emailOk ? \"That looks right.\" : \"That does not look like an email yet.\"\nsummary <- (nameOk ? Trim(fullName) : \"Someone\") (emailOk ? \" <\" email \">\" : \"\") \", \" (team = \"eng\" ? \"Engineering\" : team = \"des\" ? \"Design\" : \"Operations\") \", \" years \" year\" (years = 1 ? \"\" : \"s\") \" of experience\"",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "New contact",
+   "width": 660,
+   "height": 750,
+   "minwidth": 480,
+   "minheight": 480,
+   "theme": "light",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E77B",
+   "menus": "",
+   "status": "",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "saveBtn",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "resetBtn Click -> assign fullName \"\"\nresetBtn Click -> assign email \"\"\nresetBtn Click -> assign phone \"\"\nresetBtn Click -> assign skills \"\"\nresetBtn Click -> assign notes \"\"\nresetBtn Click -> toast Cleared",
+   "states": "",
+   "binds": "nameBox <-> fullName\nemailBox <-> email\nphoneBox <-> phone\nteamDdl <-> team\nskillTags <-> skills\nyearsNum <-> years\nnotesBox <-> notes\nemailLbl.Text <- emailHint\ndoneBar.Value <- done\ndoneLbl.Text <- doneText\nsaveBtn.Enabled <- canSave\nsummaryBar <- summary",
+   "hotkeys": "",
+   "init": "",
+   "script": "; One line per contact, in a CSV beside the script.\nSaveContact() {\n    global g, fullName, email, phone, team, skills, years, notes\n    f := A_ScriptDir \"\\contacts.csv\"\n    q := (s) => '\"' StrReplace(String(s), '\"', '\"\"') '\"'\n    if !FileExist(f)\n        FileAppend(\"Name,Email,Phone,Team,Skills,Years,Notes`n\", f, \"UTF-8\")\n    FileAppend(q(fullName) \",\" q(email) \",\" q(phone) \",\" q(team) \",\" q(skills) \",\" years \",\" q(notes) \"`n\", f, \"UTF-8\")\n    g.Toast(\"Saved \" Trim(fullName), 2000, \"success\")\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n20",
+      "type": "Progress",
+      "name": "doneBar",
+      "arg": "0",
+      "layout": {
+       "fill": 1
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n21",
+      "type": "Text",
+      "name": "doneLbl",
+      "arg": "0% filled in",
+      "layout": {
+       "place": "same",
+       "w": 110
+      },
+      "props": {
+       "hint": 1,
+       "align": "Right"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n8",
+      "type": "Card",
+      "name": "",
+      "arg": "Who",
+      "layout": {},
+      "props": {},
+      "events": [],
+      "kids": [
+       {
+        "id": "n1",
+        "type": "Text",
+        "name": "",
+        "arg": "Full name",
+        "layout": {
+         "w": 150
+        },
+        "props": {},
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n2",
+        "type": "Edit",
+        "name": "nameBox",
+        "arg": "",
+        "layout": {
+         "fill": 1,
+         "place": "same"
+        },
+        "props": {
+         "placeholder": "Jane Doe"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n3",
+        "type": "Text",
+        "name": "",
+        "arg": "Email",
+        "layout": {
+         "w": 150
+        },
+        "props": {},
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n4",
+        "type": "Edit",
+        "name": "emailBox",
+        "arg": "",
+        "layout": {
+         "fill": 1,
+         "place": "same"
+        },
+        "props": {
+         "placeholder": "jane@example.com"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n5",
+        "type": "Text",
+        "name": "emailLbl",
+        "arg": "The welcome note goes here.",
+        "layout": {
+         "ml": 158
+        },
+        "props": {
+         "hint": 1
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n6",
+        "type": "Text",
+        "name": "",
+        "arg": "Phone",
+        "layout": {
+         "w": 150
+        },
+        "props": {},
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n7",
+        "type": "Edit",
+        "name": "phoneBox",
+        "arg": "",
+        "layout": {
+         "w": 240,
+         "place": "same"
+        },
+        "props": {
+         "placeholder": "+44 20 7946 0958"
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     },
+     {
+      "id": "n17",
+      "type": "Card",
+      "name": "",
+      "arg": "Work",
+      "layout": {
+       "top": 4
+      },
+      "props": {},
+      "events": [],
+      "kids": [
+       {
+        "id": "n9",
+        "type": "Text",
+        "name": "",
+        "arg": "Team",
+        "layout": {
+         "w": 150
+        },
+        "props": {},
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n10",
+        "type": "DDL",
+        "name": "teamDdl",
+        "arg": "eng:Engineering\ndes:Design\nops:Operations",
+        "layout": {
+         "w": 240,
+         "place": "same"
+        },
+        "props": {
+         "value": "eng"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n11",
+        "type": "Text",
+        "name": "",
+        "arg": "Skills",
+        "layout": {
+         "w": 150
+        },
+        "props": {},
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n12",
+        "type": "Tags",
+        "name": "skillTags",
+        "arg": "",
+        "layout": {
+         "fill": 1,
+         "place": "same"
+        },
+        "props": {
+         "suggest": "AutoHotkey|Design|Writing|Support|Sales|Testing|Research",
+         "placeholder": "Type, and press Enter"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n13",
+        "type": "Text",
+        "name": "",
+        "arg": "Starts on",
+        "layout": {
+         "w": 150
+        },
+        "props": {},
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n14",
+        "type": "Date",
+        "name": "startDate",
+        "arg": "today",
+        "layout": {
+         "w": 200,
+         "place": "same"
+        },
+        "props": {},
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n15",
+        "type": "Text",
+        "name": "",
+        "arg": "Years in the job",
+        "layout": {
+         "place": "same",
+         "gap": 24
+        },
+        "props": {},
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n16",
+        "type": "Number",
+        "name": "yearsNum",
+        "arg": "3",
+        "layout": {
+         "place": "same",
+         "w": 110
+        },
+        "props": {
+         "min": "0",
+         "max": "60"
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     },
+     {
+      "id": "n19",
+      "type": "Card",
+      "name": "",
+      "arg": "Notes",
+      "layout": {
+       "top": 4,
+       "grow": 1
+      },
+      "props": {},
+      "events": [],
+      "kids": [
+       {
+        "id": "n18",
+        "type": "Edit",
+        "name": "notesBox",
+        "arg": "",
+        "layout": {
+         "fill": 1,
+         "grow": 1
+        },
+        "props": {
+         "rows": 3,
+         "placeholder": "Anything worth knowing"
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     },
+     {
+      "id": "n22",
+      "type": "InfoBar",
+      "name": "summaryBar",
+      "arg": "Someone, Engineering, 3 years of experience",
+      "layout": {
+       "top": 4
+      },
+      "props": {
+       "title": "So far",
+       "kind": "info",
+       "noclose": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n23",
+      "type": "Text",
+      "name": "",
+      "arg": "",
+      "layout": {
+       "fill": 1
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n24",
+      "type": "Button",
+      "name": "resetBtn",
+      "arg": "Clear",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "kind": "Subtle",
+       "icon": "E894"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n25",
+      "type": "Button",
+      "name": "saveBtn",
+      "arg": "Save",
+      "layout": {
+       "place": "same",
+       "w": 110
+      },
+      "props": {
+       "kind": "Accent",
+       "icon": "E74E"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "SaveContact()"
+       }
+      ],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

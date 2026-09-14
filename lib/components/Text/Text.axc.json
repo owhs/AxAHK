@@ -1,0 +1,52 @@
+{
+  "name": "Text",
+  "description": "Label",
+  "order": 2001,
+  "include": "lib\\components\\Text\\AxText.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Text",
+      "label": "Label",
+      "icon": "E8A5",
+      "category": "Common",
+      "prefix": "txt",
+      "arg": {
+        "key": "text",
+        "label": "Text",
+        "kind": "multiline",
+        "default": "Label"
+      },
+      "props": [
+        {
+          "key": "align",
+          "label": "Alignment",
+          "kind": "choice",
+          "emit": "flagset",
+          "options": "|Right|Center"
+        },
+        {
+          "key": "caption",
+          "label": "Caption",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "hint",
+          "label": "Hint",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

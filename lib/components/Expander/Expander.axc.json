@@ -1,0 +1,53 @@
+{
+  "name": "Expander",
+  "description": "Expander",
+  "order": 1003,
+  "css": "AxExpander.css",
+  "include": "lib\\components\\Expander\\AxExpander.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Expander",
+      "label": "Expander",
+      "icon": "E76C",
+      "category": "Containers",
+      "prefix": "exp",
+      "box": true,
+      "arg": {
+        "key": "title",
+        "label": "Title",
+        "kind": "text",
+        "default": "More"
+      },
+      "props": [
+        {
+          "key": "desc",
+          "label": "Description",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "icon",
+          "label": "Icon",
+          "kind": "icon",
+          "emit": "kv"
+        },
+        {
+          "key": "open",
+          "label": "Open by default",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

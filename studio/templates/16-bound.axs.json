@@ -1,0 +1,342 @@
+{
+ "format": "axstudio/2",
+ "name": "Bound to a value",
+ "desc": "Bindings, rules and states doing all the work -- not one line of handler code. A name, a size and a colour, each shown five ways, and a chart drawn from them.",
+ "uid": 18,
+ "cur": 1,
+ "vars": "who = \"World\"\nloud = 0\nsize = 40\ncolour = \"#60cdff\"\ngreeting <- (loud ? \"HELLO \" StrUpper(who) \"!\" : \"Hello \" who)\nhowLong <- StrLen(who) \" character\" (StrLen(who) = 1 ? \"\" : \"s\")\nhasName <- (Trim(who) != \"\")\nsizeText <- size \"%\"\nbars <- \"Size: \" Round(size / 4) \",\" Round(size / 2) \",\" size \",\" Round(size * 0.8) \",\" Round(size * 0.6)",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Bound",
+   "width": 660,
+   "height": 720,
+   "minwidth": 480,
+   "minheight": 460,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E71B",
+   "menus": "",
+   "status": "msg | Nothing here has a handler | grow icon=E71B",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "clearBtn Click -> assign who \"\"\nclearBtn Click -> toast Cleared\nresetBtn Click -> assign size 40\naboutLink Click -> state busy",
+   "states": "busy: aboutLink.Enabled = 0\nidle: aboutLink.Enabled = 1",
+   "binds": "nameBox <-> who\ngreetLabel.Text <- greeting\nshoutSwitch <-> loud\nlenLabel.Text <- howLong\nclearBtn.Enabled <- hasName\nsizeSlider <-> size\nsizeNum <-> size\nsizeBar.Value <- size\nsizeGauge.Value <- size\nsizeLbl.Text <- sizeText\npal <-> colour\ncolourLbl.Text <- colour\nchart.Value <- bars",
+   "hotkeys": "",
+   "init": "",
+   "script": "",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "Text",
+      "name": "",
+      "arg": "Type in the box, drag the slider, pick a colour.",
+      "layout": {},
+      "props": {
+       "caption": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Text",
+      "name": "",
+      "arg": "Every control below is bound to a value; the values keep them in step.",
+      "layout": {},
+      "props": {
+       "hint": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Edit",
+      "name": "nameBox",
+      "arg": "World",
+      "layout": {
+       "w": 260,
+       "top": 8
+      },
+      "props": {
+       "placeholder": "Your name"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Switch",
+      "name": "shoutSwitch",
+      "arg": "Shout it",
+      "layout": {
+       "place": "same",
+       "gap": 16
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Text",
+      "name": "greetLabel",
+      "arg": "Hello World",
+      "layout": {
+       "style": "font-size:20px;font-weight:600"
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "Text",
+      "name": "lenLabel",
+      "arg": "5 characters",
+      "layout": {},
+      "props": {
+       "hint": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Button",
+      "name": "clearBtn",
+      "arg": "Clear",
+      "layout": {},
+      "props": {
+       "kind": "Accent"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n8",
+      "type": "Link",
+      "name": "aboutLink",
+      "arg": "What is this?",
+      "layout": {
+       "place": "same"
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n9",
+      "type": "Separator",
+      "name": "",
+      "arg": "",
+      "layout": {},
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n10",
+      "type": "Slider",
+      "name": "sizeSlider",
+      "arg": "40",
+      "layout": {
+       "fill": 1
+      },
+      "props": {
+       "min": "0",
+       "max": "100",
+       "novalue": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n11",
+      "type": "Number",
+      "name": "sizeNum",
+      "arg": "40",
+      "layout": {
+       "place": "same",
+       "w": 110
+      },
+      "props": {
+       "min": "0",
+       "max": "100"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n12",
+      "type": "Text",
+      "name": "sizeLbl",
+      "arg": "40%",
+      "layout": {
+       "place": "same",
+       "w": 50
+      },
+      "props": {
+       "caption": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n13",
+      "type": "Button",
+      "name": "resetBtn",
+      "arg": "Back to 40",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "kind": "Subtle"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n14",
+      "type": "Progress",
+      "name": "sizeBar",
+      "arg": "40",
+      "layout": {
+       "fill": 1
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n15",
+      "type": "Gauge",
+      "name": "sizeGauge",
+      "arg": "40",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "max": "100"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n16",
+      "type": "Palette",
+      "name": "pal",
+      "arg": "#60cdff\n#c792ea\n#6ccb5f\n#fce100\n#ff99a4\n#f7a35c",
+      "layout": {},
+      "props": {
+       "value": "#60cdff"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n17",
+      "type": "Text",
+      "name": "colourLbl",
+      "arg": "#60cdff",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "caption": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n18",
+      "type": "Chart",
+      "name": "chart",
+      "arg": "Size: 10,20,40,32,24",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 130
+      },
+      "props": {
+       "kind": "bar",
+       "labels": "a quarter,a half,all of it,four fifths,three fifths",
+       "max": "100",
+       "numbers": 1
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

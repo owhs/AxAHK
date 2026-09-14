@@ -1,0 +1,14 @@
+/* AxTab.css -- the shape of the tabs.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.tabs { display: flex; }
+.tab-panel { display: none; }
+
+/* A placed tabs control: one box, the strip at its top, the page showing
+   filling the rest -- and the page is what its controls are placed in.
+   Every page, not only .visible: a click shows one with style.display. */
+.tabs-frame { display: -ms-flexbox; display: flex; -ms-flex-direction: column; flex-direction: column; }
+.tabs-frame > .tabs { -ms-flex: 0 0 auto; flex: 0 0 auto; }
+.tabs-frame > .tab-panel { position: relative; -ms-flex: 1 1 auto; flex: 1 1 auto; }

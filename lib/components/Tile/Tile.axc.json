@@ -1,0 +1,58 @@
+{
+  "name": "Tile",
+  "description": "Tile",
+  "order": 4005,
+  "css": "AxTile.css",
+  "include": "lib\\components\\Tile\\AxTile.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Tile",
+      "label": "Tile",
+      "icon": "E8FD",
+      "category": "Display",
+      "prefix": "tile",
+      "arg": {
+        "key": "name",
+        "label": "Name",
+        "kind": "text",
+        "default": "Files"
+      },
+      "props": [
+        {
+          "key": "value",
+          "label": "Value",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "desc",
+          "label": "Description",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "icon",
+          "label": "Icon",
+          "kind": "icon",
+          "emit": "kv"
+        },
+        {
+          "key": "removable",
+          "label": "Removable",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "Card",
+  "description": "Card",
+  "order": 1000,
+  "include": "lib\\components\\Card\\AxCard.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Card",
+      "label": "Card",
+      "icon": "E7C3",
+      "category": "Containers",
+      "prefix": "card",
+      "box": true,
+      "arg": {
+        "key": "title",
+        "label": "Title",
+        "kind": "text",
+        "default": ""
+      },
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

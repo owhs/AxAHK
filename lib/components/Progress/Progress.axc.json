@@ -1,0 +1,40 @@
+{
+  "name": "Progress",
+  "description": "Progress bar",
+  "order": 4000,
+  "css": "AxProgress.css",
+  "include": "lib\\components\\Progress\\AxProgress.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Progress",
+      "label": "Progress bar",
+      "icon": "E9F3",
+      "category": "Display",
+      "prefix": "pb",
+      "arg": {
+        "key": "value",
+        "label": "Value",
+        "kind": "num",
+        "default": "35"
+      },
+      "props": [
+        {
+          "key": "indeterminate",
+          "label": "Indeterminate",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

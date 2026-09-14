@@ -1,0 +1,18 @@
+/* AxCanvas.css -- the shape of the drawing surface.
+
+   The base layer: the page loads this before the theme. The <canvas> is laid
+   over the box and sized by the script to its pixels; until the script runs
+   (and always on the studio's canvas) the box shows what it is. */
+
+.axcv { position: relative; display: block; height: 240px; overflow: hidden; border-radius: 6px; }
+.axcv.fill { width: 100%; }
+.axcv-c { position: absolute; left: 0; top: 0; display: block; }
+.axcv-ph {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; opacity: .55; border: 1px dashed rgba(128, 128, 128, .6); border-radius: 6px;
+}
+.axcv-ph .ico { font-size: 18px; margin-right: 8px; }
+.axcv-live .axcv-ph { display: none; }
+.axcv-q { display: none; }
+.axcv-req { position: absolute; width: 0; height: 0; overflow: hidden; }

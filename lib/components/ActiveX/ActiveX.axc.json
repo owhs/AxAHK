@@ -1,0 +1,40 @@
+{
+  "name": "ActiveX",
+  "description": "ActiveX host",
+  "order": 9000,
+  "include": "lib\\components\\ActiveX\\AxActiveX.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "ActiveX",
+      "label": "ActiveX host",
+      "icon": "E943",
+      "category": "Advanced",
+      "prefix": "ax",
+      "arg": {
+        "key": "progid",
+        "label": "ProgID (an AHK expression)",
+        "kind": "text",
+        "default": "\"Shell.Explorer.2\"",
+        "raw": true
+      },
+      "props": [
+        {
+          "key": "stretch",
+          "label": "Fill the rest of the page",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

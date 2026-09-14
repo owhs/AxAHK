@@ -1,0 +1,478 @@
+{
+ "format": "axstudio/2",
+ "name": "Two windows",
+ "desc": "Three windows in one script: the main one, a modal Settings dialog and an About window. They share bound values, so the dialog edits what the main window shows with no code at all.",
+ "uid": 17,
+ "cur": 1,
+ "vars": "who = \"World\"\nloud = 0\ngreeting <- loud ? \"HELLO, \" StrUpper(who) \"!\" : \"Hello, \" who \".\"",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Greeter",
+   "width": 620,
+   "height": 480,
+   "minwidth": 420,
+   "minheight": 320,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E8BD",
+   "menus": "",
+   "status": "msg | Ready | grow icon=E8BD",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "settingsBtn Click -> open Settings\naboutLink Click -> open About\nsayBtn Click -> addrow said {greetLbl}\nsayBtn Click -> status msg Said it\nclearBtn Click -> clearlist said",
+   "states": "",
+   "binds": "greetLbl.Text <- greeting",
+   "hotkeys": "",
+   "init": "",
+   "script": "",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "Text",
+      "name": "greetLbl",
+      "arg": "Hello, World.",
+      "layout": {
+       "style": "font-size:24px;font-weight:600"
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Text",
+      "name": "",
+      "arg": "Settings is a modal dialog that edits the same values this window shows. Nothing passes them back and forth: they are one value.",
+      "layout": {},
+      "props": {
+       "hint": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Button",
+      "name": "settingsBtn",
+      "arg": "Settings...",
+      "layout": {
+       "top": 8
+      },
+      "props": {
+       "kind": "Accent",
+       "icon": "E713"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Button",
+      "name": "sayBtn",
+      "arg": "Say it",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8BD"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Link",
+      "name": "aboutLink",
+      "arg": "About",
+      "layout": {
+       "place": "same",
+       "gap": 16
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "ListBox",
+      "name": "said",
+      "arg": "",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 120,
+       "top": 4
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Button",
+      "name": "clearBtn",
+      "arg": "Clear the list",
+      "layout": {},
+      "props": {
+       "kind": "Subtle",
+       "icon": "E894"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  },
+  {
+   "name": "Settings",
+   "kind": "dialog",
+   "inputs": "",
+   "outputs": "",
+   "title": "Settings",
+   "width": 400,
+   "height": 250,
+   "minwidth": 0,
+   "minheight": 0,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 1,
+   "resizable": 0,
+   "icon": "E713",
+   "menus": "",
+   "status": "",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 0,
+   "minimizebox": 0,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 0,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "main",
+   "taborder": "",
+   "defaultbtn": "doneBtn",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "doneBtn Click -> close",
+   "states": "",
+   "binds": "whoBox <-> who\nloudSwitch <-> loud\npreviewLbl.Text <- greeting",
+   "hotkeys": "",
+   "init": "",
+   "script": "",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n8",
+      "type": "Text",
+      "name": "",
+      "arg": "Who should it greet?",
+      "layout": {},
+      "props": {
+       "caption": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n9",
+      "type": "Edit",
+      "name": "whoBox",
+      "arg": "",
+      "layout": {
+       "fill": 1
+      },
+      "props": {
+       "placeholder": "A name"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n10",
+      "type": "Switch",
+      "name": "loudSwitch",
+      "arg": "Shout it",
+      "layout": {},
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n11",
+      "type": "Text",
+      "name": "previewLbl",
+      "arg": "Hello, World.",
+      "layout": {},
+      "props": {
+       "hint": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n12",
+      "type": "Text",
+      "name": "",
+      "arg": "",
+      "layout": {
+       "fill": 1,
+       "top": 6
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n13",
+      "type": "Button",
+      "name": "doneBtn",
+      "arg": "Done",
+      "layout": {
+       "place": "same",
+       "w": 100
+      },
+      "props": {
+       "kind": "Accent"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  },
+  {
+   "name": "About",
+   "kind": "tool",
+   "inputs": "",
+   "outputs": "",
+   "title": "About",
+   "width": 380,
+   "height": 230,
+   "minwidth": 0,
+   "minheight": 0,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 1,
+   "resizable": 0,
+   "icon": "E946",
+   "menus": "",
+   "status": "",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 0,
+   "minimizebox": 0,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 0,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "main",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "okBtn Click -> close",
+   "states": "",
+   "binds": "",
+   "hotkeys": "",
+   "init": "",
+   "script": "",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n14",
+      "type": "Avatar",
+      "name": "",
+      "arg": "Greeter",
+      "layout": {},
+      "props": {
+       "size": "48",
+       "named": 1,
+       "sub": "Version 1.0"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n15",
+      "type": "Text",
+      "name": "",
+      "arg": "This window opens with ShowAbout(), the dialog with ShowSettings() -- the rules above write those calls.",
+      "layout": {
+       "top": 6
+      },
+      "props": {
+       "hint": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n16",
+      "type": "Text",
+      "name": "",
+      "arg": "",
+      "layout": {
+       "fill": 1,
+       "top": 6
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n17",
+      "type": "Button",
+      "name": "okBtn",
+      "arg": "Close",
+      "layout": {
+       "place": "same",
+       "w": 100
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

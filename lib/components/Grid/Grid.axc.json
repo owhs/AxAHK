@@ -1,0 +1,24 @@
+{
+  "name": "Grid",
+  "description": "Tile grid",
+  "order": 1005,
+  "css": "AxGrid.css",
+  "include": "lib\\components\\Grid\\AxGrid.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Grid",
+      "label": "Tile grid",
+      "icon": "E80A",
+      "category": "Containers",
+      "prefix": "grid",
+      "box": true,
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

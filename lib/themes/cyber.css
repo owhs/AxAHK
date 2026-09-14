@@ -1,0 +1,673 @@
+/* @extends win11 */
+/* ============================================================================
+   cyber.css — a machine's heads-up display. The trap with this look is that it
+   becomes a dark sheet with the saturation turned up, which is aurora's job
+   already, so the rule here is the opposite: the character is carried by
+   STRUCTURE, and colour is rationed.
+
+   Rules of the sheet, so later edits do not undo it:
+
+     • Glow is a TIGHT halo on a lit element, never ambient. That is the line
+       between this and aurora: aurora blooms behind the whole page, here a
+       live thing carries a 10px halo of its own and nothing else does. Ban the
+       glow outright -- as the first draft of this sheet did -- and what is
+       left is precision.css in cyan.
+     • Geometry is ASYMMETRIC. Precision is a rigorous grid of equal hairlines;
+       this is a HUD, so a panel is cut across one corner and bracketed on the
+       opposite one, the live rail item ends in a chevron, and the workspace is
+       ruled with ticks along its top edge. Same 1px line, opposite intent.
+     • Corners are cut, not rounded. Radius is 0 everywhere. The cut is a 1px
+       diagonal rather than a real notch, because a notch has to be painted in
+       the colour of whatever is behind it, and a card does not know whether it
+       is sitting on the workspace or inside a dialog.
+     • One signal colour, and it is the accent. It appears as a fill on the
+       thing that is live and as a 1px run everywhere else. If it starts
+       covering area, the HUD has stopped reading as a HUD.
+     • Magenta is an alert and amber is a caution. Both sit outside the accent
+       band on purpose and never move: a warning that changes colour with a
+       preference is not a warning.
+     • Chrome, labels and readouts are monospace; prose is a normal sans. The
+       sheet is not a terminal -- inset.css is the terminal.
+
+   The scanlines are a 4px SVG tile rather than a repeating gradient, because
+   Trident softens a 1px gradient stop and the line has to be exactly one
+   pixel to read. Its colour is rgb() plus a -opacity attribute so the data URI
+   carries no "#": a raw one would end the url() as a fragment, and
+   AxSys.RecolourCss would rewrite the literal.
+
+   No @accent-hue line is needed -- the signal is a cyan and already sits in
+   AxSys's blue band, so SetAccent repaints every lit thing at once while the
+   structural greys, held under BlueMinS, stay dead neutral. Push the accent to
+   green and it is a matrix; to amber and it is a gun-camera; to violet and it
+   is a synth rig. The chassis never moves.
+
+   The title bar is 28px, the menu bar 24 and the status bar 22, so all four
+   #shell sums are restated, and so is the height AxRich.css gives a rich
+   dialog's content.
+   ========================================================================= */
+
+/* ------------------------------------------------------------- the material */
+body.sheet-cyber {
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 13px; line-height: 18px;
+}
+body.sheet-cyber.theme-dark  { background: #0e0f11; color: #d8dde3; }
+body.sheet-cyber.theme-light { background: #eceef0; color: #16181a; }
+
+/* the machine voice: chrome, labels, readouts. Prose is left alone. */
+body.sheet-cyber #titleText, body.sheet-cyber .nav-item,
+body.sheet-cyber .caption, body.sheet-cyber .group > .legend,
+body.sheet-cyber h3, body.sheet-cyber .btn, body.sheet-cyber .tab,
+body.sheet-cyber .axmb, body.sheet-cyber .axsb, body.sheet-cyber .badge,
+body.sheet-cyber .hex, body.sheet-cyber .console, body.sheet-cyber .slider .out,
+body.sheet-cyber .fl-meta, body.sheet-cyber .dv-hcell, body.sheet-cyber .dv-count,
+body.sheet-cyber .segmented .seg, body.sheet-cyber .axctx-kbd,
+body.sheet-cyber .numberbox input, body.sheet-cyber .hotkeybox input,
+body.sheet-cyber .axdlg-btn, body.sheet-cyber #axDlgTitle, body.sheet-cyber .axtb-item {
+    font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace;
+}
+
+/* ---------------------------------------------------------------- the frame */
+/* 28px, a hairline under it, and a 3px block of signal at the left edge --
+   the power rail. It drains when the window loses focus. */
+body.sheet-cyber #titlebar {
+    position: relative; height: 28px; padding-left: 14px; background: transparent;
+}
+body.sheet-cyber.theme-dark #titlebar  { background: #121417; border-bottom: 1px solid #272b30; }
+body.sheet-cyber.theme-light #titlebar { background: #e2e5e8; border-bottom: 1px solid #d3d7db; }
+body.sheet-cyber #titlebar:before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #00d8ff;
+}
+body.sheet-cyber.theme-light #titlebar:before { background: #0088a8; }
+body.sheet-cyber.inactive #titlebar:before { background: #3a3f45; }
+body.sheet-cyber #titleText {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .22em;
+}
+body.sheet-cyber.theme-dark #titleText  { color: #7b838c; }
+body.sheet-cyber.theme-light #titleText { color: #5c646d; }
+body.sheet-cyber #titlebar .app-icon { font-size: 11px; margin-right: 10px; color: #00d8ff; }
+body.sheet-cyber.theme-light #titlebar .app-icon { color: #0088a8; }
+body.sheet-cyber #titlebar .app-icon img { width: 14px; height: 14px; }
+body.sheet-cyber.inactive #titleText, body.sheet-cyber.inactive #titlebar .app-icon { color: #4d545c; }
+
+/* the caption controls: square cells, filled when pointed at, never outlined.
+   Scoped under #titlebar so SetTint cannot paint the chassis face. */
+body.sheet-cyber #titlebar .winbtn {
+    width: 34px; height: 28px; line-height: 28px; border-radius: 0;
+    font-size: 9px; background: transparent; transition: none;
+}
+body.sheet-cyber.theme-dark #titlebar .winbtn  { color: #7b838c; }
+body.sheet-cyber.theme-light #titlebar .winbtn { color: #5c646d; }
+body.sheet-cyber #titlebar .winbtn:hover, body.sheet-cyber #titlebar .winbtn.hover {
+    background: #00d8ff; color: #04222a;
+}
+body.sheet-cyber.theme-light #titlebar .winbtn:hover,
+body.sheet-cyber.theme-light #titlebar .winbtn.hover { background: #0088a8; color: #ffffff; }
+body.sheet-cyber #titlebar #btnClose:hover, body.sheet-cyber #titlebar #btnClose.hover {
+    background: #ff2d78; color: #2a0512;
+}
+
+/* ------------------------------------------------------------ the reserves */
+body.sheet-cyber #shell { height: calc(100% - 28px); }
+body.sheet-cyber.has-menubar #shell { height: calc(100% - 52px); }
+body.sheet-cyber.has-statusbar #shell { height: calc(100% - 50px); }
+body.sheet-cyber.has-menubar.has-statusbar #shell { height: calc(100% - 74px); }
+body.sheet-cyber.axrich-dlg #content { height: calc(100% - 28px); }
+
+/* ----------------------------------------------------------------- the rail */
+body.sheet-cyber #sidebar { width: 192px; padding: 8px 0 0 0; background: transparent; }
+body.sheet-cyber.theme-dark #sidebar  { border-right: 1px solid #272b30; }
+body.sheet-cyber.theme-light #sidebar { border-right: 1px solid #d3d7db; }
+body.sheet-cyber .nav-item {
+    height: 28px; line-height: 28px; margin: 0; padding: 0 12px 0 16px; border-radius: 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .14em; background: transparent;
+}
+body.sheet-cyber .nav-item .ico { width: 18px; font-size: 12px; margin-right: 9px; }
+body.sheet-cyber.theme-dark .nav-item  { color: #7b838c; }
+body.sheet-cyber.theme-light .nav-item { color: #5c646d; }
+body.sheet-cyber.theme-dark .nav-item:hover  { background: #15171a; color: #d8dde3; }
+body.sheet-cyber.theme-light .nav-item:hover { background: #e2e5e8; color: #16181a; }
+/* the live channel is filled, not underlined: on a HUD the selected thing is
+   the bright one and everything else is the frame */
+body.sheet-cyber .nav-item.active, body.sheet-cyber .nav-item.active:hover {
+    background: #00d8ff; color: #04222a;
+}
+body.sheet-cyber.theme-light .nav-item.active,
+body.sheet-cyber.theme-light .nav-item.active:hover { background: #0088a8; color: #ffffff; }
+body.sheet-cyber .nav-item.active:before { display: none; }
+
+/* ----------------------------------------------------------- the workspace */
+/* Scanlines: a 4px tile, one pixel of line, laid over the void. */
+/* The 6px on the right and bottom is not decoration: Trident paints the
+   native scrollbar above everything, z-index included, so a #content that
+   runs to the frame edge buries the .rz resize hotspots under it and the
+   window can no longer be dragged by its right or bottom edge. win11.css
+   keeps the same inset for the same reason. */
+body.sheet-cyber #content {
+    margin: 0 6px 6px 0; padding: 16px 22px 24px 18px; border-radius: 0;
+    background-repeat: repeat; background-position: 0 0;
+}
+body.sheet-cyber.theme-dark #content {
+    background-color: #0e0f11;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%3E%3Cpath%20d='M0%203.5H4'%20stroke='rgb(255,255,255)'%20stroke-opacity='.035'%20stroke-width='1'/%3E%3C/svg%3E");
+}
+body.sheet-cyber.theme-light #content {
+    background-color: #f3f5f6;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%3E%3Cpath%20d='M0%203.5H4'%20stroke='rgb(0,0,0)'%20stroke-opacity='.04'%20stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* ----------------------------------------------------------------- writing */
+body.sheet-cyber h1 { font-size: 19px; line-height: 26px; font-weight: 600; letter-spacing: .01em; margin: 0 0 4px; }
+body.sheet-cyber h2 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; }
+body.sheet-cyber h3 {
+    font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .2em; margin: 18px 0 6px;
+}
+body.sheet-cyber .caption {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .2em; margin: 0 0 14px;
+}
+body.sheet-cyber .hint { font-size: 11px; }
+body.sheet-cyber.theme-dark .caption, body.sheet-cyber.theme-dark .hint,
+body.sheet-cyber.theme-dark h3, body.sheet-cyber.theme-dark .card-row .desc,
+body.sheet-cyber.theme-dark .tile .desc, body.sheet-cyber.theme-dark .fl-meta,
+body.sheet-cyber.theme-dark .dropzone .dz-desc, body.sheet-cyber.theme-dark .dv-count { color: #7b838c; }
+body.sheet-cyber.theme-light .caption, body.sheet-cyber.theme-light .hint,
+body.sheet-cyber.theme-light h3, body.sheet-cyber.theme-light .card-row .desc,
+body.sheet-cyber.theme-light .tile .desc, body.sheet-cyber.theme-light .fl-meta,
+body.sheet-cyber.theme-light .dropzone .dz-desc, body.sheet-cyber.theme-light .dv-count { color: #5c646d; }
+body.sheet-cyber .link, body.sheet-cyber .hyperlink, body.sheet-cyber a { color: #00d8ff; text-decoration: none; }
+body.sheet-cyber.theme-light .link, body.sheet-cyber.theme-light .hyperlink,
+body.sheet-cyber.theme-light a { color: #0088a8; }
+body.sheet-cyber .link:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------- panels and brackets */
+/* A card is a plate with two bracket corners. The brackets are borders on the
+   pseudo-elements, so they stay exactly one pixel and need no markup. */
+body.sheet-cyber .card {
+    position: relative; border-radius: 0; padding: 12px 16px; margin-bottom: 8px;
+}
+body.sheet-cyber.theme-dark .card  { background: #15171a; border: 1px solid #272b30; }
+body.sheet-cyber.theme-light .card { background: #ffffff; border: 1px solid #d3d7db; }
+body.sheet-cyber .card:before, body.sheet-cyber .card:after {
+    content: ""; position: absolute; width: 9px; height: 9px; pointer-events: none;
+    border: 1px solid #00d8ff;
+}
+body.sheet-cyber .card:before { left: -1px; top: -1px; border-width: 1px 0 0 1px; }
+body.sheet-cyber .card:after { right: -1px; bottom: -1px; border-width: 0 1px 1px 0; }
+body.sheet-cyber.theme-light .card:before, body.sheet-cyber.theme-light .card:after { border-color: #0088a8; }
+body.sheet-cyber .card.hot { border-color: #00d8ff; }
+body.sheet-cyber .card-row { min-height: 38px; }
+body.sheet-cyber .group { border-radius: 0; padding: 16px 14px 12px; margin: 12px 0; }
+body.sheet-cyber.theme-dark .group  { border: 1px solid #272b30; background: #121417; }
+body.sheet-cyber.theme-light .group { border: 1px solid #d3d7db; background: #f8f9fa; }
+body.sheet-cyber .group > .legend { font-size: 10px; text-transform: uppercase; letter-spacing: .2em; }
+body.sheet-cyber.theme-dark .group > .legend  { background: #121417; color: #00d8ff; }
+body.sheet-cyber.theme-light .group > .legend { background: #f8f9fa; color: #0088a8; }
+body.sheet-cyber .expander { border-radius: 0; margin-bottom: 8px; }
+body.sheet-cyber.theme-dark .expander  { background: #15171a; border: 1px solid #272b30; }
+body.sheet-cyber.theme-light .expander { background: #ffffff; border: 1px solid #d3d7db; }
+body.sheet-cyber .exp-header { min-height: 38px; }
+body.sheet-cyber .exp-header .chev { border-radius: 0; }
+body.sheet-cyber.theme-dark .exp-body  { background: #111214; border-top-color: #272b30; }
+body.sheet-cyber.theme-light .exp-body { background: #f3f5f6; border-top-color: #d3d7db; }
+body.sheet-cyber .tile { border-radius: 0; }
+body.sheet-cyber.theme-dark .tile  { background: #15171a; border: 1px solid #272b30; }
+body.sheet-cyber.theme-light .tile { background: #ffffff; border: 1px solid #d3d7db; }
+
+/* ---------------------------------------------------------------- controls */
+body.sheet-cyber .btn {
+    height: 26px; line-height: 24px; min-width: 60px; padding: 0 14px; border-radius: 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .16em; transition: none;
+    background: transparent;
+}
+body.sheet-cyber.theme-dark .btn  { border: 1px solid #3a3f45; color: #b6bdc4; }
+body.sheet-cyber.theme-light .btn { border: 1px solid #b9bfc5; color: #2d3136; }
+body.sheet-cyber .btn:hover { border-color: #00d8ff; color: #00d8ff; background: transparent; }
+body.sheet-cyber.theme-light .btn:hover { border-color: #0088a8; color: #0088a8; }
+body.sheet-cyber .btn:active, body.sheet-cyber .btn.pressed,
+body.sheet-cyber .btn.accent, body.sheet-cyber .axdlg-btn.primary {
+    background: #00d8ff; border: 1px solid #00d8ff; color: #04222a;
+}
+body.sheet-cyber.theme-light .btn:active, body.sheet-cyber.theme-light .btn.pressed,
+body.sheet-cyber.theme-light .btn.accent, body.sheet-cyber.theme-light .axdlg-btn.primary {
+    background: #0088a8; border-color: #0088a8; color: #ffffff;
+}
+body.sheet-cyber .btn.accent:hover, body.sheet-cyber .axdlg-btn.primary:hover {
+    background: #4ee6ff; border-color: #4ee6ff; color: #04222a;
+}
+body.sheet-cyber .btn.subtle { border-color: transparent; }
+body.sheet-cyber .btn.danger { background: #ff2d78; border-color: #ff2d78; color: #2a0512; }
+body.sheet-cyber.theme-dark .btn.disabled  { border-color: #23272c; color: #4d545c; background: transparent; }
+body.sheet-cyber.theme-light .btn.disabled { border-color: #dcdfe3; color: #a3aab1; background: transparent; }
+body.sheet-cyber .btn.icon { width: 26px; min-width: 26px; }
+
+/* a field is a well with a signal gutter down its left edge once it is live */
+body.sheet-cyber .textbox input, body.sheet-cyber .textbox textarea,
+body.sheet-cyber .searchbox input, body.sheet-cyber .numberbox input,
+body.sheet-cyber .passwordbox input, body.sheet-cyber .hotkeybox input,
+body.sheet-cyber .dd-value, body.sheet-cyber #axDlgInput, body.sheet-cyber .hex {
+    height: 26px; line-height: 24px; border-radius: 0; font-size: 12px;
+}
+body.sheet-cyber.theme-dark .textbox input, body.sheet-cyber.theme-dark .textbox textarea,
+body.sheet-cyber.theme-dark .searchbox input, body.sheet-cyber.theme-dark .numberbox input,
+body.sheet-cyber.theme-dark .passwordbox input, body.sheet-cyber.theme-dark .hotkeybox input,
+body.sheet-cyber.theme-dark .dd-value, body.sheet-cyber.theme-dark #axDlgInput,
+body.sheet-cyber.theme-dark .hex, body.sheet-cyber.theme-dark .list,
+body.sheet-cyber.theme-dark .filelist, body.sheet-cyber.theme-dark .dv-frame {
+    background: #0c0d0e; border: 1px solid #272b30; color: #d8dde3;
+}
+body.sheet-cyber.theme-light .textbox input, body.sheet-cyber.theme-light .textbox textarea,
+body.sheet-cyber.theme-light .searchbox input, body.sheet-cyber.theme-light .numberbox input,
+body.sheet-cyber.theme-light .passwordbox input, body.sheet-cyber.theme-light .hotkeybox input,
+body.sheet-cyber.theme-light .dd-value, body.sheet-cyber.theme-light #axDlgInput,
+body.sheet-cyber.theme-light .hex, body.sheet-cyber.theme-light .list,
+body.sheet-cyber.theme-light .filelist, body.sheet-cyber.theme-light .dv-frame {
+    background: #ffffff; border: 1px solid #cbd0d5; color: #16181a;
+}
+body.sheet-cyber .textbox textarea { height: auto; padding: 5px 8px; }
+body.sheet-cyber .textbox input:focus, body.sheet-cyber .textbox textarea:focus,
+body.sheet-cyber .searchbox input:focus, body.sheet-cyber .passwordbox input:focus,
+body.sheet-cyber .hotkeybox input:focus, body.sheet-cyber .hotkeybox.recording input,
+body.sheet-cyber #axDlgInput:focus, body.sheet-cyber .numberbox.focus input,
+body.sheet-cyber .dropdown.open .dd-value {
+    border: 1px solid #00d8ff; border-left-width: 3px; border-bottom-width: 1px;
+}
+body.sheet-cyber.theme-light .textbox input:focus, body.sheet-cyber.theme-light .textbox textarea:focus,
+body.sheet-cyber.theme-light .searchbox input:focus, body.sheet-cyber.theme-light .passwordbox input:focus,
+body.sheet-cyber.theme-light #axDlgInput:focus, body.sheet-cyber.theme-light .numberbox.focus input,
+body.sheet-cyber.theme-light .dropdown.open .dd-value { border-color: #0088a8; }
+body.sheet-cyber .numberbox .spin { border-radius: 0; }
+
+/* the switch is a hard throw: a rectangular track and a square knife */
+body.sheet-cyber .switch { height: 16px; }
+body.sheet-cyber .switch input { width: 36px; height: 16px; }
+body.sheet-cyber .sw-track { width: 36px; height: 16px; border-radius: 0; }
+body.sheet-cyber.theme-dark .sw-track  { background: #0c0d0e; border: 1px solid #3a3f45; }
+body.sheet-cyber.theme-light .sw-track { background: #ffffff; border: 1px solid #b9bfc5; }
+body.sheet-cyber .sw-track:before, body.sheet-cyber .switch:hover .sw-track:before {
+    left: 2px; top: 2px; width: 10px; height: 10px; border-radius: 0;
+}
+body.sheet-cyber.theme-dark .sw-track:before  { background: #7b838c; }
+body.sheet-cyber.theme-light .sw-track:before { background: #5c646d; }
+body.sheet-cyber .switch input:checked + .sw-track { background: #00d8ff; border-color: #00d8ff; }
+body.sheet-cyber .switch input:checked + .sw-track:before { left: 22px; background: #04222a; }
+body.sheet-cyber.theme-light .switch input:checked + .sw-track { background: #0088a8; border-color: #0088a8; }
+body.sheet-cyber.theme-light .switch input:checked + .sw-track:before { background: #ffffff; }
+body.sheet-cyber .sw-label { margin-left: 10px; }
+
+body.sheet-cyber .check .box { width: 15px; height: 15px; border-radius: 0; line-height: 13px; color: transparent; }
+body.sheet-cyber.theme-dark .check .box  { background: #0c0d0e; border: 1px solid #3a3f45; }
+body.sheet-cyber.theme-light .check .box { background: #ffffff; border: 1px solid #b9bfc5; }
+body.sheet-cyber .check input:checked + .box { background: #00d8ff; border-color: #00d8ff; }
+body.sheet-cyber .check input:checked + .box:before {
+    content: ""; display: block; width: 7px; height: 7px; margin: 3px auto 0; background: #04222a;
+}
+body.sheet-cyber.theme-light .check input:checked + .box { background: #0088a8; border-color: #0088a8; }
+body.sheet-cyber.theme-light .check input:checked + .box:before { background: #ffffff; }
+body.sheet-cyber .radio .ring { width: 15px; height: 15px; border-radius: 0; }
+body.sheet-cyber.theme-dark .radio .ring  { background: #0c0d0e; border: 1px solid #3a3f45; }
+body.sheet-cyber.theme-light .radio .ring { background: #ffffff; border: 1px solid #b9bfc5; }
+body.sheet-cyber .radio input:checked + .ring { border-width: 1px; border-color: #00d8ff; background: transparent; }
+body.sheet-cyber .radio input:checked + .ring:after {
+    left: 3px; top: 3px; width: 7px; height: 7px; border-radius: 0; background: #00d8ff;
+}
+body.sheet-cyber.theme-light .radio input:checked + .ring { border-color: #0088a8; }
+body.sheet-cyber.theme-light .radio input:checked + .ring:after { background: #0088a8; }
+
+body.sheet-cyber input[type=range]::-ms-track { height: 2px; }
+body.sheet-cyber input[type=range]::-ms-fill-lower { background: #00d8ff; border-radius: 0; }
+body.sheet-cyber input[type=range]::-ms-fill-upper { background: #3a3f45; border-radius: 0; }
+body.sheet-cyber input[type=range]::-ms-thumb {
+    box-sizing: border-box; width: 8px; height: 18px; border-radius: 0; border: none; background: #00d8ff;
+}
+body.sheet-cyber.theme-light input[type=range]::-ms-fill-lower { background: #0088a8; }
+body.sheet-cyber.theme-light input[type=range]::-ms-fill-upper { background: #b9bfc5; }
+body.sheet-cyber.theme-light input[type=range]::-ms-thumb { background: #0088a8; }
+
+/* the progress bar is segmented -- a readout counting up, not a liquid filling */
+body.sheet-cyber .progress { height: 8px; border-radius: 0; }
+body.sheet-cyber.theme-dark .progress  { background: #0c0d0e; border: 1px solid #272b30; }
+body.sheet-cyber.theme-light .progress { background: #ffffff; border: 1px solid #cbd0d5; }
+body.sheet-cyber .progress .bar, body.sheet-cyber .progress.indeterminate .bar {
+    border-radius: 0; background: #00d8ff;
+    background-image: repeating-linear-gradient(90deg,
+        #00d8ff 0px, #00d8ff 4px, rgba(0,0,0,0) 4px, rgba(0,0,0,0) 6px);
+}
+body.sheet-cyber.theme-light .progress .bar, body.sheet-cyber.theme-light .progress.indeterminate .bar {
+    background: #0088a8;
+    background-image: repeating-linear-gradient(90deg,
+        #0088a8 0px, #0088a8 4px, rgba(0,0,0,0) 4px, rgba(0,0,0,0) 6px);
+}
+body.sheet-cyber .ring-spinner { border-radius: 0; border-color: #3a3f45; border-top-color: #00d8ff; }
+
+/* tabs, segments, chips */
+body.sheet-cyber .tabs { margin-bottom: 12px; }
+body.sheet-cyber.theme-dark .tabs  { border-bottom: 1px solid #272b30; }
+body.sheet-cyber.theme-light .tabs { border-bottom: 1px solid #d3d7db; }
+body.sheet-cyber .tab {
+    padding: 6px 14px; margin: 0; border-radius: 0; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .16em; background: transparent;
+}
+body.sheet-cyber .tab:hover { background: transparent; color: #00d8ff; }
+body.sheet-cyber .tab.active { background: #00d8ff; color: #04222a; }
+body.sheet-cyber.theme-light .tab.active { background: #0088a8; color: #ffffff; }
+body.sheet-cyber .tab.active:after { display: none; }
+body.sheet-cyber .segmented { border-radius: 0; padding: 0; }
+body.sheet-cyber.theme-dark .segmented  { background: #0c0d0e; border: 1px solid #272b30; }
+body.sheet-cyber.theme-light .segmented { background: #ffffff; border: 1px solid #cbd0d5; }
+body.sheet-cyber .segmented .seg {
+    height: 24px; line-height: 24px; border-radius: 0; padding: 0 14px; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .14em;
+}
+body.sheet-cyber .segmented .seg.active { background: #00d8ff; color: #04222a; }
+body.sheet-cyber.theme-light .segmented .seg.active { background: #0088a8; color: #ffffff; }
+body.sheet-cyber .chip { height: 22px; line-height: 20px; border-radius: 0; padding: 0 10px; font-size: 11px; }
+body.sheet-cyber.theme-dark .chip  { background: transparent; border: 1px solid #3a3f45; }
+body.sheet-cyber.theme-light .chip { background: transparent; border: 1px solid #b9bfc5; }
+body.sheet-cyber .chip.on { background: #00d8ff; border-color: #00d8ff; color: #04222a; }
+body.sheet-cyber.theme-light .chip.on { background: #0088a8; border-color: #0088a8; color: #ffffff; }
+body.sheet-cyber .badge { border-radius: 0; height: 16px; line-height: 16px; font-size: 10px; letter-spacing: .08em; }
+body.sheet-cyber .badge.accent { background: #00d8ff; color: #04222a; }
+body.sheet-cyber .rating .star.on { color: #00d8ff; }
+body.sheet-cyber .swatch { border-radius: 0; }
+body.sheet-cyber .swatch.selected { border-color: #00d8ff; box-shadow: none; }
+
+/* alerts keep their own colours: a caution that follows a preference is not one */
+body.sheet-cyber .infobar { border-radius: 0; padding: 8px 12px; }
+body.sheet-cyber.theme-dark .infobar  { background: #15171a; border: 1px solid #272b30; }
+body.sheet-cyber.theme-light .infobar { background: #ffffff; border: 1px solid #d3d7db; }
+body.sheet-cyber .infobar .close { border-radius: 0; }
+body.sheet-cyber .infobar.success .ico { color: #00d8ff; }
+body.sheet-cyber .infobar.warning .ico { color: #ffb020; }
+body.sheet-cyber .infobar.error .ico   { color: #ff2d78; }
+body.sheet-cyber .infobar.info .ico    { color: #00d8ff; }
+body.sheet-cyber.theme-dark .infobar.warning { border-color: #4a3712; }
+body.sheet-cyber.theme-dark .infobar.error   { border-color: #4d1229; }
+
+/* ---------------------------------------------------------- menus and lists */
+body.sheet-cyber .dd-menu, body.sheet-cyber #axCtx, body.sheet-cyber .axctx {
+    border-radius: 0; padding: 2px;
+}
+body.sheet-cyber.theme-dark .dd-menu, body.sheet-cyber.theme-dark #axCtx,
+body.sheet-cyber.theme-dark .axctx {
+    background: #121417; border: 1px solid #3a3f45; box-shadow: 0 10px 26px rgba(0,0,0,.7); color: #d8dde3;
+}
+body.sheet-cyber.theme-light .dd-menu, body.sheet-cyber.theme-light #axCtx,
+body.sheet-cyber.theme-light .axctx {
+    background: #ffffff; border: 1px solid #cbd0d5; box-shadow: 0 10px 26px rgba(12,16,20,.18); color: #16181a;
+}
+body.sheet-cyber .list { border-radius: 0; padding: 2px; }
+body.sheet-cyber .dd-item, body.sheet-cyber .list-item, body.sheet-cyber .axctx-item {
+    height: 26px; line-height: 26px; border-radius: 0; font-size: 12px;
+}
+body.sheet-cyber.theme-dark .dd-item:hover, body.sheet-cyber.theme-dark .list-item:hover,
+body.sheet-cyber.theme-dark .axctx-item:hover, body.sheet-cyber.theme-dark .fl-row:hover { background: #1b1e22; }
+body.sheet-cyber.theme-light .dd-item:hover, body.sheet-cyber.theme-light .list-item:hover,
+body.sheet-cyber.theme-light .axctx-item:hover, body.sheet-cyber.theme-light .fl-row:hover { background: #e8ebee; }
+body.sheet-cyber .dd-item.selected, body.sheet-cyber .list-item.selected {
+    background: #00d8ff; color: #04222a;
+}
+body.sheet-cyber.theme-light .dd-item.selected, body.sheet-cyber.theme-light .list-item.selected {
+    background: #0088a8; color: #ffffff;
+}
+body.sheet-cyber .dd-item.selected:before, body.sheet-cyber .list-item.selected:before { display: none; }
+body.sheet-cyber .axctx-sep { margin: 2px; }
+body.sheet-cyber.theme-dark .axctx-sep  { background: #272b30; }
+body.sheet-cyber.theme-light .axctx-sep { background: #d3d7db; }
+body.sheet-cyber .axctx-kbd { font-size: 10px; letter-spacing: .08em; }
+body.sheet-cyber .list-item.kb { outline: 1px dashed #00d8ff; outline-offset: -2px; }
+body.sheet-cyber .axctx-item.kb { background: transparent; box-shadow: inset 0 0 0 1px #00d8ff; }
+body.sheet-cyber .btn:focus, body.sheet-cyber .dropdown:focus, body.sheet-cyber .list:focus,
+body.sheet-cyber .seg:focus, body.sheet-cyber .chip:focus, body.sheet-cyber .swatch:focus,
+body.sheet-cyber .axdlg-btn:focus, body.sheet-cyber .tab:focus {
+    outline: 1px dashed #00d8ff; outline-offset: 1px;
+}
+
+/* -------------------------------------------------------------- window bars */
+body.sheet-cyber .axmb {
+    height: 24px; padding: 0 4px; font-size: 10px; text-transform: uppercase; letter-spacing: .14em;
+}
+body.sheet-cyber.theme-dark .axmb  { background: #121417; border-bottom: 1px solid #272b30; }
+body.sheet-cyber.theme-light .axmb { background: #e2e5e8; border-bottom: 1px solid #d3d7db; }
+body.sheet-cyber .axmb-item { height: 20px; line-height: 20px; border-radius: 0; padding: 0 10px; }
+body.sheet-cyber.theme-dark .axmb-item:hover  { background: #1b1e22; }
+body.sheet-cyber.theme-light .axmb-item:hover { background: #d8dcdf; }
+body.sheet-cyber .axmb-item.open { background: #00d8ff; color: #04222a; }
+body.sheet-cyber.theme-light .axmb-item.open { background: #0088a8; color: #ffffff; }
+body.sheet-cyber .axsb { height: 22px; padding: 0 0 0 10px; font-size: 10px; letter-spacing: .1em; }
+body.sheet-cyber.theme-dark .axsb  { background: #121417; border-top: 1px solid #272b30; color: #7b838c; }
+body.sheet-cyber.theme-light .axsb { background: #e2e5e8; border-top: 1px solid #d3d7db; color: #5c646d; }
+body.sheet-cyber.theme-dark .axsb-part  { border-left: 1px solid #272b30; padding: 0 10px; }
+body.sheet-cyber.theme-light .axsb-part { border-left: 1px solid #d3d7db; padding: 0 10px; }
+body.sheet-cyber .axsb-part:first-child { border-left: 0; padding-left: 0; }
+body.sheet-cyber .axsb-part.action { border-radius: 0; }
+body.sheet-cyber .axsb-bar { height: 6px; border-radius: 0; }
+body.sheet-cyber .axsb-bar > i {
+    background-image: repeating-linear-gradient(90deg,
+        #00d8ff 0px, #00d8ff 4px, rgba(0,0,0,0) 4px, rgba(0,0,0,0) 6px);
+}
+
+/* ----------------------------------------------------------------- dialogs */
+body.sheet-cyber #axDlgOverlay { background: rgba(4,6,8,.7); }
+body.sheet-cyber #axDlg { position: relative; width: 430px; padding: 20px 22px; border-radius: 0; }
+body.sheet-cyber.theme-dark #axDlg {
+    background: #121417; border: 1px solid #3a3f45; border-top: 1px solid #3a3f45;
+    box-shadow: 0 24px 60px rgba(0,0,0,.75);
+}
+body.sheet-cyber.theme-light #axDlg {
+    background: #ffffff; border: 1px solid #cbd0d5; border-top: 1px solid #cbd0d5;
+    box-shadow: 0 24px 60px rgba(12,16,20,.25);
+}
+/* the dialog gets the brackets too -- it is the most important plate on screen */
+body.sheet-cyber #axDlg:before, body.sheet-cyber #axDlg:after {
+    content: ""; position: absolute; width: 12px; height: 12px; pointer-events: none;
+    border: 1px solid #00d8ff;
+}
+body.sheet-cyber #axDlg:before { left: -1px; top: -1px; border-width: 1px 0 0 1px; }
+body.sheet-cyber #axDlg:after { right: -1px; bottom: -1px; border-width: 0 1px 1px 0; }
+body.sheet-cyber #axDlgTitle {
+    font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .2em; margin-bottom: 10px;
+}
+body.sheet-cyber.theme-dark #axDlgTitle  { color: #00d8ff; }
+body.sheet-cyber.theme-light #axDlgTitle { color: #0088a8; }
+body.sheet-cyber #axDlgText { font-size: 13px; line-height: 18px; }
+body.sheet-cyber #axDlgBtns {
+    margin: 20px -22px -20px; padding: 12px 22px; border-radius: 0; justify-content: flex-end;
+}
+body.sheet-cyber.theme-dark #axDlgBtns  { background: #0e0f11; border-top: 1px solid #272b30; }
+body.sheet-cyber.theme-light #axDlgBtns { background: #f3f5f6; border-top: 1px solid #d3d7db; }
+body.sheet-cyber .axdlg-btn {
+    flex: none; min-width: 88px; height: 26px; line-height: 24px; border-radius: 0;
+    font-size: 10px; text-transform: uppercase; letter-spacing: .16em; background: transparent;
+}
+body.sheet-cyber.theme-dark .axdlg-btn  { border: 1px solid #3a3f45; color: #b6bdc4; }
+body.sheet-cyber.theme-light .axdlg-btn { border: 1px solid #b9bfc5; color: #2d3136; }
+body.sheet-cyber .axdlg-btn.danger { background: #ff2d78; border-color: #ff2d78; color: #2a0512; }
+body.sheet-cyber #axToast { border-radius: 0; font-size: 12px; padding: 8px 12px; }
+body.sheet-cyber.theme-dark #axToast {
+    background: #121417; border: 1px solid #3a3f45; border-left: 3px solid #00d8ff; color: #d8dde3;
+}
+body.sheet-cyber.theme-light #axToast {
+    background: #ffffff; border: 1px solid #cbd0d5; border-left: 3px solid #0088a8; color: #16181a;
+}
+body.sheet-cyber #axToast.kind-success { border-left: 3px solid #00d8ff; }
+body.sheet-cyber #axToast.kind-warning { border-left: 3px solid #ffb020; }
+body.sheet-cyber #axToast.kind-error   { border-left: 3px solid #ff2d78; }
+body.sheet-cyber #axTip {
+    border-radius: 0; font-size: 11px; box-shadow: none;
+    font-family: "Cascadia Mono", Consolas, monospace;
+}
+body.sheet-cyber.theme-dark #axTip  { background: #00d8ff; border: 1px solid #00d8ff; color: #04222a; }
+body.sheet-cyber.theme-light #axTip { background: #0088a8; border: 1px solid #0088a8; color: #ffffff; }
+
+/* ---------------------------------------------------------------- the grid */
+body.sheet-cyber .dv-frame { border-radius: 0; }
+body.sheet-cyber .dv-frame.focus { border-color: #00d8ff; }
+body.sheet-cyber .dv-hcell {
+    height: 26px; font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .14em;
+}
+body.sheet-cyber.theme-dark .dv-hcell  { background: #15171a; color: #7b838c; border-bottom: 1px solid #272b30; }
+body.sheet-cyber.theme-light .dv-hcell { background: #e8ebee; color: #5c646d; border-bottom: 1px solid #d3d7db; }
+body.sheet-cyber .dv-cell { height: 28px; font-size: 12px; border-top: none; }
+body.sheet-cyber.theme-dark .dv-cell  { border-bottom: 1px solid #1b1e22; }
+body.sheet-cyber.theme-light .dv-cell { border-bottom: 1px solid #e4e7ea; }
+body.sheet-cyber.theme-dark .dv-row:hover > .dv-cell  { background: #1b1e22; }
+body.sheet-cyber.theme-light .dv-row:hover > .dv-cell { background: #e8ebee; }
+body.sheet-cyber .dv-row.selected > .dv-cell { background: #00d8ff; color: #04222a; }
+body.sheet-cyber.theme-light .dv-row.selected > .dv-cell { background: #0088a8; color: #ffffff; }
+body.sheet-cyber .dv-check { border-radius: 0; }
+body.sheet-cyber .dv-check.on, body.sheet-cyber .dv-check.some {
+    background: #00d8ff; border-color: #00d8ff; color: #04222a;
+}
+body.sheet-cyber .dv-sort { color: #00d8ff; }
+body.sheet-cyber.theme-light .dv-sort { color: #0088a8; }
+
+/* ------------------------------------------ pictures, drop zones and files */
+body.sheet-cyber .imgbox, body.sheet-cyber .thumb, body.sheet-cyber .filelist { border-radius: 0; }
+body.sheet-cyber.theme-dark .imgbox, body.sheet-cyber.theme-dark .thumb  { background: #15171a; border: 1px solid #272b30; }
+body.sheet-cyber.theme-light .imgbox, body.sheet-cyber.theme-light .thumb { background: #ffffff; border: 1px solid #d3d7db; }
+body.sheet-cyber .imgbox.round { border-radius: 0; }
+body.sheet-cyber .imgbox.button:hover, body.sheet-cyber .thumb:hover { border-color: #00d8ff; }
+body.sheet-cyber .sort-list .drag-item { border-radius: 0; margin-bottom: 2px; }
+body.sheet-cyber.theme-dark .sort-list .drag-item  { background: #15171a; border: 1px solid #272b30; }
+body.sheet-cyber.theme-light .sort-list .drag-item { background: #ffffff; border: 1px solid #d3d7db; }
+body.sheet-cyber .drag-ghost { border-color: #00d8ff; box-shadow: none; -ms-transform: none; transform: none; }
+body.sheet-cyber .fl-row { height: 26px; border-radius: 0; }
+body.sheet-cyber .dropzone { border-radius: 0; border-width: 1px; border-style: dashed; }
+body.sheet-cyber.theme-dark .dropzone  { background: #111214; border-color: #3a3f45; }
+body.sheet-cyber.theme-light .dropzone { background: #ffffff; border-color: #b9bfc5; }
+body.sheet-cyber .dropzone.dragover { border-style: solid; border-color: #00d8ff; background: #06333d; }
+body.sheet-cyber.theme-light .dropzone.dragover { border-color: #0088a8; background: #cdeef7; }
+body.sheet-cyber .dropzone.reject { border-color: #ff2d78; background: #33071a; }
+body.sheet-cyber.theme-light .dropzone.reject { border-color: #ff2d78; background: #ffe0eb; }
+
+/* --------------------------------------------------------------- machine out */
+body.sheet-cyber .console { border-radius: 0; font-size: 11px; line-height: 15px; background: #08090a; color: #00d8ff; }
+body.sheet-cyber.theme-dark .console  { border: 1px solid #272b30; }
+body.sheet-cyber.theme-light .console { border: 1px solid #cbd0d5; }
+
+/* --------------------------------------------------------- title-bar items */
+body.sheet-cyber #titlebar .axtb-item {
+    height: 22px; min-width: 22px; border-radius: 0; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .12em;
+}
+body.sheet-cyber.theme-dark #titlebar .axtb-item  { color: #7b838c; }
+body.sheet-cyber.theme-light #titlebar .axtb-item { color: #5c646d; }
+body.sheet-cyber #titlebar .axtb-item:hover { background: transparent; color: #00d8ff; }
+body.sheet-cyber #titlebar .axtb-item.on, body.sheet-cyber #titlebar .axtb-item.open,
+body.sheet-cyber #titlebar .axtb-item.pop-open { background: #00d8ff; color: #04222a; }
+body.sheet-cyber.theme-light #titlebar .axtb-item.on,
+body.sheet-cyber.theme-light #titlebar .axtb-item.open,
+body.sheet-cyber.theme-light #titlebar .axtb-item.pop-open { background: #0088a8; color: #ffffff; }
+body.sheet-cyber #titlebar .axtb-item.kind-sep,
+body.sheet-cyber #titlebar .axtb-item.kind-sep:hover {
+    background: #3a3f45; border: none; height: 16px; width: 1px; min-width: 1px;
+    padding: 0; margin: 0 8px; border-radius: 0;
+}
+body.sheet-cyber #axPop {
+    border-radius: 0; padding: 12px 14px; font-size: 12px;
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+}
+body.sheet-cyber.theme-dark #axPop  { background: #121417; color: #d8dde3; border: 1px solid #3a3f45; box-shadow: 0 10px 26px rgba(0,0,0,.7); }
+body.sheet-cyber.theme-light #axPop { background: #ffffff; color: #16181a; border: 1px solid #cbd0d5; box-shadow: 0 10px 26px rgba(12,16,20,.18); }
+body.sheet-cyber .axrich-footer { padding: 10px 20px; }
+body.sheet-cyber.theme-dark .axrich-footer  { background: #0e0f11; border-top: 1px solid #272b30; }
+body.sheet-cyber.theme-light .axrich-footer { background: #f3f5f6; border-top: 1px solid #d3d7db; }
+
+/* -------------------------------------------------------------- scrollbars */
+body.sheet-cyber.theme-dark, body.sheet-cyber.theme-dark #content,
+body.sheet-cyber.theme-dark .list, body.sheet-cyber.theme-dark .dd-menu,
+body.sheet-cyber.theme-dark .filelist, body.sheet-cyber.theme-dark .dv-bodywrap,
+body.sheet-cyber.theme-dark .console {
+    scrollbar-face-color: #2f343a; scrollbar-arrow-color: #1b1e22;
+    scrollbar-track-color: #0e0f11; scrollbar-shadow-color: #0e0f11;
+    scrollbar-highlight-color: #0e0f11; scrollbar-3dlight-color: #0e0f11;
+    scrollbar-darkshadow-color: #0e0f11;
+}
+body.sheet-cyber.theme-light, body.sheet-cyber.theme-light #content,
+body.sheet-cyber.theme-light .list, body.sheet-cyber.theme-light .dd-menu,
+body.sheet-cyber.theme-light .filelist, body.sheet-cyber.theme-light .dv-bodywrap {
+    scrollbar-face-color: #c3c9cf; scrollbar-arrow-color: #e0e4e7;
+    scrollbar-track-color: #f3f5f6; scrollbar-shadow-color: #f3f5f6;
+    scrollbar-highlight-color: #f3f5f6; scrollbar-3dlight-color: #f3f5f6;
+    scrollbar-darkshadow-color: #f3f5f6;
+}
+
+/* ========================================================================= */
+/*  GEOMETRY -- the part that keeps this from being precision.css in cyan.    */
+/*  Loaded last, so it wins at equal specificity.                             */
+/* ========================================================================= */
+
+/* --------------------------------------------------------- the cut corner */
+/* Asymmetric on purpose: the top-right corner is cut with a 1px diagonal and
+   the bottom-left keeps the bracket. A real notch would have to be filled with
+   the colour of whatever is behind the panel, and a card does not know what it
+   is sitting on -- a drawn diagonal is background-independent. */
+body.sheet-cyber .card:before {
+    left: auto; right: 0; top: 0; width: 24px; height: 0;
+    border: none; border-top: 1px solid #00d8ff;
+    -ms-transform: rotate(-45deg); transform: rotate(-45deg);
+    -ms-transform-origin: 100% 0; transform-origin: 100% 0;
+}
+body.sheet-cyber .card:after { left: -1px; right: auto; bottom: -1px; border-width: 0 0 1px 1px; }
+body.sheet-cyber.theme-light .card:before { border-top-color: #0088a8; }
+
+/* the rail's live item ends in a chevron rather than a straight edge */
+body.sheet-cyber .nav-item { position: relative; overflow: hidden; }
+body.sheet-cyber .nav-item.active:after {
+    content: ""; position: absolute; right: -9px; top: 50%; width: 18px; height: 18px;
+    margin-top: -9px; -ms-transform: rotate(45deg); transform: rotate(45deg);
+}
+body.sheet-cyber.theme-dark .nav-item.active:after  { background: #0e0f11; }
+body.sheet-cyber.theme-light .nav-item.active:after { background: #eceef0; }
+
+/* -------------------------------------------------------------- the ruler */
+/* Ticks along the top edge of the workspace, riding over the scanlines: two
+   layers, the ruler repeating across the top, the scanlines tiling behind. */
+body.sheet-cyber #content { background-position: 0 0, 0 0; background-repeat: repeat-x, repeat; }
+body.sheet-cyber.theme-dark #content { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='8'%20height='7'%3E%3Cpath%20d='M0.5%200V4'%20stroke='rgb(0,216,255)'%20stroke-opacity='.30'%20stroke-width='1'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%3E%3Cpath%20d='M0%203.5H4'%20stroke='rgb(255,255,255)'%20stroke-opacity='.035'%20stroke-width='1'/%3E%3C/svg%3E"); }
+body.sheet-cyber.theme-light #content { background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='8'%20height='7'%3E%3Cpath%20d='M0.5%200V4'%20stroke='rgb(0,136,168)'%20stroke-opacity='.35'%20stroke-width='1'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='4'%20height='4'%3E%3Cpath%20d='M0%203.5H4'%20stroke='rgb(0,0,0)'%20stroke-opacity='.04'%20stroke-width='1'/%3E%3C/svg%3E"); }
+
+/* ----------------------------------------------------------- the lit halo */
+/* Tight, and only on what is actually live. Aurora puts its bloom behind the
+   page; this one belongs to the element and stops at 10px. */
+body.sheet-cyber .nav-item.active, body.sheet-cyber .btn.accent,
+body.sheet-cyber .axdlg-btn.primary, body.sheet-cyber .tab.active,
+body.sheet-cyber .segmented .seg.active, body.sheet-cyber .chip.on,
+body.sheet-cyber .switch input:checked + .sw-track {
+    box-shadow: 0 0 10px #06333d;
+}
+body.sheet-cyber.theme-light .nav-item.active, body.sheet-cyber.theme-light .btn.accent,
+body.sheet-cyber.theme-light .axdlg-btn.primary, body.sheet-cyber.theme-light .tab.active,
+body.sheet-cyber.theme-light .segmented .seg.active, body.sheet-cyber.theme-light .chip.on,
+body.sheet-cyber.theme-light .switch input:checked + .sw-track {
+    box-shadow: 0 0 10px #9adcea;
+}
+body.sheet-cyber .textbox input:focus, body.sheet-cyber .searchbox input:focus,
+body.sheet-cyber .dropdown.open .dd-value, body.sheet-cyber #axDlgInput:focus {
+    box-shadow: 0 0 8px #06333d;
+}
+
+/* ------------------------------------------------------- the hazard strip */
+/* Diagonal hatching above the dialog's buttons: the one place the sheet raises
+   its voice, and a shape precision has no vocabulary for. */
+body.sheet-cyber #axDlgBtns { position: relative; }
+body.sheet-cyber #axDlgBtns:before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; opacity: .55;
+    background-image: repeating-linear-gradient(45deg,
+        #00d8ff 0px, #00d8ff 3px, rgba(0,0,0,0) 3px, rgba(0,0,0,0) 8px);
+}
+body.sheet-cyber.theme-light #axDlgBtns:before {
+    background-image: repeating-linear-gradient(45deg,
+        #0088a8 0px, #0088a8 3px, rgba(0,0,0,0) 3px, rgba(0,0,0,0) 8px);
+}
+
+/* ---------------------------------------------------------------- the voice */
+/* Precision whispers: 19px at weight 600, tracked wide and dimmed. A HUD does
+   not whisper, and the type is most of why the two felt like one sheet. */
+body.sheet-cyber h1 {
+    font-size: 24px; line-height: 30px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em; margin: 0 0 6px;
+}
+body.sheet-cyber h2 { font-size: 16px; font-weight: 700; letter-spacing: .03em; }
+body.sheet-cyber #titleText { font-weight: 700; }
+body.sheet-cyber .btn, body.sheet-cyber .axdlg-btn { font-weight: 700; }

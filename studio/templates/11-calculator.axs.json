@@ -1,0 +1,608 @@
+{
+ "format": "axstudio/2",
+ "name": "Calculator",
+ "desc": "A calculator that fills its window and takes the keyboard: digits, + - * /, Enter, Backspace, Escape, Ctrl+C. Proper precedence, a memory, and the last sum above the display.",
+ "uid": 26,
+ "cur": 1,
+ "vars": "shown = \"0\"\nlast = \"\"\nmem = 0\nmemText <- mem ? \"M  \" mem : \"\"",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Calculator",
+   "width": 380,
+   "height": 580,
+   "minwidth": 300,
+   "minheight": 460,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E8EF",
+   "menus": "",
+   "status": "",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": ".btn.ax-growy{font-size:18px}",
+   "flows": "",
+   "states": "",
+   "binds": "display.Text <- shown\nlastLbl.Text <- last\nmemLbl.Text <- memText",
+   "hotkeys": "^c | active | own | CopyResult\n^v | active | own | PasteNumber",
+   "init": "g.On(\"keydown\", \"*\", KeyIn)",
+   "script": "expr := \"\"\n\n; One key, from a button or the keyboard.\nPress(key) {\n    global expr, shown, last, mem\n    switch key {\n    case \"C\":\n        expr := \"\", shown := \"0\"\n    case \"back\":\n        expr := SubStr(expr, 1, -1)\n        shown := (expr = \"\") ? \"0\" : expr\n    case \"=\":\n        if (expr = \"\")\n            return\n        r := Calc(expr)\n        last := expr \" =\"\n        shown := r, expr := (r = \"Error\") ? \"\" : r\n    case \"neg\":\n        expr := (SubStr(expr, 1, 1) = \"-\") ? SubStr(expr, 2) : \"-\" expr\n        shown := (expr = \"\") ? \"0\" : expr\n    case \"%\":\n        r := Calc(expr)\n        expr := (r = \"Error\") ? \"\" : Nice(r / 100), shown := (expr = \"\") ? \"Error\" : expr\n    case \"MC\":\n        mem := 0\n    case \"MR\":\n        expr .= mem, shown := expr\n    case \"M+\":\n        r := Calc(expr)\n        if (r != \"Error\")\n            mem := Calc(mem \"+\" r)\n    default:\n        expr .= key, shown := expr\n    }\n    AxBindSync()\n}\n\n; The sum, * and / before + and -. A minus at the start, or straight\n; after another sign, belongs to the number.\nCalc(s) {\n    toks := [], num := \"\"\n    loop parse s {\n        c := A_LoopField\n        if InStr(\"0123456789.\", c) || (c = \"-\" && num = \"\" && (!toks.Length || !IsNumber(toks[toks.Length])))\n            num .= c\n        else if InStr(\"+-*/\", c) {\n            if (num = \"\" || num = \"-\" || !IsNumber(num))\n                return \"Error\"\n            toks.Push(num + 0), toks.Push(c), num := \"\"\n        }\n    }\n    if (num = \"\" || num = \"-\" || !IsNumber(num))\n        return \"Error\"\n    toks.Push(num + 0)\n    i := 2\n    while (i <= toks.Length) {\n        if (toks[i] = \"*\" || toks[i] = \"/\") {\n            if (toks[i] = \"/\" && toks[i + 1] = 0)\n                return \"Error\"\n            toks[i - 1] := (toks[i] = \"*\") ? toks[i - 1] * toks[i + 1] : toks[i - 1] / toks[i + 1]\n            toks.RemoveAt(i, 2)\n        } else\n            i += 2\n    }\n    r := toks[1], i := 2\n    while (i <= toks.Length) {\n        r := (toks[i] = \"+\") ? r + toks[i + 1] : r - toks[i + 1]\n        i += 2\n    }\n    return Nice(r)\n}\nNice(n) {\n    if (Floor(n) = n && Abs(n) < 1e15)\n        return String(Integer(n))\n    return RTrim(RTrim(Format(\"{:.10f}\", n), \"0\"), \".\")\n}\n\n; The keyboard, anywhere in the window.\nKeyIn(el, ev) {\n    k := ev.keyCode, sh := ev.shiftKey\n    key := (k >= 96 && k <= 105) ? String(k - 96)\n         : (k = 56 && sh) || k = 106 ? \"*\"\n         : (k = 187 && sh) || k = 107 ? \"+\"\n         : (k = 53 && sh) ? \"%\"\n         : (k >= 48 && k <= 57 && !sh) ? String(k - 48)\n         : (k = 189 || k = 109) ? \"-\"\n         : (k = 191 || k = 111) ? \"/\"\n         : (k = 190 || k = 110) ? \".\"\n         : (k = 13 || k = 187) ? \"=\"\n         : (k = 8) ? \"back\"\n         : (k = 27 || k = 46) ? \"C\" : \"\"\n    if (key = \"\")\n        return\n    try ev.returnValue := false\n    Press(key)\n}\nCopyResult() {\n    global g, shown\n    A_Clipboard := shown\n    g.Toast(\"Copied \" shown, 1200)\n}\nPasteNumber() {\n    global expr, shown\n    expr .= RegExReplace(A_Clipboard, \"[^0-9.+\\-*/]\"), shown := expr\n    AxBindSync()\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "Text",
+      "name": "memLbl",
+      "arg": "",
+      "layout": {
+       "w": 90
+      },
+      "props": {
+       "hint": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Text",
+      "name": "lastLbl",
+      "arg": "",
+      "layout": {
+       "place": "same",
+       "fill": 1
+      },
+      "props": {
+       "hint": 1,
+       "align": "Right"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Text",
+      "name": "display",
+      "arg": "0",
+      "layout": {
+       "fill": 1,
+       "style": "font-size:40px;font-weight:300;line-height:56px;height:56px;overflow:hidden;white-space:nowrap"
+      },
+      "props": {
+       "align": "Right"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Button",
+      "name": "kMC",
+      "arg": "MC",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "top": 6
+      },
+      "props": {
+       "kind": "Subtle"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"MC\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Button",
+      "name": "kMR",
+      "arg": "MR",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {
+       "kind": "Subtle"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"MR\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "Button",
+      "name": "kMplus",
+      "arg": "M+",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {
+       "kind": "Subtle"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"M+\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Button",
+      "name": "kPct",
+      "arg": "%",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"%\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n8",
+      "type": "Button",
+      "name": "kClear",
+      "arg": "C",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"C\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n9",
+      "type": "Button",
+      "name": "kBack",
+      "arg": "⌫",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"back\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n10",
+      "type": "Button",
+      "name": "kNeg",
+      "arg": "±",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"neg\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n11",
+      "type": "Button",
+      "name": "kDiv",
+      "arg": "÷",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"/\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n12",
+      "type": "Button",
+      "name": "k7",
+      "arg": "7",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"7\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n13",
+      "type": "Button",
+      "name": "k8",
+      "arg": "8",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"8\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n14",
+      "type": "Button",
+      "name": "k9",
+      "arg": "9",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"9\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n15",
+      "type": "Button",
+      "name": "kMul",
+      "arg": "×",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"*\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n16",
+      "type": "Button",
+      "name": "k4",
+      "arg": "4",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"4\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n17",
+      "type": "Button",
+      "name": "k5",
+      "arg": "5",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"5\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n18",
+      "type": "Button",
+      "name": "k6",
+      "arg": "6",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"6\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n19",
+      "type": "Button",
+      "name": "kSub",
+      "arg": "−",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"-\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n20",
+      "type": "Button",
+      "name": "k1",
+      "arg": "1",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"1\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n21",
+      "type": "Button",
+      "name": "k2",
+      "arg": "2",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"2\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n22",
+      "type": "Button",
+      "name": "k3",
+      "arg": "3",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"3\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n23",
+      "type": "Button",
+      "name": "kAdd",
+      "arg": "+",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"+\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n24",
+      "type": "Button",
+      "name": "k0",
+      "arg": "0",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"0\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n25",
+      "type": "Button",
+      "name": "kDot",
+      "arg": ".",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {},
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\".\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n26",
+      "type": "Button",
+      "name": "kEq",
+      "arg": "=",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 44,
+       "place": "same"
+      },
+      "props": {
+       "kind": "Accent"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "Press(\"=\")"
+       }
+      ],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

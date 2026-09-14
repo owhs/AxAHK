@@ -1,0 +1,54 @@
+{
+  "name": "Row",
+  "description": "Setting row",
+  "order": 1002,
+  "css": "AxRow.css",
+  "include": "lib\\components\\Row\\AxRow.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Row",
+      "label": "Setting row",
+      "icon": "E8F1",
+      "category": "Containers",
+      "prefix": "row",
+      "box": true,
+      "arg": {
+        "key": "title",
+        "label": "Title",
+        "kind": "text",
+        "default": "Setting"
+      },
+      "props": [
+        {
+          "key": "desc",
+          "label": "Description",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "icon",
+          "label": "Icon",
+          "kind": "icon",
+          "emit": "kv"
+        },
+        {
+          "key": "nocard",
+          "label": "No card background (export only)",
+          "kind": "flag",
+          "emit": "flag",
+          "noCanvas": true
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

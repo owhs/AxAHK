@@ -1,0 +1,9 @@
+/* AxRadio.css -- the shape of the radio group.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.radio { align-items: center; display: inline-flex; position: relative; }
+.radio input { position: absolute; }
+.radio .ring { flex: none; pointer-events: none; position: relative; }
+.radio input:checked + .ring:after { position: absolute; }

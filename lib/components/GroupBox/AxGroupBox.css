@@ -1,0 +1,27 @@
+/* AxGroupBox.css -- the group box is a real <fieldset>, and its title a real
+   <legend>. IE11-safe.
+
+   The legend used to be a div hung over the frame at top:-10px, hiding the
+   line behind it with a patch of background colour. Every theme had to guess
+   what colour sat behind the group -- and the guess was wrong the moment a
+   group went into a card, a tab, a tinted window or a theme whose surfaces
+   differ, which left a mismatched box around the title or a line through it.
+
+   A fieldset has the browser cut its border for the legend, over whatever is
+   behind it, so the legend is transparent and nothing has to match. What the
+   themes still say -- the frame's border and radius, the legend's font and
+   colour -- stands; what they said to place and paint the old legend is
+   overruled here. The frame has to be a border: a box-shadow is not cut for
+   the legend and would run through its text, so shadows are off on a group
+   (the themes that drew their frame with one draw it with a border instead). */
+
+fieldset.group {
+    display: block; min-width: 0; box-shadow: none !important;
+    padding-top: 6px !important;          /* the legend makes its own room */
+}
+fieldset.group > legend.legend {
+    position: static !important; top: auto !important; left: auto !important;
+    float: none; width: auto; max-width: 100%; margin: 0; padding: 0 6px;
+    background: transparent !important; border: 0; box-shadow: none !important;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}

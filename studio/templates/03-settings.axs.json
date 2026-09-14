@@ -1,0 +1,534 @@
+{
+ "format": "axstudio/2",
+ "name": "Settings app",
+ "desc": "A page rail of setting rows, every one bound to a setting the program remembers by itself -- theme, accent, sound, quiet hours, a hotkey, starting with Windows.",
+ "uid": 30,
+ "cur": 1,
+ "vars": "volText <- volume \"%\"\nquietText <- notify ? \"Quiet from \" RegExReplace(quiet, \"^(\\d+),(\\d+)$\", \"$1:00 until $2:00\") : \"Notifications are off\"",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "checked | once 2s |  |  | state idle, toast You have the latest version",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "theme | dark | choice | Theme | dark,light,system\naccent | #0078d4 | text | Accent colour\ndensity | cozy | choice | Density | compact,cozy,roomy\nstartup | 0 | startup | Start with Windows\nnotify | 1 | onoff | Notifications\nquiet | 9,17 | text | Quiet hours\nvolume | 60 | number | Volume\nshortcut | ^!h | text | Show the window",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Settings",
+   "width": 880,
+   "height": 600,
+   "minwidth": 640,
+   "minheight": 420,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 1,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E713",
+   "menus": "",
+   "status": "msg | Every change is kept for next time | grow icon=E73E",
+   "titleitems": "menu | burger | | tip=\"Menu\" class=morph toggle | g.NavMode(\"toggle\")",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "updBtn Click -> state checking\nupdBtn Click -> start checked\nresetBtn Click -> reset\nresetBtn Click -> toast Everything is back as it started",
+   "states": "checking: updBtn.Enabled = 0, updBar.Visible = 1\nidle: updBtn.Enabled = 1, updBar.Visible = 0",
+   "binds": "rgTheme <-> theme\ncolAccent <-> accent\nsegDensity <-> density\nswStartup <-> startup\nswNotify <-> notify\nrsQuiet <-> quiet\nrsQuiet.Enabled <- notify\nquietLbl.Text <- quietText\nslVolume <-> volume\ngVolume.Value <- volume\nvolLbl.Text <- volText\nhkShow <-> shortcut",
+   "hotkeys": "",
+   "init": "g.SetTheme(theme = \"system\" ? AxWindow.SystemTheme() : theme)\ng.SetAccent(accent)",
+   "script": "",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n9",
+      "type": "Page",
+      "name": "general",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "General",
+       "icon": "E713"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n2",
+        "type": "Row",
+        "name": "",
+        "arg": "Theme",
+        "layout": {},
+        "props": {
+         "desc": "Dark, light, or whatever Windows is using",
+         "icon": "E793"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n1",
+          "type": "Radio",
+          "name": "rgTheme",
+          "arg": "dark:Dark\nlight:Light\nsystem:Use Windows",
+          "layout": {},
+          "props": {
+           "value": "dark"
+          },
+          "events": [
+           {
+            "name": "Change",
+            "code": "g.SetTheme(value = \"system\" ? AxWindow.SystemTheme() : value)"
+           }
+          ],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n4",
+        "type": "Row",
+        "name": "",
+        "arg": "Accent colour",
+        "layout": {},
+        "props": {
+         "desc": "The colour of buttons, switches and the page rail",
+         "icon": "E790"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n3",
+          "type": "ColorButton",
+          "name": "colAccent",
+          "arg": "#0078d4",
+          "layout": {},
+          "props": {},
+          "events": [
+           {
+            "name": "Change",
+            "code": "g.SetAccent(value)"
+           }
+          ],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n6",
+        "type": "Row",
+        "name": "",
+        "arg": "Density",
+        "layout": {},
+        "props": {
+         "desc": "How much room there is around things",
+         "icon": "E8A1"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n5",
+          "type": "Segmented",
+          "name": "segDensity",
+          "arg": "compact:Compact\ncozy:Cozy\nroomy:Roomy",
+          "layout": {},
+          "props": {
+           "value": "cozy"
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n8",
+        "type": "Row",
+        "name": "",
+        "arg": "Start with Windows",
+        "layout": {},
+        "props": {
+         "desc": "A shortcut in the Startup folder, made and removed for you",
+         "icon": "E7E8"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n7",
+          "type": "Switch",
+          "name": "swStartup",
+          "arg": "",
+          "layout": {},
+          "props": {
+           "nolabel": 1
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "n16",
+      "type": "Page",
+      "name": "alerts",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "Notifications",
+       "icon": "EA8F"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n11",
+        "type": "Row",
+        "name": "",
+        "arg": "Notifications",
+        "layout": {},
+        "props": {
+         "desc": "Toasts and sounds when something happens",
+         "icon": "EA8F"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n10",
+          "type": "Switch",
+          "name": "swNotify",
+          "arg": "",
+          "layout": {},
+          "props": {
+           "nolabel": 1,
+           "checked": 1
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n13",
+        "type": "Row",
+        "name": "",
+        "arg": "Quiet hours",
+        "layout": {},
+        "props": {
+         "desc": "Nothing pops up between these hours",
+         "icon": "E708"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n12",
+          "type": "RangeSlider",
+          "name": "rsQuiet",
+          "arg": "9,17",
+          "layout": {
+           "w": 260
+          },
+          "props": {
+           "min": "0",
+           "max": "24",
+           "suffix": ":00"
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n14",
+        "type": "Text",
+        "name": "quietLbl",
+        "arg": "Quiet from 9:00 until 17:00",
+        "layout": {
+         "top": 4
+        },
+        "props": {
+         "hint": 1
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n15",
+        "type": "Button",
+        "name": "testBtn",
+        "arg": "Show me one",
+        "layout": {
+         "top": 8
+        },
+        "props": {
+         "icon": "E7E7"
+        },
+        "events": [
+         {
+          "name": "Click",
+          "code": "if !notify\n    return g.Toast(\"Notifications are off\", 2000, \"warning\")\ng.Toast(\"This is what a notification looks like\", 2500, \"success\")"
+         }
+        ],
+        "kids": []
+       }
+      ]
+     },
+     {
+      "id": "n21",
+      "type": "Page",
+      "name": "sound",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "Sound",
+       "icon": "E767"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n18",
+        "type": "Row",
+        "name": "",
+        "arg": "Volume",
+        "layout": {},
+        "props": {
+         "desc": "How loud the program is",
+         "icon": "E767"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n17",
+          "type": "Slider",
+          "name": "slVolume",
+          "arg": "60",
+          "layout": {
+           "w": 260
+          },
+          "props": {
+           "min": "0",
+           "max": "100",
+           "suffix": "%"
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n19",
+        "type": "Gauge",
+        "name": "gVolume",
+        "arg": "60",
+        "layout": {
+         "top": 10
+        },
+        "props": {
+         "max": "100",
+         "ticks": 1
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n20",
+        "type": "Text",
+        "name": "volLbl",
+        "arg": "60%",
+        "layout": {},
+        "props": {
+         "caption": 1
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     },
+     {
+      "id": "n25",
+      "type": "Page",
+      "name": "keys",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "Shortcuts",
+       "icon": "E765"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n23",
+        "type": "Row",
+        "name": "",
+        "arg": "Show the window",
+        "layout": {},
+        "props": {
+         "desc": "Press it anywhere, whatever is in front",
+         "icon": "E7C4"
+        },
+        "events": [],
+        "kids": [
+         {
+          "id": "n22",
+          "type": "Hotkey",
+          "name": "hkShow",
+          "arg": "^!h",
+          "layout": {},
+          "props": {},
+          "events": [
+           {
+            "name": "Hotkey",
+            "code": "g.Show()\nWinActivate(\"ahk_id \" g.Hwnd)"
+           }
+          ],
+          "kids": []
+         }
+        ]
+       },
+       {
+        "id": "n24",
+        "type": "InfoBar",
+        "name": "",
+        "arg": "Click in the box and press the keys you want. They work from anywhere while the program runs, and the program remembers them.",
+        "layout": {
+         "top": 8
+        },
+        "props": {
+         "title": "Your own keys",
+         "kind": "info",
+         "noclose": 1
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     },
+     {
+      "id": "n30",
+      "type": "Page",
+      "name": "about",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "About",
+       "icon": "E946"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n26",
+        "type": "InfoBar",
+        "name": "",
+        "arg": "Every setting here is bound to a value the program keeps in a small .ini beside itself. No handler reads or writes one.",
+        "layout": {},
+        "props": {
+         "title": "Settings 1.0",
+         "kind": "success",
+         "noclose": 1
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n27",
+        "type": "Button",
+        "name": "updBtn",
+        "arg": "Check for updates",
+        "layout": {
+         "top": 8
+        },
+        "props": {
+         "kind": "Accent",
+         "icon": "E895"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n28",
+        "type": "Progress",
+        "name": "updBar",
+        "arg": "0",
+        "layout": {
+         "place": "same",
+         "w": 160,
+         "hidden": 1
+        },
+        "props": {
+         "indeterminate": 1
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n29",
+        "type": "Button",
+        "name": "resetBtn",
+        "arg": "Put every setting back",
+        "layout": {
+         "top": 8
+        },
+        "props": {
+         "kind": "Subtle",
+         "icon": "E777"
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

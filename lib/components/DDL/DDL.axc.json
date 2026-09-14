@@ -1,0 +1,45 @@
+{
+  "name": "DDL",
+  "description": "Drop-down",
+  "order": 2008,
+  "css": "AxDDL.css",
+  "include": "lib\\components\\DDL\\AxDDL.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "DDL",
+      "label": "Drop-down",
+      "icon": "E70D",
+      "category": "Common",
+      "prefix": "dd",
+      "arg": {
+        "key": "options",
+        "label": "Options",
+        "kind": "options",
+        "default": "a:Alpha\nb:Beta"
+      },
+      "props": [
+        {
+          "key": "value",
+          "label": "Value",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "placeholder",
+          "label": "Placeholder",
+          "kind": "text",
+          "emit": "kv"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

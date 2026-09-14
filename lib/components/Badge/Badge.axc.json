@@ -1,0 +1,41 @@
+{
+  "name": "Badge",
+  "description": "Badge",
+  "order": 4002,
+  "css": "AxBadge.css",
+  "include": "lib\\components\\Badge\\AxBadge.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Badge",
+      "label": "Badge",
+      "icon": "E97C",
+      "category": "Display",
+      "prefix": "bd",
+      "arg": {
+        "key": "text",
+        "label": "Text",
+        "kind": "text",
+        "default": "New"
+      },
+      "props": [
+        {
+          "key": "kind",
+          "label": "Kind",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "|accent|success|warning|danger"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

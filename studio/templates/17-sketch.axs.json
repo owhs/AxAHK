@@ -1,0 +1,229 @@
+{
+  "format": "axstudio/2",
+  "name": "Sketchpad",
+  "desc": "A canvas to draw on that fills the window: colours, a brush size, undo, clear and save as PNG. The drawing is the Canvas control's own; a line of code per button.",
+  "uid": 8,
+  "cur": 1,
+  "vars": "",
+  "files": "",
+  "includes": "",
+  "args": "",
+  "modes": "",
+  "tray": "",
+  "compile": "",
+  "conds": "",
+  "strings": "",
+  "timers": "",
+  "events": "",
+  "watchers": "",
+  "macros": "",
+  "settings": "",
+  "windows": [
+    {
+      "name": "Main",
+      "kind": "main",
+      "inputs": "",
+      "outputs": "",
+      "title": "Sketchpad",
+      "width": 760,
+      "height": 560,
+      "minwidth": 480,
+      "minheight": 360,
+      "theme": "dark",
+      "stylesheet": "win11",
+      "accent": "",
+      "tint": "",
+      "tintstrength": 0.18,
+      "nav": 0,
+      "headings": "",
+      "escapecloses": 0,
+      "resizable": 1,
+      "icon": "E771",
+      "menus": "",
+      "status": "msg | Drag to draw. Ctrl+Z takes a stroke back | grow icon=E771",
+      "titleitems": "",
+      "titleshow": 1,
+      "titlecenter": 0,
+      "maximizebox": 1,
+      "minimizebox": 1,
+      "roundcorners": 1,
+      "snaplayouts": 1,
+      "bordercolor": "",
+      "snapborder": "",
+      "alwaysontop": 0,
+      "noactivate": 0,
+      "exitonclose": 1,
+      "opacity": "",
+      "appname": "",
+      "focusring": "",
+      "allowzoom": 0,
+      "nativecontextmenu": 0,
+      "composited": 0,
+      "backcolor": "",
+      "winx": "",
+      "winy": "",
+      "tooltipdelay": "",
+      "useaccent": 1,
+      "appid": "",
+      "frame": 1,
+      "pagescroll": "",
+      "importlayout": "",
+      "importresize": 0,
+      "startstate": "",
+      "startpos": "",
+      "taborder": "",
+      "defaultbtn": "",
+      "cancelbtn": "",
+      "menubar": "",
+      "statusbar": "",
+      "look": "",
+      "css": "",
+      "flows": "",
+      "states": "",
+      "binds": "",
+      "hotkeys": "^z | active | own | Undo",
+      "init": "",
+      "script": "; The canvas does the drawing; these are the few things it is asked to do.\nUndo() {\n    global pad\n    pad.Component.Undo()\n}\nSavePicture() {\n    global g, pad\n    path := FileSelect(\"S16\", A_MyDocuments \"\\sketch.png\", \"Save the sketch\", \"PNG picture (*.png)\")\n    if (path = \"\")\n        return\n    if !RegExMatch(path, \"i)\\.png$\")\n        path .= \".png\"\n    if pad.Component.Save(path)\n        g.Status(\"msg\", \"Saved \" path)\n}",
+      "root": {
+        "id": "root",
+        "type": "Root",
+        "name": "",
+        "arg": "",
+        "layout": {},
+        "props": {},
+        "events": [],
+        "kids": [
+          {
+            "arg": "#ffffff\n#ff5f6d\n#ffb900\n#7ed957\n#00b7c3\n#3a96dd\n#8764b8\n#e3008c",
+            "id": "n1",
+            "type": "Palette",
+            "name": "colour",
+            "events": [
+              {
+                "code": "pad.Component.Paint(true, value, size.Value)",
+                "name": "Change"
+              }
+            ],
+            "layout": {},
+            "props": {
+              "value": "#ffffff",
+              "small": 1
+            },
+            "kids": []
+          },
+          {
+            "arg": "Size",
+            "id": "n2",
+            "type": "Text",
+            "name": "",
+            "events": [],
+            "layout": {
+              "place": "same"
+            },
+            "props": {},
+            "kids": []
+          },
+          {
+            "arg": "6",
+            "id": "n3",
+            "type": "Slider",
+            "name": "size",
+            "events": [
+              {
+                "code": "pad.Component.Paint(true, colour.Value, value)",
+                "name": "Change"
+              }
+            ],
+            "layout": {
+              "place": "same",
+              "w": 140
+            },
+            "props": {
+              "max": "60",
+              "min": "1"
+            },
+            "kids": []
+          },
+          {
+            "arg": "Undo",
+            "id": "n4",
+            "type": "Button",
+            "name": "undoBtn",
+            "events": [
+              {
+                "code": "Undo()",
+                "name": "Click"
+              }
+            ],
+            "layout": {
+              "place": "same"
+            },
+            "props": {
+              "icon": "E7A7",
+              "kind": "Subtle"
+            },
+            "kids": []
+          },
+          {
+            "arg": "Clear",
+            "id": "n5",
+            "type": "Button",
+            "name": "clearBtn",
+            "events": [
+              {
+                "code": "pad.Component.Clear()",
+                "name": "Click"
+              }
+            ],
+            "layout": {
+              "place": "same"
+            },
+            "props": {
+              "icon": "E74D",
+              "kind": "Subtle"
+            },
+            "kids": []
+          },
+          {
+            "arg": "Save...",
+            "id": "n6",
+            "type": "Button",
+            "name": "saveBtn",
+            "events": [
+              {
+                "code": "SavePicture()",
+                "name": "Click"
+              }
+            ],
+            "layout": {
+              "place": "same"
+            },
+            "props": {
+              "icon": "E74E"
+            },
+            "kids": []
+          },
+          {
+            "arg": "",
+            "id": "n7",
+            "type": "Canvas",
+            "name": "pad",
+            "events": [],
+            "layout": {
+              "grow": 1,
+              "fill": 1,
+              "h": 200
+            },
+            "props": {
+              "background": "#1d1d1d",
+              "size": "6",
+              "brush": "#ffffff",
+              "paint": 1
+            },
+            "kids": []
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,452 @@
+{
+ "format": "axstudio/2",
+ "name": "Dashboard",
+ "desc": "Live numbers: stat cards, an area chart and a donut that fill the window, gauges, a filterable activity log and a weekly report -- fed by a timer through bound values.",
+ "uid": 22,
+ "cur": 1,
+ "vars": "cpu = 32\nmem = 58\nusers = 1284\ncpuText <- Round(cpu) \"%\"\nmemText <- Round(mem) \"%\"\nusersText <- users \"\"",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "tick | 2s | start |  | call Tick\nclock | 1s | start |  | call Clock",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Pulse",
+   "width": 1060,
+   "height": 700,
+   "minwidth": 760,
+   "minheight": 500,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 1,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E9D9",
+   "menus": "",
+   "status": "msg | Live: a timer every 2 seconds, bound values do the rest | grow icon=E9D9\nclock | | w=80 right",
+   "titleitems": "menu | burger | | tip=\"Show or hide the names\" class=morph toggle | g.NavMode(\"toggle\")\nbrand | text | Pulse |\ngap | spacer | |\nbell | glyph | EA8F | right tip=\"Alerts\" | g.Toast(\"No new alerts\", 1500)\nacct | glyph | E77B | right tip=\"Account\"",
+   "titleshow": 0,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "tileLog Click -> page activity\ntileReport Click -> page reports\ntileHelp Click -> run https://www.autohotkey.com/docs/v2/\nsendBtn Click -> toast The report is on its way",
+   "states": "",
+   "binds": "statCpu.Value <- cpuText\nstatMem.Value <- memText\nstatUsers.Value <- usersText\ncpuGauge.Value <- cpu\nmemGauge.Value <- mem",
+   "hotkeys": "",
+   "init": "",
+   "script": "; The timer's work: a new reading, a point on each line, and one\n; AxBindSync() so every bound card and gauge shows it.\nTick() {\n    global cpu, mem, users, traffic, statCpu, statMem, statUsers\n    cpu := Max(3, Min(97, cpu + Random(-9, 9)))\n    mem := Max(20, Min(95, mem + Random(-3, 3)))\n    users += Random(-4, 9)\n    traffic.Push(Random(60, 130))\n    statCpu.Push(Round(cpu)), statMem.Push(Round(mem)), statUsers.Push(users)\n    AxBindSync()\n}\nClock() {\n    global g\n    g.Status(\"clock\", FormatTime(, \"HH:mm:ss\"))\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n13",
+      "type": "Page",
+      "name": "overview",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "Overview",
+       "icon": "E80F"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n1",
+        "type": "Stat",
+        "name": "statUsers",
+        "arg": "1284",
+        "layout": {
+         "fill": 1
+        },
+        "props": {
+         "label": "Visitors now",
+         "icon": "E716",
+         "trend": "+12%",
+         "note": "since this morning",
+         "spark": "1180,1210,1195,1240,1262,1284"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n2",
+        "type": "Stat",
+        "name": "statCpu",
+        "arg": "32%",
+        "layout": {
+         "fill": 1,
+         "place": "same"
+        },
+        "props": {
+         "label": "Processor",
+         "icon": "E950",
+         "note": "across 8 cores",
+         "spark": "28,35,31,40,33,32",
+         "good": "down"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n3",
+        "type": "Stat",
+        "name": "statMem",
+        "arg": "58%",
+        "layout": {
+         "fill": 1,
+         "place": "same"
+        },
+        "props": {
+         "label": "Memory",
+         "icon": "E964",
+         "note": "of 16 GB",
+         "spark": "55,56,58,57,59,58",
+         "good": "down"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n4",
+        "type": "Stat",
+        "name": "statErr",
+        "arg": "3",
+        "layout": {
+         "fill": 1,
+         "place": "same"
+        },
+        "props": {
+         "label": "Errors today",
+         "icon": "E783",
+         "trend": "-40%",
+         "note": "5 yesterday",
+         "good": "down",
+         "spark": "9,7,8,6,5,5,3"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n5",
+        "type": "Chart",
+        "name": "traffic",
+        "arg": "Visits: 72,68,90,85,110,96,120,104,118,99,126,131",
+        "layout": {
+         "fill": 1,
+         "grow": 1,
+         "h": 200
+        },
+        "props": {
+         "kind": "area"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n6",
+        "type": "Chart",
+        "name": "sources",
+        "arg": "48,26,16,10",
+        "layout": {
+         "w": 280,
+         "grow": 1,
+         "place": "same",
+         "h": 200
+        },
+        "props": {
+         "kind": "donut",
+         "labels": "Search,Direct,Social,Email",
+         "suffix": "%"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n7",
+        "type": "Gauge",
+        "name": "cpuGauge",
+        "arg": "32",
+        "layout": {},
+        "props": {
+         "max": "100",
+         "ticks": 1
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n8",
+        "type": "Gauge",
+        "name": "memGauge",
+        "arg": "58",
+        "layout": {
+         "place": "same"
+        },
+        "props": {
+         "max": "100",
+         "ticks": 1
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n12",
+        "type": "Grid",
+        "name": "tiles",
+        "arg": "",
+        "layout": {},
+        "props": {},
+        "events": [],
+        "kids": [
+         {
+          "id": "n9",
+          "type": "Tile",
+          "name": "tileLog",
+          "arg": "Activity",
+          "layout": {},
+          "props": {
+           "value": "activity",
+           "icon": "E81C",
+           "desc": "What happened today"
+          },
+          "events": [],
+          "kids": []
+         },
+         {
+          "id": "n10",
+          "type": "Tile",
+          "name": "tileReport",
+          "arg": "Reports",
+          "layout": {},
+          "props": {
+           "value": "reports",
+           "icon": "E9F9",
+           "desc": "This week"
+          },
+          "events": [],
+          "kids": []
+         },
+         {
+          "id": "n11",
+          "type": "Tile",
+          "name": "tileHelp",
+          "arg": "Help",
+          "layout": {},
+          "props": {
+           "value": "help",
+           "icon": "E897",
+           "desc": "The docs"
+          },
+          "events": [],
+          "kids": []
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "id": "n17",
+      "type": "Page",
+      "name": "activity",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "Activity",
+       "icon": "E81C"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n14",
+        "type": "Search",
+        "name": "actFind",
+        "arg": "",
+        "layout": {
+         "fill": 1
+        },
+        "props": {
+         "placeholder": "Filter the log"
+        },
+        "events": [
+         {
+          "name": "Change",
+          "code": "actGrid.Filter(value)"
+         }
+        ],
+        "kids": []
+       },
+       {
+        "id": "n15",
+        "type": "Segmented",
+        "name": "actKind",
+        "arg": "all:All\nerr:Errors\nwarn:Warnings",
+        "layout": {
+         "place": "same"
+        },
+        "props": {
+         "value": "all"
+        },
+        "events": [
+         {
+          "name": "Change",
+          "code": "actGrid.Filter(value = \"err\" ? \"Error\" : value = \"warn\" ? \"Warning\" : \"\")"
+         }
+        ],
+        "kids": []
+       },
+       {
+        "id": "n16",
+        "type": "DataView",
+        "name": "actGrid",
+        "arg": "{Columns: [{Key: \"time\", Title: \"Time\", Width: 110}, {Key: \"level\", Title: \"Level\", Width: 110},\n            {Key: \"src\", Title: \"Source\", Width: 130}, {Key: \"msg\", Title: \"What happened\", Width: 360}],\n Rows: [{time: \"09:12:04\", level: \"Error\", src: \"Backup\", msg: \"The disk is full\"},\n        {time: \"09:10:40\", level: \"Info\", src: \"Sync\", msg: \"412 files are up to date\"},\n        {time: \"09:05:13\", level: \"Warning\", src: \"Mail\", msg: \"The server took 4 s to answer\"},\n        {time: \"08:58:02\", level: \"Info\", src: \"Web\", msg: \"1,204 visits in the last hour\"},\n        {time: \"08:44:51\", level: \"Info\", src: \"Backup\", msg: \"Started\"},\n        {time: \"08:31:20\", level: \"Warning\", src: \"Disk\", msg: \"C: is 91% full\"},\n        {time: \"08:12:09\", level: \"Info\", src: \"Login\", msg: \"Jane signed in\"},\n        {time: \"07:58:44\", level: \"Error\", src: \"Mail\", msg: \"Could not send the digest\"},\n        {time: \"07:40:31\", level: \"Info\", src: \"Sync\", msg: \"Finished in 38 s\"},\n        {time: \"07:02:00\", level: \"Info\", src: \"System\", msg: \"Started\"}]}",
+        "layout": {
+         "fill": 1,
+         "grow": 1,
+         "h": 200
+        },
+        "props": {
+         "notools": 1
+        },
+        "events": [
+         {
+          "name": "Activate",
+          "code": "g.Alert(row.msg, row.src \" at \" row.time, row.level = \"Error\" ? \"error\" : \"info\")"
+         }
+        ],
+        "kids": []
+       }
+      ]
+     },
+     {
+      "id": "n22",
+      "type": "Page",
+      "name": "reports",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "title": "Reports",
+       "icon": "E9F9"
+      },
+      "events": [],
+      "kids": [
+       {
+        "id": "n18",
+        "type": "Breadcrumb",
+        "name": "crumbs",
+        "arg": "home:Home:E80F\nreports:Reports\nweek:This week",
+        "layout": {},
+        "props": {
+         "value": "week"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n19",
+        "type": "Chart",
+        "name": "week",
+        "arg": "This week: 120,132,101,134,90,43,38\nLast week: 98,110,95,120,101,50,31",
+        "layout": {
+         "fill": 1,
+         "grow": 1,
+         "h": 200
+        },
+        "props": {
+         "kind": "bar",
+         "labels": "Mon,Tue,Wed,Thu,Fri,Sat,Sun",
+         "numbers": 1
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n20",
+        "type": "Stepper",
+        "name": "steps",
+        "arg": "Collect:the numbers\nCheck:them twice\nSend:the report",
+        "layout": {
+         "fill": 1
+        },
+        "props": {
+         "value": "2"
+        },
+        "events": [],
+        "kids": []
+       },
+       {
+        "id": "n21",
+        "type": "Button",
+        "name": "sendBtn",
+        "arg": "Send the report",
+        "layout": {
+         "top": 6
+        },
+        "props": {
+         "kind": "Accent",
+         "icon": "E724"
+        },
+        "events": [],
+        "kids": []
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

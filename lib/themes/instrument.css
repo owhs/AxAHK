@@ -1,0 +1,425 @@
+/* @extends win11 */
+/* @accent-hue 38 16 */
+/* ============================================================================
+   instrument.css — the restraint of fine instrument design: deep warm
+   graphite, one brass accent, and quality carried by proportion and negative
+   space rather than by texture, bevels or ornament.
+
+   Rules of the sheet, so later edits do not undo it:
+
+     • Nothing is separated by a box. Structure is hairlines and two percent of
+       luminance. There are no cards, no shadows, no gloss, no glow.
+     • Type is small, quiet and widely letter-spaced. Labels are uppercase at
+       11px with .18em tracking; almost nothing is pure white.
+     • Brass appears perhaps twice on a screen. If it starts appearing three
+       times, something has been over-decorated.
+     • Corners are 3px. Not rounded, not square.
+
+   The caption buttons are drawn here rather than set in a font: each is a
+   1px hairline shape built from :before and :after, so they stay exactly one
+   pixel at any size and match the hairlines used everywhere else. They rest at
+   low opacity and come up when the pointer is anywhere in the title bar.
+
+   The @accent-hue line above tells AxSys.RecolourCss that this sheet's accent
+   material is brass (hue 38) rather than the usual blue, so SetAccent repaints
+   the brass instead of missing it. Leave the accent alone and brass stands.
+
+   The title bar is 44px, not the usual 32, so the four #shell reserves below
+   have to be restated -- see the note there.
+   ========================================================================= */
+
+/* ------------------------------------------------------------- the material */
+body.sheet-instrument {
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 13px;
+}
+body.sheet-instrument.theme-dark { background: #1b1a18; color: #e6e3dd; }
+body.sheet-instrument.theme-light { background: #edeae4; color: #23211e; }
+
+/* ------------------------------------------------------------- the frame */
+/* No fill, no divider, no separation from the content beneath: the title bar
+   is simply the space the name sits in. */
+body.sheet-instrument #titlebar {
+    height: 44px; padding-left: 18px; background: transparent; border: none;
+}
+body.sheet-instrument #titleText {
+    flex: 1; text-align: center; font-size: 11px; font-weight: 400;
+    text-transform: uppercase; letter-spacing: .18em;
+}
+body.sheet-instrument.theme-dark #titleText { color: rgba(230,227,221,.40); }
+body.sheet-instrument.theme-light #titleText { color: rgba(35,33,30,.45); }
+body.sheet-instrument #titlebar .app-icon { font-size: 12px; color: #c8a15a; margin-right: 0; }
+body.sheet-instrument.inactive #titleText,
+body.sheet-instrument.inactive #titlebar .app-icon { color: rgba(140,136,128,.45); }
+/* one hairline of lighter material along the top edge, and nothing else */
+body.sheet-instrument.theme-dark:before {
+    content: ""; position: fixed; left: 0; right: 0; top: 0; height: 1px;
+    background: rgba(255,255,255,.055); pointer-events: none; z-index: 20000;
+}
+
+/* ---------------------------------------------------- the caption controls */
+/* Drawn, not typed. The glyph the frame ships with is hidden and each control
+   is built from hairlines: a rule, a square, a cross. They sit quiet until the
+   pointer is in the title bar, then a brass rule appears under the one being
+   pointed at -- the only hover chrome in the design. */
+body.sheet-instrument .winbtn {
+    position: relative; width: 40px; height: 44px; margin: 0;
+    font-size: 0; color: transparent; background: transparent;
+    border: none; border-radius: 0; box-shadow: none;
+    opacity: .26;
+}
+body.sheet-instrument #titlebar:hover .winbtn { opacity: .75; }
+body.sheet-instrument .winbtn:hover, body.sheet-instrument .winbtn.hover { opacity: 1; }
+body.sheet-instrument.inactive .winbtn { opacity: .16; }
+body.sheet-instrument .winbtn span { display: none; }
+
+/* the hairline the shapes are made of */
+body.sheet-instrument .winbtn:before, body.sheet-instrument .winbtn:after {
+    content: ""; position: absolute; display: block;
+    background: #e6e3dd; color: transparent; font-size: 0;
+}
+body.sheet-instrument.theme-light .winbtn:before,
+body.sheet-instrument.theme-light .winbtn:after { background: #23211e; }
+
+/* minimise: a single rule */
+body.sheet-instrument #btnMin:before {
+    left: 14px; top: 22px; width: 12px; height: 1px;
+}
+body.sheet-instrument #btnMin:after { display: none; }
+
+/* maximise: an open square, hairline only */
+body.sheet-instrument #btnMax:before {
+    left: 15px; top: 16px; width: 9px; height: 9px;
+    background: transparent; border: 1px solid #e6e3dd;
+}
+body.sheet-instrument.theme-light #btnMax:before { border-color: #23211e; }
+body.sheet-instrument #btnMax:after { display: none; }
+/* restored from maximised: the square steps back, a second edge behind it */
+body.sheet-instrument.maximized #btnMax:before { left: 13px; top: 18px; }
+body.sheet-instrument.maximized #btnMax:after {
+    display: block; left: 17px; top: 14px; width: 9px; height: 9px;
+    background: transparent; border: 1px solid #e6e3dd;
+}
+body.sheet-instrument.maximized.theme-light #btnMax:after { border-color: #23211e; }
+
+/* close: two hairlines crossed */
+body.sheet-instrument #btnClose:before, body.sheet-instrument #btnClose:after {
+    left: 14px; top: 21px; width: 13px; height: 1px;
+    -ms-transform: rotate(45deg); transform: rotate(45deg);
+}
+body.sheet-instrument #btnClose:after {
+    -ms-transform: rotate(-45deg); transform: rotate(-45deg);
+}
+/* the only hover chrome: a brass rule beneath, red for close */
+body.sheet-instrument .winbtn:hover, body.sheet-instrument .winbtn.hover {
+    box-shadow: inset 0 -1px 0 #c8a15a;
+}
+body.sheet-instrument #btnClose:hover, body.sheet-instrument #btnClose.hover {
+    background: transparent; box-shadow: inset 0 -1px 0 #b4544a;
+}
+body.sheet-instrument #btnClose:hover:before, body.sheet-instrument #btnClose:hover:after,
+body.sheet-instrument #btnClose.hover:before, body.sheet-instrument #btnClose.hover:after {
+    background: #b4544a;
+}
+
+/* ------------------------------------------------------------ the reserves */
+/* win11.css works these out by hand from a 32px title bar; this one is 44, so
+   all four have to be restated or the page runs past the bottom. */
+body.sheet-instrument #shell { height: calc(100% - 44px); }
+body.sheet-instrument.has-menubar #shell { height: calc(100% - 72px); }
+body.sheet-instrument.has-statusbar #shell { height: calc(100% - 68px); }
+body.sheet-instrument.has-menubar.has-statusbar #shell { height: calc(100% - 96px); }
+
+/* --------------------------------------------------------------- the pane */
+body.sheet-instrument #sidebar {
+    width: 208px; padding: 6px 0 6px 10px; background: transparent; border: none;
+}
+body.sheet-instrument .nav-item {
+    position: relative; height: 34px; line-height: 34px; margin: 1px 0;
+    padding: 0 12px 0 16px; border-radius: 0; background: transparent;
+    font-size: 11px; text-transform: uppercase; letter-spacing: .16em;
+}
+body.sheet-instrument.theme-dark .nav-item { color: rgba(230,227,221,.42); }
+body.sheet-instrument.theme-light .nav-item { color: rgba(35,33,30,.50); }
+body.sheet-instrument.theme-dark .nav-item:hover { background: transparent; color: rgba(230,227,221,.72); }
+body.sheet-instrument.theme-light .nav-item:hover { background: transparent; color: rgba(35,33,30,.78); }
+/* the active item: brass text and a short brass rule, nothing more */
+body.sheet-instrument .nav-item.active { background: transparent; color: #c8a15a; font-weight: 400; }
+body.sheet-instrument.theme-light .nav-item.active { color: #9a7434; }
+body.sheet-instrument .nav-item.active:before {
+    content: ""; position: absolute; left: 0; top: 9px; bottom: 9px;
+    width: 2px; border-radius: 0; background: #c8a15a;
+}
+body.sheet-instrument.theme-light .nav-item.active:before { background: #9a7434; }
+
+/* the content is a barely lighter panel, told apart by luminance not by a line */
+body.sheet-instrument #content { padding: 20px 26px; border-radius: 3px; }
+body.sheet-instrument.theme-dark #content {
+    background: #201f1d; border: 1px solid rgba(255,255,255,.05); border-right: none; border-bottom: none;
+}
+body.sheet-instrument.theme-light #content {
+    background: #f6f4ef; border: 1px solid rgba(0,0,0,.06); border-right: none; border-bottom: none;
+}
+
+/* ---------------------------------------------------------------- writing */
+body.sheet-instrument h1 {
+    font-size: 20px; font-weight: 400; letter-spacing: .04em; margin: 0 0 4px;
+}
+body.sheet-instrument h2 { font-size: 14px; font-weight: 500; letter-spacing: .04em; margin: 22px 0 8px; }
+body.sheet-instrument h3 { font-size: 12px; font-weight: 500; letter-spacing: .06em; margin: 16px 0 4px; }
+body.sheet-instrument .caption {
+    font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .18em;
+    background: transparent; margin: 22px 0 8px;
+}
+/* the legend keeps its absolute placement and the background that masks the
+   border behind it -- only the lettering changes */
+body.sheet-instrument .group > .legend {
+    font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .18em;
+    margin: 0;
+}
+body.sheet-instrument.theme-dark .group > .legend { background: #201f1d; }
+body.sheet-instrument.theme-light .group > .legend { background: #f6f4ef; }
+body.sheet-instrument.theme-dark .caption, body.sheet-instrument.theme-dark .group > .legend,
+body.sheet-instrument.theme-dark .hint, body.sheet-instrument.theme-dark .card-row .desc {
+    color: rgba(230,227,221,.38);
+}
+body.sheet-instrument.theme-light .caption, body.sheet-instrument.theme-light .group > .legend,
+body.sheet-instrument.theme-light .hint, body.sheet-instrument.theme-light .card-row .desc {
+    color: rgba(35,33,30,.48);
+}
+body.sheet-instrument .hint { font-size: 11px; text-transform: none; letter-spacing: .01em; }
+body.sheet-instrument .card-row .desc { font-size: 11px; }
+body.sheet-instrument .card-row .title { font-size: 12px; font-weight: 400; letter-spacing: .03em; }
+body.sheet-instrument .link, body.sheet-instrument .hyperlink, body.sheet-instrument a {
+    color: #c8a15a; text-decoration: none;
+}
+body.sheet-instrument.theme-light .link, body.sheet-instrument.theme-light .hyperlink,
+body.sheet-instrument.theme-light a { color: #9a7434; }
+body.sheet-instrument .card-row .ico { font-size: 14px; }
+body.sheet-instrument.theme-dark .card-row .ico { color: rgba(230,227,221,.35); }
+body.sheet-instrument.theme-light .card-row .ico { color: rgba(35,33,30,.45); }
+
+/* ------------------------------------------------- surfaces, without boxes */
+/* a card is not a box here: it is a run of rows with a hairline under it */
+body.sheet-instrument .card, body.sheet-instrument .expander,
+body.sheet-instrument .tile, body.sheet-instrument .tab-panel {
+    background: transparent; border: none; border-radius: 0;
+    box-shadow: none; padding: 12px 2px; margin: 0 0 2px;
+}
+/* A .group is a fieldset: its legend is absolutely positioned at top:-10px and
+   has to sit in the group's own top padding, over its border. Flattening it
+   like a card drops the legend onto the first row, so it keeps its box -- just
+   drawn as a hairline instead of a panel. */
+body.sheet-instrument .group {
+    background: transparent; border-radius: 0; box-shadow: none;
+    padding: 18px 14px 12px; margin: 14px 0;
+}
+body.sheet-instrument.theme-dark .group { border: 1px solid rgba(255,255,255,.07); }
+body.sheet-instrument.theme-light .group { border: 1px solid rgba(0,0,0,.08); }
+/* .card-row .ctl is allowed to wrap, so a wide palette puts its hex chip on a
+   second line and the row grows. There has to be room for that or the wrapped
+   line lands on the hairline below -- which is what the padding above is for,
+   and why the control cluster carries a little of its own. */
+body.sheet-instrument .card-row .ctl { padding: 3px 0; }
+body.sheet-instrument.theme-dark .card, body.sheet-instrument.theme-dark .expander {
+    border-bottom: 1px solid rgba(255,255,255,.055);
+}
+body.sheet-instrument.theme-light .card, body.sheet-instrument.theme-light .expander {
+    border-bottom: 1px solid rgba(0,0,0,.07);
+}
+body.sheet-instrument .card-row { min-height: 46px; }
+body.sheet-instrument .exp-header { min-height: 42px; background: transparent; font-weight: 400; }
+
+/* ---------------------------------------------------------------- controls */
+body.sheet-instrument .btn {
+    height: 30px; line-height: 28px; padding: 0 14px; border-radius: 2px;
+    font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: .14em;
+    background: transparent; box-shadow: none;
+}
+body.sheet-instrument.theme-dark .btn { border: 1px solid rgba(255,255,255,.13); color: rgba(230,227,221,.78); }
+body.sheet-instrument.theme-light .btn { border: 1px solid rgba(0,0,0,.16); color: rgba(35,33,30,.80); }
+body.sheet-instrument.theme-dark .btn:hover { background: rgba(255,255,255,.03); color: #e6e3dd; }
+body.sheet-instrument.theme-light .btn:hover { background: rgba(0,0,0,.02); color: #23211e; }
+/* the primary action is brass, and it is an outline -- never a filled slab */
+body.sheet-instrument .btn.accent, body.sheet-instrument .axdlg-btn.primary {
+    background: transparent; border: 1px solid #c8a15a; color: #c8a15a;
+}
+body.sheet-instrument.theme-light .btn.accent,
+body.sheet-instrument.theme-light .axdlg-btn.primary { border-color: #9a7434; color: #9a7434; }
+body.sheet-instrument .btn.accent:hover, body.sheet-instrument .axdlg-btn.primary:hover {
+    background: rgba(200,161,90,.08);
+}
+body.sheet-instrument .btn.subtle { border-color: transparent; }
+body.sheet-instrument .btn.danger { border-color: #b4544a; color: #b4544a; background: transparent; }
+body.sheet-instrument.theme-dark .btn.disabled { color: rgba(230,227,221,.22); border-color: rgba(255,255,255,.06); }
+body.sheet-instrument.theme-light .btn.disabled { color: rgba(35,33,30,.28); border-color: rgba(0,0,0,.07); }
+
+/* fields are a rule to write on, not a well to fill */
+body.sheet-instrument input, body.sheet-instrument textarea,
+body.sheet-instrument .textbox input, body.sheet-instrument .textbox textarea,
+body.sheet-instrument .searchbox input, body.sheet-instrument .numberbox input,
+body.sheet-instrument .passwordbox input, body.sheet-instrument .hotkeybox input,
+body.sheet-instrument .dd-value, body.sheet-instrument #axDlgInput {
+    height: 30px; padding: 0 2px; border-radius: 0; font-size: 12px;
+    background: transparent; box-shadow: none;
+}
+body.sheet-instrument.theme-dark input, body.sheet-instrument.theme-dark textarea,
+body.sheet-instrument.theme-dark .textbox input, body.sheet-instrument.theme-dark .textbox textarea,
+body.sheet-instrument.theme-dark .searchbox input, body.sheet-instrument.theme-dark .numberbox input,
+body.sheet-instrument.theme-dark .passwordbox input, body.sheet-instrument.theme-dark .hotkeybox input,
+body.sheet-instrument.theme-dark .dd-value, body.sheet-instrument.theme-dark #axDlgInput {
+    border: none; border-bottom: 1px solid rgba(255,255,255,.13); color: #e6e3dd;
+}
+body.sheet-instrument.theme-light input, body.sheet-instrument.theme-light textarea,
+body.sheet-instrument.theme-light .textbox input, body.sheet-instrument.theme-light .textbox textarea,
+body.sheet-instrument.theme-light .searchbox input, body.sheet-instrument.theme-light .numberbox input,
+body.sheet-instrument.theme-light .passwordbox input, body.sheet-instrument.theme-light .hotkeybox input,
+body.sheet-instrument.theme-light .dd-value, body.sheet-instrument.theme-light #axDlgInput {
+    border: none; border-bottom: 1px solid rgba(0,0,0,.16); color: #23211e;
+}
+body.sheet-instrument .textbox input:focus, body.sheet-instrument .searchbox input:focus,
+body.sheet-instrument .numberbox input:focus, body.sheet-instrument .passwordbox input:focus,
+body.sheet-instrument .hotkeybox input:focus, body.sheet-instrument #axDlgInput:focus,
+body.sheet-instrument .textbox textarea:focus {
+    border-bottom: 1px solid #c8a15a; box-shadow: none;
+}
+body.sheet-instrument textarea, body.sheet-instrument .textbox textarea { height: auto; padding: 6px 2px; }
+
+/* the switch: a hairline track, brass when it is on */
+body.sheet-instrument .sw-track { border-radius: 9px; background: transparent; box-shadow: none; }
+body.sheet-instrument.theme-dark .sw-track { border: 1px solid rgba(255,255,255,.20); }
+body.sheet-instrument.theme-light .sw-track { border: 1px solid rgba(0,0,0,.22); }
+body.sheet-instrument .switch input:checked + .sw-track { background: transparent; border-color: #c8a15a; }
+body.sheet-instrument .switch input:checked + .sw-track:before { background: #c8a15a; }
+body.sheet-instrument .chip.on, body.sheet-instrument .segmented .seg.active {
+    background: transparent; border: 1px solid #c8a15a; color: #c8a15a;
+}
+body.sheet-instrument .badge.accent { background: transparent; border: 1px solid #c8a15a; color: #c8a15a; }
+body.sheet-instrument .progress { border-radius: 0; background: rgba(255,255,255,.07); }
+body.sheet-instrument .progress .bar, body.sheet-instrument .progress.indeterminate .bar { background: #c8a15a; }
+body.sheet-instrument .rating .star.on { color: #c8a15a; }
+body.sheet-instrument .tab {
+    background: transparent; border: none; border-radius: 0; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .14em;
+}
+body.sheet-instrument .tab.active { background: transparent; border-bottom: 1px solid #c8a15a; color: #c8a15a; }
+
+/* Checkboxes, radios and sliders are painted by the accent rules the core
+   writes, which use the default Fluent blue when no accent has been chosen --
+   so in a brass design they stayed blue. Brass here instead; because the sheet
+   declares @accent-hue 38, these follow SetAccent like everything else. */
+body.sheet-instrument .check input:checked + .box {
+    background: transparent; border-color: #c8a15a; color: #c8a15a;
+}
+body.sheet-instrument .radio input:checked + .ring { border-color: #c8a15a; }
+body.sheet-instrument .radio input:checked + .ring:after { background: #c8a15a; }
+body.sheet-instrument input[type=range]::-ms-fill-lower { background: #c8a15a; }
+body.sheet-instrument input[type=range]::-ms-thumb { background: #c8a15a; }
+body.sheet-instrument input[type=range]::-ms-fill-upper { background: rgba(255,255,255,.10); }
+body.sheet-instrument .swatch.selected { border-color: #c8a15a; }
+body.sheet-instrument .nav-item.active:after,
+body.sheet-instrument .tab.active:after { background: #c8a15a; }
+/* the same clash aurora had: a box drawn round a tab that is only a bottom rule */
+body.sheet-instrument .tab:focus {
+    outline: none !important; border-bottom: 1px solid #c8a15a;
+}
+
+/* --------------------------------------------------------- menus and lists */
+body.sheet-instrument .dd-menu, body.sheet-instrument #axCtx,
+body.sheet-instrument .axctx, body.sheet-instrument .list {
+    border-radius: 3px; padding: 4px;
+}
+body.sheet-instrument.theme-dark .dd-menu, body.sheet-instrument.theme-dark #axCtx,
+body.sheet-instrument.theme-dark .axctx, body.sheet-instrument.theme-dark .list {
+    background: #232220; border: 1px solid rgba(255,255,255,.07); box-shadow: 0 12px 28px rgba(0,0,0,.5);
+}
+body.sheet-instrument.theme-light .dd-menu, body.sheet-instrument.theme-light #axCtx,
+body.sheet-instrument.theme-light .axctx, body.sheet-instrument.theme-light .list {
+    background: #ffffff; border: 1px solid rgba(0,0,0,.09); box-shadow: 0 12px 28px rgba(0,0,0,.12);
+}
+body.sheet-instrument .dd-item, body.sheet-instrument .list-item,
+body.sheet-instrument .axctx-item { height: 30px; line-height: 30px; border-radius: 2px; font-size: 12px; }
+body.sheet-instrument.theme-dark .dd-item:hover, body.sheet-instrument.theme-dark .list-item:hover,
+body.sheet-instrument.theme-dark .axctx-item:hover, body.sheet-instrument.theme-dark .axctx-item.kb,
+body.sheet-instrument.theme-dark .axmb-item:hover, body.sheet-instrument.theme-dark .axmb-item.open {
+    background: rgba(255,255,255,.045); color: inherit;
+}
+body.sheet-instrument.theme-light .dd-item:hover, body.sheet-instrument.theme-light .list-item:hover,
+body.sheet-instrument.theme-light .axctx-item:hover, body.sheet-instrument.theme-light .axctx-item.kb,
+body.sheet-instrument.theme-light .axmb-item:hover, body.sheet-instrument.theme-light .axmb-item.open {
+    background: rgba(0,0,0,.04); color: inherit;
+}
+body.sheet-instrument .dd-item.selected, body.sheet-instrument .list-item.selected {
+    background: transparent; color: #c8a15a; box-shadow: none;
+}
+body.sheet-instrument .dd-item.selected:before, body.sheet-instrument .list-item.selected:before {
+    background: #c8a15a;
+}
+
+/* ------------------------------------------------------------ window bars */
+body.sheet-instrument .axmb { background: transparent; }
+body.sheet-instrument .axmb-item {
+    border-radius: 2px; font-size: 10px; text-transform: uppercase; letter-spacing: .14em;
+}
+body.sheet-instrument .axsb { background: transparent; font-size: 10px; letter-spacing: .10em; }
+body.sheet-instrument .axsb-part { border: none; }
+body.sheet-instrument.theme-dark .axmb { border-bottom: 1px solid rgba(255,255,255,.05); }
+body.sheet-instrument.theme-light .axmb { border-bottom: 1px solid rgba(0,0,0,.06); }
+body.sheet-instrument.theme-dark .axsb { border-top: 1px solid rgba(255,255,255,.05); color: rgba(230,227,221,.38); }
+body.sheet-instrument.theme-light .axsb { border-top: 1px solid rgba(0,0,0,.06); color: rgba(35,33,30,.48); }
+
+/* --------------------------------------------------------------- dialogs */
+body.sheet-instrument #axDlgOverlay { background: rgba(10,9,8,.55); }
+body.sheet-instrument #axDlg { width: 440px; padding: 26px; border-radius: 3px; }
+body.sheet-instrument.theme-dark #axDlg {
+    background: #232220; border: 1px solid rgba(255,255,255,.08); box-shadow: 0 24px 60px rgba(0,0,0,.6);
+}
+body.sheet-instrument.theme-light #axDlg {
+    background: #ffffff; border: 1px solid rgba(0,0,0,.10); box-shadow: 0 24px 60px rgba(0,0,0,.18);
+}
+body.sheet-instrument #axDlgTitle {
+    font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: .18em; margin-bottom: 14px;
+}
+body.sheet-instrument #axDlgText { font-size: 12px; }
+body.sheet-instrument #axDlgBtns {
+    margin: 24px 0 0; padding: 0; background: transparent; border: none; justify-content: flex-end;
+}
+
+/* -------------------------------------------------------------- the grid */
+body.sheet-instrument .dv-frame { border-radius: 3px; background: transparent; }
+body.sheet-instrument.theme-dark .dv-frame { border: 1px solid rgba(255,255,255,.06); }
+body.sheet-instrument.theme-light .dv-frame { border: 1px solid rgba(0,0,0,.07); }
+body.sheet-instrument .dv-hcell {
+    height: 36px; background: transparent; font-size: 10px; font-weight: 400;
+    text-transform: uppercase; letter-spacing: .16em;
+}
+body.sheet-instrument.theme-dark .dv-hcell {
+    color: rgba(230,227,221,.38); border-bottom: 1px solid rgba(255,255,255,.07);
+}
+body.sheet-instrument.theme-light .dv-hcell {
+    color: rgba(35,33,30,.48); border-bottom: 1px solid rgba(0,0,0,.08);
+}
+body.sheet-instrument .dv-cell { height: 38px; border-top: none; font-size: 12px; }
+body.sheet-instrument.theme-dark .dv-cell { border-bottom: 1px solid rgba(255,255,255,.04); }
+body.sheet-instrument.theme-light .dv-cell { border-bottom: 1px solid rgba(0,0,0,.05); }
+body.sheet-instrument.theme-dark .dv-row:hover > .dv-cell { background: rgba(255,255,255,.02); }
+body.sheet-instrument.theme-light .dv-row:hover > .dv-cell { background: rgba(0,0,0,.015); }
+body.sheet-instrument .dv-row.selected > .dv-cell { background: transparent; color: #c8a15a; }
+body.sheet-instrument .dv-check.on, body.sheet-instrument .dv-check.some {
+    background: transparent; border-color: #c8a15a; color: #c8a15a;
+}
+
+/* ------------------------------------------- title-bar items and popovers */
+body.sheet-instrument .axtb-item {
+    height: 26px; min-width: 26px; border-radius: 2px; font-size: 10px;
+    text-transform: uppercase; letter-spacing: .14em; background: transparent;
+}
+body.sheet-instrument.theme-dark .axtb-item  { color: rgba(230,227,221,.55); }
+body.sheet-instrument.theme-light .axtb-item { color: rgba(35,33,30,.60); }
+body.sheet-instrument .axtb-item:hover { background: transparent; color: #c8a15a; }
+body.sheet-instrument .axtb-item.on, body.sheet-instrument .axtb-item.open,
+body.sheet-instrument .axtb-item.pop-open { background: transparent; color: #c8a15a; box-shadow: inset 0 -1px 0 #c8a15a; }
+body.sheet-instrument .axtb-burger i { height: 1px; }
+body.sheet-instrument #axPop { border-radius: 3px; padding: 12px 14px; font-size: 12px; }
+body.sheet-instrument.theme-dark #axPop  { background: #232220; color: #e6e3dd; border: 1px solid rgba(255,255,255,.07); box-shadow: 0 12px 28px rgba(0,0,0,.5); }
+body.sheet-instrument.theme-light #axPop { background: #ffffff; color: #23211e; border: 1px solid rgba(0,0,0,.09); box-shadow: 0 12px 28px rgba(0,0,0,.12); }

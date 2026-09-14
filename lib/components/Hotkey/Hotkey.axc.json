@@ -1,0 +1,37 @@
+{
+  "name": "Hotkey",
+  "description": "Hotkey box",
+  "order": 3005,
+  "css": "AxHotkey.css",
+  "include": "lib\\components\\Hotkey\\AxHotkey.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Hotkey",
+      "label": "Hotkey box",
+      "icon": "E765",
+      "category": "Input",
+      "prefix": "hk",
+      "arg": {
+        "key": "value",
+        "label": "Hotkey",
+        "kind": "text",
+        "default": "^!h"
+      },
+      "props": [
+        {
+          "key": "placeholder",
+          "label": "Placeholder",
+          "kind": "text",
+          "emit": "kv"
+        }
+      ],
+      "events": [
+        "Hotkey",
+        "Change",
+        "Click",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

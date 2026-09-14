@@ -1,0 +1,39 @@
+{
+  "name": "CheckBox",
+  "description": "Check box",
+  "order": 2004,
+  "css": "AxCheckBox.css",
+  "include": "lib\\components\\CheckBox\\AxCheckBox.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "CheckBox",
+      "label": "Check box",
+      "icon": "E739",
+      "category": "Common",
+      "prefix": "chk",
+      "arg": {
+        "key": "text",
+        "label": "Label",
+        "kind": "text",
+        "default": "Enable"
+      },
+      "props": [
+        {
+          "key": "checked",
+          "label": "Checked",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

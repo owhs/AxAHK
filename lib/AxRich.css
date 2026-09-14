@@ -1,0 +1,26 @@
+/* =============================================================================
+   AxRich.css — the chrome shared by every rich dialog (AxRichDialog).
+   Registered by the layer itself and injected into any window it builds, so a
+   component only has to style its own contents.
+   ============================================================================= */
+
+/* A dialog has no sidebar, so AxTags never builds #shell and #content is left
+   to grow past the window. Give it the height the shell would have, so it
+   scrolls instead of being clipped. */
+body.axrich-dlg #content {
+    height: 100%; height: calc(100% - 32px);
+    margin: 0; padding: 6px 22px 24px 22px; box-sizing: border-box;
+    overflow-y: auto; overflow-x: hidden;
+}
+body.axrich-dlg h1 { margin: 8px 0 18px 0; }
+
+/* The footer is pinned and full-bleed: inside the content flow it would be a
+   flex item on an .ax-line and only as wide as its buttons. */
+.axrich-footer {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    padding: 14px 22px; text-align: right;
+    background: #1c1c1c; border-top: 1px solid rgba(255,255,255,.08);
+}
+body.theme-light .axrich-footer { background: #eeeeee; border-top-color: rgba(0,0,0,.08); }
+.axrich-footer .btn { min-width: 104px; height: 36px; line-height: 34px; margin-left: 10px; }
+body.axrich-dlg.has-footer #content { padding-bottom: 80px; }

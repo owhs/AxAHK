@@ -1,0 +1,331 @@
+{
+  "format": "axstudio/2",
+  "name": "Quest",
+  "desc": "A small top-down adventure: a village, a meadow of slimes, a locked grove. The Game view's 2D world, a hero whose fields the panel is bound to, rules for picking things up, and the rest in a page of code.",
+  "uid": 19,
+  "cur": 1,
+  "vars": "Hero = {Name: \"Aria\", HP: 20, MaxHP: 20, Atk: 1, Gold: 0, XP: 0, Level: 1, Potions: 1, Key: 0}\nQuest = {Step: 0, Slimes: 0, Need: 5}\nTalk = \"\"\nHpPct <- Round(Hero.HP * 100 / Hero.MaxHP)\nHpLine <- \"HP \" Hero.HP \" / \" Hero.MaxHP\nLevelLine <- \"Level \" Hero.Level \"  ·  XP \" Hero.XP \" of \" Hero.Level * 5\nGoldLine <- Hero.Gold \" gold  ·  attack \" Hero.Atk\nPotionLine <- \"Drink a potion (\" Hero.Potions \")\"\nQuestLine <- QuestOf(Quest)",
+  "files": "",
+  "includes": "",
+  "args": "",
+  "modes": "",
+  "tray": "",
+  "compile": "",
+  "conds": "",
+  "strings": "",
+  "timers": "",
+  "events": "",
+  "watchers": "",
+  "macros": "",
+  "settings": "",
+  "windows": [
+    {
+      "name": "Main",
+      "kind": "main",
+      "inputs": "",
+      "outputs": "",
+      "title": "Quest",
+      "width": 1180,
+      "height": 760,
+      "minwidth": 900,
+      "minheight": 560,
+      "theme": "dark",
+      "stylesheet": "win11",
+      "accent": "",
+      "tint": "",
+      "tintstrength": 0.18,
+      "nav": 0,
+      "headings": "",
+      "escapecloses": 0,
+      "resizable": 1,
+      "icon": "E7FC",
+      "menus": "",
+      "status": "",
+      "titleitems": "",
+      "titleshow": 1,
+      "titlecenter": 0,
+      "maximizebox": 1,
+      "minimizebox": 1,
+      "roundcorners": 1,
+      "snaplayouts": 1,
+      "bordercolor": "",
+      "snapborder": "",
+      "alwaysontop": 0,
+      "noactivate": 0,
+      "exitonclose": 1,
+      "opacity": "",
+      "appname": "",
+      "focusring": "",
+      "allowzoom": 0,
+      "nativecontextmenu": 0,
+      "composited": 0,
+      "backcolor": "",
+      "winx": "",
+      "winy": "",
+      "tooltipdelay": "",
+      "useaccent": 1,
+      "appid": "",
+      "frame": 1,
+      "pagescroll": "",
+      "importlayout": "",
+      "importresize": 0,
+      "startstate": "",
+      "startpos": "",
+      "taborder": "",
+      "defaultbtn": "",
+      "cancelbtn": "",
+      "menubar": "",
+      "statusbar": "",
+      "look": "",
+      "css": "#heroCard { height: 440px; overflow-y: auto; overflow-x: hidden; margin-bottom: 0; }",
+      "flows": "world Hit:coin -> add Hero.Gold 1\nworld Hit:coin -> do Pickup(eng, b, \"+1 gold\", \"#ffd84a\")\nworld Hit:potion -> add Hero.Potions 1\nworld Hit:potion -> do Pickup(eng, b, \"+1 potion\", \"#ff8a95\")\nworld Hit:slime -> do Hurt(eng, b)\nworld Hit:chest -> do OpenChest(eng)\nworld Key:space -> do Attack(eng)\nworld Key:e -> do TalkNear(eng)\nworld Key:q -> do DrinkPotion()\npotionBtn Click -> do DrinkPotion()\npotionBtn Click -> do world.Focus()\nnameBox Change -> do world.Component.Set(\"hero\", {Label: Hero.Name})\ndebugSw Change -> do world.Component.Debug({Stats: debugSw.Value, Colliders: debugSw.Value})\ndebugSw Change -> do world.Focus()",
+      "states": "",
+      "binds": "nameBox <-> Hero.Name\nhpText.Text <- HpLine\nhpBar <- HpPct\nlvText.Text <- LevelLine\ngoldText.Text <- GoldLine\npotionBtn.Text <- PotionLine\nquestText.Text <- QuestLine\ntalkText.Text <- Talk",
+      "hotkeys": "",
+      "init": "SetupWorld()",
+      "script": "; Quest: a small top-down adventure on the Game view, in its 2D world.\n;\n; Where each part lives:\n;   Logic > Values    Hero and Quest are values with fields. The panel on the\n;                     right is bound to them, and HpLine, LevelLine, QuestLine\n;                     are worked out from them, so nothing here writes to the\n;                     panel: change Hero.HP, call AxBindSync(), and it follows.\n;   Logic > Rules     picking up coins and potions (add to Hero, then take the\n;                     thing away), and what Space, E and Q do\n;   world, Tick       what happens as time goes by (Events tab of the game view)\n;   this code         the map, who says what, fighting, the gate and the chest\n\n; the running state that is nobody's business but this code's\nclass Play {\n    static Over := false, HurtUntil := 0, TalkUntil := 0, RespawnAt := 0, NextId := 0\n    static SlimeHp := Map()\n}\n\nSetupWorld() {\n    eng := world.Component\n    Play.SlimeHp := Map(), Play.Over := false\n    eng.Clear()\n    eng.World({Mode: \"2d\", Tile: 36, Back: \"#10141c\"})\n    eng.Map(QuestMap(), Map(\n        \".\", {Color: \"#4f8f3f\", Deco: \"grass\"},\n        \",\", {Color: \"#4f8f3f\", Deco: \"flowers\"},\n        \"T\", {Color: \"#4f8f3f\", Deco: \"tree\", Solid: true},\n        \"o\", {Color: \"#4f8f3f\", Deco: \"rock\", Solid: true},\n        \":\", {Color: \"#c8a86b\", Deco: \"path\"},\n        \"~\", {Color: \"#2f6fb0\", Deco: \"water\", Solid: true},\n        \"b\", {Color: \"#9b7447\", Deco: \"planks\"},\n        \"R\", {Color: \"#b5473a\", Deco: \"roof\", Solid: true},\n        \"#\", {Color: \"#8c8a94\", Deco: \"brick\", Solid: true},\n        \"D\", {Color: \"#8c8a94\", Deco: \"door\", Solid: true},\n        \"G\", {Color: \"#6b4a2f\", Deco: \"door\", Accent: \"#4a3222\", Solid: true}))\n    eng.Spawn(\"hero\", {Sprite: \"hero\", X: 8.5, Y: 11.5, Size: 0.9, Solid: true, Control: {Speed: 5},\n                       Hits: [\"coin\", \"potion\", \"slime\", \"chest\"], Label: Hero.Name, Watch: true})\n    eng.Camera({Follow: \"hero\"})\n    eng.Spawn(\"elder\", {Sprite: \"elder\", X: 6.5, Y: 8.6, Size: 0.9, Solid: true, Tag: \"npc\", Label: \"Elder Bram\"})\n    eng.Spawn(\"mira\", {Sprite: \"villager\", X: 12.5, Y: 9.5, Size: 0.85, Solid: true, Tag: \"npc\", Label: \"Mira\",\n                       Wander: {Speed: 0.6, Every: 2.5}})\n    for p in [[24, 5], [30, 14], [26, 19], [36, 22], [23, 11], [33, 12]]\n        AddSlime(p[1] + 0.5, p[2] + 0.5)\n    for p in [[3, 11], [15, 7], [22, 3], [27, 8], [36, 16], [24, 22], [31, 22], [14, 20], [37, 11], [9, 22]]\n        AddCoin(p[1] + 0.5, p[2] + 0.5)\n    eng.Spawn(\"potion1\", {Sprite: \"potion\", X: 16.5, Y: 21.5, Size: 0.6, Tag: \"potion\", Layer: 0})\n    eng.Spawn(\"potion2\", {Sprite: \"potion\", X: 34.5, Y: 17.5, Size: 0.6, Tag: \"potion\", Layer: 0})\n    eng.Spawn(\"chest\", {Sprite: \"chest\", X: 33.5, Y: 4.5, Size: 0.9, Tag: \"chest\", Radius: 0.6})\n    eng.Hud(\"help\", {Text: \"WASD / arrows walk     Space swing     E talk     Q potion\", X: 14, Y: -30,\n                     Size: 13, Bold: false, Color: \"#dfe8ff\"})\n    eng.Debug({Stats: false})\n    world.Focus()\n    Say(\"Aria wakes in the village. The elder looks worried: walk up to him and press E.\")\n}\n\n; ---------------------------------------------------------------- things\nAddSlime(x, y) {\n    id := \"slime\" (++Play.NextId)\n    Play.SlimeHp[id] := 3\n    world.Component.Spawn(id, {Sprite: \"slime\", X: x, Y: y, Size: 0.75, Solid: true, Tag: \"slime\", Watch: true,\n                               Wander: {Speed: 1, Every: 1.8}, Chase: {Target: \"hero\", Speed: 1.7, Range: 3.5}})\n}\nAddCoin(x, y) {\n    world.Component.Spawn(\"coin\" (++Play.NextId), {Sprite: \"coin\", X: x, Y: y, Size: 0.5, Tag: \"coin\", Layer: 0,\n                                                   Bob: {Amp: 0.08, Speed: 4}})\n}\n; a coin or a potion picked up: the rule has already added it to Hero\nPickup(eng, id, text, colour) {\n    e := eng.Entity(id)\n    if !IsObject(e)\n        return\n    eng.Burst({X: e.X, Y: e.Y, N: 12, Color: colour, Speed: 3})\n    eng.Float(e.X, e.Y - 0.5, text, {Color: colour})\n    eng.Kill(id)\n}\n\n; ------------------------------------------------------------- fighting\n; Space: the nearest slime within reach loses Hero.Atk, and is knocked back\nAttack(eng) {\n    if Play.Over\n        return\n    h := eng.Entity(\"hero\")\n    fx := h.Get(\"fx\", 0), fy := h.Get(\"fy\", 1)\n    eng.Burst({X: h.X + fx * 0.6, Y: h.Y + fy * 0.6, N: 8, Color: \"#ffffff\", Speed: 3, Life: 0.3})\n    target := eng.Near(\"hero\", \"slime\", 1.7)\n    if (target = \"\")\n        return\n    s := eng.Entity(target)\n    Play.SlimeHp[target] := Play.SlimeHp.Get(target, 1) - Hero.Atk\n    eng.Float(s.X, s.Y - 0.6, \"-\" Hero.Atk, {Color: \"#ffe066\"})\n    dx := s.X - h.X, dy := s.Y - h.Y, d := Sqrt(dx * dx + dy * dy) || 1\n    eng.Set(target, {VX: dx / d * 5, VY: dy / d * 5})\n    if (Play.SlimeHp[target] > 0)\n        return\n    Play.SlimeHp.Delete(target)\n    eng.Burst({X: s.X, Y: s.Y, N: 20, Color: \"#4fbf5a\", Speed: 4})\n    eng.Kill(target)\n    Hero.XP += 2\n    if (Quest.Step = 1)\n        Quest.Slimes := Min(Quest.Need, Quest.Slimes + 1)\n    if (Random(1, 3) = 1)\n        AddCoin(s.X, s.Y)\n    if (Hero.XP >= Hero.Level * 5)\n        LevelUp(eng)\n    AxBindSync()\n}\nLevelUp(eng) {\n    Hero.XP -= Hero.Level * 5\n    Hero.Level += 1, Hero.MaxHP += 4, Hero.HP := Hero.MaxHP, Hero.Atk += 1\n    h := eng.Entity(\"hero\")\n    eng.Float(h.X, h.Y - 1, \"Level \" Hero.Level \"!\", {Color: \"#ffe066\", Size: 0.7, Life: 1.6})\n    eng.Burst({X: h.X, Y: h.Y, N: 24, Color: \"#ffe066\", Speed: 4})\n}\n; a slime touched the hero\nHurt(eng, slime) {\n    t := IsObject(eng.LastTick) ? eng.LastTick.Time : 0\n    if (Play.Over || t < Play.HurtUntil)\n        return\n    Play.HurtUntil := t + 1.2\n    Hero.HP := Max(0, Hero.HP - 2)\n    h := eng.Entity(\"hero\"), s := eng.Entity(slime)\n    if IsObject(s) {\n        dx := h.X - s.X, dy := h.Y - s.Y, d := Sqrt(dx * dx + dy * dy) || 1\n        eng.Set(\"hero\", {VX: dx / d * 9, VY: dy / d * 9})\n    }\n    eng.Set(\"hero\", {Flash: true})\n    eng.Float(h.X, h.Y - 0.8, \"-2\", {Color: \"#ff6b6b\"})\n    eng.Shake(0.4)\n    AxBindSync()\n    if (Hero.HP <= 0)\n        Faint(eng)\n}\nFaint(eng) {\n    Play.Over := true\n    eng.Set(\"hero\", {Frozen: true, Flash: false})\n    eng.Hud(\"big\", {Text: \"You fainted...`nPress Enter to wake up in the village\", X: \"50%\", Y: \"35%\",\n                    Size: 24, Align: \"center\", Color: \"#ffffff\", Box: true})\n}\nDrinkPotion() {\n    if Play.Over\n        return\n    if (Hero.Potions <= 0)\n        return Say(\"No potions left. Mira sells them in the village.\")\n    if (Hero.HP >= Hero.MaxHP)\n        return Say(\"Aria is already at full health.\")\n    Hero.Potions -= 1\n    Hero.HP := Min(Hero.MaxHP, Hero.HP + 10)\n    eng := world.Component\n    h := eng.Entity(\"hero\")\n    eng.Float(h.X, h.Y - 0.8, \"+10\", {Color: \"#7dff9a\"})\n    AxBindSync()\n}\n\n; --------------------------------------------------------------- talking\n; E: whoever is next to the hero, or the gate\nTalkNear(eng) {\n    if Play.Over\n        return\n    who := eng.Near(\"hero\", \"npc\", 1.8)\n    if (who = \"elder\")\n        return Say(ElderSays())\n    if (who = \"mira\")\n        return Say(MiraSays())\n    h := eng.Entity(\"hero\")\n    loop 3 {\n        dy := A_Index - 2\n        loop 3 {\n            dx := A_Index - 2\n            if (eng.TileAt(h.X + dx, h.Y + dy) = \"G\")\n                return OpenGate(eng)\n        }\n    }\n}\nElderSays() {\n    switch Quest.Step {\n    case 0:\n        Quest.Step := 1\n        AxBindSync()\n        return \"Elder Bram: Slimes are eating the turnips! Clear five of them out of the meadow, east over the bridge. Space swings your sword.\"\n    case 1:\n        left := Quest.Need - Quest.Slimes\n        if (left > 0)\n            return \"Elder Bram: \" left \" more to go. If they hurt you, Q drinks a potion.\"\n        Quest.Step := 2, Hero.Key := 1\n        AxBindSync()\n        return \"Elder Bram: You did it! Take this old key. It opens the grove gate in the north-east. Something shines in there.\"\n    case 2, 3:\n        return \"Elder Bram: The grove is in the far north-east corner, behind the stone wall.\"\n    default:\n        return \"Elder Bram: The Sunstone, back in the village! Thank you, \" Hero.Name \".\"\n    }\n}\nMiraSays() {\n    if (Hero.Gold >= 5) {\n        Hero.Gold -= 5, Hero.Potions += 1\n        AxBindSync()\n        return \"Mira: A potion for five gold. There you go, and mind those slimes.\"\n    }\n    return \"Mira: My potions are five gold each. Coins turn up all over the meadow.\"\n}\nOpenGate(eng) {\n    if !Hero.Key\n        return Say(\"The gate is locked. Someone in the village must have the key.\")\n    for x in [33, 34]\n        eng.Tile(x, 8, \":\")\n    eng.Burst({X: 34, Y: 8.5, N: 16, Color: \"#c8a86b\", Speed: 3})\n    Hero.Key := 0\n    Quest.Step := Max(Quest.Step, 3)\n    AxBindSync()\n    Say(\"The key turns, and the gate creaks open.\")\n}\nOpenChest(eng) {\n    if (Quest.Step != 3)\n        return\n    Quest.Step := 4\n    c := eng.Entity(\"chest\")\n    eng.Burst({X: c.X, Y: c.Y, N: 40, Color: \"#ffd84a\", Speed: 5, Life: 1.4})\n    eng.Spawn(\"sunstone\", {Sprite: \"gem\", X: c.X, Y: c.Y - 0.9, Size: 0.7, Layer: 2, Bob: {Amp: 0.15, Speed: 3}})\n    eng.Hud(\"big\", {Text: \"You found the Sunstone!\", X: \"50%\", Y: \"35%\", Size: 30, Align: \"center\", Color: \"#ffe066\"})\n    SetTimer(() => eng.Hud(\"big\"), -3500)\n    Hero.Gold += 20\n    AxBindSync()\n    Say(\"A Sunstone, warm as a summer afternoon. Take it back to Elder Bram.\")\n}\n; a line in the talk box over the world, and in Talk (bound to the panel)\nSay(text) {\n    global Talk\n    Talk := text\n    eng := world.Component\n    eng.Hud(\"talk\", {Text: Wrap(text, 62), X: \"50%\", Y: -124, Size: 15, Bold: false, Align: \"center\", Box: true})\n    Play.TalkUntil := (IsObject(eng.LastTick) ? eng.LastTick.Time : 0) + 6\n    AxBindSync()\n}\nWrap(text, width) {\n    out := \"\", line := \"\"\n    for w in StrSplit(text, \" \") {\n        if (line != \"\" && StrLen(line) + 1 + StrLen(w) > width)\n            out .= line \"`n\", line := w\n        else\n            line .= (line = \"\" ? \"\" : \" \") w\n    }\n    return out line\n}\n\n; what the quest panel says: QuestLine (Logic > Values) is worked out from this\nQuestOf(q) {\n    switch q.Step {\n    case 0: return \"Talk to Elder Bram, in the village.\"\n    case 1: return \"Clear the slimes out of the east meadow: \" q.Slimes \" of \" q.Need \".\"\n    case 2: return \"Open the grove gate in the north-east with the elder's key.\"\n    case 3: return \"Find what shines in the grove.\"\n    default: return \"Take the Sunstone back to Elder Bram. You have won!\"\n    }\n}\n\n; the map: one character a tile (the legend is in SetupWorld)\nQuestMap() {\n    return [\n        \"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\",\n        \"T.................~~~..,.....##########T\",\n        \"T....,........,,...~~~....,,.#,,,,,,,,#T\",\n        \"T...RRRRRR.RRRRR,..~~~...T.,.#,,....,,#T\",\n        \"T...RRRRRR.RRRRR...~~~.T.....#,,....,,#T\",\n        \"T...###D##.##D##..~~~,....T..#,,....,,#T\",\n        \"T.....,.........,.~~~........#,,....,,#T\",\n        \"T...,..::...::...~~~....o....#,,,,,,,,#T\",\n        \"T......::...::...~~~.........####GG####T\",\n        \"T.o...,::...::.o..~~~......::::::::.,..T\",\n        \"T......::...::....~~~...,..::::::::.T,.T\",\n        \"T......::..,::....~~~......::........,.T\",\n        \"T.:::::::::::::::bbbbb:::::::.,........T\",\n        \"T.:::::::::::::::bbbbb:::::::,......o..T\",\n        \"T....::::::...T....~~~...........,.,,..T\",\n        \"T....::::::.......~~~,.............T..,T\",\n        \"T..RRRRRR.,...,...~~~....o,.......,....T\",\n        \"T..RRRRRR.RRRRR..~~~...T...T...........T\",\n        \"T..###D##.RRRRR..~~~,.........~~~~~....T\",\n        \"T...,,..,.##D##...~~~...,....~~~~~~~.,,T\",\n        \"T...,......,......~~~.o,.....~~~~~~~...T\",\n        \"T.T...............~~~.....,...~~~~~....T\",\n        \"T.....T....o.......~~~...,...........,.T\",\n        \"T...............T..~~~,...o....,.....T.T\",\n        \"T..................~~~,................T\",\n        \"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\"]\n}",
+      "root": {
+        "id": "root",
+        "type": "Root",
+        "name": "",
+        "arg": "",
+        "layout": {},
+        "props": {},
+        "events": [],
+        "kids": [
+          {
+            "arg": "",
+            "id": "n1",
+            "type": "Game",
+            "name": "world",
+            "events": [
+              {
+                "name": "Tick",
+                "code": "; About thirty times a second: what happens as time goes by.\n; eng is the game, t the tick (t.Time, t.Dt, t.Keys, t.Pressed, t.Hits).\nif (Play.HurtUntil && t.Time > Play.HurtUntil) {\n    Play.HurtUntil := 0\n    eng.Set(\"hero\", {Flash: false})\n}\nif (Play.TalkUntil && t.Time > Play.TalkUntil) {\n    Play.TalkUntil := 0\n    eng.Hud(\"talk\")\n}\n; fainted: Enter wakes Aria up in the village, with half her gold\nif (Play.Over && t.Pressed.Has(\"enter\")) {\n    Play.Over := false\n    Hero.HP := Hero.MaxHP, Hero.Gold := Hero.Gold // 2\n    eng.Set(\"hero\", {X: 8.5, Y: 11.5, Frozen: false})\n    eng.Hud(\"big\")\n    AxBindSync()\n    Say(\"Aria wakes up by the well, a little poorer.\")\n}\n; a new slime now and then, while the meadow is quiet\nif (Play.SlimeHp.Count < 4 && t.Time > Play.RespawnAt) {\n    Play.RespawnAt := t.Time + 6\n    x := Random(22, 37), y := Random(10, 23), ch := eng.TileAt(x, y)\n    if (ch = \".\" || ch = \",\")\n        AddSlime(x + 0.5, y + 0.5)\n}"
+              }
+            ],
+            "layout": {
+              "grow": 1,
+              "h": 440
+            },
+            "props": {
+              "mode": "2d",
+              "tick": "30"
+            },
+            "kids": []
+          },
+          {
+            "arg": "Aria's journey",
+            "id": "n18",
+            "type": "Card",
+            "name": "heroCard",
+            "events": [],
+            "layout": {
+              "place": "same",
+              "w": 292,
+              "grow": 1,
+              "gap": 12
+            },
+            "props": {},
+            "kids": [
+              {
+                "arg": "Bound to Hero and Quest (Logic > Values)",
+                "id": "n2",
+                "type": "Text",
+                "name": "",
+                "events": [],
+                "layout": {},
+                "props": {
+                  "caption": 1
+                },
+                "kids": []
+              },
+              {
+                "arg": "Aria",
+                "id": "n3",
+                "type": "Edit",
+                "name": "nameBox",
+                "events": [],
+                "layout": {
+                  "fill": 1
+                },
+                "props": {
+                  "placeholder": "Your hero's name"
+                },
+                "kids": []
+              },
+              {
+                "arg": "HP 20 / 20",
+                "id": "n4",
+                "type": "Text",
+                "name": "hpText",
+                "events": [],
+                "layout": {
+                  "top": 6
+                },
+                "props": {},
+                "kids": []
+              },
+              {
+                "arg": "100",
+                "id": "n5",
+                "type": "Progress",
+                "name": "hpBar",
+                "events": [],
+                "layout": {
+                  "fill": 1
+                },
+                "props": {},
+                "kids": []
+              },
+              {
+                "arg": "Level 1  ·  XP 0 of 5",
+                "id": "n6",
+                "type": "Text",
+                "name": "lvText",
+                "events": [],
+                "layout": {},
+                "props": {
+                  "hint": 1
+                },
+                "kids": []
+              },
+              {
+                "arg": "0 gold  ·  attack 1",
+                "id": "n7",
+                "type": "Text",
+                "name": "goldText",
+                "events": [],
+                "layout": {},
+                "props": {
+                  "hint": 1
+                },
+                "kids": []
+              },
+              {
+                "arg": "Drink a potion (1)",
+                "id": "n8",
+                "type": "Button",
+                "name": "potionBtn",
+                "events": [],
+                "layout": {
+                  "top": 4
+                },
+                "props": {
+                  "icon": "E95E",
+                  "kind": "Subtle"
+                },
+                "kids": []
+              },
+              {
+                "arg": "",
+                "id": "n9",
+                "type": "Separator",
+                "name": "",
+                "events": [],
+                "layout": {},
+                "props": {},
+                "kids": []
+              },
+              {
+                "arg": "Quest",
+                "id": "n10",
+                "type": "Text",
+                "name": "",
+                "events": [],
+                "layout": {},
+                "props": {
+                  "caption": 1
+                },
+                "kids": []
+              },
+              {
+                "arg": "Talk to Elder Bram, in the village.",
+                "id": "n11",
+                "type": "Text",
+                "name": "questText",
+                "events": [],
+                "layout": {
+                  "fill": 1
+                },
+                "props": {},
+                "kids": []
+              },
+              {
+                "arg": "",
+                "id": "n12",
+                "type": "Separator",
+                "name": "",
+                "events": [],
+                "layout": {},
+                "props": {},
+                "kids": []
+              },
+              {
+                "arg": "Last said",
+                "id": "n13",
+                "type": "Text",
+                "name": "",
+                "events": [],
+                "layout": {},
+                "props": {
+                  "caption": 1
+                },
+                "kids": []
+              },
+              {
+                "arg": "",
+                "id": "n14",
+                "type": "Text",
+                "name": "talkText",
+                "events": [],
+                "layout": {
+                  "fill": 1
+                },
+                "props": {
+                  "hint": 1
+                },
+                "kids": []
+              },
+              {
+                "arg": "",
+                "id": "n15",
+                "type": "Separator",
+                "name": "",
+                "events": [],
+                "layout": {},
+                "props": {},
+                "kids": []
+              },
+              {
+                "arg": "Show the engine at work",
+                "id": "n16",
+                "type": "Switch",
+                "name": "debugSw",
+                "events": [],
+                "layout": {},
+                "props": {},
+                "kids": []
+              },
+              {
+                "arg": "Click the world first. WASD or the arrows walk, Space swings, E talks, Q drinks a potion.",
+                "id": "n17",
+                "type": "Text",
+                "name": "",
+                "events": [],
+                "layout": {
+                  "fill": 1,
+                  "top": 6
+                },
+                "props": {
+                  "hint": 1
+                },
+                "kids": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "name": "DataView",
+  "description": "List, tree or grouped grid: sort, resize, tick, filter, page.",
+  "order": 7200,
+  "css": "AxDataView.css",
+  "include": "lib\\components\\DataView\\AxDataView.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "DataView",
+      "label": "Data view",
+      "icon": "E71D",
+      "category": "Rich",
+      "prefix": "dv",
+      "arg": {
+        "key": "data",
+        "label": "Data (an AHK expression)",
+        "kind": "multiline",
+        "raw": true,
+        "default": "{Columns: [{Key: \"name\", Title: \"Name\", Width: 220}],\n  Rows: [{Key: \"a\", name: \"First row\"}]}"
+      },
+      "props": [
+        {
+          "key": "pagesize",
+          "label": "Page size",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "tree",
+          "label": "Tree",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "checkboxes",
+          "label": "Check boxes",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "single",
+          "label": "Single select",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "nosearch",
+          "label": "No search box",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "notools",
+          "label": "No toolbar",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Select",
+        "Check",
+        "Activate",
+        "Change",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

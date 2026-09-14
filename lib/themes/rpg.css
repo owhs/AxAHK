@@ -1,0 +1,515 @@
+/* @extends win11 */
+/* @accent-hue 45 30 */
+/* ============================================================================
+   rpg.css — parchment, tooled leather and gilt. Every other sheet in this set
+   is a machine of some kind; this one is a made object, and it is the only
+   place in the library where ornament is allowed to exist.
+
+   Rules of the sheet, so later edits do not undo it:
+
+     • It is SET IN A SERIF. Nothing else here is, and that single decision
+       does more to separate this sheet from the rest than any colour could.
+       Readouts keep a serif too -- there is no machine voice in this world.
+     • Structure is a DOUBLE RULE, not a hairline: a dark rim with a gilt line
+       just inside it, which is how a framed plaque has been drawn for five
+       hundred years. One inset shadow does both.
+     • Ornament is rationed to the corners and the section marks. A fleuron on
+       every element would be a costume; on the dialog and the headings it is
+       a binding.
+     • Surfaces are RAISED or SUNKEN. A button is a plaque with a lit top edge
+       and a shadow under it; pressing it pushes it into the wood. Nothing is
+       flat and nothing floats.
+
+   --------------------------------------------------------- choose a house
+   The @accent-hue band is 45 give or take 30, which is wide on purpose: it
+   covers the gilt AND the leather AND the rim, so SetAccent does not move a
+   highlight -- it moves the whole material. Crimson keep, emerald wood elf,
+   cold blue barrow. Two things are deliberately held out of it:
+
+     • The ink. Text is a warm near-black (light) and a parchment white (dark),
+       both under AxSys.BlueMinS, so the words never take a colour.
+     • Blood red, at hue 0, which is outside the band. A health bar and a
+       destructive action stay red in every house.
+
+   RecolourCss keeps each colour's value and only turns its hue, so a dark
+   leather stays dark whatever is chosen and the contrast never collapses.
+
+   The two themes answer an accent differently, and that is deliberate. The
+   parchment is pale enough to sit under the saturation floor, so LIGHT keeps
+   its paper and re-gilds it -- the same page, bound in a different house's
+   colours. The leather is saturated and moves, so DARK is re-dyed outright.
+   Paper is paper; hide is what gets dyed.
+
+   The parchment mottle and the gilt fleuron are SVG tiles. Their colours are
+   written rgb() with a -opacity attribute so the data URIs carry no "#" -- a
+   raw one would end the url() as a fragment, and RecolourCss would rewrite the
+   literal. The mottle is therefore fixed while the ground beneath it turns,
+   which is what you want: the grain of the paper is not the dye.
+
+   The title bar is 30px, the menu bar 26 and the status bar 24, so all four
+   #shell sums are restated, and so is the height AxRich.css gives a rich
+   dialog's content.
+   ========================================================================= */
+
+/* ------------------------------------------------------------- the material */
+body.sheet-rpg {
+    font-family: Georgia, "Palatino Linotype", "Book Antiqua", "Times New Roman", serif;
+    font-size: 14px; line-height: 20px;
+}
+body.sheet-rpg.theme-light { background: #e8dcc0; color: #2b2723; }
+body.sheet-rpg.theme-dark  { background: #241c14; color: #e8e0d0; }
+
+/* --------------------------------------------------------------- the frame */
+/* A leather band with a gilt line beneath it, and the name set in small caps
+   the way it would be tooled into the cover. */
+body.sheet-rpg #titlebar {
+    position: relative; height: 30px; padding-left: 14px; background: transparent;
+}
+body.sheet-rpg.theme-light #titlebar {
+    background: #cbb68c; border-bottom: 1px solid #6b5636;
+    box-shadow: inset 0 -2px 0 #b8912f, inset 0 1px 0 #e0d0ab;
+}
+body.sheet-rpg.theme-dark #titlebar {
+    background: #33261a; border-bottom: 1px solid #12100c;
+    box-shadow: inset 0 -2px 0 #8a6d28, inset 0 1px 0 #4a3a24;
+}
+body.sheet-rpg #titleText {
+    font-size: 13px; font-variant: small-caps; letter-spacing: .10em;
+}
+body.sheet-rpg.theme-light #titleText { color: #3e3323; text-shadow: 0 1px 0 #e2d3af; }
+body.sheet-rpg.theme-dark #titleText  { color: #e6d6a8; text-shadow: 0 1px 0 #16120c; }
+body.sheet-rpg #titlebar .app-icon { font-size: 14px; margin-right: 9px; color: #b8912f; }
+body.sheet-rpg.theme-dark #titlebar .app-icon { color: #d4af4a; }
+body.sheet-rpg.inactive #titleText, body.sheet-rpg.inactive #titlebar .app-icon { opacity: .55; }
+
+/* the caption controls are small plaques, and they press in */
+body.sheet-rpg #titlebar .winbtn {
+    width: 26px; height: 20px; line-height: 18px; margin: 0 3px 0 0; border-radius: 3px;
+    font-size: 9px; transition: none;
+}
+body.sheet-rpg.theme-light #titlebar .winbtn {
+    color: #4a3d29; background: #d8c69e; border: 1px solid #8a7146;
+    box-shadow: inset 0 1px 0 #ece0c2, 0 1px 0 #b09a6d;
+}
+body.sheet-rpg.theme-dark #titlebar .winbtn {
+    color: #d8c9a4; background: #43331f; border: 1px solid #12100c;
+    box-shadow: inset 0 1px 0 #5c4728, 0 1px 0 #17130d;
+}
+body.sheet-rpg #titlebar .winbtn:hover, body.sheet-rpg #titlebar .winbtn.hover {
+    border-color: #b8912f; color: #2b2723;
+}
+body.sheet-rpg.theme-light #titlebar .winbtn:hover { background: #e7d9b4; }
+body.sheet-rpg.theme-dark #titlebar .winbtn:hover  { background: #57422a; color: #f0e2ba; }
+body.sheet-rpg #titlebar .winbtn:active, body.sheet-rpg #titlebar .winbtn.pressed {
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.35);
+}
+body.sheet-rpg #titlebar #btnClose:hover, body.sheet-rpg #titlebar #btnClose.hover {
+    background: #9d2b2b; border-color: #6f1c1c; color: #f4e6d0;
+}
+
+/* ------------------------------------------------------------ the reserves */
+body.sheet-rpg #shell { height: calc(100% - 30px); }
+body.sheet-rpg.has-menubar #shell { height: calc(100% - 56px); }
+body.sheet-rpg.has-statusbar #shell { height: calc(100% - 54px); }
+body.sheet-rpg.has-menubar.has-statusbar #shell { height: calc(100% - 80px); }
+body.sheet-rpg.axrich-dlg #content { height: calc(100% - 30px); }
+
+/* ----------------------------------------------------------------- the rail */
+body.sheet-rpg #sidebar { width: 196px; padding: 10px 8px; }
+body.sheet-rpg.theme-light #sidebar { background: #dccfa9; border-right: 1px solid #a89065; }
+body.sheet-rpg.theme-dark #sidebar  { background: #2b2116; border-right: 1px solid #12100c; }
+body.sheet-rpg .nav-item {
+    height: 30px; margin-bottom: 3px; padding: 0 12px; border-radius: 4px;
+    font-size: 14px; font-variant: small-caps; letter-spacing: .04em;
+    border: 1px solid transparent; background: transparent;
+}
+body.sheet-rpg .nav-item .ico { width: 20px; font-size: 14px; margin-right: 9px; }
+body.sheet-rpg.theme-light .nav-item { color: #453a29; }
+body.sheet-rpg.theme-dark .nav-item  { color: #cbbfa6; }
+body.sheet-rpg.theme-light .nav-item:hover { background: #e6dabb; }
+body.sheet-rpg.theme-dark .nav-item:hover  { background: #382a1c; }
+/* the chosen page is a gilt-edged plaque */
+body.sheet-rpg .nav-item.active, body.sheet-rpg .nav-item.active:hover {
+    border-color: #b8912f; color: #2b2723;
+    background: #d9bd6c; box-shadow: inset 0 1px 0 #f0dda2, 0 1px 0 #9c7c28;
+}
+body.sheet-rpg.theme-dark .nav-item.active, body.sheet-rpg.theme-dark .nav-item.active:hover {
+    border-color: #d4af4a; color: #f4e9cd;
+    background: #6b5220; box-shadow: inset 0 1px 0 #8a6d28, 0 1px 0 #171208;
+}
+body.sheet-rpg .nav-item.active:before { display: none; }
+
+/* ----------------------------------------------------------- the workspace */
+/* Parchment with a mottle tiled over it. The mottle is fixed while the ground
+   turns with the accent: the grain of the paper is not the dye. */
+/* The 6px on the right and bottom is not decoration: Trident paints the
+   native scrollbar above everything, z-index included, so a #content that
+   runs to the frame edge buries the .rz resize hotspots under it and the
+   window can no longer be dragged by its right or bottom edge. win11.css
+   keeps the same inset for the same reason. */
+body.sheet-rpg #content {
+    margin: 0 6px 6px 0; padding: 16px 24px 24px 20px; background-repeat: repeat;
+}
+body.sheet-rpg.theme-light #content {
+    background-color: #ede1c6;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='40'%20height='40'%3E%3Ccircle%20cx='8'%20cy='12'%20r='9'%20fill='rgb(120,95,50)'%20fill-opacity='.045'/%3E%3Ccircle%20cx='30'%20cy='28'%20r='11'%20fill='rgb(120,95,50)'%20fill-opacity='.035'/%3E%3Ccircle%20cx='23'%20cy='5'%20r='6'%20fill='rgb(80,60,30)'%20fill-opacity='.03'/%3E%3C/svg%3E");
+}
+body.sheet-rpg.theme-dark #content {
+    background-color: #2a2016;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='40'%20height='40'%3E%3Ccircle%20cx='8'%20cy='12'%20r='9'%20fill='rgb(0,0,0)'%20fill-opacity='.12'/%3E%3Ccircle%20cx='30'%20cy='28'%20r='11'%20fill='rgb(0,0,0)'%20fill-opacity='.10'/%3E%3Ccircle%20cx='23'%20cy='5'%20r='6'%20fill='rgb(255,220,150)'%20fill-opacity='.02'/%3E%3C/svg%3E");
+}
+
+/* ----------------------------------------------------------------- writing */
+body.sheet-rpg h1 {
+    font-size: 26px; line-height: 32px; font-weight: 400; font-variant: small-caps;
+    letter-spacing: .03em; margin: 0 0 6px;
+}
+body.sheet-rpg.theme-light h1 { color: #4a3a1c; text-shadow: 0 1px 0 #f5ead0; }
+body.sheet-rpg.theme-dark h1  { color: #e6cb84; text-shadow: 0 1px 0 #17120b; }
+/* a section mark: the fleuron, then the words, then a gilt rule to the margin */
+body.sheet-rpg h2 {
+    position: relative; font-size: 18px; font-weight: 400; font-variant: small-caps;
+    letter-spacing: .03em; margin: 22px 0 10px; padding-left: 20px;
+}
+body.sheet-rpg h2:before {
+    content: ""; position: absolute; left: 0; top: 50%; width: 13px; height: 13px; margin-top: -7px;
+    background-repeat: no-repeat; background-size: 13px 13px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='14'%20viewBox='0%200%2014%2014'%3E%3Cpath%20d='M7%200L9%205L14%207L9%209L7%2014L5%209L0%207L5%205Z'%20fill='rgb(184,145,47)'/%3E%3C/svg%3E");
+}
+body.sheet-rpg.theme-light h2 { color: #4a3a1c; }
+body.sheet-rpg.theme-dark h2  { color: #e6cb84; }
+body.sheet-rpg h3 { font-size: 14px; font-weight: 700; font-variant: small-caps; letter-spacing: .04em; margin: 16px 0 6px; }
+body.sheet-rpg .caption { font-size: 13px; font-variant: small-caps; letter-spacing: .06em; font-style: normal; }
+body.sheet-rpg .hint { font-size: 12px; font-style: italic; }
+body.sheet-rpg.theme-light .caption, body.sheet-rpg.theme-light .hint,
+body.sheet-rpg.theme-light .card-row .desc, body.sheet-rpg.theme-light .tile .desc,
+body.sheet-rpg.theme-light .fl-meta, body.sheet-rpg.theme-light .dropzone .dz-desc { color: #6b6255; }
+body.sheet-rpg.theme-dark .caption, body.sheet-rpg.theme-dark .hint,
+body.sheet-rpg.theme-dark .card-row .desc, body.sheet-rpg.theme-dark .tile .desc,
+body.sheet-rpg.theme-dark .fl-meta, body.sheet-rpg.theme-dark .dropzone .dz-desc { color: #a99b84; }
+body.sheet-rpg .link, body.sheet-rpg .hyperlink, body.sheet-rpg a { color: #8a6a1c; text-decoration: underline; }
+body.sheet-rpg.theme-dark .link, body.sheet-rpg.theme-dark .hyperlink,
+body.sheet-rpg.theme-dark a { color: #e0be62; }
+
+/* ------------------------------------------------------- the double rule */
+/* A dark rim with a gilt line just inside it. One inset shadow does both:
+   3px of the panel's own colour, then a single pixel of gold. */
+body.sheet-rpg .card, body.sheet-rpg .expander, body.sheet-rpg .group, body.sheet-rpg .tile {
+    border-radius: 5px; padding: 14px 16px; margin-bottom: 10px;
+}
+body.sheet-rpg.theme-light .card, body.sheet-rpg.theme-light .expander,
+body.sheet-rpg.theme-light .group, body.sheet-rpg.theme-light .tile {
+    background: #f2e9d5; border: 1px solid #8a7146;
+    box-shadow: inset 0 0 0 3px #f2e9d5, inset 0 0 0 4px #cfae52, 0 1px 2px rgba(60,45,20,.18);
+}
+body.sheet-rpg.theme-dark .card, body.sheet-rpg.theme-dark .expander,
+body.sheet-rpg.theme-dark .group, body.sheet-rpg.theme-dark .tile {
+    background: #332619; border: 1px solid #12100c;
+    box-shadow: inset 0 0 0 3px #332619, inset 0 0 0 4px #6b5220, 0 1px 2px rgba(0,0,0,.4);
+}
+body.sheet-rpg .card.hot { border-color: #b8912f; }
+body.sheet-rpg .card-row { min-height: 42px; }
+body.sheet-rpg .group { padding: 20px 16px 14px; margin: 14px 0; }
+/* the double frame as a double border: the legend cuts a border, not a shadow */
+body.sheet-rpg.theme-light .group { border: 5px double #8a7146; }
+body.sheet-rpg.theme-dark .group  { border: 5px double #6b5220; }
+body.sheet-rpg .group > .legend { font-size: 14px; font-variant: small-caps; letter-spacing: .05em; }
+body.sheet-rpg.theme-light .group > .legend { background: #f2e9d5; color: #4a3a1c; }
+body.sheet-rpg.theme-dark .group > .legend  { background: #332619; color: #e6cb84; }
+body.sheet-rpg .exp-header { min-height: 44px; }
+body.sheet-rpg .exp-header .chev { border-radius: 4px; }
+body.sheet-rpg.theme-light .exp-body { background: #e9dcbe; border-top-color: #b39c6c; }
+body.sheet-rpg.theme-dark .exp-body  { background: #2a2016; border-top-color: #4a3a24; }
+
+/* ---------------------------------------------------------------- controls */
+/* A button is a plaque: lit along its top edge, shadowed underneath, and it
+   sinks into the wood when pressed. */
+body.sheet-rpg .btn {
+    height: 30px; line-height: 26px; min-width: 78px; padding: 0 16px; border-radius: 4px;
+    font-family: inherit; font-size: 14px; font-variant: small-caps; letter-spacing: .04em;
+}
+body.sheet-rpg.theme-light .btn {
+    color: #3a3126; background: #ddcda4; border: 1px solid #8a7146;
+    box-shadow: inset 0 1px 0 #f2e6c8, 0 2px 0 #b09a6d;
+}
+body.sheet-rpg.theme-dark .btn {
+    color: #e2d6bc; background: #43331f; border: 1px solid #12100c;
+    box-shadow: inset 0 1px 0 #5c4728, 0 2px 0 #17130d;
+}
+body.sheet-rpg.theme-light .btn:hover { background: #e9dab6; border-color: #b8912f; }
+body.sheet-rpg.theme-dark .btn:hover  { background: #543f26; border-color: #8a6d28; }
+body.sheet-rpg .btn:active, body.sheet-rpg .btn.pressed {
+    -ms-transform: translateY(2px); transform: translateY(2px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.32);
+}
+/* the deed worth doing is struck in gold */
+body.sheet-rpg .btn.accent, body.sheet-rpg .axdlg-btn.primary {
+    color: #33290f; background: #d9bd6c; border: 1px solid #8a6d28;
+    box-shadow: inset 0 1px 0 #f4e3ab, 0 2px 0 #9c7c28;
+}
+body.sheet-rpg .btn.accent:hover, body.sheet-rpg .axdlg-btn.primary:hover { background: #e6cd85; }
+body.sheet-rpg .btn.danger {
+    color: #f6e7d2; background: #9d2b2b; border-color: #6f1c1c;
+    box-shadow: inset 0 1px 0 #c05252, 0 2px 0 #5d1616;
+}
+body.sheet-rpg .btn.subtle { background: transparent; border-color: transparent; box-shadow: none; }
+body.sheet-rpg .btn.disabled { opacity: .5; box-shadow: none; }
+body.sheet-rpg .btn.icon { width: 30px; min-width: 30px; }
+
+/* fields are cut into the surface, not laid on it */
+body.sheet-rpg .textbox input, body.sheet-rpg .textbox textarea,
+body.sheet-rpg .searchbox input, body.sheet-rpg .numberbox input,
+body.sheet-rpg .passwordbox input, body.sheet-rpg .hotkeybox input,
+body.sheet-rpg .dd-value, body.sheet-rpg #axDlgInput, body.sheet-rpg .hex {
+    height: 30px; line-height: 28px; border-radius: 4px; font-family: inherit; font-size: 14px;
+}
+body.sheet-rpg.theme-light .textbox input, body.sheet-rpg.theme-light .textbox textarea,
+body.sheet-rpg.theme-light .searchbox input, body.sheet-rpg.theme-light .numberbox input,
+body.sheet-rpg.theme-light .passwordbox input, body.sheet-rpg.theme-light .hotkeybox input,
+body.sheet-rpg.theme-light .dd-value, body.sheet-rpg.theme-light #axDlgInput,
+body.sheet-rpg.theme-light .hex, body.sheet-rpg.theme-light .list,
+body.sheet-rpg.theme-light .filelist, body.sheet-rpg.theme-light .dv-frame {
+    background: #f7f0de; border: 1px solid #a89065; color: #2b2723;
+    box-shadow: inset 0 2px 3px rgba(90,70,35,.20);
+}
+body.sheet-rpg.theme-dark .textbox input, body.sheet-rpg.theme-dark .textbox textarea,
+body.sheet-rpg.theme-dark .searchbox input, body.sheet-rpg.theme-dark .numberbox input,
+body.sheet-rpg.theme-dark .passwordbox input, body.sheet-rpg.theme-dark .hotkeybox input,
+body.sheet-rpg.theme-dark .dd-value, body.sheet-rpg.theme-dark #axDlgInput,
+body.sheet-rpg.theme-dark .hex, body.sheet-rpg.theme-dark .list,
+body.sheet-rpg.theme-dark .filelist, body.sheet-rpg.theme-dark .dv-frame {
+    background: #1e1710; border: 1px solid #12100c; color: #e8e0d0;
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.45);
+}
+body.sheet-rpg .textbox textarea { height: auto; padding: 6px 10px; }
+body.sheet-rpg .textbox input:focus, body.sheet-rpg .textbox textarea:focus,
+body.sheet-rpg .searchbox input:focus, body.sheet-rpg .passwordbox input:focus,
+body.sheet-rpg .hotkeybox input:focus, body.sheet-rpg .hotkeybox.recording input,
+body.sheet-rpg #axDlgInput:focus, body.sheet-rpg .numberbox.focus input,
+body.sheet-rpg .dropdown.open .dd-value {
+    border: 1px solid #b8912f; border-bottom-width: 1px;
+}
+
+body.sheet-rpg .sw-track { width: 42px; height: 20px; border-radius: 10px; }
+body.sheet-rpg .switch { height: 20px; }
+body.sheet-rpg .switch input { width: 42px; height: 20px; }
+body.sheet-rpg.theme-light .sw-track { background: #ddcda4; border: 1px solid #8a7146; box-shadow: inset 0 2px 3px rgba(90,70,35,.22); }
+body.sheet-rpg.theme-dark .sw-track  { background: #1e1710; border: 1px solid #12100c; box-shadow: inset 0 2px 3px rgba(0,0,0,.45); }
+body.sheet-rpg .sw-track:before, body.sheet-rpg .switch:hover .sw-track:before {
+    left: 3px; top: 3px; width: 12px; height: 12px; border-radius: 50%;
+    background: #8a7146; box-shadow: 0 1px 0 rgba(255,255,255,.35);
+}
+body.sheet-rpg .switch input:checked + .sw-track { background: #d9bd6c; border-color: #8a6d28; }
+body.sheet-rpg .switch input:checked + .sw-track:before { left: 25px; background: #4a3a1c; }
+body.sheet-rpg .check .box { border-radius: 3px; }
+body.sheet-rpg.theme-light .check .box { background: #f7f0de; border: 1px solid #8a7146; box-shadow: inset 0 1px 2px rgba(90,70,35,.20); }
+body.sheet-rpg.theme-dark .check .box  { background: #1e1710; border: 1px solid #12100c; box-shadow: inset 0 1px 2px rgba(0,0,0,.45); }
+body.sheet-rpg .check input:checked + .box { background: #d9bd6c; border-color: #8a6d28; color: #33290f; }
+body.sheet-rpg.theme-light .radio .ring { background: #f7f0de; border: 1px solid #8a7146; }
+body.sheet-rpg.theme-dark .radio .ring  { background: #1e1710; border: 1px solid #12100c; }
+body.sheet-rpg .radio input:checked + .ring { border-width: 5px; border-color: #b8912f; background: #f7f0de; }
+body.sheet-rpg .radio input:checked + .ring:after { background: #f7f0de; }
+
+body.sheet-rpg input[type=range]::-ms-fill-lower { background: #b8912f; border-radius: 3px; }
+body.sheet-rpg input[type=range]::-ms-thumb {
+    box-sizing: border-box; width: 14px; height: 22px; border-radius: 3px;
+    background: #ddcda4; border: 1px solid #8a7146;
+}
+body.sheet-rpg.theme-light input[type=range]::-ms-fill-upper { background: #c6b389; }
+body.sheet-rpg.theme-dark input[type=range]::-ms-fill-upper { background: #3d2f1e; }
+body.sheet-rpg.theme-dark input[type=range]::-ms-thumb { background: #5c4728; border-color: #12100c; }
+
+/* the health bar: sunk, filled, and glossed along its top */
+body.sheet-rpg .progress { height: 14px; border-radius: 7px; }
+body.sheet-rpg.theme-light .progress { background: #cdbc94; border: 1px solid #8a7146; box-shadow: inset 0 2px 3px rgba(90,70,35,.28); }
+body.sheet-rpg.theme-dark .progress  { background: #1e1710; border: 1px solid #12100c; box-shadow: inset 0 2px 3px rgba(0,0,0,.5); }
+body.sheet-rpg .progress .bar, body.sheet-rpg .progress.indeterminate .bar {
+    border-radius: 6px; background: #b8912f; box-shadow: inset 0 1px 0 rgba(255,240,200,.55);
+}
+body.sheet-rpg .ring-spinner { border-color: #a89065; border-top-color: #b8912f; }
+
+body.sheet-rpg .tabs { margin-bottom: 14px; }
+body.sheet-rpg.theme-light .tabs { border-bottom-color: #a89065; }
+body.sheet-rpg.theme-dark .tabs  { border-bottom-color: #4a3a24; }
+body.sheet-rpg .tab {
+    padding: 6px 14px; border-radius: 4px 4px 0 0; font-variant: small-caps;
+    font-size: 14px; letter-spacing: .04em; border: 1px solid transparent; border-bottom: none;
+}
+body.sheet-rpg .tab.active { color: #33290f; background: #d9bd6c; border-color: #8a6d28; }
+body.sheet-rpg.theme-dark .tab.active { color: #f4e9cd; background: #6b5220; border-color: #8a6d28; }
+body.sheet-rpg .tab.active:after { display: none; }
+body.sheet-rpg .segmented { border-radius: 5px; padding: 2px; }
+body.sheet-rpg.theme-light .segmented { background: #ddcda4; border-color: #8a7146; }
+body.sheet-rpg.theme-dark .segmented  { background: #2a2016; border-color: #12100c; }
+body.sheet-rpg .segmented .seg { border-radius: 3px; font-variant: small-caps; font-size: 13px; }
+body.sheet-rpg .segmented .seg.active { background: #d9bd6c; color: #33290f; }
+body.sheet-rpg .chip { border-radius: 12px; height: 26px; line-height: 24px; font-size: 13px; }
+body.sheet-rpg.theme-light .chip { background: #ddcda4; border: 1px solid #8a7146; }
+body.sheet-rpg.theme-dark .chip  { background: #43331f; border: 1px solid #12100c; }
+body.sheet-rpg .chip.on { background: #d9bd6c; border-color: #8a6d28; color: #33290f; }
+body.sheet-rpg .badge { border-radius: 9px; }
+body.sheet-rpg .badge.accent { background: #b8912f; color: #33290f; }
+body.sheet-rpg .rating .star.on { color: #cfae52; }
+body.sheet-rpg .swatch { border-radius: 3px; }
+body.sheet-rpg .swatch.selected { border-color: #b8912f; }
+
+/* ---------------------------------------------------------- menus and lists */
+body.sheet-rpg .dd-menu, body.sheet-rpg #axCtx, body.sheet-rpg .axctx { border-radius: 5px; padding: 4px; }
+body.sheet-rpg.theme-light .dd-menu, body.sheet-rpg.theme-light #axCtx, body.sheet-rpg.theme-light .axctx {
+    background: #f2e9d5; border: 1px solid #8a7146; color: #2b2723;
+    box-shadow: inset 0 0 0 3px #f2e9d5, inset 0 0 0 4px #cfae52, 0 8px 20px rgba(60,45,20,.3);
+}
+body.sheet-rpg.theme-dark .dd-menu, body.sheet-rpg.theme-dark #axCtx, body.sheet-rpg.theme-dark .axctx {
+    background: #332619; border: 1px solid #12100c; color: #e8e0d0;
+    box-shadow: inset 0 0 0 3px #332619, inset 0 0 0 4px #6b5220, 0 8px 20px rgba(0,0,0,.6);
+}
+body.sheet-rpg .dd-item, body.sheet-rpg .list-item, body.sheet-rpg .axctx-item {
+    height: 30px; line-height: 30px; border-radius: 3px; font-size: 14px;
+}
+body.sheet-rpg.theme-light .dd-item:hover, body.sheet-rpg.theme-light .list-item:hover,
+body.sheet-rpg.theme-light .axctx-item:hover, body.sheet-rpg.theme-light .fl-row:hover { background: #e6dabb; }
+body.sheet-rpg.theme-dark .dd-item:hover, body.sheet-rpg.theme-dark .list-item:hover,
+body.sheet-rpg.theme-dark .axctx-item:hover, body.sheet-rpg.theme-dark .fl-row:hover { background: #43331f; }
+body.sheet-rpg .dd-item.selected, body.sheet-rpg .list-item.selected { background: #d9bd6c; color: #33290f; }
+body.sheet-rpg.theme-dark .dd-item.selected, body.sheet-rpg.theme-dark .list-item.selected { background: #6b5220; color: #f4e9cd; }
+body.sheet-rpg .dd-item.selected:before, body.sheet-rpg .list-item.selected:before { display: none; }
+body.sheet-rpg .list { border-radius: 5px; }
+body.sheet-rpg .axctx-sep { margin: 4px 6px; }
+body.sheet-rpg.theme-light .axctx-sep { background: #cfae52; }
+body.sheet-rpg.theme-dark .axctx-sep  { background: #6b5220; }
+body.sheet-rpg .btn:focus, body.sheet-rpg .dropdown:focus, body.sheet-rpg .list:focus,
+body.sheet-rpg .tab:focus, body.sheet-rpg .seg:focus, body.sheet-rpg .chip:focus,
+body.sheet-rpg .swatch:focus, body.sheet-rpg .axdlg-btn:focus {
+    outline: 2px solid #b8912f; outline-offset: 1px;
+}
+
+/* -------------------------------------------------------------- window bars */
+body.sheet-rpg .axmb { height: 26px; padding: 0 6px; font-size: 14px; font-variant: small-caps; }
+body.sheet-rpg.theme-light .axmb { background: #dccfa9; border-bottom: 1px solid #a89065; }
+body.sheet-rpg.theme-dark .axmb  { background: #2b2116; border-bottom: 1px solid #12100c; }
+body.sheet-rpg .axmb-item { height: 22px; line-height: 22px; border-radius: 3px; padding: 0 10px; }
+body.sheet-rpg.theme-light .axmb-item:hover, body.sheet-rpg.theme-light .axmb-item.open { background: #e6dabb; }
+body.sheet-rpg.theme-dark .axmb-item:hover, body.sheet-rpg.theme-dark .axmb-item.open  { background: #43331f; }
+body.sheet-rpg .axsb { height: 24px; padding: 0 6px 0 12px; font-size: 13px; }
+body.sheet-rpg.theme-light .axsb { background: #dccfa9; border-top: 1px solid #a89065; color: #5c5245; }
+body.sheet-rpg.theme-dark .axsb  { background: #2b2116; border-top: 1px solid #12100c; color: #a99b84; }
+body.sheet-rpg.theme-light .axsb-part { border-left-color: #b8a677; }
+body.sheet-rpg.theme-dark .axsb-part  { border-left-color: #4a3a24; }
+body.sheet-rpg .axsb-bar { height: 8px; border-radius: 4px; }
+body.sheet-rpg .axsb-bar > i { background: #b8912f; box-shadow: inset 0 1px 0 rgba(255,240,200,.5); }
+
+/* ----------------------------------------------------------------- dialogs */
+/* The most important plate in the world gets the ornament: a double rule and
+   a fleuron in each of its four corners. One symmetric asset, four positions. */
+body.sheet-rpg #axDlgOverlay { background: rgba(30,22,12,.62); }
+body.sheet-rpg #axDlg {
+    width: 450px; padding: 22px 24px; border-radius: 6px;
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+    background-position: 9px 9px, right 9px top 9px, 9px bottom 9px, right 9px bottom 9px;
+    background-size: 13px 13px, 13px 13px, 13px 13px, 13px 13px;
+    background-image:
+        url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='14'%20viewBox='0%200%2014%2014'%3E%3Cpath%20d='M7%200L9%205L14%207L9%209L7%2014L5%209L0%207L5%205Z'%20fill='rgb(184,145,47)'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='14'%20viewBox='0%200%2014%2014'%3E%3Cpath%20d='M7%200L9%205L14%207L9%209L7%2014L5%209L0%207L5%205Z'%20fill='rgb(184,145,47)'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='14'%20viewBox='0%200%2014%2014'%3E%3Cpath%20d='M7%200L9%205L14%207L9%209L7%2014L5%209L0%207L5%205Z'%20fill='rgb(184,145,47)'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='14'%20viewBox='0%200%2014%2014'%3E%3Cpath%20d='M7%200L9%205L14%207L9%209L7%2014L5%209L0%207L5%205Z'%20fill='rgb(184,145,47)'/%3E%3C/svg%3E");
+}
+body.sheet-rpg.theme-light #axDlg {
+    background-color: #f2e9d5; border: 1px solid #8a7146; border-top: 1px solid #8a7146;
+    box-shadow: inset 0 0 0 4px #f2e9d5, inset 0 0 0 5px #cfae52, 0 20px 50px rgba(40,28,12,.45);
+}
+body.sheet-rpg.theme-dark #axDlg {
+    background-color: #332619; border: 1px solid #12100c; border-top: 1px solid #12100c;
+    box-shadow: inset 0 0 0 4px #332619, inset 0 0 0 5px #6b5220, 0 20px 50px rgba(0,0,0,.7);
+}
+body.sheet-rpg #axDlgTitle { font-size: 20px; font-weight: 400; font-variant: small-caps; letter-spacing: .04em; }
+body.sheet-rpg.theme-light #axDlgTitle { color: #4a3a1c; }
+body.sheet-rpg.theme-dark #axDlgTitle  { color: #e6cb84; }
+body.sheet-rpg #axDlgBtns { margin: 20px 0 0; padding: 14px 0 0; background: transparent; justify-content: flex-end; }
+body.sheet-rpg.theme-light #axDlgBtns { border-top: 1px solid #cfae52; }
+body.sheet-rpg.theme-dark #axDlgBtns  { border-top: 1px solid #6b5220; }
+body.sheet-rpg .axdlg-btn {
+    flex: none; min-width: 96px; height: 30px; line-height: 26px; border-radius: 4px;
+    font-family: inherit; font-size: 14px; font-variant: small-caps; letter-spacing: .04em;
+}
+body.sheet-rpg.theme-light .axdlg-btn { color: #3a3126; background: #ddcda4; border: 1px solid #8a7146; box-shadow: inset 0 1px 0 #f2e6c8, 0 2px 0 #b09a6d; }
+body.sheet-rpg.theme-dark .axdlg-btn  { color: #e2d6bc; background: #43331f; border: 1px solid #12100c; box-shadow: inset 0 1px 0 #5c4728, 0 2px 0 #17130d; }
+body.sheet-rpg .axdlg-btn.danger { color: #f6e7d2; background: #9d2b2b; border-color: #6f1c1c; }
+body.sheet-rpg #axToast { border-radius: 5px; font-size: 14px; }
+body.sheet-rpg.theme-light #axToast { background: #f2e9d5; color: #2b2723; border: 1px solid #8a7146; border-left: 4px solid #b8912f; }
+body.sheet-rpg.theme-dark #axToast  { background: #332619; color: #e8e0d0; border: 1px solid #12100c; border-left: 4px solid #b8912f; }
+body.sheet-rpg #axTip { border-radius: 4px; font-family: inherit; font-size: 12px; }
+body.sheet-rpg.theme-light #axTip { background: #2b2723; color: #f2e9d5; border: 1px solid #12100c; }
+body.sheet-rpg.theme-dark #axTip  { background: #1e1710; color: #e8e0d0; border: 1px solid #12100c; }
+
+/* ---------------------------------------------------------------- the grid */
+body.sheet-rpg .dv-frame { border-radius: 5px; }
+body.sheet-rpg .dv-hcell { height: 32px; font-family: inherit; font-size: 14px; font-weight: 400; font-variant: small-caps; letter-spacing: .04em; }
+body.sheet-rpg.theme-light .dv-hcell { background: #ddcda4; color: #4a3a1c; border-bottom: 1px solid #a89065; }
+body.sheet-rpg.theme-dark .dv-hcell  { background: #3d2f1e; color: #e6cb84; border-bottom: 1px solid #12100c; }
+body.sheet-rpg .dv-cell { height: 32px; font-size: 14px; border-top: none; }
+body.sheet-rpg.theme-light .dv-cell { border-bottom: 1px solid #ddcfaa; }
+body.sheet-rpg.theme-dark .dv-cell  { border-bottom: 1px solid #3d2f1e; }
+body.sheet-rpg.theme-light .dv-row:hover > .dv-cell { background: #e6dabb; }
+body.sheet-rpg.theme-dark .dv-row:hover > .dv-cell  { background: #3d2f1e; }
+body.sheet-rpg .dv-row.selected > .dv-cell { background: #d9bd6c; color: #33290f; }
+body.sheet-rpg.theme-dark .dv-row.selected > .dv-cell { background: #6b5220; color: #f4e9cd; }
+body.sheet-rpg .dv-check.on, body.sheet-rpg .dv-check.some { background: #d9bd6c; border-color: #8a6d28; color: #33290f; }
+body.sheet-rpg .dv-sort { color: #b8912f; }
+
+/* ------------------------------------------ pictures, drop zones and files */
+body.sheet-rpg .imgbox, body.sheet-rpg .thumb, body.sheet-rpg .filelist { border-radius: 5px; }
+body.sheet-rpg.theme-light .imgbox, body.sheet-rpg.theme-light .thumb { background: #f2e9d5; border: 1px solid #8a7146; }
+body.sheet-rpg.theme-dark .imgbox, body.sheet-rpg.theme-dark .thumb  { background: #332619; border: 1px solid #12100c; }
+body.sheet-rpg .imgbox.button:hover, body.sheet-rpg .thumb:hover { border-color: #b8912f; }
+body.sheet-rpg .sort-list .drag-item { border-radius: 4px; }
+body.sheet-rpg.theme-light .sort-list .drag-item { background: #f2e9d5; border-color: #a89065; }
+body.sheet-rpg.theme-dark .sort-list .drag-item  { background: #332619; border-color: #12100c; }
+body.sheet-rpg .drag-ghost { border-color: #b8912f; }
+body.sheet-rpg .fl-row { height: 30px; border-radius: 3px; }
+body.sheet-rpg .dropzone { border-radius: 6px; border-width: 2px; }
+body.sheet-rpg.theme-light .dropzone { background: #ede1c6; border-color: #a89065; }
+body.sheet-rpg.theme-dark .dropzone  { background: #2a2016; border-color: #4a3a24; }
+body.sheet-rpg .dropzone.dragover { border-style: solid; border-color: #b8912f; background: #e6d5a4; }
+body.sheet-rpg.theme-dark .dropzone.dragover { background: #46351a; }
+body.sheet-rpg .dropzone.reject { border-color: #9d2b2b; }
+body.sheet-rpg .console { border-radius: 4px; font-family: Consolas, monospace; }
+
+/* --------------------------------------------------------- title-bar items */
+body.sheet-rpg #titlebar .axtb-item {
+    height: 22px; min-width: 22px; border-radius: 3px; font-family: inherit;
+    font-size: 13px; font-variant: small-caps;
+}
+body.sheet-rpg.theme-light #titlebar .axtb-item { color: #3e3323; }
+body.sheet-rpg.theme-dark #titlebar .axtb-item  { color: #e6d6a8; }
+body.sheet-rpg.theme-light #titlebar .axtb-item:hover { background: #e0d0ab; }
+body.sheet-rpg.theme-dark #titlebar .axtb-item:hover  { background: #4a3a24; }
+body.sheet-rpg #titlebar .axtb-item.on, body.sheet-rpg #titlebar .axtb-item.open,
+body.sheet-rpg #titlebar .axtb-item.pop-open { background: #d9bd6c; color: #33290f; }
+body.sheet-rpg #titlebar .axtb-item.kind-sep, body.sheet-rpg #titlebar .axtb-item.kind-sep:hover {
+    background: #b8912f; border: none; height: 14px; width: 1px; min-width: 1px;
+    padding: 0; margin: 0 7px; border-radius: 0;
+}
+body.sheet-rpg #axPop { border-radius: 5px; padding: 12px 14px; font-family: inherit; font-size: 13px; }
+body.sheet-rpg.theme-light #axPop { background: #f2e9d5; color: #2b2723; border: 1px solid #8a7146; box-shadow: inset 0 0 0 3px #f2e9d5, inset 0 0 0 4px #cfae52, 0 8px 20px rgba(60,45,20,.3); }
+body.sheet-rpg.theme-dark #axPop  { background: #332619; color: #e8e0d0; border: 1px solid #12100c; box-shadow: inset 0 0 0 3px #332619, inset 0 0 0 4px #6b5220, 0 8px 20px rgba(0,0,0,.6); }
+body.sheet-rpg .axrich-footer { padding: 12px 22px; }
+body.sheet-rpg.theme-light .axrich-footer { background: #dccfa9; border-top-color: #a89065; }
+body.sheet-rpg.theme-dark .axrich-footer  { background: #2b2116; border-top-color: #12100c; }
+
+/* -------------------------------------------------------------- scrollbars */
+body.sheet-rpg.theme-light, body.sheet-rpg.theme-light #content,
+body.sheet-rpg.theme-light .list, body.sheet-rpg.theme-light .dd-menu,
+body.sheet-rpg.theme-light .filelist, body.sheet-rpg.theme-light .dv-bodywrap {
+    scrollbar-face-color: #c6b389; scrollbar-arrow-color: #6b5636;
+    scrollbar-track-color: #e3d5b2; scrollbar-shadow-color: #e3d5b2;
+    scrollbar-highlight-color: #e3d5b2; scrollbar-3dlight-color: #e3d5b2;
+    scrollbar-darkshadow-color: #e3d5b2;
+}
+body.sheet-rpg.theme-dark, body.sheet-rpg.theme-dark #content,
+body.sheet-rpg.theme-dark .list, body.sheet-rpg.theme-dark .dd-menu,
+body.sheet-rpg.theme-dark .filelist, body.sheet-rpg.theme-dark .dv-bodywrap {
+    scrollbar-face-color: #4a3a24; scrollbar-arrow-color: #a99b84;
+    scrollbar-track-color: #241c14; scrollbar-shadow-color: #241c14;
+    scrollbar-highlight-color: #241c14; scrollbar-3dlight-color: #241c14;
+    scrollbar-darkshadow-color: #241c14;
+}

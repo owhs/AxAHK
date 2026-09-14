@@ -1,0 +1,38 @@
+{
+  "name": "Search",
+  "description": "Search box",
+  "order": 3001,
+  "include": "lib\\components\\Search\\AxSearch.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Search",
+      "label": "Search box",
+      "icon": "E721",
+      "category": "Input",
+      "prefix": "q",
+      "arg": {
+        "key": "text",
+        "label": "Value",
+        "kind": "text",
+        "default": ""
+      },
+      "props": [
+        {
+          "key": "placeholder",
+          "label": "Placeholder",
+          "kind": "text",
+          "emit": "kv"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

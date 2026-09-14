@@ -1,0 +1,154 @@
+/* base.css — overlays injected by AxWindow (context menu, dialog, toast,
+   tooltip), the window frame, resize hotspots and page switching.
+   Loaded first in <head> so every theme can override it. */
+#axCtx,.axctx,#axDlgOverlay,#axToast,.axdlg-btn{-ms-user-select:none;user-select:none;font-family:'Segoe UI',Tahoma,sans-serif}
+#axCtx, .axctx {position:fixed;display:none;z-index:100000;min-width:170px;background:#20232e;border:1px solid #363b4a;border-radius:6px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.55);font-size:12px;color:#e6e8ef}
+.axctx-item{display:flex;align-items:center;padding:6px 12px;border-radius:4px;cursor:default;white-space:nowrap}
+.axctx-item:hover{background:#4c6ef5;color:#fff}
+.axctx-item.disabled{color:#6b7085}.axctx-item.disabled:hover{background:none;color:#6b7085}
+.axctx-kbd{margin-left:auto;padding-left:24px;font-size:11px;color:#9aa2b8}
+.axctx-item:hover .axctx-kbd{color:#dfe5ff}
+.axctx-sep{height:1px;background:#363b4a;margin:4px 6px}
+#axDlgOverlay{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.55);display:none;z-index:100001}
+#axDlg{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);width:400px;max-width:92%;background:#20232e;border:1px solid #363b4a;border-top:3px solid #4c6ef5;border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.6);padding:18px 20px 16px}
+#axDlg.kind-warning{border-top-color:#f0ad4e}#axDlg.kind-error{border-top-color:#d9534f}#axDlg.kind-question{border-top-color:#5bc0de}#axDlg.kind-success{border-top-color:#5cb85c}
+#axDlgTitle{font-size:14px;font-weight:600;color:#fff;margin-bottom:8px;padding-right:36px}
+/* the dialog's own close button, top right, as on any window: it answers as
+   Escape does (the Cancel button). The glyph comes from :before so a sheet
+   can swap it (win98 and winxp use Marlett's, as their caption buttons do). */
+#axDlgClose{position:absolute;top:10px;right:10px;z-index:1;width:32px;height:32px;line-height:32px;text-align:center;border-radius:4px;cursor:default;opacity:.72;color:inherit;font-size:10px;-ms-user-select:none;user-select:none}
+#axDlgClose:before{content:"\E8BB";font-family:'Segoe Fluent Icons','Segoe MDL2 Assets'}
+#axDlgClose:hover{opacity:1;background:rgba(128,128,128,.22)}
+#axDlgClose:active{background:rgba(128,128,128,.34)}
+#axDlgText{font-size:13px;color:#b7bcd0;line-height:1.5;white-space:pre-wrap}
+#axDlgInput{display:none;width:100%;margin-top:12px;padding:8px 10px;font-size:13px;background:#14161e;border:1px solid #2a2e3a;border-radius:6px;color:#fff;outline:none;box-sizing:border-box}
+#axDlgInput:focus{border-color:#4c6ef5}
+/* Trident draws its own clear button in a text field; every control
+   hides it, and so must the one in a dialog. */
+#axDlgInput::-ms-clear{display:none}
+#axDlgBtns{display:flex;justify-content:flex-end;margin-top:18px}
+.axdlg-btn{padding:7px 16px;margin-left:8px;font-size:12px;background:#2a2e3a;color:#e6e8ef;border:1px solid #363b4a;border-radius:6px;cursor:default}
+.axdlg-btn:hover{background:#343a4a}.axdlg-btn:active{transform:scale(.97)}
+.axdlg-btn.primary{background:#4c6ef5;border-color:#4c6ef5;color:#fff}.axdlg-btn.primary:hover{background:#5c7cff}
+.axdlg-btn.danger{background:#d9534f;border-color:#d9534f;color:#fff}.axdlg-btn.danger:hover{background:#e46561}
+#axToast{position:fixed;display:none;left:50%;bottom:22px;transform:translateX(-50%);z-index:100002;padding:9px 16px;font-size:12px;background:#2a2e3a;color:#fff;border:1px solid #363b4a;border-left:3px solid #4c6ef5;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:80%}
+#axToast.kind-success{border-left-color:#5cb85c}#axToast.kind-warning{border-left-color:#f0ad4e}#axToast.kind-error{border-left-color:#d9534f}
+ahkscript,script{display:none}
+html,body{-ms-content-zooming:none;-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}
+#titlebar{height:32px;display:flex;align-items:center;padding-left:12px;cursor:default;-ms-user-select:none;user-select:none}
+#titleText{flex:1;font-size:12px}
+.winbtn{width:46px;height:32px;line-height:32px;text-align:center;font-size:10px;font-family:'Segoe Fluent Icons','Segoe MDL2 Assets'}
+.winbtn:hover,.winbtn.hover{background:rgba(128,128,128,.25)}
+#btnClose:hover,#btnClose.hover{background:#c42b1c;color:#fff}
+#btnMax .ico-restore{display:none}
+body.maximized #btnMax .ico-max{display:none}
+body.maximized #btnMax .ico-restore{display:inline}
+.rz{position:fixed;z-index:9999}
+.rz-n,.rz-s{left:8px;right:8px;height:5px;cursor:ns-resize}.rz-n{top:0}.rz-s{bottom:0}
+.rz-w,.rz-e{top:8px;bottom:8px;width:5px;cursor:ew-resize}.rz-w{left:0}.rz-e{right:0}
+.rz-nw,.rz-ne,.rz-sw,.rz-se{width:8px;height:8px}
+.rz-nw{top:0;left:0;cursor:nwse-resize}.rz-se{bottom:0;right:0;cursor:nwse-resize}
+.rz-ne{top:0;right:0;cursor:nesw-resize}.rz-sw{bottom:0;left:0;cursor:nesw-resize}
+body.maximized .rz{display:none}
+body.noresize .rz{display:none}body.nomax #btnMax{display:none}body.nomin #btnMin{display:none}
+#titlebar .app-icon img{width:16px;height:16px;vertical-align:middle;display:block}
+.page{display:none}.page.visible{display:block}
+/* a page with no heading of its own still needs the air the heading
+   used to put above the first row */
+.page.noheading{padding-top:12px}
+#axTip{position:fixed;display:none;z-index:100003;max-width:260px;padding:6px 10px;font-size:11px;line-height:1.4;background:#2a2e3a;color:#fff;border:1px solid #3d4356;border-radius:5px;box-shadow:0 6px 18px rgba(0,0,0,.45);white-space:pre-wrap;pointer-events:none}
+
+
+/* menu marks (a tick, a radio dot or a glyph) and submenu arrows */
+#axCtx.hasmarks .axctx-item, .axctx.hasmarks .axctx-item { padding-left: 4px; }
+.axctx-mark {
+    display: inline-block; width: 22px; flex: none; text-align: center;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 11px;
+}
+.axctx-item.checked .axctx-mark { opacity: 1; }
+.axctx-mark.radio { font-family: inherit; font-size: 15px; line-height: 1; }
+.axctx-sub {
+    margin-left: auto; padding-left: 18px; flex: none;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 9px; opacity: .7;
+}
+.axctx-item.kb { background: #4c6ef5; color: #fff; }
+
+/* title-bar items (AxWindow.Titlebar.ahk). The two slots are flex children of
+   #titlebar and collapse to nothing when empty, so a window that never calls
+   TitleBar() is laid out exactly as before. */
+/* No :empty here. Trident does not restyle for it when innerHTML changes,
+   so a slot filled at load stayed hidden until the next interaction; an
+   empty flex row with no padding is zero wide anyway. */
+.axtb-slot{display:flex;align-items:center;flex:none;-ms-user-select:none;user-select:none}
+/* room between the last item and whatever follows it -- the caption text on the
+   left, the caption buttons on the right */
+#axTbLeft.has-items{margin-right:10px}
+#axTbRight.has-items{margin-right:6px}
+body.axtb-off .axtb-slot{display:none!important}
+body.axtb-notitle #titleText{display:none!important}
+/* the caption text is out of the flex row (hidden, or centred below), so
+   something else has to hold the space or the caption buttons pack to
+   the left against it. */
+body.axtb-notitle #axTbLeft{display:flex;flex:1;min-width:0}
+/* CenterTitle: the caption text leaves the flex row and is centred on the
+   window itself, so it stays centred whatever is in the slots. The padding
+   keeps a long title clear of the items and the caption buttons; pointer-events
+   hands the drag back to the title bar underneath. */
+body.axtb-center #titlebar{position:relative}
+body.axtb-center #titleText{position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;padding:0 150px;pointer-events:none}
+body.axtb-center #axTbLeft{display:flex;flex:1;min-width:0}
+.axtb-item{position:relative;display:flex;align-items:center;justify-content:center;height:24px;min-width:24px;padding:0 6px;margin:0 1px;border-radius:4px;cursor:default;white-space:nowrap;font-size:12px;transition:background .1s}
+.axtb-item:hover{background:rgba(128,128,128,.22)}
+.axtb-item.on,.axtb-item.open,.axtb-item.pop-open{background:rgba(128,128,128,.30)}
+.axtb-item.disabled{opacity:.4}
+.axtb-item.disabled:hover{background:none}
+.axtb-slot .axtb-item.kind-sep{width:1px;min-width:1px;height:14px;padding:0;margin:0 6px;border-radius:0;background:rgba(128,128,128,.4)}
+.axtb-slot .axtb-item.kind-sep:hover{background:rgba(128,128,128,.4)}
+.axtb-slot .axtb-item.kind-spacer{flex:1;min-width:10px;padding:0;margin:0;background:none}
+.axtb-slot .axtb-item.kind-spacer:hover{background:none}
+.axtb-item .ico{font-family:'Segoe Fluent Icons','Segoe MDL2 Assets';font-size:14px;line-height:1}
+.axtb-item img{display:block;max-height:20px;max-width:100%}
+.axtb-item .ax-svg,.axtb-item .ax-svg svg{display:block;line-height:0}
+/* the burger, and the cross it becomes when the item is "on" and asked to
+   morph (Class: "morph") -- three rules, no glyph, crisp at any DPI */
+.axtb-burger{position:relative;display:block;width:15px;height:12px}
+.axtb-burger i{position:absolute;left:0;right:0;height:2px;background:currentColor;-ms-transform-origin:50% 50%;transform-origin:50% 50%;transition:top .2s cubic-bezier(.2,.8,.3,1),transform .2s cubic-bezier(.2,.8,.3,1),opacity .12s ease}
+.axtb-burger i:nth-child(1){top:0}
+.axtb-burger i:nth-child(2){top:5px}
+.axtb-burger i:nth-child(3){top:10px}
+.axtb-item.morph.on .axtb-burger i:nth-child(1){top:5px;-ms-transform:rotate(45deg);transform:rotate(45deg)}
+.axtb-item.morph.on .axtb-burger i:nth-child(2){opacity:0}
+.axtb-item.morph.on .axtb-burger i:nth-child(3){top:5px;-ms-transform:rotate(-45deg);transform:rotate(-45deg)}
+
+/* the popover: a panel of the page's own markup, anchored to an element.
+   It is positioned from AHK and faded in a frame later, which is why the
+   transition is on opacity and transform rather than on display. */
+/* A search item is a BUTTON until something turns it on -- no fill, no border,
+   the same box as the items beside it -- and the width is what opens it into a
+   field. Everything animates off one class, so a sheet only has to say how wide
+   it goes and what colour it lightens to. */
+.axtb-slot .axtb-item.axtb-search{flex:1 1 auto;max-width:24px;min-width:24px;padding:0;overflow:hidden;background:none;border:1px solid transparent;transition:max-width .26s cubic-bezier(.2,.8,.3,1),background .14s ease,border-color .14s ease}
+.axtb-slot .axtb-item.axtb-search:hover{background:rgba(128,128,128,.16);border-color:rgba(128,128,128,.34)}
+.axtb-slot .axtb-item.axtb-search.on,.axtb-slot .axtb-item.axtb-search.on:hover{max-width:420px;background:rgba(128,128,128,.24)}
+.axtb-search input{flex:0 0 0;width:0;min-width:0;height:100%;padding:0;border:none;outline:none;background:transparent;color:inherit;font:inherit;font-size:12px;cursor:text;opacity:0;pointer-events:none;transition:opacity .16s ease}
+.axtb-search.on input{flex:1 1 auto;width:auto;padding:0 8px;opacity:1;pointer-events:auto}
+.axtb-search input::-ms-clear{display:none}
+/* The magnifier sits in the middle of the button and slides to the left edge
+   of the box as it opens. No margin:auto to centre it -- Trident's flexbox
+   does not resolve auto margins on a flex item reliably, and it ends up
+   pinned to one side. The item's own justify-content does the centring,
+   which needs the margin left at zero to work. */
+.axtb-search .sico{flex:none;font-size:13px;opacity:.9;margin:0;transition:margin .26s cubic-bezier(.2,.8,.3,1)}
+.axtb-search.on .sico{margin:0 2px 0 8px}
+/* A submenu carries a transparent strip down its left edge, overlapping the
+   menu that opened it. It is a pseudo-element, so it is not a node of its
+   own: a pointer on it reports the panel, which is exactly what the hover
+   handler wants to hear. Together with the close timer it means a diagonal
+   run at a submenu no longer loses it. */
+.axctx.sub:before{content:"";position:absolute;left:-7px;top:-6px;bottom:-6px;width:9px}
+#axPop{position:fixed;display:none;z-index:100004;max-width:520px;padding:10px 12px;background:#20232e;color:#e6e8ef;border:1px solid #363b4a;border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.5);font-family:'Segoe UI',Tahoma,sans-serif;font-size:12px;line-height:1.45;opacity:0;-ms-transform:translateY(-6px);transform:translateY(-6px);transition:opacity .16s ease,transform .18s cubic-bezier(.2,.8,.3,1)}
+#axPop.open{opacity:1;-ms-transform:translateY(0);transform:translateY(0)}
+/* unsaved changes (win.Dirty): a dot before the title */
+body.ax-dirty #titleText::before{content:"\25CF\00A0";opacity:.75}
+/* the dialog button the keyboard is on (arrow keys, Tab) */
+.axdlg-btn.kb{box-shadow:0 0 0 2px #60cdff}body.theme-light .axdlg-btn.kb{box-shadow:0 0 0 2px #005fb8}.axdlg-btn:focus{outline:none}

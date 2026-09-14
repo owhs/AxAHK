@@ -1,0 +1,420 @@
+/* @extends win11 */
+/* @accent-hue 25 22 */
+/* ============================================================================
+   cozy.css — soft, warm and pleased to see you. The rest of this library is
+   made of instruments, chassis and HUDs; this one is made of cushions, and it
+   is the only sheet that is allowed to be *friendly*.
+
+   Rules of the sheet, so later edits do not undo it:
+
+     • Everything is ROUND. 18px on surfaces, 14px on controls, a full pill on
+       anything small. A sharp corner in this sheet is a bug.
+     • Buttons are CHUNKY and they COMPRESS. A solid 4px edge sits under each
+       one -- not a blur, a solid colour -- and pressing it drops the button
+       3px onto that edge. That single detail does more work than the whole
+       palette: it is what makes the sheet feel like a toy rather than a form.
+     • Motion OVERSHOOTS. Transitions settle with a slight bounce rather than
+       easing flat, because nothing here is in a hurry.
+     • Shadows are WARM, never grey. A neutral drop shadow on a cream surface
+       reads as dirt; these are all tinted towards the ground.
+     • Space is generous. If it looks tight, it is wrong.
+
+   ------------------------------------------------------------ personalisation
+   @accent-hue 25 (give or take 22) makes coral the accent material, so
+   SetAccent moves the friendly colour and not much else: the grounds are warm
+   but flat, held under AxSys.BlueMinS, so the room stays cream while the
+   cushions change colour. The band stops short of hue 0, which leaves the
+   danger red outside it -- a delete button should still look like a delete
+   button in a mint-green house.
+
+   This is also the sheet SetTint was waiting for. Every surface is a filled,
+   rounded shape rather than a hairline, so a tint genuinely re-decorates the
+   room instead of nudging a few borders.
+
+   The title bar is 34px, the menu bar 28 and the status bar 26, so all four
+   #shell sums are restated, and so is the height AxRich.css gives a rich
+   dialog's content.
+   ========================================================================= */
+
+/* ------------------------------------------------------------- the material */
+body.sheet-cozy {
+    font-family: "Segoe UI Variable Display", "Segoe UI", Nunito, system-ui, sans-serif;
+    font-size: 14px; line-height: 21px;
+}
+body.sheet-cozy.theme-light { background: #fdf3ec; color: #3b3238; }
+body.sheet-cozy.theme-dark  { background: #241f22; color: #f0e8ea; }
+
+/* --------------------------------------------------------------- the frame */
+body.sheet-cozy #titlebar { height: 34px; padding-left: 16px; background: transparent; }
+body.sheet-cozy.theme-light #titlebar { background: #fbe9df; }
+body.sheet-cozy.theme-dark #titlebar  { background: #2e282c; }
+body.sheet-cozy #titleText { font-size: 13px; font-weight: 600; letter-spacing: .01em; }
+body.sheet-cozy.theme-light #titleText { color: #6b5a52; }
+body.sheet-cozy.theme-dark #titleText  { color: #cfc3c7; }
+body.sheet-cozy #titlebar .app-icon { font-size: 15px; margin-right: 10px; color: #ff8a5c; }
+body.sheet-cozy.inactive #titleText, body.sheet-cozy.inactive #titlebar .app-icon { opacity: .5; }
+
+/* round caption buttons, because a square one would be the only sharp thing
+   in the window. Scoped under #titlebar so SetTint leaves them alone. */
+body.sheet-cozy #titlebar .winbtn {
+    width: 26px; height: 26px; line-height: 26px; margin: 0 3px 0 0; border-radius: 50%;
+    font-size: 9px; background: transparent;
+    transition: background .16s cubic-bezier(.34,1.56,.64,1);
+}
+body.sheet-cozy.theme-light #titlebar .winbtn { color: #7d6a61; }
+body.sheet-cozy.theme-dark #titlebar .winbtn  { color: #c4b8bc; }
+body.sheet-cozy.theme-light #titlebar .winbtn:hover { background: #f6d7c6; color: #3b3238; }
+body.sheet-cozy.theme-dark #titlebar .winbtn:hover  { background: #443b40; color: #f0e8ea; }
+body.sheet-cozy #titlebar #btnClose:hover, body.sheet-cozy #titlebar #btnClose.hover {
+    background: #ff8a8a; color: #4a1414;
+}
+
+/* ------------------------------------------------------------ the reserves */
+body.sheet-cozy #shell { height: calc(100% - 34px); }
+body.sheet-cozy.has-menubar #shell { height: calc(100% - 62px); }
+body.sheet-cozy.has-statusbar #shell { height: calc(100% - 60px); }
+body.sheet-cozy.has-menubar.has-statusbar #shell { height: calc(100% - 88px); }
+body.sheet-cozy.axrich-dlg #content { height: calc(100% - 34px); }
+
+/* ----------------------------------------------------------------- the rail */
+body.sheet-cozy #sidebar { width: 210px; padding: 12px 10px; }
+body.sheet-cozy.theme-light #sidebar { background: #fbe9df; }
+body.sheet-cozy.theme-dark #sidebar  { background: #2e282c; }
+body.sheet-cozy .nav-item {
+    height: 40px; margin-bottom: 6px; padding: 0 16px; border-radius: 20px;
+    font-size: 14px; font-weight: 600; background: transparent;
+    transition: background .18s cubic-bezier(.34,1.56,.64,1), color .18s ease;
+}
+body.sheet-cozy .nav-item .ico { width: 22px; font-size: 16px; margin-right: 12px; }
+body.sheet-cozy.theme-light .nav-item { color: #6b5a52; }
+body.sheet-cozy.theme-dark .nav-item  { color: #c4b8bc; }
+body.sheet-cozy.theme-light .nav-item:hover { background: #f7ddd0; color: #3b3238; }
+body.sheet-cozy.theme-dark .nav-item:hover  { background: #3a3236; color: #f0e8ea; }
+body.sheet-cozy .nav-item.active, body.sheet-cozy .nav-item.active:hover {
+    background: #ff8a5c; color: #45180a; box-shadow: 0 3px 0 #e06a3e;
+}
+body.sheet-cozy .nav-item.active:before { display: none; }
+
+/* ----------------------------------------------------------- the workspace */
+/* The 6px on the right and bottom is not decoration: Trident paints the
+   native scrollbar above everything, z-index included, so a #content that
+   runs to the frame edge buries the .rz resize hotspots under it and the
+   window can no longer be dragged by its right or bottom edge. win11.css
+   keeps the same inset for the same reason. */
+body.sheet-cozy #content { margin: 0 6px 6px 0; padding: 18px 26px 28px 22px; }
+body.sheet-cozy.theme-light #content { background: #fdf3ec; }
+body.sheet-cozy.theme-dark #content  { background: #241f22; }
+
+/* ----------------------------------------------------------------- writing */
+body.sheet-cozy h1 { font-size: 26px; line-height: 34px; font-weight: 800; letter-spacing: -.01em; margin: 4px 0 10px; }
+body.sheet-cozy h2 { font-size: 18px; font-weight: 700; margin: 22px 0 10px; }
+body.sheet-cozy h3 { font-size: 14px; font-weight: 700; margin: 16px 0 8px; }
+body.sheet-cozy .caption { font-size: 13px; font-weight: 600; }
+body.sheet-cozy .hint { font-size: 12px; }
+body.sheet-cozy.theme-light .caption, body.sheet-cozy.theme-light .hint,
+body.sheet-cozy.theme-light .card-row .desc, body.sheet-cozy.theme-light .tile .desc,
+body.sheet-cozy.theme-light .fl-meta, body.sheet-cozy.theme-light .dropzone .dz-desc { color: #8a7770; }
+body.sheet-cozy.theme-dark .caption, body.sheet-cozy.theme-dark .hint,
+body.sheet-cozy.theme-dark .card-row .desc, body.sheet-cozy.theme-dark .tile .desc,
+body.sheet-cozy.theme-dark .fl-meta, body.sheet-cozy.theme-dark .dropzone .dz-desc { color: #a89aa0; }
+body.sheet-cozy .link, body.sheet-cozy .hyperlink, body.sheet-cozy a { color: #e0632c; font-weight: 600; text-decoration: none; }
+body.sheet-cozy.theme-dark .link, body.sheet-cozy.theme-dark .hyperlink, body.sheet-cozy.theme-dark a { color: #ffa079; }
+body.sheet-cozy .link:hover { text-decoration: underline; }
+
+/* ------------------------------------------------------------- the cushions */
+body.sheet-cozy .card, body.sheet-cozy .expander, body.sheet-cozy .tile {
+    border-radius: 18px; padding: 16px 20px; margin-bottom: 12px; border: none;
+}
+body.sheet-cozy.theme-light .card, body.sheet-cozy.theme-light .expander,
+body.sheet-cozy.theme-light .tile { background: #ffffff; box-shadow: 0 2px 0 #f0dccf, 0 6px 16px rgba(150,100,75,.10); }
+body.sheet-cozy.theme-dark .card, body.sheet-cozy.theme-dark .expander,
+body.sheet-cozy.theme-dark .tile { background: #2e282c; box-shadow: 0 2px 0 #1c181a, 0 6px 16px rgba(0,0,0,.28); }
+body.sheet-cozy .card-row { min-height: 46px; }
+body.sheet-cozy .card.hot { box-shadow: 0 0 0 2px #ff8a5c, 0 6px 16px rgba(150,100,75,.14); }
+/* the ring is a border, so the legend can cut it (a shadow is not cut) */
+body.sheet-cozy .group { border-radius: 18px; padding: 22px 18px 16px; margin: 14px 0; }
+body.sheet-cozy.theme-light .group { background: #fff7f2; border: 2px solid #f6e3d8; }
+body.sheet-cozy.theme-dark .group  { background: #2a2427; border: 2px solid #3a3236; }
+body.sheet-cozy .group > .legend { font-size: 13px; font-weight: 700; }
+body.sheet-cozy.theme-light .group > .legend { background: #fff7f2; color: #6b5a52; }
+body.sheet-cozy.theme-dark .group > .legend  { background: #2a2427; color: #c4b8bc; }
+body.sheet-cozy .exp-header { min-height: 50px; }
+body.sheet-cozy .exp-header .chev { border-radius: 50%; width: 30px; height: 30px; line-height: 30px; }
+body.sheet-cozy.theme-light .exp-body { background: #fff7f2; border-top: none; border-radius: 0 0 18px 18px; }
+body.sheet-cozy.theme-dark .exp-body  { background: #2a2427; border-top: none; border-radius: 0 0 18px 18px; }
+
+/* ---------------------------------------------------------------- controls */
+/* The chunky button. The 4px edge underneath is a SOLID colour, not a blur,
+   and pressing drops the button onto it -- three lines, and the whole sheet
+   reads as a toy because of them. */
+body.sheet-cozy .btn {
+    height: 38px; line-height: 34px; min-width: 88px; padding: 0 20px; border-radius: 14px;
+    font-size: 14px; font-weight: 700; border: none;
+    transition: transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .12s ease, background .16s ease;
+}
+body.sheet-cozy.theme-light .btn { color: #4a3b34; background: #f4e2d6; box-shadow: 0 4px 0 #e0c8b8; }
+body.sheet-cozy.theme-dark .btn  { color: #f0e8ea; background: #3a3236; box-shadow: 0 4px 0 #221d1f; }
+body.sheet-cozy.theme-light .btn:hover { background: #f9ebe2; }
+body.sheet-cozy.theme-dark .btn:hover  { background: #453c41; }
+body.sheet-cozy .btn:active, body.sheet-cozy .btn.pressed {
+    -ms-transform: translateY(3px); transform: translateY(3px);
+}
+body.sheet-cozy.theme-light .btn:active, body.sheet-cozy.theme-light .btn.pressed { box-shadow: 0 1px 0 #e0c8b8; }
+body.sheet-cozy.theme-dark .btn:active, body.sheet-cozy.theme-dark .btn.pressed   { box-shadow: 0 1px 0 #221d1f; }
+body.sheet-cozy .btn.accent, body.sheet-cozy .axdlg-btn.primary {
+    color: #45180a; background: #ff8a5c; box-shadow: 0 4px 0 #e06a3e;
+}
+body.sheet-cozy .btn.accent:hover, body.sheet-cozy .axdlg-btn.primary:hover { background: #ffa079; }
+body.sheet-cozy .btn.accent:active, body.sheet-cozy .btn.accent.pressed { box-shadow: 0 1px 0 #e06a3e; }
+body.sheet-cozy .btn.danger { color: #4a1414; background: #ff8a8a; box-shadow: 0 4px 0 #e06060; }
+body.sheet-cozy .btn.subtle { background: transparent; box-shadow: none; }
+body.sheet-cozy .btn.disabled { opacity: .45; box-shadow: none; }
+body.sheet-cozy .btn.icon { width: 38px; min-width: 38px; border-radius: 50%; padding: 0; }
+
+/* fields are soft wells with a fat friendly ring when you are in them */
+body.sheet-cozy .textbox input, body.sheet-cozy .textbox textarea,
+body.sheet-cozy .searchbox input, body.sheet-cozy .numberbox input,
+body.sheet-cozy .passwordbox input, body.sheet-cozy .hotkeybox input,
+body.sheet-cozy .dd-value, body.sheet-cozy #axDlgInput, body.sheet-cozy .hex {
+    height: 38px; line-height: 36px; border-radius: 14px; font-size: 14px; padding: 0 14px;
+    transition: box-shadow .16s ease, background .16s ease;
+}
+body.sheet-cozy.theme-light .textbox input, body.sheet-cozy.theme-light .textbox textarea,
+body.sheet-cozy.theme-light .searchbox input, body.sheet-cozy.theme-light .numberbox input,
+body.sheet-cozy.theme-light .passwordbox input, body.sheet-cozy.theme-light .hotkeybox input,
+body.sheet-cozy.theme-light .dd-value, body.sheet-cozy.theme-light #axDlgInput,
+body.sheet-cozy.theme-light .hex, body.sheet-cozy.theme-light .list,
+body.sheet-cozy.theme-light .filelist, body.sheet-cozy.theme-light .dv-frame {
+    background: #fff7f2; border: none; color: #3b3238; box-shadow: inset 0 0 0 2px #f0dccf;
+}
+body.sheet-cozy.theme-dark .textbox input, body.sheet-cozy.theme-dark .textbox textarea,
+body.sheet-cozy.theme-dark .searchbox input, body.sheet-cozy.theme-dark .numberbox input,
+body.sheet-cozy.theme-dark .passwordbox input, body.sheet-cozy.theme-dark .hotkeybox input,
+body.sheet-cozy.theme-dark .dd-value, body.sheet-cozy.theme-dark #axDlgInput,
+body.sheet-cozy.theme-dark .hex, body.sheet-cozy.theme-dark .list,
+body.sheet-cozy.theme-dark .filelist, body.sheet-cozy.theme-dark .dv-frame {
+    background: #2a2427; border: none; color: #f0e8ea; box-shadow: inset 0 0 0 2px #3a3236;
+}
+body.sheet-cozy .textbox textarea { height: auto; padding: 10px 14px; }
+body.sheet-cozy .textbox input:focus, body.sheet-cozy .textbox textarea:focus,
+body.sheet-cozy .searchbox input:focus, body.sheet-cozy .passwordbox input:focus,
+body.sheet-cozy .hotkeybox input:focus, body.sheet-cozy .hotkeybox.recording input,
+body.sheet-cozy #axDlgInput:focus, body.sheet-cozy .numberbox.focus input,
+body.sheet-cozy .dropdown.open .dd-value {
+    border: none; box-shadow: inset 0 0 0 2px #ff8a5c;
+}
+body.sheet-cozy .searchbox .ico, body.sheet-cozy .hotkeybox .kb { top: 11px; }
+body.sheet-cozy .numberbox .spin { border-radius: 8px; }
+body.sheet-cozy .passwordbox .reveal { border-radius: 10px; top: 6px; height: 26px; line-height: 26px; }
+
+/* a plump switch */
+body.sheet-cozy .switch { height: 26px; }
+body.sheet-cozy .switch input { width: 50px; height: 26px; }
+body.sheet-cozy .sw-track { width: 50px; height: 26px; border-radius: 13px; border: none; }
+body.sheet-cozy.theme-light .sw-track { background: #f0dccf; }
+body.sheet-cozy.theme-dark .sw-track  { background: #3a3236; }
+body.sheet-cozy .sw-track:before {
+    left: 4px; top: 4px; width: 18px; height: 18px; background: #ffffff;
+    box-shadow: 0 1px 3px rgba(120,80,60,.35);
+    transition: left .2s cubic-bezier(.34,1.56,.64,1), width .12s ease;
+}
+body.sheet-cozy .switch:hover .sw-track:before { width: 20px; height: 18px; top: 4px; }
+body.sheet-cozy .switch input:checked + .sw-track { background: #ff8a5c; }
+body.sheet-cozy .switch input:checked + .sw-track:before { left: 28px; background: #ffffff; }
+body.sheet-cozy .sw-label { margin-left: 14px; font-weight: 600; }
+
+body.sheet-cozy .check .box { width: 22px; height: 22px; border-radius: 8px; line-height: 20px; border: none; }
+body.sheet-cozy.theme-light .check .box { background: #f4e2d6; }
+body.sheet-cozy.theme-dark .check .box  { background: #3a3236; }
+body.sheet-cozy .check input:checked + .box { background: #ff8a5c; color: #45180a; }
+body.sheet-cozy .radio .ring { width: 22px; height: 22px; border: none; }
+body.sheet-cozy.theme-light .radio .ring { background: #f4e2d6; }
+body.sheet-cozy.theme-dark .radio .ring  { background: #3a3236; }
+body.sheet-cozy .radio input:checked + .ring { border: 6px solid #ff8a5c; background: #ffffff; }
+body.sheet-cozy .radio input:checked + .ring:after { background: #ffffff; }
+body.sheet-cozy .check .lbl, body.sheet-cozy .radio .lbl { margin-left: 10px; }
+
+body.sheet-cozy input[type=range]::-ms-track { height: 8px; }
+body.sheet-cozy input[type=range]::-ms-fill-lower { background: #ff8a5c; border-radius: 4px; }
+body.sheet-cozy input[type=range]::-ms-thumb {
+    box-sizing: border-box; width: 24px; height: 24px; border-radius: 50%;
+    background: #ffffff; border: 3px solid #ff8a5c;
+}
+body.sheet-cozy.theme-light input[type=range]::-ms-fill-upper { background: #f0dccf; border-radius: 4px; }
+body.sheet-cozy.theme-dark input[type=range]::-ms-fill-upper { background: #3a3236; border-radius: 4px; }
+
+body.sheet-cozy .progress { height: 12px; border-radius: 6px; }
+body.sheet-cozy.theme-light .progress { background: #f0dccf; }
+body.sheet-cozy.theme-dark .progress  { background: #3a3236; }
+body.sheet-cozy .progress .bar, body.sheet-cozy .progress.indeterminate .bar { background: #ff8a5c; border-radius: 6px; }
+body.sheet-cozy .ring-spinner { border-color: #f0dccf; border-top-color: #ff8a5c; }
+
+/* pills all the way down */
+body.sheet-cozy .tabs { border-bottom: none; margin-bottom: 16px; }
+body.sheet-cozy .tab {
+    padding: 8px 18px; border-radius: 18px; font-weight: 700; margin-right: 6px;
+    transition: background .16s cubic-bezier(.34,1.56,.64,1);
+}
+body.sheet-cozy.theme-light .tab:hover { background: #f7ddd0; }
+body.sheet-cozy.theme-dark .tab:hover  { background: #3a3236; }
+body.sheet-cozy .tab.active { background: #ff8a5c; color: #45180a; }
+body.sheet-cozy .tab.active:after { display: none; }
+body.sheet-cozy .segmented { border-radius: 20px; padding: 4px; border: none; }
+body.sheet-cozy.theme-light .segmented { background: #f4e2d6; }
+body.sheet-cozy.theme-dark .segmented  { background: #2a2427; }
+body.sheet-cozy .segmented .seg { height: 30px; line-height: 30px; border-radius: 16px; font-weight: 700; padding: 0 16px; }
+body.sheet-cozy .segmented .seg.active { background: #ff8a5c; color: #45180a; }
+body.sheet-cozy .chip { height: 30px; line-height: 28px; border-radius: 16px; padding: 0 14px; font-weight: 600; border: none; }
+body.sheet-cozy.theme-light .chip { background: #f4e2d6; }
+body.sheet-cozy.theme-dark .chip  { background: #3a3236; }
+body.sheet-cozy .chip.on { background: #ff8a5c; color: #45180a; }
+body.sheet-cozy .badge { border-radius: 10px; font-weight: 700; }
+body.sheet-cozy .badge.accent { background: #ff8a5c; color: #45180a; }
+body.sheet-cozy .rating .star.on { color: #ffb020; }
+body.sheet-cozy .swatch { border-radius: 50%; }
+body.sheet-cozy .swatch.selected { border-color: #ff8a5c; }
+body.sheet-cozy .infobar { border-radius: 16px; padding: 12px 16px; border: none; }
+body.sheet-cozy.theme-light .infobar { background: #fff7f2; }
+body.sheet-cozy.theme-dark .infobar  { background: #2e282c; }
+body.sheet-cozy .infobar .close { border-radius: 50%; }
+
+/* ---------------------------------------------------------- menus and lists */
+body.sheet-cozy .dd-menu, body.sheet-cozy #axCtx, body.sheet-cozy .axctx {
+    border-radius: 16px; padding: 6px; border: none;
+}
+body.sheet-cozy.theme-light .dd-menu, body.sheet-cozy.theme-light #axCtx, body.sheet-cozy.theme-light .axctx {
+    background: #ffffff; color: #3b3238; box-shadow: 0 10px 30px rgba(150,100,75,.22);
+}
+body.sheet-cozy.theme-dark .dd-menu, body.sheet-cozy.theme-dark #axCtx, body.sheet-cozy.theme-dark .axctx {
+    background: #2e282c; color: #f0e8ea; box-shadow: 0 10px 30px rgba(0,0,0,.5);
+}
+body.sheet-cozy .list { border-radius: 16px; }
+body.sheet-cozy .dd-item, body.sheet-cozy .list-item, body.sheet-cozy .axctx-item {
+    height: 36px; line-height: 36px; border-radius: 12px; font-size: 14px;
+}
+body.sheet-cozy.theme-light .dd-item:hover, body.sheet-cozy.theme-light .list-item:hover,
+body.sheet-cozy.theme-light .axctx-item:hover, body.sheet-cozy.theme-light .fl-row:hover { background: #fbe9df; }
+body.sheet-cozy.theme-dark .dd-item:hover, body.sheet-cozy.theme-dark .list-item:hover,
+body.sheet-cozy.theme-dark .axctx-item:hover, body.sheet-cozy.theme-dark .fl-row:hover { background: #3a3236; }
+body.sheet-cozy .dd-item.selected, body.sheet-cozy .list-item.selected { background: #ff8a5c; color: #45180a; }
+body.sheet-cozy .dd-item.selected:before, body.sheet-cozy .list-item.selected:before { display: none; }
+body.sheet-cozy .axctx-sep { margin: 6px 10px; }
+body.sheet-cozy.theme-light .axctx-sep { background: #f0dccf; }
+body.sheet-cozy.theme-dark .axctx-sep  { background: #3a3236; }
+body.sheet-cozy .btn:focus, body.sheet-cozy .dropdown:focus, body.sheet-cozy .list:focus,
+body.sheet-cozy .tab:focus, body.sheet-cozy .seg:focus, body.sheet-cozy .chip:focus,
+body.sheet-cozy .swatch:focus, body.sheet-cozy .axdlg-btn:focus {
+    outline: 3px solid #ffc4ab; outline-offset: 2px;
+}
+
+/* -------------------------------------------------------------- window bars */
+body.sheet-cozy .axmb { height: 28px; padding: 0 8px; font-size: 13px; border-bottom: none; }
+body.sheet-cozy.theme-light .axmb { background: #fbe9df; }
+body.sheet-cozy.theme-dark .axmb  { background: #2e282c; }
+body.sheet-cozy .axmb-item { height: 22px; line-height: 22px; border-radius: 11px; padding: 0 12px; font-weight: 600; }
+body.sheet-cozy.theme-light .axmb-item:hover, body.sheet-cozy.theme-light .axmb-item.open { background: #f7ddd0; }
+body.sheet-cozy.theme-dark .axmb-item:hover, body.sheet-cozy.theme-dark .axmb-item.open  { background: #3a3236; }
+body.sheet-cozy .axsb { height: 26px; padding: 0 8px 0 14px; font-size: 12px; border-top: none; }
+body.sheet-cozy.theme-light .axsb { background: #fbe9df; color: #8a7770; }
+body.sheet-cozy.theme-dark .axsb  { background: #2e282c; color: #a89aa0; }
+body.sheet-cozy .axsb-part { border-left: none; }
+body.sheet-cozy .axsb-part.action { border-radius: 12px; }
+body.sheet-cozy .axsb-bar { height: 8px; border-radius: 4px; }
+body.sheet-cozy .axsb-bar > i { background: #ff8a5c; }
+
+/* ----------------------------------------------------------------- dialogs */
+body.sheet-cozy #axDlgOverlay { background: rgba(60,40,35,.38); }
+body.sheet-cozy #axDlg { width: 460px; padding: 26px 28px; border-radius: 24px; border: none; }
+body.sheet-cozy.theme-light #axDlg { background: #ffffff; border-top: none; box-shadow: 0 24px 60px rgba(120,80,60,.30); }
+body.sheet-cozy.theme-dark #axDlg  { background: #2e282c; border-top: none; box-shadow: 0 24px 60px rgba(0,0,0,.6); }
+body.sheet-cozy #axDlgTitle { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+body.sheet-cozy #axDlgBtns {
+    margin: 24px -28px -26px; padding: 18px 28px; border-radius: 0 0 24px 24px;
+    border-top: none; justify-content: flex-end;
+}
+body.sheet-cozy.theme-light #axDlgBtns { background: #fff7f2; }
+body.sheet-cozy.theme-dark #axDlgBtns  { background: #2a2427; }
+body.sheet-cozy .axdlg-btn {
+    flex: none; min-width: 104px; height: 38px; line-height: 34px; border-radius: 14px;
+    font-size: 14px; font-weight: 700; border: none;
+}
+body.sheet-cozy.theme-light .axdlg-btn { color: #4a3b34; background: #f4e2d6; box-shadow: 0 4px 0 #e0c8b8; }
+body.sheet-cozy.theme-dark .axdlg-btn  { color: #f0e8ea; background: #3a3236; box-shadow: 0 4px 0 #221d1f; }
+body.sheet-cozy .axdlg-btn.danger { color: #4a1414; background: #ff8a8a; box-shadow: 0 4px 0 #e06060; }
+body.sheet-cozy #axToast { border-radius: 18px; padding: 14px 20px; font-weight: 600; border: none; }
+body.sheet-cozy.theme-light #axToast { background: #ffffff; color: #3b3238; border-left: 5px solid #ff8a5c; box-shadow: 0 10px 30px rgba(150,100,75,.24); }
+body.sheet-cozy.theme-dark #axToast  { background: #2e282c; color: #f0e8ea; border-left: 5px solid #ff8a5c; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+body.sheet-cozy #axTip { border-radius: 12px; padding: 7px 12px; font-size: 12px; border: none; }
+body.sheet-cozy.theme-light #axTip { background: #3b3238; color: #fdf3ec; }
+body.sheet-cozy.theme-dark #axTip  { background: #f0e8ea; color: #241f22; }
+
+/* ---------------------------------------------------------------- the grid */
+body.sheet-cozy .dv-frame { border-radius: 18px; }
+body.sheet-cozy .dv-hcell { height: 40px; font-size: 13px; font-weight: 700; border-bottom: none; }
+body.sheet-cozy.theme-light .dv-hcell { background: #fbe9df; color: #6b5a52; }
+body.sheet-cozy.theme-dark .dv-hcell  { background: #3a3236; color: #c4b8bc; }
+body.sheet-cozy .dv-cell { height: 40px; font-size: 14px; border-top: none; }
+body.sheet-cozy.theme-light .dv-cell { border-bottom: 1px solid #f7ece5; }
+body.sheet-cozy.theme-dark .dv-cell  { border-bottom: 1px solid #332c30; }
+body.sheet-cozy.theme-light .dv-row:hover > .dv-cell { background: #fff7f2; }
+body.sheet-cozy.theme-dark .dv-row:hover > .dv-cell  { background: #332c30; }
+body.sheet-cozy .dv-row.selected > .dv-cell { background: #ffd6c4; color: #45180a; }
+body.sheet-cozy.theme-dark .dv-row.selected > .dv-cell { background: #5c3625; color: #ffe3d5; }
+body.sheet-cozy .dv-check { border-radius: 7px; }
+body.sheet-cozy .dv-check.on, body.sheet-cozy .dv-check.some { background: #ff8a5c; border-color: #ff8a5c; color: #45180a; }
+body.sheet-cozy .dv-sort { color: #e0632c; }
+
+/* ------------------------------------------ pictures, drop zones and files */
+body.sheet-cozy .imgbox, body.sheet-cozy .thumb, body.sheet-cozy .filelist { border-radius: 18px; border: none; }
+body.sheet-cozy.theme-light .imgbox, body.sheet-cozy.theme-light .thumb { background: #fff7f2; box-shadow: inset 0 0 0 2px #f0dccf; }
+body.sheet-cozy.theme-dark .imgbox, body.sheet-cozy.theme-dark .thumb  { background: #2a2427; box-shadow: inset 0 0 0 2px #3a3236; }
+body.sheet-cozy .imgbox.round { border-radius: 50%; }
+body.sheet-cozy .imgbox.button:hover, body.sheet-cozy .thumb:hover { box-shadow: inset 0 0 0 2px #ff8a5c; }
+body.sheet-cozy .sort-list .drag-item { border-radius: 14px; border: none; margin-bottom: 8px; }
+body.sheet-cozy.theme-light .sort-list .drag-item { background: #ffffff; box-shadow: 0 2px 0 #f0dccf; }
+body.sheet-cozy.theme-dark .sort-list .drag-item  { background: #2e282c; box-shadow: 0 2px 0 #1c181a; }
+body.sheet-cozy .drag-ghost { border: none; box-shadow: 0 12px 28px rgba(120,80,60,.35); }
+body.sheet-cozy .fl-row { height: 36px; border-radius: 12px; }
+body.sheet-cozy .dropzone { border-radius: 20px; border-width: 3px; }
+body.sheet-cozy.theme-light .dropzone { background: #fff7f2; border-color: #f0dccf; }
+body.sheet-cozy.theme-dark .dropzone  { background: #2a2427; border-color: #3a3236; }
+body.sheet-cozy .dropzone.dragover { border-style: solid; border-color: #ff8a5c; background: #ffe3d5; }
+body.sheet-cozy.theme-dark .dropzone.dragover { background: #4a2b1c; }
+body.sheet-cozy .console { border-radius: 14px; }
+
+/* --------------------------------------------------------- title-bar items */
+body.sheet-cozy #titlebar .axtb-item { height: 26px; min-width: 26px; border-radius: 13px; font-weight: 600; }
+body.sheet-cozy.theme-light #titlebar .axtb-item { color: #6b5a52; }
+body.sheet-cozy.theme-dark #titlebar .axtb-item  { color: #c4b8bc; }
+body.sheet-cozy.theme-light #titlebar .axtb-item:hover { background: #f6d7c6; }
+body.sheet-cozy.theme-dark #titlebar .axtb-item:hover  { background: #443b40; }
+body.sheet-cozy #titlebar .axtb-item.on, body.sheet-cozy #titlebar .axtb-item.open,
+body.sheet-cozy #titlebar .axtb-item.pop-open { background: #ff8a5c; color: #45180a; }
+body.sheet-cozy #titlebar .axtb-item.kind-sep, body.sheet-cozy #titlebar .axtb-item.kind-sep:hover {
+    background: #f0dccf; border: none; height: 14px; width: 2px; min-width: 2px;
+    padding: 0; margin: 0 8px; border-radius: 1px;
+}
+body.sheet-cozy #axPop { border-radius: 18px; padding: 14px 18px; border: none; font-size: 13px; }
+body.sheet-cozy.theme-light #axPop { background: #ffffff; color: #3b3238; box-shadow: 0 10px 30px rgba(150,100,75,.22); }
+body.sheet-cozy.theme-dark #axPop  { background: #2e282c; color: #f0e8ea; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+body.sheet-cozy .axrich-footer { padding: 14px 24px; border-top: none; }
+body.sheet-cozy.theme-light .axrich-footer { background: #fff7f2; }
+body.sheet-cozy.theme-dark .axrich-footer  { background: #2a2427; }
+
+/* -------------------------------------------------------------- scrollbars */
+body.sheet-cozy.theme-light, body.sheet-cozy.theme-light #content,
+body.sheet-cozy.theme-light .list, body.sheet-cozy.theme-light .dd-menu,
+body.sheet-cozy.theme-light .filelist, body.sheet-cozy.theme-light .dv-bodywrap {
+    scrollbar-face-color: #f0dccf; scrollbar-arrow-color: #c9ab9a;
+    scrollbar-track-color: #fdf3ec; scrollbar-shadow-color: #fdf3ec;
+    scrollbar-highlight-color: #fdf3ec; scrollbar-3dlight-color: #fdf3ec;
+    scrollbar-darkshadow-color: #fdf3ec;
+}
+body.sheet-cozy.theme-dark, body.sheet-cozy.theme-dark #content,
+body.sheet-cozy.theme-dark .list, body.sheet-cozy.theme-dark .dd-menu,
+body.sheet-cozy.theme-dark .filelist, body.sheet-cozy.theme-dark .dv-bodywrap {
+    scrollbar-face-color: #443b40; scrollbar-arrow-color: #6b5f65;
+    scrollbar-track-color: #241f22; scrollbar-shadow-color: #241f22;
+    scrollbar-highlight-color: #241f22; scrollbar-3dlight-color: #241f22;
+    scrollbar-darkshadow-color: #241f22;
+}

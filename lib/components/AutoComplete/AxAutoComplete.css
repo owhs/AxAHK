@@ -1,0 +1,7 @@
+/* AxAutoComplete.css -- the shape of the autocomplete.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.autocomplete { display: inline-block; position: relative; }
+.ac-menu { overflow-y: auto; }

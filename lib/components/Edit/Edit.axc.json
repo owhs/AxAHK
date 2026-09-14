@@ -1,0 +1,50 @@
+{
+  "name": "Edit",
+  "description": "Text box",
+  "order": 2007,
+  "include": "lib\\components\\Edit\\AxEdit.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Edit",
+      "label": "Text box",
+      "icon": "E70F",
+      "category": "Common",
+      "prefix": "edit",
+      "arg": {
+        "key": "text",
+        "label": "Value",
+        "kind": "text",
+        "default": ""
+      },
+      "props": [
+        {
+          "key": "placeholder",
+          "label": "Placeholder",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "rows",
+          "label": "Rows",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "readonly",
+          "label": "Read only",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

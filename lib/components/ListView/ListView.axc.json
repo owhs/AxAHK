@@ -1,0 +1,54 @@
+{
+  "name": "ListView",
+  "description": "AutoHotkey's ListView and TreeView, on a data view: LV.Add / TV.Add and the rest work as they do on Gui().",
+  "order": 7100,
+  "css": "",
+  "include": "lib\\components\\ListView\\AxListView.ahk",
+  "requires": ["DataView"],
+  "controls": [
+    {
+      "type": "ListView",
+      "label": "List view",
+      "icon": "EA37",
+      "category": "Rich",
+      "prefix": "lv",
+      "arg": {
+        "key": "rows",
+        "label": "Columns, then rows (cells split by |)",
+        "kind": "multiline",
+        "default": "Name | Size | Kind\nreadme.md | 12 KB | Document\nphoto.jpg | 2.4 MB | Picture\nsetup.exe | 880 KB | Program"
+      },
+      "props": [
+        { "key": "checked", "label": "Check boxes", "kind": "flag", "emit": "flag", "word": "Checked" },
+        { "key": "single", "label": "One row at a time", "kind": "flag", "emit": "flag", "word": "Single" },
+        { "key": "grid", "label": "Grid lines", "kind": "flag", "emit": "flag", "word": "Grid" },
+        { "key": "nosorthdr", "label": "Titles do not sort", "kind": "flag", "emit": "flag", "word": "NoSortHdr" },
+        { "key": "search", "label": "Filter box", "kind": "flag", "emit": "flag", "word": "Search" },
+        { "key": "pagesize", "label": "Rows a page", "kind": "num", "emit": "kv", "word": "PageSize" }
+      ],
+      "events": ["Click", "DoubleClick", "ItemSelect", "ItemCheck", "ItemFocus", "ColClick", "ContextMenu",
+                 "Change", "Focus", "Blur", "Select", "Check", "Activate"]
+    },
+    {
+      "type": "TreeView",
+      "label": "Tree view",
+      "icon": "E8A4",
+      "category": "Rich",
+      "prefix": "tv",
+      "arg": {
+        "key": "items",
+        "label": "Items (indent to go under the one above)",
+        "kind": "multiline",
+        "default": "Documents\n    Letters\n    Taxes\nPictures\n    Holiday\n    Family\nMusic"
+      },
+      "props": [
+        { "key": "checked", "label": "Check boxes", "kind": "flag", "emit": "flag", "word": "Checked" },
+        { "key": "checktree", "label": "Ticking a branch ticks under it", "kind": "flag", "emit": "flag", "word": "CheckTree" },
+        { "key": "expanded", "label": "Start opened", "kind": "flag", "emit": "flag", "word": "Expanded" },
+        { "key": "search", "label": "Filter box", "kind": "flag", "emit": "flag", "word": "Search" }
+      ],
+      "events": ["Click", "DoubleClick", "ItemSelect", "ItemCheck", "ItemExpand", "ContextMenu",
+                 "Change", "Focus", "Blur", "Select", "Check", "Activate"]
+    }
+  ]
+}

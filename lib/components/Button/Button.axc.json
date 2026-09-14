@@ -1,0 +1,52 @@
+{
+  "name": "Button",
+  "description": "Button",
+  "order": 2000,
+  "include": "lib\\components\\Button\\AxButton.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Button",
+      "label": "Button",
+      "icon": "E7C3",
+      "category": "Common",
+      "prefix": "btn",
+      "arg": {
+        "key": "text",
+        "label": "Text",
+        "kind": "text",
+        "default": "Button"
+      },
+      "props": [
+        {
+          "key": "kind",
+          "label": "Kind",
+          "kind": "choice",
+          "emit": "flagset",
+          "options": "|Accent|Subtle|Danger|Icon"
+        },
+        {
+          "key": "icon",
+          "label": "Icon",
+          "kind": "icon",
+          "emit": "kv"
+        },
+        {
+          "key": "disabled",
+          "label": "Disabled",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "MouseDown",
+        "MouseUp",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

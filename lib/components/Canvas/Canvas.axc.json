@@ -1,0 +1,49 @@
+{
+  "name": "Canvas",
+  "description": "A surface to draw on: shapes, text, pictures and gradients, a scene that animates and can be dragged, and freehand painting.",
+  "order": 7450,
+  "css": "AxCanvas.css",
+  "include": "lib\\components\\Canvas\\AxCanvas.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Canvas",
+      "label": "Canvas",
+      "icon": "E771",
+      "category": "Rich",
+      "prefix": "canvas",
+      "props": [
+        {
+          "key": "background",
+          "label": "Background",
+          "kind": "color",
+          "emit": "kv"
+        },
+        {
+          "key": "paint",
+          "label": "The user can paint on it",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "brush",
+          "label": "Brush colour",
+          "kind": "color",
+          "emit": "kv"
+        },
+        {
+          "key": "size",
+          "label": "Brush size",
+          "kind": "num",
+          "emit": "kv",
+          "default": "4"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

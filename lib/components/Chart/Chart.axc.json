@@ -1,0 +1,78 @@
+{
+  "name": "Chart",
+  "description": "Numbers as a picture: bars, a line, an area or a donut, from one line of numbers per series.",
+  "order": 4025,
+  "css": "AxChart.css",
+  "include": "lib\\components\\Chart\\AxChart.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Chart",
+      "label": "Chart",
+      "icon": "E9D9",
+      "category": "Display",
+      "prefix": "chart",
+      "arg": {
+        "key": "data",
+        "label": "Numbers (Name: 1,2,3 -- one series per line)",
+        "kind": "multiline",
+        "default": "Visits: 12,18,9,22,17,25,21"
+      },
+      "props": [
+        {
+          "key": "kind",
+          "label": "Kind",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "bar|line|area|donut",
+          "default": "bar"
+        },
+        {
+          "key": "labels",
+          "label": "Labels (a,b,c)",
+          "kind": "text",
+          "emit": "kv",
+          "default": "Mon,Tue,Wed,Thu,Fri,Sat,Sun"
+        },
+        {
+          "key": "max",
+          "label": "Top of the scale",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "suffix",
+          "label": "After each number",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "legend",
+          "label": "Legend",
+          "kind": "choice",
+          "emit": "flagset",
+          "options": "|Legend|NoLegend"
+        },
+        {
+          "key": "numbers",
+          "label": "Numbers on the bars",
+          "kind": "flag",
+          "emit": "flag",
+          "word": "Numbers"
+        },
+        {
+          "key": "noaxis",
+          "label": "No scale or grid",
+          "kind": "flag",
+          "emit": "flag",
+          "word": "NoAxis"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

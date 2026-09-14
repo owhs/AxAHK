@@ -1,0 +1,16 @@
+/* AxGame.css -- the shape of the game's surface. The <canvas> is sized by
+   the script to the box's pixels; until then (and on the studio's canvas)
+   the box says what it is. The box takes the keyboard when clicked. */
+
+.axge { position: relative; display: block; height: 360px; overflow: hidden; border-radius: 6px; outline: none; }
+.axge.fill { width: 100%; }
+.axge-c { position: absolute; left: 0; top: 0; display: block; }
+.axge-ph {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; opacity: .55; border: 1px dashed rgba(128, 128, 128, .6); border-radius: 6px;
+}
+.axge-ph .ico { font-size: 18px; margin-right: 8px; }
+.axge-live .axge-ph { display: none; }
+.axge-q { display: none; }
+.axge-req { position: absolute; width: 0; height: 0; overflow: hidden; }

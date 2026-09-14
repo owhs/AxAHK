@@ -1,0 +1,172 @@
+{
+ "format": "axstudio/2",
+ "name": "Quick note",
+ "desc": "A note that keeps itself: rich text filling the window, a footer of buttons, Ctrl+S to save, a pin that keeps it on top, and a question before closing with unsaved changes. Rules and states, very little code.",
+ "uid": 4,
+ "cur": 1,
+ "vars": "",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Quick note",
+   "width": 560,
+   "height": 440,
+   "minwidth": 380,
+   "minheight": 300,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E70B",
+   "menus": "",
+   "status": "msg | Not saved yet | grow icon=E70B\nwhere | Documents\\Quick note.md | right dim",
+   "titleitems": "pin | glyph | E718 | right tip=\"Keep it on top\" toggle | ToggleTop()",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": "",
+   "importlayout": "",
+   "importresize": 0,
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "note Change -> state dirty\nnote Change -> dirty\nsaveBtn Click -> call SaveNote",
+   "states": "dirty: saveBtn.Enabled = 1\nclean: saveBtn.Enabled = 0",
+   "binds": "",
+   "hotkeys": "^s | active | own | SaveNote",
+   "init": "LoadNote()",
+   "script": "NoteFile := A_MyDocuments \"\\Quick note.md\"\nonTop := false\n\n; What was written last time, if there is any.\n; Closing with unsaved changes asks Save / Don't save / Cancel -- the window's\n; Keys and closing settings (Window tab): ask when there are unsaved changes,\n; saved by SaveNote. \"note Change -> dirty\" is what marks them.\nLoadNote() {\n    global g, note, NoteFile\n    if FileExist(NoteFile)\n        note.Value := FileRead(NoteFile, \"UTF-8\")\n    MainState(\"clean\")\n    g.Dirty := false\n}\nSaveNote() {\n    global g, note, NoteFile\n    try FileDelete(NoteFile)\n    FileAppend(note.Value, NoteFile, \"UTF-8\")\n    MainState(\"clean\")\n    g.Dirty := false                  ; nothing unsaved: closing asks nothing\n    g.Status(\"msg\", \"Saved at \" FormatTime(, \"HH:mm\"))\n    return true\n}\nToggleTop() {\n    global g, onTop\n    onTop := !onTop\n    g.AlwaysOnTop(onTop)\n    g.Toast(onTop ? \"Kept on top\" : \"Not on top any more\", 1500)\n}",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "RichText",
+      "name": "note",
+      "arg": "",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 100
+      },
+      "props": {
+       "format": "md",
+       "tools": "minimal",
+       "placeholder": "Write anything. **Bold**, - lists and # headings work as you type."
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Button",
+      "name": "saveBtn",
+      "arg": "Save",
+      "layout": {
+       "w": 110
+      },
+      "props": {
+       "kind": "Accent",
+       "icon": "E74E"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Button",
+      "name": "clearBtn",
+      "arg": "Clear",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "kind": "Subtle",
+       "icon": "E894"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "if g.Confirm(\"Clear the whole note?\", \"Quick note\", \"Clear\", \"Keep it\")\n    note.Value := \"\", MainState(\"dirty\"), g.Dirty := true"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Text",
+      "name": "",
+      "arg": "Ctrl+S saves it",
+      "layout": {
+       "place": "same",
+       "fill": 1
+      },
+      "props": {
+       "hint": 1,
+       "align": "Right"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   },
+   "askclose": "dirty",
+   "savewith": "SaveNote",
+   "beforeclose": ""
+  }
+ ]
+}

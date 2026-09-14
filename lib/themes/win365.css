@@ -1,0 +1,701 @@
+/* @extends win11 */
+/* ============================================================================
+   win365.css — the productivity suite look: a brand-painted header, a warm
+   neutral canvas, and content that sits on lifted white surfaces. Where
+   win11.css is flat, cool and borderless — Fluent's *system* chrome — this is
+   Fluent as an *application* wears it: the window announces itself with a
+   colour band, and everything below it is paper laid on that colour's grey.
+
+   Rules of the sheet, so later edits do not undo it:
+
+     • The header is the identity. It is painted, it is 38px, it carries the
+       title in the middle, and it is the one saturated surface in the window.
+       Nothing else competes with it.
+     • Depth is a shadow, not a line. Panels lift off the canvas with the
+       Fluent elevation ramp (2 / 4 / 8 / 16 / 64); hairlines are used only
+       where two surfaces meet edge to edge, never to draw a box.
+     • The greys are warm. #f3f2f1 / #e1dfdd / #605e5c on the light side,
+       #1b1a19 / #3b3a39 / #a9a5a2 on the dark. A cool slate grey in here
+       fights the brand blue and reads as Windows 11 instead.
+     • Radius: 8px for surfaces, 4px for controls, a full pill for anything
+       that carries state (the rail's live page, chips, segments).
+
+   --------------------------------------------------------- personalisation
+   No @accent-hue line, and none is wanted: every coloured thing in this sheet
+   is already in AxSys's blue band, so SetAccent repaints the whole identity —
+   header, rail pill, primary buttons, links, selection — from one colour, and
+   a near-grey accent drains the header to a neutral bar rather than hue-
+   shifting it. Three things follow from that and should be kept:
+
+     • The neutrals are warm but flat (S < AxSys.BlueMinS), so they are left
+       alone while the brand material moves.
+     • Accent washes are pre-blended to solid hex, because RecolourCss rewrites
+       "#rrggbb" literals and not rgba(). A wash pale enough to fall under the
+       saturation floor would freeze at Office blue while the rest of the
+       window changed, so the selection tints here are deliberately a shade
+       stronger than Office's own.
+     • Red, green and amber sit outside the band and never move: they are
+       status, not brand.
+
+   ------------------------------------------------------------- the header
+   The bloom at the right of the band is an SVG rather than a CSS gradient:
+   two soft ellipses sharing one horizontal fade, which Trident draws cleanly
+   where a large radial-gradient would band in 8-bit. Every colour in it is
+   rgb() + stop-opacity and the fill reference is written url(%23a), so the
+   data URI carries no raw "#" — a "#" would terminate the url() as a fragment,
+   and RecolourCss would rewrite anything that looked like a hex literal.
+
+   The window keeps the rounded Windows 11 corner: this sheet is listed in
+   AxGui.RoundSheets, which is what decides it. The band is painted on
+   #titlebar and not on body, so the DWM corner clips the paint cleanly rather
+   than leaving a square shoulder above the rounding.
+
+   SetTint has to know what this sheet is actually made of: its cards and
+   fields are white paper on a warm grey, not shades of the background, so it
+   registers them in AxGui.SheetSurf — including Chrome, because the rail and
+   the two bars are paper here as well. Without that the tint derived its
+   surfaces from the canvas and mixed the lift straight out of the window.
+
+   ------------------------------------------------------------ the reserves
+   The title bar is 38px, the menu bar 32 and the status bar 26 — not
+   win11.css's 32, 28 and 24 — so all four #shell sums have to be restated, and
+   so does the height AxRich.css gives a rich dialog's content.
+   ========================================================================= */
+
+/* ------------------------------------------------------------- the material */
+body.sheet-win365 {
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+    font-size: 14px; line-height: 20px;
+}
+body.sheet-win365.theme-dark  { background: #1b1a19; color: #f0eeec; }
+body.sheet-win365.theme-light { background: #f3f2f1; color: #242322; }
+body.sheet-win365 .hex, body.sheet-win365 .console, body.sheet-win365 .fl-meta,
+body.sheet-win365 .slider .out {
+    font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+}
+
+/* --------------------------------------------------------------- the header */
+/* 38px of brand. The bloom is pinned right at its natural 320px over a soft
+   vertical wash, so the shape holds at any window width; the band drops both
+   and goes neutral when the window loses focus. */
+body.sheet-win365 #titlebar {
+    position: relative; z-index: 5; height: 38px; padding-left: 14px;
+    background-position: right top, 0 0; background-repeat: no-repeat, repeat-x;
+    background-size: 320px 100%, auto;
+}
+body.sheet-win365.theme-dark #titlebar {
+    background-color: #123f6e;
+    background-image:
+        url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='320'%20height='38'%20viewBox='0%200%20320%2038'%20preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient%20id='a'%20x1='0'%20y1='0'%20x2='1'%20y2='0'%3E%3Cstop%20offset='0'%20stop-color='rgb(255,255,255)'%20stop-opacity='0'/%3E%3Cstop%20offset='1'%20stop-color='rgb(255,255,255)'%20stop-opacity='.13'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cellipse%20cx='300'%20cy='4'%20rx='150'%20ry='32'%20fill='url(%23a)'/%3E%3Cellipse%20cx='236'%20cy='40'%20rx='118'%20ry='24'%20fill='url(%23a)'/%3E%3C/svg%3E"),
+        linear-gradient(rgba(255,255,255,.07) 0%, rgba(255,255,255,.015) 55%, rgba(0,0,0,.10) 100%);
+    box-shadow: 0 1px 4px rgba(0,0,0,.45);
+}
+body.sheet-win365.theme-light #titlebar {
+    background-color: #0f5aa8;
+    background-image:
+        url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='320'%20height='38'%20viewBox='0%200%20320%2038'%20preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient%20id='a'%20x1='0'%20y1='0'%20x2='1'%20y2='0'%3E%3Cstop%20offset='0'%20stop-color='rgb(255,255,255)'%20stop-opacity='0'/%3E%3Cstop%20offset='1'%20stop-color='rgb(255,255,255)'%20stop-opacity='.18'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cellipse%20cx='300'%20cy='4'%20rx='150'%20ry='32'%20fill='url(%23a)'/%3E%3Cellipse%20cx='236'%20cy='40'%20rx='118'%20ry='24'%20fill='url(%23a)'/%3E%3C/svg%3E"),
+        linear-gradient(rgba(255,255,255,.10) 0%, rgba(255,255,255,.02) 55%, rgba(0,0,0,.07) 100%);
+    box-shadow: 0 1px 4px rgba(0,0,0,.16);
+}
+/* out of focus the band drains to neutral: no bloom, no brand, no lift */
+body.sheet-win365.inactive #titlebar { background-image: none; box-shadow: none; }
+body.sheet-win365.theme-dark.inactive #titlebar  { background-color: #2f2e2c; }
+body.sheet-win365.theme-light.inactive #titlebar { background-color: #6b6a68; }
+
+/* The title sits in the middle of the window, not after the icon. Centring it
+   with padding would mean knowing what else is in the bar, so it leaves the
+   flex row instead and is centred on the window itself: it then stays centred
+   whatever TitleBar() puts in the slots. The 150px of padding keeps a long one
+   clear of the items and of the caption buttons, and pointer-events hands the
+   drag back to the bar underneath. #axTbLeft takes the space the title gave
+   up, so the caption buttons stay hard right. */
+body.sheet-win365 #titlebar { position: relative; }
+body.sheet-win365 #titleText {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 150px; pointer-events: none;
+    font-size: 12px; font-weight: 600; letter-spacing: .01em; color: #ffffff;
+}
+body.sheet-win365 #axTbLeft { display: flex; flex: 1; min-width: 0; }
+body.sheet-win365.theme-light #titleText { color: #ffffff; }
+body.sheet-win365.inactive #titleText, body.sheet-win365.theme-light.inactive #titleText {
+    color: rgba(255,255,255,.62);
+}
+/* the app tile: the icon in a rounded square of its own, the way a suite app
+   badges itself in the corner of its window */
+body.sheet-win365 #titlebar .app-icon {
+    width: 22px; height: 22px; line-height: 22px; margin-right: 10px; flex: none;
+    text-align: center; font-size: 12px; border-radius: 5px; color: #ffffff;
+    background: rgba(255,255,255,.20);
+}
+body.sheet-win365 #titlebar .app-icon img { width: 14px; height: 14px; margin: 4px auto 0; }
+body.sheet-win365.inactive #titlebar .app-icon { background: rgba(255,255,255,.14); color: rgba(255,255,255,.62); }
+
+/* ---------------------------------------------------- the caption controls */
+/* Scoped under #titlebar deliberately: SetTint paints .winbtn with the page
+   surface, and an id in the selector keeps them transparent over the band. */
+body.sheet-win365 #titlebar .winbtn {
+    width: 44px; height: 38px; line-height: 38px; border-radius: 0;
+    font-size: 10px; color: #ffffff; background: transparent; transition: background .1s;
+}
+body.sheet-win365 #titlebar .winbtn:hover, body.sheet-win365 #titlebar .winbtn.hover {
+    background: rgba(255,255,255,.16);
+}
+body.sheet-win365 #titlebar #btnClose:hover, body.sheet-win365 #titlebar #btnClose.hover {
+    background: #c50f1f; color: #ffffff;
+}
+body.sheet-win365.inactive #titlebar .winbtn { color: rgba(255,255,255,.62); }
+
+/* --------------------------------------------------------- the search pill */
+/* The one piece of chrome every app in the suite has. It is not built into the
+   frame — it is whatever markup a title-bar item carries — but the look is the
+   sheet's, so an app gets it by asking for it:
+
+     {Kind: "html", Class: "axtb-search", Html: '<input id="q" placeholder="Search">'}
+
+   It never turns white. Dropping a sheet of paper into a painted band reads as
+   a hole punched in the chrome, so the whole container lightens instead and
+   the text stays white -- the box IS the field, rather than being a frame
+   round one. Three steps: at rest, hovered, and open, with one more when a
+   caret is actually in it. */
+body.sheet-win365 #titlebar .axtb-item.axtb-search {
+    flex: 1 1 auto; max-width: 28px; min-width: 28px; height: 28px; overflow: hidden;
+    padding: 0; margin: 0 1px; border-radius: 4px;
+    background: transparent; border: 1px solid transparent;
+    transition: max-width .26s cubic-bezier(.2,.8,.3,1), margin .26s cubic-bezier(.2,.8,.3,1),
+                background .14s, border-color .14s;
+}
+/* Hovered, it previews the field it is about to become: a softer fill than a
+   plain item's, plus the hairline edge. A bare wash with no edge reads as a
+   patch stuck on the band rather than as a button. */
+body.sheet-win365 #titlebar .axtb-item.axtb-search:hover {
+    background: rgba(255,255,255,.13); border-color: rgba(255,255,255,.26);
+}
+body.sheet-win365 #titlebar .axtb-item.axtb-search.on,
+body.sheet-win365 #titlebar .axtb-item.axtb-search.on:hover {
+    max-width: 460px; margin: 0 8px; height: 26px;
+    background: rgba(255,255,255,.26); border-color: rgba(255,255,255,.42);
+}
+body.sheet-win365 #titlebar .axtb-item.axtb-search.focus {
+    background: rgba(255,255,255,.32); border-color: rgba(255,255,255,.66);
+}
+body.sheet-win365 #titlebar .axtb-search input {
+    height: 24px; border: none; outline: none;
+    background: transparent; color: #ffffff; font: inherit; font-size: 12px; cursor: text;
+}
+body.sheet-win365 #titlebar .axtb-search.on input { padding: 0 8px 0 2px; }
+body.sheet-win365 #titlebar .axtb-search input:-ms-input-placeholder { color: rgba(255,255,255,.72); }
+body.sheet-win365 #titlebar .axtb-search input::-ms-clear { display: none; }
+
+/* ------------------------------------------------------------ the reserves */
+/* win11.css works these out by hand from 32 + 28 + 24; this window is
+   38 + 32 + 26, so all four have to be restated or the page runs past the
+   bottom. AxRich.css sizes a rich dialog's #content the same way. */
+body.sheet-win365 #shell { height: calc(100% - 38px); }
+body.sheet-win365.has-menubar #shell { height: calc(100% - 70px); }
+body.sheet-win365.has-statusbar #shell { height: calc(100% - 64px); }
+body.sheet-win365.has-menubar.has-statusbar #shell { height: calc(100% - 96px); }
+body.sheet-win365.axrich-dlg #content { height: calc(100% - 38px); }
+
+/* --------------------------------------------------------------- the rail */
+/* The navigation pane is paper, not canvas: a white column against the warm
+   grey, and the live page is a filled brand pill. */
+body.sheet-win365 #sidebar { width: 220px; padding: 8px; }
+body.sheet-win365.theme-dark #sidebar  { background: #201f1e; border-right: 1px solid #302f2d; }
+body.sheet-win365.theme-light #sidebar { background: #ffffff; border-right: 1px solid #e1dfdd; }
+body.sheet-win365 .nav-item {
+    height: 36px; margin-bottom: 2px; padding: 0 14px; border-radius: 18px;
+    font-size: 14px; background: transparent;
+}
+body.sheet-win365 .nav-item .ico { width: 22px; font-size: 16px; margin-right: 12px; }
+body.sheet-win365.theme-dark .nav-item  { color: #e6e3e1; }
+body.sheet-win365.theme-light .nav-item { color: #242322; }
+body.sheet-win365.theme-dark .nav-item:hover  { background: #302f2d; }
+body.sheet-win365.theme-light .nav-item:hover { background: #f3f2f1; }
+/* the pill carries the state, so win11's 3px edge marker goes */
+body.sheet-win365 .nav-item.active:before { display: none; }
+body.sheet-win365 .nav-item.active, body.sheet-win365 .nav-item.active:hover {
+    background: #0f6cbd; color: #ffffff; font-weight: 600;
+}
+body.sheet-win365.theme-dark .nav-item.active, body.sheet-win365.theme-dark .nav-item.active:hover {
+    background: #479ef5; color: #0b1c2e;
+}
+
+/* ------------------------------------------------------------ the workspace */
+body.sheet-win365 #content { margin: 0 8px 8px 0; padding: 14px 26px 28px 20px; }
+
+/* ------------------------------------------------------------------ writing */
+body.sheet-win365 h1 { font-size: 24px; line-height: 32px; font-weight: 600; margin: 6px 0 14px; }
+body.sheet-win365 h2 { font-size: 18px; line-height: 24px; font-weight: 600; margin: 22px 0 10px; }
+body.sheet-win365 h3 { font-size: 14px; font-weight: 600; margin: 18px 0 8px; }
+body.sheet-win365.theme-dark .caption, body.sheet-win365.theme-dark .hint,
+body.sheet-win365.theme-dark .card-row .desc, body.sheet-win365.theme-dark .tile .desc,
+body.sheet-win365.theme-dark .fl-meta, body.sheet-win365.theme-dark .dropzone .dz-desc,
+body.sheet-win365.theme-dark .dv-count { color: #a9a5a2; }
+body.sheet-win365.theme-light .caption, body.sheet-win365.theme-light .hint,
+body.sheet-win365.theme-light .card-row .desc, body.sheet-win365.theme-light .tile .desc,
+body.sheet-win365.theme-light .fl-meta, body.sheet-win365.theme-light .dropzone .dz-desc,
+body.sheet-win365.theme-light .dv-count { color: #605e5c; }
+body.sheet-win365 .link, body.sheet-win365 .hyperlink, body.sheet-win365 a { color: #0f6cbd; }
+body.sheet-win365.theme-dark .link, body.sheet-win365.theme-dark .hyperlink,
+body.sheet-win365.theme-dark a { color: #479ef5; }
+
+/* -------------------------------------------------------------- the surfaces */
+/* Paper on the canvas: a radius, a shadow, and — on the dark side only — a
+   hairline, because a shadow alone does not separate two dark greys. */
+body.sheet-win365 .card {
+    border-radius: 8px; padding: 14px 18px; margin-bottom: 10px;
+}
+body.sheet-win365.theme-light .card {
+    background: #ffffff; border: 1px solid transparent;
+    box-shadow: 0 1px 2px rgba(0,0,0,.10), 0 0 2px rgba(0,0,0,.08);
+}
+body.sheet-win365.theme-dark .card {
+    background: #262524; border: 1px solid #302f2d;
+    box-shadow: 0 1px 2px rgba(0,0,0,.30);
+}
+body.sheet-win365 .card { transition: box-shadow .12s ease, background .12s ease; }
+body.sheet-win365.theme-light .card:hover { box-shadow: 0 4px 8px rgba(0,0,0,.12), 0 0 2px rgba(0,0,0,.10); }
+body.sheet-win365.theme-dark .card:hover  { background: #2b2a29; }
+body.sheet-win365 .card-row { min-height: 44px; }
+body.sheet-win365 .card.hot { border-color: #0f6cbd; }
+body.sheet-win365.theme-dark .card.hot { border-color: #479ef5; }
+body.sheet-win365 .group { border-radius: 8px; padding: 20px 16px 14px; margin: 14px 0; }
+body.sheet-win365.theme-light .group { border: 1px solid #e1dfdd; background: #ffffff; }
+body.sheet-win365.theme-dark .group  { border: 1px solid #3b3a39; background: #201f1e; }
+body.sheet-win365 .group > .legend { font-size: 12px; font-weight: 600; }
+body.sheet-win365.theme-light .group > .legend { background: #ffffff; color: #605e5c; }
+body.sheet-win365.theme-dark .group > .legend  { background: #201f1e; color: #a9a5a2; }
+body.sheet-win365 .expander { border-radius: 8px; margin-bottom: 10px; }
+body.sheet-win365.theme-light .expander {
+    background: #ffffff; border: none; box-shadow: 0 1px 2px rgba(0,0,0,.10), 0 0 2px rgba(0,0,0,.08);
+}
+body.sheet-win365.theme-dark .expander { background: #262524; border: 1px solid #302f2d; }
+body.sheet-win365 .exp-header .chev { border-radius: 4px; }
+body.sheet-win365.theme-light .exp-body { background: #faf9f8; border-top-color: #e1dfdd; border-radius: 0 0 8px 8px; }
+body.sheet-win365.theme-dark .exp-body  { background: #201f1e; border-top-color: #302f2d; border-radius: 0 0 8px 8px; }
+body.sheet-win365 .tile { border-radius: 8px; }
+body.sheet-win365.theme-light .tile {
+    background: #ffffff; border: none; box-shadow: 0 1px 2px rgba(0,0,0,.10), 0 0 2px rgba(0,0,0,.08);
+}
+body.sheet-win365.theme-dark .tile { background: #262524; border: 1px solid #302f2d; }
+body.sheet-win365.theme-light .tile:hover { background: #ffffff; box-shadow: 0 4px 8px rgba(0,0,0,.14), 0 0 2px rgba(0,0,0,.12); }
+body.sheet-win365.theme-dark .tile:hover  { background: #2f2e2c; }
+
+/* ----------------------------------------------------------------- controls */
+body.sheet-win365 .btn {
+    height: 32px; line-height: 30px; padding: 0 14px; border-radius: 4px;
+    font-size: 14px; font-weight: 600;
+}
+body.sheet-win365.theme-light .btn {
+    background: #ffffff; color: #242322; border: 1px solid #d2d0ce; border-bottom-color: #d2d0ce;
+}
+body.sheet-win365.theme-dark .btn {
+    background: #302f2d; color: #f0eeec; border: 1px solid #484644; border-bottom-color: #484644;
+}
+body.sheet-win365.theme-light .btn:hover { background: #f3f2f1; border-color: #c8c6c4; }
+body.sheet-win365.theme-dark .btn:hover  { background: #3b3a39; border-color: #5a5856; }
+body.sheet-win365.theme-light .btn:active, body.sheet-win365.theme-light .btn.pressed { background: #edebe9; color: #242322; }
+body.sheet-win365.theme-dark .btn:active, body.sheet-win365.theme-dark .btn.pressed  { background: #292827; color: #f0eeec; }
+body.sheet-win365 .btn.subtle { background: transparent; border-color: transparent; }
+body.sheet-win365.theme-light .btn.subtle:hover { background: #f3f2f1; }
+body.sheet-win365.theme-dark .btn.subtle:hover  { background: #302f2d; }
+/* the primary action carries the brand, flat and filled */
+body.sheet-win365 .btn.accent, body.sheet-win365 .axdlg-btn.primary {
+    background: #0f6cbd; border: 1px solid #0f6cbd; color: #ffffff;
+}
+body.sheet-win365 .btn.accent:hover, body.sheet-win365 .axdlg-btn.primary:hover {
+    background: #115ea3; border-color: #115ea3;
+}
+body.sheet-win365 .btn.accent:active, body.sheet-win365 .btn.accent.pressed {
+    background: #0c4578; border-color: #0c4578; color: #ffffff;
+}
+body.sheet-win365.theme-dark .btn.accent, body.sheet-win365.theme-dark .axdlg-btn.primary {
+    background: #479ef5; border-color: #479ef5; color: #0b1c2e;
+}
+body.sheet-win365.theme-dark .btn.accent:hover, body.sheet-win365.theme-dark .axdlg-btn.primary:hover {
+    background: #62aef8; border-color: #62aef8;
+}
+body.sheet-win365 .btn.danger { background: #c50f1f; border-color: #c50f1f; color: #ffffff; }
+body.sheet-win365 .btn.danger:hover { background: #b10e1c; border-color: #b10e1c; }
+body.sheet-win365.theme-light .btn.disabled { background: #f3f2f1; color: #a19f9d; border-color: #edebe9; }
+body.sheet-win365.theme-dark .btn.disabled  { background: #262524; color: #6d6b69; border-color: #302f2d; }
+body.sheet-win365 .btn.icon { width: 32px; min-width: 32px; }
+
+/* fields: a filled well with a hairline, and a brand rule underneath when it
+   takes the focus — the one place this sheet draws attention with a line */
+body.sheet-win365 .textbox input, body.sheet-win365 .textbox textarea,
+body.sheet-win365 .searchbox input, body.sheet-win365 .numberbox input,
+body.sheet-win365 .passwordbox input, body.sheet-win365 .hotkeybox input,
+body.sheet-win365 .dd-value, body.sheet-win365 #axDlgInput, body.sheet-win365 .hex {
+    height: 32px; border-radius: 4px; font-size: 14px;
+}
+body.sheet-win365.theme-light .textbox input, body.sheet-win365.theme-light .textbox textarea,
+body.sheet-win365.theme-light .searchbox input, body.sheet-win365.theme-light .numberbox input,
+body.sheet-win365.theme-light .passwordbox input, body.sheet-win365.theme-light .hotkeybox input,
+body.sheet-win365.theme-light .dd-value, body.sheet-win365.theme-light #axDlgInput,
+body.sheet-win365.theme-light .hex, body.sheet-win365.theme-light .list,
+body.sheet-win365.theme-light .filelist, body.sheet-win365.theme-light .dv-frame {
+    background: #ffffff; border: 1px solid #d2d0ce; border-bottom-color: #605e5c; color: #242322;
+}
+body.sheet-win365.theme-dark .textbox input, body.sheet-win365.theme-dark .textbox textarea,
+body.sheet-win365.theme-dark .searchbox input, body.sheet-win365.theme-dark .numberbox input,
+body.sheet-win365.theme-dark .passwordbox input, body.sheet-win365.theme-dark .hotkeybox input,
+body.sheet-win365.theme-dark .dd-value, body.sheet-win365.theme-dark #axDlgInput,
+body.sheet-win365.theme-dark .hex, body.sheet-win365.theme-dark .list,
+body.sheet-win365.theme-dark .filelist, body.sheet-win365.theme-dark .dv-frame {
+    background: #1f1e1d; border: 1px solid #484644; border-bottom-color: #8a8886; color: #f0eeec;
+}
+body.sheet-win365 .textbox textarea { height: auto; padding: 6px 10px; }
+body.sheet-win365 .textbox input:focus, body.sheet-win365 .textbox textarea:focus,
+body.sheet-win365 .searchbox input:focus, body.sheet-win365 .passwordbox input:focus,
+body.sheet-win365 .hotkeybox input:focus, body.sheet-win365 .hotkeybox.recording input,
+body.sheet-win365 #axDlgInput:focus, body.sheet-win365 .numberbox.focus input,
+body.sheet-win365 .dropdown.open .dd-value {
+    border-bottom: 2px solid #0f6cbd;
+}
+body.sheet-win365.theme-dark .textbox input:focus, body.sheet-win365.theme-dark .textbox textarea:focus,
+body.sheet-win365.theme-dark .searchbox input:focus, body.sheet-win365.theme-dark .passwordbox input:focus,
+body.sheet-win365.theme-dark .hotkeybox input:focus, body.sheet-win365.theme-dark #axDlgInput:focus,
+body.sheet-win365.theme-dark .numberbox.focus input, body.sheet-win365.theme-dark .dropdown.open .dd-value {
+    border-bottom-color: #479ef5; background: #1f1e1d;
+}
+body.sheet-win365.theme-light .textbox input:focus, body.sheet-win365.theme-light .textbox textarea:focus,
+body.sheet-win365.theme-light .searchbox input:focus { background: #ffffff; }
+body.sheet-win365 .numberbox .spin { border-radius: 3px; }
+body.sheet-win365 .passwordbox .reveal { border-radius: 4px; }
+
+/* the toggle: a soft pill, brand when it is on */
+body.sheet-win365 .switch { height: 22px; }
+body.sheet-win365 .switch input { width: 44px; height: 22px; }
+body.sheet-win365 .sw-track { width: 44px; height: 22px; border-radius: 11px; }
+body.sheet-win365.theme-light .sw-track { background: #ffffff; border: 1px solid #605e5c; }
+body.sheet-win365.theme-dark .sw-track  { background: #1f1e1d; border: 1px solid #8a8886; }
+body.sheet-win365 .sw-track:before { left: 4px; top: 4px; width: 12px; height: 12px; }
+body.sheet-win365 .switch:hover .sw-track:before { width: 14px; height: 14px; top: 3px; }
+body.sheet-win365 .switch input:checked + .sw-track { background: #0f6cbd; border-color: #0f6cbd; }
+body.sheet-win365 .switch input:checked + .sw-track:before { left: 26px; background: #ffffff; }
+body.sheet-win365.theme-dark .switch input:checked + .sw-track { background: #479ef5; border-color: #479ef5; }
+body.sheet-win365.theme-dark .switch input:checked + .sw-track:before { background: #0b1c2e; }
+
+body.sheet-win365 .check .box { border-radius: 4px; }
+body.sheet-win365.theme-light .check .box { background: #ffffff; border: 1px solid #605e5c; }
+body.sheet-win365.theme-dark .check .box  { background: #1f1e1d; border: 1px solid #8a8886; }
+body.sheet-win365 .check input:checked + .box { background: #0f6cbd; border-color: #0f6cbd; color: #ffffff; }
+body.sheet-win365.theme-dark .check input:checked + .box { background: #479ef5; border-color: #479ef5; color: #0b1c2e; }
+body.sheet-win365.theme-light .radio .ring { background: #ffffff; border: 1px solid #605e5c; }
+body.sheet-win365.theme-dark .radio .ring  { background: #1f1e1d; border: 1px solid #8a8886; }
+body.sheet-win365 .radio input:checked + .ring { border-width: 5px; border-color: #0f6cbd; background: #ffffff; }
+body.sheet-win365 .radio input:checked + .ring:after { background: #ffffff; }
+body.sheet-win365.theme-dark .radio input:checked + .ring { border-color: #479ef5; background: #1b1a19; }
+body.sheet-win365.theme-dark .radio input:checked + .ring:after { background: #1b1a19; }
+
+body.sheet-win365 input[type=range]::-ms-fill-lower { background: #0f6cbd; }
+body.sheet-win365 input[type=range]::-ms-thumb {
+    box-sizing: border-box; width: 20px; height: 20px; border-radius: 50%;
+    background: #0f6cbd; border: 5px solid #ffffff;
+}
+body.sheet-win365.theme-light input[type=range]::-ms-fill-upper { background: #c8c6c4; }
+body.sheet-win365.theme-dark input[type=range]::-ms-fill-lower { background: #479ef5; }
+body.sheet-win365.theme-dark input[type=range]::-ms-fill-upper { background: #605e5c; }
+body.sheet-win365.theme-dark input[type=range]::-ms-thumb { background: #479ef5; border-color: #1b1a19; }
+
+body.sheet-win365 .progress { height: 4px; border-radius: 2px; }
+body.sheet-win365.theme-light .progress { background: #e1dfdd; }
+body.sheet-win365.theme-dark .progress  { background: #3b3a39; }
+body.sheet-win365 .progress .bar, body.sheet-win365 .progress.indeterminate .bar { background: #0f6cbd; }
+body.sheet-win365.theme-dark .progress .bar, body.sheet-win365.theme-dark .progress.indeterminate .bar { background: #479ef5; }
+body.sheet-win365 .ring-spinner { border-top-color: #0f6cbd; }
+body.sheet-win365.theme-dark .ring-spinner { border-top-color: #479ef5; }
+
+/* tabs read as a command strip: a 2px brand rule under the live one */
+body.sheet-win365 .tabs { margin-bottom: 16px; }
+body.sheet-win365.theme-light .tabs { border-bottom-color: #e1dfdd; }
+body.sheet-win365.theme-dark .tabs  { border-bottom-color: #3b3a39; }
+body.sheet-win365 .tab { padding: 8px 14px; border-radius: 4px 4px 0 0; font-weight: 600; }
+body.sheet-win365.theme-light .tab:hover { background: #f3f2f1; }
+body.sheet-win365.theme-dark .tab:hover  { background: #302f2d; }
+body.sheet-win365 .tab.active { background: transparent; color: #0f6cbd; }
+body.sheet-win365.theme-dark .tab.active { color: #479ef5; }
+body.sheet-win365 .tab.active:after { left: 8px; right: 8px; height: 2px; border-radius: 1px; background: #0f6cbd; }
+body.sheet-win365.theme-dark .tab.active:after { background: #479ef5; }
+
+body.sheet-win365 .segmented { border-radius: 16px; padding: 3px; }
+body.sheet-win365.theme-light .segmented { background: #edebe9; border-color: #e1dfdd; }
+body.sheet-win365.theme-dark .segmented  { background: #262524; border-color: #3b3a39; }
+body.sheet-win365 .segmented .seg { border-radius: 13px; font-size: 13px; font-weight: 600; }
+body.sheet-win365 .segmented .seg.active { background: #0f6cbd; color: #ffffff; }
+body.sheet-win365.theme-dark .segmented .seg.active { background: #479ef5; color: #0b1c2e; }
+body.sheet-win365 .chip { border-radius: 14px; font-size: 13px; }
+body.sheet-win365.theme-light .chip { background: #ffffff; border-color: #d2d0ce; }
+body.sheet-win365.theme-dark .chip  { background: #302f2d; border-color: #484644; }
+body.sheet-win365 .chip.on { background: #0f6cbd; border-color: #0f6cbd; color: #ffffff; }
+body.sheet-win365.theme-dark .chip.on { background: #479ef5; border-color: #479ef5; color: #0b1c2e; }
+body.sheet-win365 .badge.accent { background: #0f6cbd; color: #ffffff; }
+body.sheet-win365.theme-dark .badge.accent { background: #479ef5; color: #0b1c2e; }
+body.sheet-win365 .rating .star.on { color: #0f6cbd; }
+body.sheet-win365.theme-dark .rating .star.on { color: #479ef5; }
+body.sheet-win365 .swatch { border-radius: 5px; }
+body.sheet-win365 .swatch.selected { border-color: #0f6cbd; }
+body.sheet-win365.theme-dark .swatch.selected { border-color: #479ef5; box-shadow: inset 0 0 0 1px #1b1a19; }
+
+/* status colours: outside the brand band, and they stay where they are */
+body.sheet-win365 .infobar { border-radius: 6px; padding: 10px 14px; }
+body.sheet-win365.theme-light .infobar { background: #ffffff; border: 1px solid #e1dfdd; }
+body.sheet-win365.theme-dark .infobar  { background: #262524; border: 1px solid #3b3a39; }
+body.sheet-win365 .infobar .close { border-radius: 4px; }
+body.sheet-win365.theme-light .infobar.success { background: #dff6dd; border-color: #b5e8b0; }
+body.sheet-win365.theme-light .infobar.warning { background: #fff4ce; border-color: #f2df9a; }
+body.sheet-win365.theme-light .infobar.error   { background: #fde7e9; border-color: #f4b9be; }
+body.sheet-win365.theme-dark .infobar.success  { background: #182c18; border-color: #2c4a2c; }
+body.sheet-win365.theme-dark .infobar.warning  { background: #32270f; border-color: #574521; }
+body.sheet-win365.theme-dark .infobar.error    { background: #331b1d; border-color: #5c3033; }
+body.sheet-win365 .infobar.info .ico { color: #0f6cbd; }
+body.sheet-win365.theme-dark .infobar.info .ico { color: #479ef5; }
+
+/* ----------------------------------------------------------- menus and lists */
+body.sheet-win365 .dd-menu, body.sheet-win365 #axCtx, body.sheet-win365 .axctx {
+    border-radius: 6px; padding: 4px;
+}
+body.sheet-win365.theme-light .dd-menu, body.sheet-win365.theme-light #axCtx,
+body.sheet-win365.theme-light .axctx {
+    background: #ffffff; border: 1px solid #e1dfdd; color: #242322;
+    box-shadow: 0 8px 16px rgba(0,0,0,.14), 0 0 2px rgba(0,0,0,.12);
+}
+body.sheet-win365.theme-dark .dd-menu, body.sheet-win365.theme-dark #axCtx,
+body.sheet-win365.theme-dark .axctx {
+    background: #292827; border: 1px solid #3b3a39; color: #f0eeec;
+    box-shadow: 0 8px 16px rgba(0,0,0,.45), 0 0 2px rgba(0,0,0,.4);
+}
+body.sheet-win365 .list { border-radius: 6px; }
+body.sheet-win365 .dd-item, body.sheet-win365 .list-item, body.sheet-win365 .axctx-item {
+    height: 34px; line-height: 34px; border-radius: 4px;
+}
+body.sheet-win365.theme-light .dd-item:hover, body.sheet-win365.theme-light .list-item:hover,
+body.sheet-win365.theme-light .axctx-item:hover, body.sheet-win365.theme-light .fl-row:hover { background: #f3f2f1; }
+body.sheet-win365.theme-dark .dd-item:hover, body.sheet-win365.theme-dark .list-item:hover,
+body.sheet-win365.theme-dark .axctx-item:hover, body.sheet-win365.theme-dark .fl-row:hover { background: #302f2d; }
+/* Selection is a brand wash, pre-blended so SetAccent moves it. It is a shade
+   stronger than the suite's own tint on purpose: a paler one falls under
+   AxSys.BlueMinS and would sit at Office blue while the window turned. */
+body.sheet-win365.theme-light .dd-item.selected, body.sheet-win365.theme-light .list-item.selected {
+    background: #b9d9f5; color: #10365c;
+}
+body.sheet-win365.theme-dark .dd-item.selected, body.sheet-win365.theme-dark .list-item.selected {
+    background: #1c3f63; color: #eaf3fc;
+}
+body.sheet-win365 .dd-item.selected:before, body.sheet-win365 .list-item.selected:before {
+    left: 0; top: 6px; bottom: 6px; width: 3px; border-radius: 2px; background: #0f6cbd;
+}
+body.sheet-win365.theme-dark .dd-item.selected:before,
+body.sheet-win365.theme-dark .list-item.selected:before { background: #479ef5; }
+body.sheet-win365 .axctx-sep { margin: 4px 8px; }
+body.sheet-win365.theme-light .axctx-sep { background: #e1dfdd; }
+body.sheet-win365.theme-dark .axctx-sep  { background: #3b3a39; }
+/* the sheet's own ring, used by a window that asks for FocusRing: "contrast" */
+body.sheet-win365 .btn:focus, body.sheet-win365 .dropdown:focus, body.sheet-win365 .list:focus,
+body.sheet-win365 .tab:focus, body.sheet-win365 .seg:focus, body.sheet-win365 .chip:focus,
+body.sheet-win365 .swatch:focus, body.sheet-win365 .axdlg-btn:focus {
+    outline: 2px solid #0f6cbd; outline-offset: 1px;
+}
+body.sheet-win365.theme-dark .btn:focus, body.sheet-win365.theme-dark .dropdown:focus,
+body.sheet-win365.theme-dark .list:focus, body.sheet-win365.theme-dark .tab:focus,
+body.sheet-win365.theme-dark .seg:focus, body.sheet-win365.theme-dark .chip:focus,
+body.sheet-win365.theme-dark .swatch:focus, body.sheet-win365.theme-dark .axdlg-btn:focus {
+    outline-color: #479ef5;
+}
+
+/* -------------------------------------------------------------- window bars */
+/* The menu bar is the command surface: it belongs to the paper below the band,
+   not to the band, so it takes the rail's white and its own hairline. */
+body.sheet-win365 .axmb { height: 32px; padding: 0 8px; font-size: 13px; }
+body.sheet-win365.theme-light .axmb { background: #ffffff; border-bottom: 1px solid #e1dfdd; }
+body.sheet-win365.theme-dark .axmb  { background: #201f1e; border-bottom: 1px solid #302f2d; }
+body.sheet-win365 .axmb-item { height: 26px; line-height: 26px; padding: 0 12px; border-radius: 4px; font-weight: 600; }
+body.sheet-win365.theme-light .axmb-item:hover { background: #f3f2f1; }
+body.sheet-win365.theme-dark .axmb-item:hover  { background: #302f2d; }
+body.sheet-win365 .axmb-item.open {
+    background: transparent; color: #0f6cbd; box-shadow: inset 0 -2px 0 #0f6cbd;
+}
+body.sheet-win365.theme-dark .axmb-item.open { color: #479ef5; box-shadow: inset 0 -2px 0 #479ef5; }
+body.sheet-win365 .axsb { height: 26px; padding: 0 6px 0 14px; font-size: 12px; }
+body.sheet-win365.theme-light .axsb { background: #ffffff; border-top: 1px solid #e1dfdd; color: #605e5c; }
+body.sheet-win365.theme-dark .axsb  { background: #201f1e; border-top: 1px solid #302f2d; color: #a9a5a2; }
+body.sheet-win365.theme-light .axsb-part { border-left-color: #e1dfdd; }
+body.sheet-win365.theme-dark .axsb-part  { border-left-color: #3b3a39; }
+body.sheet-win365 .axsb-part.action { border-radius: 4px; }
+body.sheet-win365 .axsb-bar { border-radius: 3px; }
+body.sheet-win365.theme-light .axsb-bar { background: #e1dfdd; }
+body.sheet-win365.theme-dark .axsb-bar  { background: #3b3a39; }
+body.sheet-win365 .axsb-bar > i { background: #0f6cbd; }
+body.sheet-win365.theme-dark .axsb-bar > i { background: #479ef5; }
+
+/* ------------------------------------------------------------------ dialogs */
+body.sheet-win365 #axDlgOverlay { background: rgba(0,0,0,.4); }
+body.sheet-win365 #axDlg { width: 460px; padding: 24px; border-radius: 8px; }
+body.sheet-win365.theme-light #axDlg {
+    background: #ffffff; border: none; border-top: none;
+    box-shadow: 0 32px 64px rgba(0,0,0,.24), 0 0 8px rgba(0,0,0,.20);
+}
+body.sheet-win365.theme-dark #axDlg {
+    background: #292827; border: 1px solid #3b3a39; border-top: 1px solid #3b3a39;
+    box-shadow: 0 32px 64px rgba(0,0,0,.55), 0 0 8px rgba(0,0,0,.45);
+}
+body.sheet-win365 #axDlgTitle { font-size: 20px; line-height: 26px; font-weight: 600; }
+body.sheet-win365.theme-dark #axDlgTitle  { color: #f0eeec; }
+body.sheet-win365.theme-light #axDlgTitle { color: #242322; }
+body.sheet-win365 #axDlgBtns {
+    margin: 24px -24px -24px; padding: 18px 24px; border-radius: 0 0 8px 8px; justify-content: flex-end;
+}
+body.sheet-win365.theme-light #axDlgBtns { background: #faf9f8; border-top: 1px solid #e1dfdd; }
+body.sheet-win365.theme-dark #axDlgBtns  { background: #201f1e; border-top: 1px solid #3b3a39; }
+body.sheet-win365 .axdlg-btn {
+    flex: none; min-width: 96px; height: 32px; line-height: 30px; border-radius: 4px; font-weight: 600;
+}
+body.sheet-win365.theme-light .axdlg-btn { background: #ffffff; color: #242322; border: 1px solid #d2d0ce; }
+body.sheet-win365.theme-dark .axdlg-btn  { background: #302f2d; color: #f0eeec; border: 1px solid #484644; }
+body.sheet-win365 .axdlg-btn.danger { background: #c50f1f; border-color: #c50f1f; color: #ffffff; }
+body.sheet-win365 #axToast { border-radius: 8px; padding: 12px 16px; }
+body.sheet-win365.theme-light #axToast {
+    background: #ffffff; border: 1px solid #e1dfdd; border-left: 4px solid #0f6cbd; color: #242322;
+    box-shadow: 0 8px 16px rgba(0,0,0,.14), 0 0 2px rgba(0,0,0,.12);
+}
+body.sheet-win365.theme-dark #axToast {
+    background: #292827; border: 1px solid #3b3a39; border-left: 4px solid #479ef5; color: #f0eeec;
+    box-shadow: 0 8px 16px rgba(0,0,0,.45), 0 0 2px rgba(0,0,0,.4);
+}
+body.sheet-win365 #axToast.kind-success { border-left-color: #107c10; }
+body.sheet-win365 #axToast.kind-warning { border-left-color: #ca5010; }
+body.sheet-win365 #axToast.kind-error   { border-left-color: #c50f1f; }
+body.sheet-win365 #axTip { border-radius: 6px; padding: 6px 10px; }
+body.sheet-win365.theme-light #axTip {
+    background: #ffffff; border: 1px solid #e1dfdd; color: #242322;
+    box-shadow: 0 4px 8px rgba(0,0,0,.14), 0 0 2px rgba(0,0,0,.12);
+}
+body.sheet-win365.theme-dark #axTip { background: #292827; border: 1px solid #3b3a39; color: #f0eeec; }
+
+/* --------------------------------------------------------------- the grid */
+body.sheet-win365 .dv-frame { border-radius: 8px; }
+body.sheet-win365 .dv-frame.focus { border-color: #0f6cbd; }
+body.sheet-win365.theme-dark .dv-frame.focus { border-color: #479ef5; }
+body.sheet-win365 .dv-hcell { height: 40px; font-size: 13px; font-weight: 600; }
+body.sheet-win365.theme-light .dv-hcell { background: #faf9f8; color: #605e5c; border-bottom: 1px solid #e1dfdd; }
+body.sheet-win365.theme-dark .dv-hcell  { background: #262524; color: #a9a5a2; border-bottom: 1px solid #3b3a39; }
+body.sheet-win365 .dv-cell { height: 40px; font-size: 14px; border-top: none; }
+body.sheet-win365.theme-light .dv-cell { border-bottom: 1px solid #edebe9; }
+body.sheet-win365.theme-dark .dv-cell  { border-bottom: 1px solid #302f2d; }
+body.sheet-win365.theme-light .dv-row:hover > .dv-cell { background: #f3f2f1; }
+body.sheet-win365.theme-dark .dv-row:hover > .dv-cell  { background: #302f2d; }
+body.sheet-win365.theme-light .dv-row.selected > .dv-cell { background: #b9d9f5; color: #10365c; }
+body.sheet-win365.theme-dark .dv-row.selected > .dv-cell  { background: #1c3f63; color: #eaf3fc; }
+body.sheet-win365 .dv-check { border-radius: 3px; }
+body.sheet-win365 .dv-check.on, body.sheet-win365 .dv-check.some {
+    background: #0f6cbd; border-color: #0f6cbd; color: #ffffff;
+}
+body.sheet-win365.theme-dark .dv-check.on, body.sheet-win365.theme-dark .dv-check.some {
+    background: #479ef5; border-color: #479ef5; color: #0b1c2e;
+}
+body.sheet-win365 .dv-sort { color: #0f6cbd; }
+body.sheet-win365.theme-dark .dv-sort { color: #479ef5; }
+
+/* ------------------------------------------- pictures, drop zones and files */
+body.sheet-win365 .imgbox, body.sheet-win365 .thumb { border-radius: 8px; }
+body.sheet-win365.theme-light .imgbox, body.sheet-win365.theme-light .thumb {
+    background: #ffffff; border: 1px solid #e1dfdd;
+}
+body.sheet-win365.theme-dark .imgbox, body.sheet-win365.theme-dark .thumb {
+    background: #262524; border: 1px solid #3b3a39;
+}
+body.sheet-win365 .imgbox.round { border-radius: 50%; }
+body.sheet-win365 .imgbox.button:hover, body.sheet-win365 .thumb:hover { border-color: #0f6cbd; }
+body.sheet-win365.theme-dark .imgbox.button:hover, body.sheet-win365.theme-dark .thumb:hover { border-color: #479ef5; }
+body.sheet-win365 .sort-list .drag-item { border-radius: 6px; }
+body.sheet-win365.theme-light .sort-list .drag-item { background: #ffffff; border-color: #e1dfdd; }
+body.sheet-win365.theme-dark .sort-list .drag-item  { background: #262524; border-color: #3b3a39; }
+body.sheet-win365 .drag-ghost { border-color: #0f6cbd; box-shadow: 0 8px 16px rgba(0,0,0,.24); }
+body.sheet-win365 .fl-row { height: 34px; border-radius: 4px; }
+body.sheet-win365 .filelist { border-radius: 8px; }
+body.sheet-win365 .dropzone { border-radius: 8px; border-width: 2px; }
+body.sheet-win365.theme-light .dropzone { background: #ffffff; border-color: #c8c6c4; }
+body.sheet-win365.theme-dark .dropzone  { background: #201f1e; border-color: #484644; }
+/* pre-blended rather than rgba(), so the wash follows SetAccent */
+body.sheet-win365 .dropzone.dragover { border-color: #0f6cbd; border-style: solid; background: #bcd9f5; }
+body.sheet-win365.theme-dark .dropzone.dragover { border-color: #479ef5; background: #173a5e; }
+body.sheet-win365 .dropzone.reject { border-color: #c50f1f; background: #fbe4e6; }
+body.sheet-win365.theme-dark .dropzone.reject { background: #331b1d; }
+
+/* --------------------------------------------------------------- machine out */
+body.sheet-win365 .console { border-radius: 6px; }
+body.sheet-win365.theme-light .console { background: #1b1a19; border-color: #e1dfdd; }
+
+/* ----------------------------------------------------------- the rich footer */
+body.sheet-win365.theme-light .axrich-footer { background: #faf9f8; border-top-color: #e1dfdd; }
+body.sheet-win365.theme-dark .axrich-footer  { background: #201f1e; border-top-color: #302f2d; }
+
+/* --------------------------------------------------------------- scrollbars */
+/* Trident gives a stylesheet seven colours and nothing else: no width, no
+   radius, no overlay. What it will do is drop the 3D entirely — set the four
+   bevel colours to the track and the shadow, highlight and both edges stop
+   being drawn, leaving a flat thumb in a flat channel with the arrows a shade
+   of the track rather than a pair of buttons. Every scrolling surface is given
+   the track it actually sits on, so the bar disappears into its own panel. */
+body.sheet-win365.theme-light, body.sheet-win365.theme-light .thumbs,
+body.sheet-win365.theme-light .console, body.sheet-win365.theme-light #content {
+    scrollbar-face-color: #c8c6c4; scrollbar-arrow-color: #b0aeac;
+    scrollbar-track-color: #f3f2f1; scrollbar-shadow-color: #f3f2f1;
+    scrollbar-highlight-color: #f3f2f1; scrollbar-3dlight-color: #f3f2f1;
+    scrollbar-darkshadow-color: #f3f2f1;
+}
+body.sheet-win365.theme-light .list, body.sheet-win365.theme-light .dd-menu,
+body.sheet-win365.theme-light .filelist, body.sheet-win365.theme-light .dv-bodywrap {
+    scrollbar-face-color: #d5d3d1; scrollbar-arrow-color: #e6e4e2;
+    scrollbar-track-color: #ffffff; scrollbar-shadow-color: #ffffff;
+    scrollbar-highlight-color: #ffffff; scrollbar-3dlight-color: #ffffff;
+    scrollbar-darkshadow-color: #ffffff;
+}
+body.sheet-win365.theme-dark, body.sheet-win365.theme-dark .thumbs,
+body.sheet-win365.theme-dark .console, body.sheet-win365.theme-dark #content {
+    scrollbar-face-color: #4a4846; scrollbar-arrow-color: #3a3836;
+    scrollbar-track-color: #1b1a19; scrollbar-shadow-color: #1b1a19;
+    scrollbar-highlight-color: #1b1a19; scrollbar-3dlight-color: #1b1a19;
+    scrollbar-darkshadow-color: #1b1a19;
+}
+body.sheet-win365.theme-dark .list, body.sheet-win365.theme-dark .dd-menu,
+body.sheet-win365.theme-dark .filelist, body.sheet-win365.theme-dark .dv-bodywrap {
+    scrollbar-face-color: #4e4c4a; scrollbar-arrow-color: #3c3a38;
+    scrollbar-track-color: #1f1e1d; scrollbar-shadow-color: #1f1e1d;
+    scrollbar-highlight-color: #1f1e1d; scrollbar-3dlight-color: #1f1e1d;
+    scrollbar-darkshadow-color: #1f1e1d;
+}
+
+/* ------------------------------------------- title-bar items and popovers */
+/* Items live on the brand band, so they are white on it and lift with the
+   same translucent wash as the caption buttons. The popover is paper: the
+   flyout surface of the suite, at depth 16. */
+body.sheet-win365 #titlebar .axtb-item {
+    height: 28px; min-width: 28px; padding: 0 8px; border-radius: 4px;
+    color: #ffffff; font-size: 13px;
+}
+body.sheet-win365 #titlebar .axtb-item:hover { background: rgba(255,255,255,.16); }
+body.sheet-win365 #titlebar .axtb-item.on,
+body.sheet-win365 #titlebar .axtb-item.open,
+body.sheet-win365 #titlebar .axtb-item.pop-open { background: rgba(255,255,255,.26); }
+body.sheet-win365 #titlebar .axtb-item.kind-sep,
+body.sheet-win365 #titlebar .axtb-item.kind-sep:hover {
+    background: rgba(255,255,255,.34); height: 16px;
+    width: 1px; min-width: 1px; padding: 0; margin: 0 8px; border-radius: 0;
+}
+body.sheet-win365.inactive #titlebar .axtb-item { color: rgba(255,255,255,.62); }
+body.sheet-win365 .axtb-text { font-weight: 600; }
+body.sheet-win365 #axPop {
+    padding: 14px 16px; border-radius: 8px; font-size: 14px; line-height: 20px;
+    font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+}
+body.sheet-win365.theme-light #axPop {
+    background: #ffffff; color: #242322; border: 1px solid #e1dfdd;
+    box-shadow: 0 8px 16px rgba(0,0,0,.14), 0 0 2px rgba(0,0,0,.12);
+}
+body.sheet-win365.theme-dark #axPop {
+    background: #292827; color: #f0eeec; border: 1px solid #3b3a39;
+    box-shadow: 0 8px 16px rgba(0,0,0,.45), 0 0 2px rgba(0,0,0,.4);
+}

@@ -1,0 +1,51 @@
+{
+  "name": "Radio",
+  "description": "Radio group",
+  "order": 2006,
+  "css": "AxRadio.css",
+  "include": "lib\\components\\Radio\\AxRadio.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Radio",
+      "label": "Radio group",
+      "icon": "E915",
+      "category": "Common",
+      "prefix": "rg",
+      "arg": {
+        "key": "options",
+        "label": "Options",
+        "kind": "options",
+        "default": "a:Alpha\nb:Beta"
+      },
+      "props": [
+        {
+          "key": "value",
+          "label": "Value",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "vertical",
+          "label": "Vertical",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "group",
+          "label": "Group",
+          "kind": "text",
+          "emit": "kv"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

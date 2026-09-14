@@ -1,0 +1,195 @@
+/* =============================================================================
+   AxDataView.css — list / tree / grouped grid.
+   Two tables share one column layout: the header sits in its own clipped wrap
+   and the body scrolls under it, with the horizontal scroll kept in step from
+   AHK. table-layout:fixed means a resize writes one <col> width, not one per
+   cell.
+   ============================================================================= */
+.dv { position: relative; -ms-user-select: none; user-select: none; }
+
+/* ------------------------------------------------------------------ toolbar */
+/* Not flex, deliberately. IE11 computes flex-basis:auto from an item's CONTENT
+   box even when box-sizing is border-box, so a padded button in a flex row is
+   laid out narrower than its own label and the text is clipped -- which is
+   what ate the end of "Columns". The toolbar has no need of flex: inline-block
+   children and a floated count lay out identically and cannot hit that bug. */
+.dv-tools { display: block; margin-bottom: 8px; }
+.dv-tools:after { content: ""; display: block; clear: both; height: 0; }
+.dv-tools > * { display: inline-block; vertical-align: middle; margin-right: 8px; }
+.dv-tools .searchbox { width: 260px; max-width: 100%; }
+.dv-count { float: right; margin-right: 0; font-size: 12px; color: rgba(255,255,255,.55); white-space: nowrap; }
+body.theme-light .dv-count { color: rgba(0,0,0,.45); }
+
+/* -------------------------------------------------------------------- frame */
+.dv-frame {
+    border: 1px solid rgba(255,255,255,.0698); border-radius: 6px; overflow: hidden;
+    background: rgba(255,255,255,.0345);
+}
+body.theme-light .dv-frame { border-color: rgba(0,0,0,.0578); background: #fbfbfb; }
+.dv-headwrap { overflow: hidden; border-bottom: 1px solid rgba(255,255,255,.0698); }
+body.theme-light .dv-headwrap { border-bottom-color: rgba(0,0,0,.0578); }
+.dv-bodywrap { overflow: auto; outline: none; }
+/* the body holds the tabindex, so the frame is what shows the focus */
+.dv-frame.focus { border-color: rgba(128,128,128,.65); }
+.dv-table { table-layout: fixed; border-collapse: collapse; border-spacing: 0; }
+
+/* ------------------------------------------------------------------- header */
+.dv-hcell {
+    position: relative; height: 34px; padding: 0 10px; text-align: left; font-weight: 600;
+    font-size: 12px; color: rgba(255,255,255,.786); white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; background: rgba(255,255,255,.0345);
+}
+body.theme-light .dv-hcell { color: rgba(0,0,0,.6); background: #f6f6f6; }
+.dv-hcell:hover { background: rgba(255,255,255,.0605); }
+body.theme-light .dv-hcell:hover { background: #efefef; }
+.dv-hcell.nosort:hover { background: rgba(255,255,255,.0345); }
+body.theme-light .dv-hcell.nosort:hover { background: #f6f6f6; }
+.dv-hcell.right { text-align: right; } .dv-hcell.center { text-align: center; }
+.dv-sort { font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 9px; margin-left: 6px; opacity: 0; }
+.dv-hcell.sorted .dv-sort { opacity: .9; }
+/* the grip straddles the column edge so it is easy to grab */
+.dv-grip { position: absolute; top: 0; right: -3px; width: 7px; height: 100%; cursor: col-resize; z-index: 3; }
+.dv-grip:hover, .dv-grip.active { background: rgba(128,128,128,.55); }
+body.dv-resizing, body.dv-resizing * { cursor: col-resize !important; }
+
+/* --------------------------------------------------------------------- rows */
+.dv-row { height: 32px; }
+.dv-row:hover > .dv-cell { background: rgba(255,255,255,.0605); }
+body.theme-light .dv-row:hover > .dv-cell { background: rgba(0,0,0,.0373); }
+.dv-row.selected > .dv-cell { background: rgba(255,255,255,.0837); }
+body.theme-light .dv-row.selected > .dv-cell { background: rgba(0,0,0,.0578); }
+.dv-row.cursor > .dv-cell { box-shadow: inset 0 0 0 1px rgba(128,128,128,.45); }
+.dv-cell {
+    padding: 0 10px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border-top: 1px solid rgba(255,255,255,.035);
+}
+body.theme-light .dv-cell { border-top-color: rgba(0,0,0,.035); }
+.dv-cell.right { text-align: right; } .dv-cell.center { text-align: center; }
+.dv-cell.dim { color: rgba(255,255,255,.55); }
+body.theme-light .dv-cell.dim { color: rgba(0,0,0,.45); }
+/* a row is a <tr>: never give it a :before. Generated content on a table row
+   gets wrapped in an anonymous table-cell, which adds a phantom column and
+   shifts every real cell in that row out of line with the <col> widths. */
+
+/* group rows */
+.dv-row.group > .dv-cell {
+    background: rgba(255,255,255,.055); font-weight: 600; border-top-color: rgba(255,255,255,.07);
+}
+body.theme-light .dv-row.group > .dv-cell { background: #f1f1f1; border-top-color: rgba(0,0,0,.06); }
+.dv-row.group:hover > .dv-cell { background: rgba(255,255,255,.075); }
+body.theme-light .dv-row.group:hover > .dv-cell { background: #ebebeb; }
+.dv-gcount { margin-left: 8px; font-weight: 400; font-size: 12px; opacity: .6; }
+
+/* indent, twisty, checkbox, icon */
+.dv-indent { display: inline-block; height: 1px; vertical-align: middle; }
+.dv-twisty {
+    display: inline-block; width: 18px; text-align: center; vertical-align: middle;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 8px;
+    transition: transform .12s;
+}
+.dv-twisty:before { content: "\E76C"; }              /* ChevronRight */
+.dv-twisty.open:before { content: "\E70D"; }         /* ChevronDown */
+.dv-twisty.leaf:before { content: ""; }
+.dv-check {
+    display: inline-block; width: 16px; height: 16px; margin-right: 8px; border-radius: 3px;
+    vertical-align: middle; border: 1px solid rgba(255,255,255,.55); text-align: center;
+    line-height: 14px; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 10px;
+}
+body.theme-light .dv-check { border-color: rgba(0,0,0,.45); }
+.dv-check.on:before { content: "\E73E"; }            /* CheckMark */
+.dv-check.some:before { content: "\E738"; }          /* Remove (dash) */
+.dv-check.on, .dv-check.some { background: #60cdff; border-color: #60cdff; color: #000; }
+.dv-icon { margin-right: 8px; vertical-align: middle; opacity: .8; }
+.dv-text { vertical-align: middle; }
+
+.dv-empty { padding: 28px 12px; text-align: center; font-size: 12px; color: rgba(255,255,255,.45); }
+body.theme-light .dv-empty { color: rgba(0,0,0,.4); }
+
+/* ------------------------------------------------------------------- footer */
+.dv-foot { display: flex; align-items: center; flex-wrap: wrap; margin-top: 8px; font-size: 12px; }
+.dv-foot > * { margin-right: 8px; }
+.dv-foot .btn { min-width: 30px; height: 26px; line-height: 24px; padding: 0 9px; }
+.dv-foot .btn.disabled { opacity: .4; }
+.dv-page { color: rgba(255,255,255,.786); white-space: nowrap; }
+body.theme-light .dv-page { color: rgba(0,0,0,.6); }
+.dv-status { margin-left: auto; margin-right: 0; color: rgba(255,255,255,.55); white-space: nowrap; }
+body.theme-light .dv-status { color: rgba(0,0,0,.45); }
+
+/* column chooser button + the grip's size-to-fit affordance */
+.dv-tools .btn .ico { font-size: 12px; margin-right: 4px; vertical-align: -1px; }
+/* Measured, not guessed: the Columns button lays out at 82px around 80px of
+   content -- two pixels of slack. It is not too narrow, it is too tight, and
+   .btn clips with overflow:hidden, so any machine whose Segoe UI measures a
+   hair wider loses the last letter. Give a toolbar button room and let it
+   spill rather than clip if it ever runs out. */
+.dv-tools .btn { padding: 0 12px; overflow: visible; text-overflow: clip; }
+.dv-grip:active { background: rgba(128,128,128,.8); }
+
+
+/* ------------------------------------------- the retro stylesheets ------- */
+/* win98 and winxp are their own palettes rather than a light/dark pair, so
+   the grid's colours are stated outright for them instead of leaning on the
+   translucent Fluent ones (which vanish against a solid surface). */
+body.sheet-win98 .dv-frame, body.sheet-winxp .dv-frame { border-radius: 0; }
+body.sheet-win98 .dv-frame { background: #fff; border: 1px solid; border-color: #808080 #fff #fff #808080; }
+body.sheet-winxp .dv-frame { background: #fff; border: 1px solid #7f9db9; }
+body.sheet-win98 .dv-hcell { background: #c0c0c0; color: #000; border-right: 1px solid #808080;
+    border-bottom: 1px solid #808080; height: 22px; font-weight: normal; }
+body.sheet-win98 .dv-hcell:hover { background: #d8d8d8; }
+body.sheet-winxp .dv-hcell { background: #f1f1f1; color: #000; border-right: 1px solid #d4d0c8;
+    border-bottom: 1px solid #aca899; height: 22px; }
+body.sheet-winxp .dv-hcell:hover { background: #e8f0fb; }
+body.sheet-win98 .dv-headwrap, body.sheet-winxp .dv-headwrap { border-bottom: 0; }
+body.sheet-win98 .dv-cell, body.sheet-winxp .dv-cell { border-top: 0; color: #000; height: 20px; }
+body.sheet-win98 .dv-cell.dim, body.sheet-winxp .dv-cell.dim { color: #444; }
+body.sheet-win98 .dv-row:hover > .dv-cell { background: #e8e8e8; }
+body.sheet-winxp .dv-row:hover > .dv-cell { background: #eaf1fb; }
+body.sheet-win98 .dv-row.selected > .dv-cell { background: #000080; color: #fff; }
+body.sheet-winxp .dv-row.selected > .dv-cell { background: #316ac5; color: #fff; }
+body.sheet-win98 .dv-row.selected > .dv-cell.dim, body.sheet-winxp .dv-row.selected > .dv-cell.dim { color: #dfe8fb; }
+body.sheet-win98 .dv-row.group > .dv-cell { background: #c0c0c0; color: #000; }
+body.sheet-winxp .dv-row.group > .dv-cell { background: #ece9d8; color: #000; }
+body.sheet-win98 .dv-check { background: #fff; border: 1px solid; border-color: #808080 #fff #fff #808080;
+    border-radius: 0; color: #000; }
+body.sheet-winxp .dv-check { background: #fff; border: 1px solid #7f9db9; border-radius: 0; color: #000; }
+body.sheet-win98 .dv-check.on, body.sheet-win98 .dv-check.some { background: #fff; color: #000; }
+body.sheet-winxp .dv-check.on, body.sheet-winxp .dv-check.some { background: #fff; color: #316ac5; }
+body.sheet-win98 .dv-empty, body.sheet-winxp .dv-empty { color: #666; }
+body.sheet-win98 .dv-count, body.sheet-win98 .dv-status, body.sheet-win98 .dv-page,
+body.sheet-winxp .dv-count, body.sheet-winxp .dv-status, body.sheet-winxp .dv-page { color: #000; }
+body.sheet-win98 .dv-icon, body.sheet-winxp .dv-icon { color: #000080; opacity: 1; }
+body.sheet-win98 .dv-grip:hover, body.sheet-winxp .dv-grip:hover { background: #808080; }
+
+/* and the same again once those sheets are in dark mode */
+body.sheet-win98.theme-dark .dv-frame { background: #232323; border-color: #101010 #6e6e6e #6e6e6e #101010; }
+body.sheet-winxp.theme-dark .dv-frame { background: #262626; border-color: #6a6a6a; }
+body.sheet-win98.theme-dark .dv-hcell { background: #4a4a4a; color: #e8e8e8; border-right-color: #202020; border-bottom-color: #202020; }
+body.sheet-winxp.theme-dark .dv-hcell { background: #4d4d4d; color: #eaeaea; border-right-color: #5a5a5a; border-bottom-color: #5a5a5a; }
+body.sheet-win98.theme-dark .dv-hcell:hover { background: #565656; }
+body.sheet-winxp.theme-dark .dv-hcell:hover { background: #585858; }
+body.sheet-win98.theme-dark .dv-cell, body.sheet-winxp.theme-dark .dv-cell { color: #e8e8e8; }
+body.sheet-win98.theme-dark .dv-cell.dim, body.sheet-winxp.theme-dark .dv-cell.dim { color: #b0b0b0; }
+body.sheet-win98.theme-dark .dv-row:hover > .dv-cell { background: #333; }
+body.sheet-winxp.theme-dark .dv-row:hover > .dv-cell { background: #35435c; }
+body.sheet-win98.theme-dark .dv-row.group > .dv-cell { background: #4a4a4a; }
+body.sheet-winxp.theme-dark .dv-row.group > .dv-cell { background: #4d4d4d; }
+body.sheet-win98.theme-dark .dv-check, body.sheet-winxp.theme-dark .dv-check { background: #232323; color: #e8e8e8; }
+body.sheet-win98.theme-dark .dv-check.on, body.sheet-win98.theme-dark .dv-check.some,
+body.sheet-winxp.theme-dark .dv-check.on, body.sheet-winxp.theme-dark .dv-check.some { background: #232323; color: #60cdff; }
+body.sheet-win98.theme-dark .dv-empty, body.sheet-winxp.theme-dark .dv-empty { color: #a0a0a0; }
+body.sheet-win98.theme-dark .dv-count, body.sheet-win98.theme-dark .dv-status, body.sheet-win98.theme-dark .dv-page,
+body.sheet-winxp.theme-dark .dv-count, body.sheet-winxp.theme-dark .dv-status, body.sheet-winxp.theme-dark .dv-page { color: #d0d0d0; }
+body.sheet-win98.theme-dark .dv-icon, body.sheet-winxp.theme-dark .dv-icon { color: #9ecbff; }
+
+/* ------------------------------ as AutoHotkey's own ListView and TreeView */
+/* The footer's display is written inline by the component, hence !important. */
+.dv.nohead .dv-headwrap { display: none; }
+.dv.nofoot .dv-foot { display: none !important; }
+.dv.gridlines .dv-cell { border-right: 1px solid rgba(128,128,128,.18); border-top-color: rgba(128,128,128,.18); }
+/* a tree is one column as wide as the box, rows closer together, no rules */
+.dv.tvw .dv-table { width: 100% !important; }
+.dv.tvw .dv-row { height: 26px; }
+.dv.tvw .dv-cell { border-top: 0; }
+.dv.lvw .dv-row { height: 28px; }
+body.sheet-win98 .dv.tvw .dv-row, body.sheet-winxp .dv.tvw .dv-row,
+body.sheet-win98 .dv.lvw .dv-row, body.sheet-winxp .dv.lvw .dv-row { height: 20px; }

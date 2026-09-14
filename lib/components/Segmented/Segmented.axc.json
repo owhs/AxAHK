@@ -1,0 +1,39 @@
+{
+  "name": "Segmented",
+  "description": "Segmented",
+  "order": 3006,
+  "css": "AxSegmented.css",
+  "include": "lib\\components\\Segmented\\AxSegmented.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Segmented",
+      "label": "Segmented",
+      "icon": "E71D",
+      "category": "Input",
+      "prefix": "seg",
+      "arg": {
+        "key": "options",
+        "label": "Options (value:Label:Glyph per line)",
+        "kind": "options",
+        "default": "grid:Grid\nlist:List"
+      },
+      "props": [
+        {
+          "key": "value",
+          "label": "Value",
+          "kind": "text",
+          "emit": "kv"
+        }
+      ],
+      "events": [
+        "Change",
+        "Click",
+        "DoubleClick",
+        "ContextMenu",
+        "Focus",
+        "Blur"
+      ]
+    }
+  ]
+}

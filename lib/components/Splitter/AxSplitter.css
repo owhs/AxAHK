@@ -1,0 +1,26 @@
+/* AxSplitter.css — a draggable divider between two parts of a page. */
+
+.axsp {
+    position: relative;
+    -ms-user-select: none; user-select: none;
+    background: rgba(128, 128, 128, .18);
+    flex: none;
+}
+.axsp.vert  { width: 6px; cursor: col-resize; align-self: stretch; min-height: 24px; }
+.axsp.horiz { height: 6px; cursor: row-resize; width: 100%; margin: 4px 0; }
+.axsp:hover, .axsp.dragging { background: #4cc2ff; }
+
+/* the grip: three dots, so a 6px band still reads as something you can take
+   hold of rather than a hairline that happens to be a different colour */
+.axsp .grip {
+    position: absolute; left: 50%; top: 50%; opacity: .55;
+}
+.axsp.vert .grip  { width: 2px; height: 18px; margin: -9px 0 0 -1px;
+    background: repeating-linear-gradient(to bottom, currentColor 0, currentColor 2px, transparent 2px, transparent 5px); }
+.axsp.horiz .grip { width: 18px; height: 2px; margin: -1px 0 0 -9px;
+    background: repeating-linear-gradient(to right, currentColor 0, currentColor 2px, transparent 2px, transparent 5px); }
+.axsp:hover .grip, .axsp.dragging .grip { opacity: .9; }
+
+body.theme-light .axsp { background: rgba(0, 0, 0, .12); }
+body.axsp-dragging, body.axsp-dragging * { cursor: col-resize !important; }
+body.axsp-dragging.axsp-row, body.axsp-dragging.axsp-row * { cursor: row-resize !important; }

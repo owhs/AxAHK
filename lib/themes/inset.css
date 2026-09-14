@@ -1,0 +1,568 @@
+/* @extends win11 */
+/* @accent-hue 160 22 */
+/* ============================================================================
+   inset.css — the modern inset terminal: clean geometry, precise recessed
+   depth and high-contrast monospaced type. Panels are not floated on the
+   page with shadows; they are *fitted into* it, each one sitting in a
+   micro-recessed channel cut into the chassis.
+
+   Rules of the sheet, so later edits do not undo it:
+
+     • Depth is a channel, never a drop shadow. A surface that sits proud
+       carries "inset 0 1px 0" of light along its top edge and a 1px dark ring
+       outside it; a surface you type into carries "inset 0 1px 2px" of
+       shadow. Nothing in this sheet casts a shadow downward onto the page
+       except the things that genuinely float — menus, dialogs, tooltips.
+     • Everything is monospaced. This is a terminal: the type grid is the
+       layout grid, and a proportional font breaks the alignment the whole
+       design rests on.
+     • Corners are 3px. Sharp-edged, but machined rather than cut.
+     • Phosphor green is state — running, on, selected. Electric cyan is the
+       keyboard and information. Neither is decoration.
+
+   The chassis is a 2px matte slate frame drawn as body's own border. Every
+   box in the sheet is border-box, so it eats into body's 100% instead of
+   adding to it, and #shell's percentages resolve against what is left — no
+   arithmetic anywhere else has to know about it.
+
+   The title bar is 34px, not the usual 32, so the four #shell reserves that
+   win11.css works out by hand have to be restated — see the note there.
+
+   The @accent-hue line tells AxSys.RecolourCss that this sheet's accent
+   material is phosphor green (hue 160) as well as the usual blue band, so
+   SetAccent repaints the green AND the cyan. Leave the accent alone and the
+   pair stands as drawn.
+   ========================================================================= */
+
+/* ------------------------------------------------------------ the chassis */
+body.sheet-inset {
+    font-family: "Cascadia Mono", "JetBrains Mono", Consolas, "Courier New", monospace;
+    font-size: 13px; line-height: 19px; border: 2px solid #282a2f;
+}
+body.sheet-inset.theme-dark { background: #1a1c1f; color: #cfd6e0; }
+body.sheet-inset.theme-light { background: #e8eaee; color: #212327; border-color: #c2c8d1; }
+
+/* -------------------------------------------------------------- the header */
+/* Clean on the left but for the system tag; every control grouped hard right. */
+body.sheet-inset #titlebar { height: 34px; padding: 0 6px 0 14px; background: transparent; border: none; }
+body.sheet-inset.theme-dark #titlebar {
+    border-bottom: 1px solid #0e1011; box-shadow: inset 0 -1px 0 rgba(255,255,255,.07);
+}
+body.sheet-inset.theme-light #titlebar {
+    border-bottom: 1px solid #c2c8d1; box-shadow: inset 0 -1px 0 #ffffff;
+}
+body.sheet-inset #titleText { font-size: 12px; letter-spacing: .04em; color: #10b981; }
+body.sheet-inset.theme-light #titleText { color: #0a7f5c; }
+body.sheet-inset #titlebar .app-icon { font-size: 13px; margin-right: 9px; color: #10b981; }
+body.sheet-inset.theme-light #titlebar .app-icon { color: #0a7f5c; }
+body.sheet-inset.inactive #titleText,
+body.sheet-inset.inactive #titlebar .app-icon { color: rgba(130,140,152,.55); }
+
+/* ------------------------------------------------ grouped inset controls */
+/* Three minimal squares, each recessed into the header the way every other
+   surface in the sheet is: a dark ring outside, a catch of light inside. */
+body.sheet-inset .winbtn {
+    width: 26px; height: 22px; line-height: 20px; margin-left: 5px; border-radius: 3px;
+    font-size: 9px; transition: background .1s, color .1s, box-shadow .1s;
+}
+body.sheet-inset #btnMin, body.sheet-inset #btnClose { font-size: 0; }
+body.sheet-inset #btnMin:before { content: "\2212"; font: 400 13px "Cascadia Mono", Consolas, monospace; }
+body.sheet-inset #btnMax .ico-max { font-size: 0; }
+body.sheet-inset #btnMax .ico-max:before { content: "+"; font: 400 14px "Cascadia Mono", Consolas, monospace; }
+body.sheet-inset #btnClose:before { content: "\00D7"; font: 400 14px "Cascadia Mono", Consolas, monospace; }
+body.sheet-inset.theme-dark .winbtn {
+    background: #222428; color: rgba(207,214,224,.72);
+    border: 1px solid #33363c; box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
+body.sheet-inset.theme-light .winbtn {
+    background: #f4f5f8; color: rgba(28,32,39,.72);
+    border: 1px solid #d5dae2; box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+}
+body.sheet-inset.theme-dark .winbtn:hover, body.sheet-inset.theme-dark .winbtn.hover {
+    background: #2d3035; color: #eef2f7;
+}
+body.sheet-inset.theme-light .winbtn:hover, body.sheet-inset.theme-light .winbtn.hover {
+    background: #e6e9ee; color: #131416;
+}
+/* pressed: the button drops one pixel into its own channel */
+body.sheet-inset .winbtn:active, body.sheet-inset .winbtn.pressed {
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.45);
+}
+body.sheet-inset #btnClose:hover, body.sheet-inset #btnClose.hover {
+    background: #d34a45; border-color: #d34a45; color: #fff; box-shadow: none;
+}
+body.sheet-inset.inactive .winbtn { color: rgba(130,140,152,.45); }
+
+/* ------------------------------------------------------------ the reserves */
+/* win11.css works these out by hand from a 32px title bar; this one is 34, so
+   all four have to be restated or the page runs past the bottom. */
+body.sheet-inset #shell { height: calc(100% - 34px); }
+body.sheet-inset.has-menubar #shell { height: calc(100% - 62px); }
+body.sheet-inset.has-statusbar #shell { height: calc(100% - 58px); }
+body.sheet-inset.has-menubar.has-statusbar #shell { height: calc(100% - 86px); }
+
+/* ------------------------------------------------------------- the tree */
+body.sheet-inset #sidebar { width: 200px; padding: 8px 6px; background: transparent; }
+body.sheet-inset.theme-dark #sidebar { border-right: 1px solid rgba(255,255,255,.055); }
+body.sheet-inset.theme-light #sidebar { border-right: 1px solid rgba(0,0,0,.07); }
+body.sheet-inset .nav-item {
+    position: relative; height: 28px; line-height: 28px; margin-bottom: 2px;
+    padding: 0 10px 0 13px; border-radius: 3px; background: transparent; font-size: 12px;
+}
+body.sheet-inset .nav-item .ico { width: 20px; font-size: 14px; margin-right: 9px; }
+body.sheet-inset.theme-dark .nav-item { color: rgba(207,214,224,.66); }
+body.sheet-inset.theme-light .nav-item { color: rgba(28,32,39,.70); }
+body.sheet-inset.theme-dark .nav-item:hover { background: rgba(255,255,255,.045); color: #eef2f7; }
+body.sheet-inset.theme-light .nav-item:hover { background: rgba(0,0,0,.04); color: #131416; }
+/* the active row is the one place a channel is cut into the sidebar itself */
+body.sheet-inset.theme-dark .nav-item.active {
+    background: #17191b; color: #6ee7b7;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.045), inset 0 1px 3px rgba(0,0,0,.45);
+}
+body.sheet-inset.theme-light .nav-item.active {
+    background: #dfe3e9; color: #0a7f5c;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.06), inset 0 1px 3px rgba(0,0,0,.10);
+}
+body.sheet-inset .nav-item.active:before {
+    content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; width: 2px;
+    border-radius: 0; background: #10b981;
+}
+
+/* --------------------------------------------------------- the workspace */
+/* Flat and opaque: the chassis holds the depth, the workspace holds none. */
+body.sheet-inset #content { padding: 14px 20px 22px 14px; border-radius: 0; }
+body.sheet-inset.theme-dark #content { background: #18191c; }
+body.sheet-inset.theme-light #content { background: #f1f3f6; }
+
+/* ----------------------------------------------------------------- writing */
+body.sheet-inset h1 { font-size: 19px; line-height: 26px; font-weight: 600; letter-spacing: .01em; margin: 0 0 10px; }
+body.sheet-inset h2 { font-size: 15px; line-height: 22px; font-weight: 600; margin: 20px 0 8px; }
+body.sheet-inset h3 { font-size: 13px; line-height: 18px; font-weight: 600; margin: 15px 0 6px; }
+body.sheet-inset .caption {
+    font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: .14em;
+    background: transparent; margin: 18px 0 7px;
+}
+/* the legend keeps its absolute placement and the fill that masks the border
+   behind it — only the lettering and that fill's colour change */
+body.sheet-inset .group > .legend { font-size: 11px; letter-spacing: .10em; padding: 0 6px; }
+body.sheet-inset.theme-dark .group > .legend { background: #18191c; }
+body.sheet-inset.theme-light .group > .legend { background: #f1f3f6; }
+body.sheet-inset.theme-dark .caption, body.sheet-inset.theme-dark .group > .legend,
+body.sheet-inset.theme-dark .hint, body.sheet-inset.theme-dark .card-row .desc {
+    color: rgba(207,214,224,.52);
+}
+body.sheet-inset.theme-light .caption, body.sheet-inset.theme-light .group > .legend,
+body.sheet-inset.theme-light .hint, body.sheet-inset.theme-light .card-row .desc {
+    color: rgba(28,32,39,.58);
+}
+body.sheet-inset .hint { font-size: 11px; line-height: 16px; text-transform: none; letter-spacing: 0; margin-top: 7px; }
+body.sheet-inset .card-row .desc { font-size: 11px; line-height: 16px; }
+body.sheet-inset .card-row .title { font-size: 12px; font-weight: 400; }
+body.sheet-inset.theme-dark h1, body.sheet-inset.theme-dark .card-row .title { color: #eef2f7; }
+body.sheet-inset.theme-light h1, body.sheet-inset.theme-light .card-row .title { color: #17191b; }
+body.sheet-inset .link, body.sheet-inset .hyperlink, body.sheet-inset a { color: #22d3ee; text-decoration: none; }
+body.sheet-inset.theme-light .link, body.sheet-inset.theme-light .hyperlink,
+body.sheet-inset.theme-light a { color: #0b7f96; }
+body.sheet-inset .link:hover, body.sheet-inset a:hover { text-decoration: underline; }
+body.sheet-inset .card-row .ico { font-size: 15px; width: 22px; margin-right: 13px; }
+body.sheet-inset.theme-dark .card-row .ico { color: rgba(207,214,224,.45); }
+body.sheet-inset.theme-light .card-row .ico { color: rgba(28,32,39,.48); }
+
+/* ------------------------------------------------------------ inset panes */
+/* Proud of the workspace: a ring of shadow outside, a catch of light inside.
+   No downward drop shadow — that would float the panel instead of fitting it. */
+body.sheet-inset .card, body.sheet-inset .expander, body.sheet-inset .tile,
+body.sheet-inset .group, body.sheet-inset .dropzone {
+    border-radius: 3px; margin-bottom: 6px;
+}
+body.sheet-inset .card, body.sheet-inset .expander { padding: 12px 14px; }
+body.sheet-inset .group { padding: 18px 14px 12px; margin: 14px 0; }
+body.sheet-inset.theme-dark .card, body.sheet-inset.theme-dark .expander,
+body.sheet-inset.theme-dark .tile, body.sheet-inset.theme-dark .group {
+    background: #222428; border: 1px solid #383c42;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
+}
+body.sheet-inset.theme-light .card, body.sheet-inset.theme-light .expander,
+body.sheet-inset.theme-light .tile, body.sheet-inset.theme-light .group {
+    background: #f8f9fb; border: 1px solid #cdd3dc;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.09), inset 0 1px 0 #ffffff;
+}
+body.sheet-inset .card.hot { border-color: #10b981; }
+body.sheet-inset .card-row { min-height: 38px; }
+/* Monospace runs about 15% wider than the sans win11.css sized these columns
+   for, so a description was being ellipsised after four or five words. The
+   text column takes the room back and the control cluster wraps instead. */
+body.sheet-inset .card-row .text { flex: 1 1 260px; min-width: 160px; }
+body.sheet-inset .card-row .ctl { max-width: 58%; }
+body.sheet-inset .card-row .ctl { padding: 2px 0; }
+body.sheet-inset .exp-header { min-height: 40px; padding: 6px 14px; background: transparent; }
+body.sheet-inset .exp-header .chev { width: 26px; height: 26px; line-height: 26px; border-radius: 3px; }
+body.sheet-inset .exp-body { padding: 10px 14px 14px; }
+body.sheet-inset.theme-dark .exp-body { background: #18191c; border-top: 1px solid #33363c; }
+body.sheet-inset.theme-light .exp-body { background: #eef0f4; border-top: 1px solid #d5dae2; }
+body.sheet-inset .tile { padding: 12px; }
+body.sheet-inset .tab-panel { background: transparent; border: none; box-shadow: none; }
+
+/* --------------------------------------------------------- flat tactile */
+body.sheet-inset .btn {
+    height: 28px; line-height: 26px; min-width: 56px; padding: 0 13px; border-radius: 3px;
+    font-size: 12px; letter-spacing: .02em; transition: background .1s, box-shadow .1s;
+}
+body.sheet-inset.theme-dark .btn {
+    background: #292c30; border: 1px solid #3b3f45; border-bottom-color: #3b3f45;
+    color: rgba(207,214,224,.90); box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+}
+body.sheet-inset.theme-light .btn {
+    background: #f8f9fb; border: 1px solid #d5dae2; border-bottom-color: #c6ccd6;
+    color: rgba(28,32,39,.90); box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+}
+body.sheet-inset.theme-dark .btn:hover { background: #31353a; color: #eef2f7; }
+body.sheet-inset.theme-light .btn:hover { background: #eff1f5; color: #131416; }
+/* pressed drops the button into its own channel — the same gesture the
+   caption switches make */
+body.sheet-inset .btn:active, body.sheet-inset .btn.pressed {
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.40);
+}
+body.sheet-inset .btn.icon { width: 28px; min-width: 28px; line-height: 26px; }
+body.sheet-inset .btn .ico { line-height: 26px; }
+body.sheet-inset .btn.accent, body.sheet-inset .axdlg-btn.primary {
+    background: #10b981; border-color: #0d9c6d; color: #052b20;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+}
+body.sheet-inset .btn.accent:hover, body.sheet-inset .axdlg-btn.primary:hover {
+    background: #1ecb92; border-color: #10b981;
+}
+body.sheet-inset .btn.subtle { background: transparent; border-color: transparent; box-shadow: none; }
+body.sheet-inset .btn.danger, body.sheet-inset .axdlg-btn.danger {
+    background: #d34a45; border-color: #b83b37; color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+}
+body.sheet-inset.theme-dark .btn.disabled { background: #1f2225; color: rgba(207,214,224,.28); border-color: #2b2e33; box-shadow: none; }
+body.sheet-inset.theme-light .btn.disabled { background: #eceef2; color: rgba(28,32,39,.32); border-color: #dde1e8; box-shadow: none; }
+
+/* fields sit recessed into the panel they belong to */
+body.sheet-inset .textbox input, body.sheet-inset .textbox textarea,
+body.sheet-inset .searchbox input, body.sheet-inset .numberbox input,
+body.sheet-inset .passwordbox input, body.sheet-inset .hotkeybox input,
+body.sheet-inset .dd-value, body.sheet-inset #axDlgInput, body.sheet-inset .hex {
+    height: 28px; line-height: 26px; padding: 0 9px; border-radius: 3px; font-size: 12px;
+}
+body.sheet-inset.theme-dark .textbox input, body.sheet-inset.theme-dark .textbox textarea,
+body.sheet-inset.theme-dark .searchbox input, body.sheet-inset.theme-dark .numberbox input,
+body.sheet-inset.theme-dark .passwordbox input, body.sheet-inset.theme-dark .hotkeybox input,
+body.sheet-inset.theme-dark .dd-value, body.sheet-inset.theme-dark #axDlgInput,
+body.sheet-inset.theme-dark .hex, body.sheet-inset.theme-dark .list,
+body.sheet-inset.theme-dark .filelist, body.sheet-inset.theme-dark .sort-list .drag-item {
+    background: #131416; border: 1px solid #33363c; border-bottom-color: #33363c;
+    color: #cfd6e0; box-shadow: inset 0 1px 2px rgba(0,0,0,.50);
+}
+body.sheet-inset.theme-light .textbox input, body.sheet-inset.theme-light .textbox textarea,
+body.sheet-inset.theme-light .searchbox input, body.sheet-inset.theme-light .numberbox input,
+body.sheet-inset.theme-light .passwordbox input, body.sheet-inset.theme-light .hotkeybox input,
+body.sheet-inset.theme-light .dd-value, body.sheet-inset.theme-light #axDlgInput,
+body.sheet-inset.theme-light .hex, body.sheet-inset.theme-light .list,
+body.sheet-inset.theme-light .filelist, body.sheet-inset.theme-light .sort-list .drag-item {
+    background: #ffffff; border: 1px solid #d5dae2; border-bottom-color: #c6ccd6;
+    color: #212327; box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
+}
+body.sheet-inset .textbox textarea { height: auto; padding: 6px 9px; }
+body.sheet-inset .dd-value { padding: 0 32px 0 9px; }
+body.sheet-inset .list, body.sheet-inset .filelist { padding: 4px; }
+body.sheet-inset .sort-list .drag-item { min-height: 34px; }
+/* focus lights the channel green rather than thickening its edge */
+body.sheet-inset .textbox input:focus, body.sheet-inset .textbox textarea:focus,
+body.sheet-inset .searchbox input:focus, body.sheet-inset .numberbox.focus input,
+body.sheet-inset .passwordbox input:focus, body.sheet-inset .hotkeybox input:focus,
+body.sheet-inset .hotkeybox.recording input, body.sheet-inset #axDlgInput:focus,
+body.sheet-inset .dropdown.open .dd-value {
+    border-color: #10b981; border-bottom-width: 1px; border-bottom-color: #10b981;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.45), inset 0 0 0 1px #0f4d3c;
+}
+body.sheet-inset .numberbox .spin { border-radius: 2px; }
+body.sheet-inset .searchbox .ico { top: 7px; }
+body.sheet-inset .hotkeybox .kb { top: 7px; }
+body.sheet-inset .passwordbox .reveal { top: 3px; height: 22px; line-height: 22px; border-radius: 2px; }
+
+/* the switch: a recessed track that lights phosphor when it is on */
+body.sheet-inset .sw-track { border-radius: 10px; }
+body.sheet-inset.theme-dark .sw-track {
+    background: #131416; border: 1px solid #3b3f45; box-shadow: inset 0 1px 2px rgba(0,0,0,.5);
+}
+body.sheet-inset.theme-light .sw-track {
+    background: #e2e6ec; border: 1px solid #c6ccd6; box-shadow: inset 0 1px 2px rgba(0,0,0,.10);
+}
+body.sheet-inset .switch input:checked + .sw-track {
+    background: #10b981; border-color: #0d9c6d; box-shadow: inset 0 1px 2px rgba(0,0,0,.25);
+}
+body.sheet-inset .switch input:checked + .sw-track:before { background: #052b20; }
+body.sheet-inset .sw-label { font-size: 12px; }
+
+/* Checkboxes, radios and sliders are painted by the accent rules the core
+   writes, which fall back to Fluent blue when no accent has been chosen — so
+   in a phosphor design they stayed blue. Green here instead; because the
+   sheet declares @accent-hue 160, they follow SetAccent like everything. */
+body.sheet-inset .check .box { border-radius: 3px; }
+body.sheet-inset.theme-dark .check .box, body.sheet-inset.theme-dark .radio .ring {
+    background: #131416; border-color: #51565f; box-shadow: inset 0 1px 2px rgba(0,0,0,.45);
+}
+body.sheet-inset.theme-light .check .box, body.sheet-inset.theme-light .radio .ring {
+    background: #ffffff; border-color: #b6bec9; box-shadow: inset 0 1px 2px rgba(0,0,0,.08);
+}
+body.sheet-inset .check input:checked + .box {
+    background: #10b981; border-color: #0d9c6d; color: #052b20; box-shadow: none;
+}
+body.sheet-inset .radio input:checked + .ring { border-color: #10b981; box-shadow: none; }
+body.sheet-inset .radio input:checked + .ring:after { background: #052b20; }
+body.sheet-inset input[type=range]::-ms-fill-lower { background: #10b981; }
+body.sheet-inset input[type=range]::-ms-fill-upper { background: rgba(120,132,148,.45); }
+body.sheet-inset input[type=range]::-ms-thumb { width: 16px; height: 16px; background: #10b981; border-width: 3px; }
+body.sheet-inset .swatch { border-radius: 3px; }
+body.sheet-inset .swatch.selected { border-color: #10b981; }
+body.sheet-inset .rating .star.on { color: #10b981; }
+body.sheet-inset .progress { height: 6px; border-radius: 3px; }
+body.sheet-inset.theme-dark .progress { background: #131416; box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
+body.sheet-inset.theme-light .progress { background: #e2e6ec; box-shadow: inset 0 1px 2px rgba(0,0,0,.10); }
+body.sheet-inset .progress .bar, body.sheet-inset .progress.indeterminate .bar { background: #10b981; }
+body.sheet-inset .ring-spinner { border-top-color: #10b981; }
+
+/* ---------------------------------------------------------- chips and tabs */
+body.sheet-inset .chip { height: 24px; line-height: 22px; padding: 0 11px; border-radius: 3px; font-size: 11px; }
+body.sheet-inset .chip.on { background: #10b981; border-color: #0d9c6d; color: #052b20; }
+body.sheet-inset .badge { border-radius: 3px; font-size: 11px; }
+body.sheet-inset .badge.accent { background: #10b981; color: #052b20; }
+body.sheet-inset .badge.success { background: #10b981; color: #052b20; }
+body.sheet-inset .badge.warning { background: #f0b429; color: #2b1d02; }
+body.sheet-inset .badge.error { background: #d34a45; color: #fff; }
+body.sheet-inset .segmented { padding: 2px; border-radius: 4px; }
+body.sheet-inset.theme-dark .segmented { background: #131416; border-color: #33363c; box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
+body.sheet-inset.theme-light .segmented { background: #e2e6ec; border-color: #d5dae2; box-shadow: inset 0 1px 2px rgba(0,0,0,.08); }
+body.sheet-inset .segmented .seg { height: 24px; line-height: 24px; border-radius: 2px; font-size: 12px; }
+body.sheet-inset .segmented .seg.active { background: #10b981; color: #052b20; }
+body.sheet-inset .tab { padding: 7px 12px; border-radius: 3px 3px 0 0; font-size: 12px; }
+body.sheet-inset.theme-dark .tab.active { background: #222428; color: #eef2f7; }
+body.sheet-inset.theme-light .tab.active { background: #f8f9fb; color: #131416; }
+body.sheet-inset .tab.active:after { height: 2px; border-radius: 0; background: #10b981; }
+/* a box drawn round a tab that is only a bottom rule reads as a mistake */
+body.sheet-inset .tab:focus { outline: none !important; }
+body.sheet-inset .tab:focus:after {
+    content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; background: #22d3ee;
+}
+
+/* ---------------------------------------------------- menus that do float */
+/* The only surfaces in the sheet allowed a downward shadow: they are not
+   fitted into the chassis, they hang above it. */
+body.sheet-inset .dd-menu, body.sheet-inset #axCtx, body.sheet-inset .axctx,
+body.sheet-inset #axDlg, body.sheet-inset #axToast, body.sheet-inset #axTip {
+    border-radius: 4px;
+}
+body.sheet-inset.theme-dark .dd-menu, body.sheet-inset.theme-dark #axCtx,
+body.sheet-inset.theme-dark .axctx, body.sheet-inset.theme-dark #axToast,
+body.sheet-inset.theme-dark #axTip {
+    background: #272a2e; border: 1px solid #3e4249; box-shadow: 0 10px 26px rgba(0,0,0,.55);
+}
+body.sheet-inset.theme-light .dd-menu, body.sheet-inset.theme-light #axCtx,
+body.sheet-inset.theme-light .axctx, body.sheet-inset.theme-light #axToast,
+body.sheet-inset.theme-light #axTip {
+    background: #ffffff; border: 1px solid #d5dae2; box-shadow: 0 10px 26px rgba(0,0,0,.14);
+}
+body.sheet-inset .dd-item, body.sheet-inset .list-item, body.sheet-inset .axctx-item {
+    height: 28px; line-height: 28px; border-radius: 3px; font-size: 12px;
+}
+/* the checklist tick shares the :before the selection bar also claims, so its
+   line-height has to follow the row height down with it */
+body.sheet-inset .list.checklist .list-item:before { line-height: 28px; }
+body.sheet-inset.theme-dark .dd-item:hover, body.sheet-inset.theme-dark .list-item:hover,
+body.sheet-inset.theme-dark .dd-item.hl, body.sheet-inset.theme-dark .axctx-item:hover,
+body.sheet-inset.theme-dark .axctx-item.kb, body.sheet-inset.theme-dark .axmb-item:hover,
+body.sheet-inset.theme-dark .axmb-item.open, body.sheet-inset.theme-dark .fl-row:hover {
+    background: rgba(255,255,255,.06); color: inherit;
+}
+body.sheet-inset.theme-light .dd-item:hover, body.sheet-inset.theme-light .list-item:hover,
+body.sheet-inset.theme-light .dd-item.hl, body.sheet-inset.theme-light .axctx-item:hover,
+body.sheet-inset.theme-light .axctx-item.kb, body.sheet-inset.theme-light .axmb-item:hover,
+body.sheet-inset.theme-light .axmb-item.open, body.sheet-inset.theme-light .fl-row:hover {
+    background: rgba(0,0,0,.05); color: inherit;
+}
+body.sheet-inset .dd-item.selected, body.sheet-inset .list-item.selected {
+    background: #1b3933; color: #6ee7b7;
+}
+body.sheet-inset.theme-light .dd-item.selected, body.sheet-inset.theme-light .list-item.selected {
+    background: #b0e6d3; color: #076048;
+}
+body.sheet-inset .dd-item.selected:before, body.sheet-inset .list-item.selected:before { background: #10b981; }
+body.sheet-inset .fl-row { height: 28px; border-radius: 3px; }
+body.sheet-inset .thumb, body.sheet-inset .imgbox { border-radius: 3px; }
+body.sheet-inset .dropzone { border-width: 1px; border-style: dashed; box-shadow: none; }
+body.sheet-inset.theme-dark .dropzone.dragover { border-color: #10b981; border-style: solid; background: #1b3933; }
+body.sheet-inset.theme-light .dropzone.dragover { border-color: #10b981; border-style: solid; background: #b0e6d3; }
+body.sheet-inset .dropzone.dragover .dz-ico { color: #10b981; }
+body.sheet-inset .drag-ghost { border-color: #10b981; box-shadow: 0 14px 30px rgba(0,0,0,.55); }
+
+/* ------------------------------------------------------------ window bars */
+body.sheet-inset .axmb { background: transparent; height: 28px; font-size: 12px; }
+body.sheet-inset .axmb-item { height: 22px; line-height: 22px; border-radius: 3px; }
+body.sheet-inset.theme-dark .axmb { border-bottom: 1px solid rgba(255,255,255,.055); }
+body.sheet-inset.theme-light .axmb { border-bottom: 1px solid rgba(0,0,0,.07); }
+body.sheet-inset .axsb { background: transparent; height: 24px; font-size: 11px; letter-spacing: .04em; }
+body.sheet-inset .axsb-part.action { border-radius: 3px; }
+body.sheet-inset.theme-dark .axsb { border-top: 1px solid rgba(255,255,255,.055); color: rgba(207,214,224,.58); }
+body.sheet-inset.theme-light .axsb { border-top: 1px solid rgba(0,0,0,.07); color: rgba(28,32,39,.62); }
+body.sheet-inset.theme-dark .axsb-part { border-left-color: rgba(255,255,255,.055); }
+body.sheet-inset.theme-light .axsb-part { border-left-color: rgba(0,0,0,.07); }
+body.sheet-inset .axsb-bar { border-radius: 3px; }
+body.sheet-inset .axsb-bar > i { background: #10b981; }
+
+/* --------------------------------------------------------- console readout */
+/* Flush and low-profile: the deepest channel in the sheet. */
+body.sheet-inset .console {
+    border-radius: 3px; padding: 8px 10px; font-size: 12px; line-height: 17px;
+    background: #0e1011; color: #6ee7b7;
+}
+body.sheet-inset.theme-dark .console { border: 1px solid #33363c; box-shadow: inset 0 1px 3px rgba(0,0,0,.6); }
+body.sheet-inset.theme-light .console { border: 1px solid #c6ccd6; box-shadow: inset 0 1px 3px rgba(0,0,0,.35); }
+
+/* -------------------------------------------------------------- messages */
+body.sheet-inset .infobar { border-radius: 3px; }
+body.sheet-inset .infobar .close { border-radius: 3px; }
+body.sheet-inset.theme-dark .infobar { background: #222428; border-color: #33363c; }
+body.sheet-inset.theme-light .infobar { background: #f8f9fb; border-color: #d5dae2; }
+body.sheet-inset.theme-dark .infobar.success { background: #1b3933; }
+body.sheet-inset.theme-light .infobar.success { background: #b0e6d3; }
+body.sheet-inset .infobar.success .ico { color: #10b981; }
+body.sheet-inset.theme-dark .infobar.info { background: #1e363c; }
+body.sheet-inset.theme-light .infobar.info { background: #aee2ee; }
+body.sheet-inset .infobar.info .ico { color: #22d3ee; }
+body.sheet-inset .infobar.warning { background: rgba(240,180,41,.12); }
+body.sheet-inset .infobar.warning .ico { color: #f0b429; }
+body.sheet-inset .infobar.error { background: rgba(211,74,69,.14); }
+body.sheet-inset .infobar.error .ico { color: #e57a76; }
+body.sheet-inset #axToast.kind-success { border-left: 3px solid #10b981; }
+body.sheet-inset #axToast.kind-info { border-left: 3px solid #22d3ee; }
+body.sheet-inset #axToast.kind-warning { border-left: 3px solid #f0b429; }
+body.sheet-inset #axToast.kind-error { border-left: 3px solid #d34a45; }
+
+/* ----------------------------------------------------------------- dialogs */
+body.sheet-inset #axDlgOverlay { background: rgba(8,10,13,.58); }
+body.sheet-inset #axDlg { width: 440px; padding: 22px; }
+body.sheet-inset.theme-dark #axDlg {
+    background: #272a2e; border: 1px solid #3e4249; border-top-color: #3e4249;
+    box-shadow: 0 26px 60px rgba(0,0,0,.62);
+}
+body.sheet-inset.theme-light #axDlg {
+    background: #ffffff; border: 1px solid #d5dae2; border-top-color: #d5dae2;
+    box-shadow: 0 26px 60px rgba(0,0,0,.20);
+}
+body.sheet-inset #axDlgTitle { font-size: 15px; font-weight: 600; letter-spacing: .02em; margin-bottom: 10px; }
+body.sheet-inset #axDlgText { font-size: 12px; line-height: 18px; }
+body.sheet-inset #axDlgBtns { margin: 20px -22px -22px; padding: 16px 22px; border-radius: 0 0 4px 4px; }
+body.sheet-inset.theme-dark #axDlgBtns { background: #1e2023; border-top: 1px solid #3e4249; }
+body.sheet-inset.theme-light #axDlgBtns { background: #f1f3f6; border-top: 1px solid #d5dae2; }
+body.sheet-inset .axdlg-btn { flex: none; height: 28px; line-height: 26px; border-radius: 3px; font-size: 12px; }
+
+/* -------------------------------------------------------------- the grid */
+body.sheet-inset .dv-frame { border-radius: 3px; }
+body.sheet-inset.theme-dark .dv-frame {
+    background: #131416; border: 1px solid #33363c; box-shadow: inset 0 1px 3px rgba(0,0,0,.5);
+}
+body.sheet-inset.theme-light .dv-frame {
+    background: #ffffff; border: 1px solid #d5dae2; box-shadow: inset 0 1px 3px rgba(0,0,0,.07);
+}
+body.sheet-inset .dv-hcell { height: 30px; font-size: 11px; font-weight: 400; letter-spacing: .08em; text-transform: uppercase; }
+body.sheet-inset.theme-dark .dv-hcell { background: #222428; color: rgba(207,214,224,.55); border-bottom: 1px solid #33363c; }
+body.sheet-inset.theme-light .dv-hcell { background: #f1f3f6; color: rgba(28,32,39,.60); border-bottom: 1px solid #d5dae2; }
+body.sheet-inset .dv-cell { height: 30px; border-top: none; font-size: 12px; }
+body.sheet-inset.theme-dark .dv-cell { border-bottom: 1px solid rgba(255,255,255,.045); }
+body.sheet-inset.theme-light .dv-cell { border-bottom: 1px solid rgba(0,0,0,.055); }
+body.sheet-inset .dv-row.selected > .dv-cell { background: #1b3933; color: #6ee7b7; }
+body.sheet-inset.theme-light .dv-row.selected > .dv-cell { background: #b0e6d3; color: #076048; }
+body.sheet-inset .dv-check { border-radius: 3px; }
+body.sheet-inset .dv-check.on, body.sheet-inset .dv-check.some {
+    background: #10b981; border-color: #0d9c6d; color: #052b20;
+}
+
+/* ---------------------------------------------------------- keyboard focus */
+/* Green says state; cyan says the keyboard is here — and !important, because
+   the core writes its own ring the same way and would otherwise leave a
+   Fluent-blue box on a phosphor screen. */
+body.sheet-inset .btn:focus, body.sheet-inset .dropdown:focus,
+body.sheet-inset .list:focus, body.sheet-inset .seg:focus,
+body.sheet-inset .chip:focus, body.sheet-inset .link:focus,
+body.sheet-inset .rating:focus, body.sheet-inset .swatch:focus,
+body.sheet-inset .axdlg-btn:focus, body.sheet-inset .imgbox.button:focus,
+body.sheet-inset .dropzone:focus {
+    outline: 1px solid #22d3ee !important; outline-offset: 1px !important;
+}
+body.sheet-inset .list-item.kb { outline: 1px dashed #22d3ee !important; outline-offset: -1px; }
+
+/* Trident's own scrollbars, matched to the chassis */
+body.sheet-inset.theme-dark {
+    scrollbar-face-color: #3b3f45; scrollbar-track-color: #18191c; scrollbar-arrow-color: #8b95a3;
+    scrollbar-shadow-color: #18191c; scrollbar-highlight-color: #18191c;
+    scrollbar-3dlight-color: #18191c; scrollbar-darkshadow-color: #18191c;
+}
+body.sheet-inset.theme-light {
+    scrollbar-face-color: #c6ccd6; scrollbar-track-color: #f1f3f6; scrollbar-arrow-color: #6b737e;
+    scrollbar-shadow-color: #f1f3f6; scrollbar-highlight-color: #f1f3f6;
+    scrollbar-3dlight-color: #f1f3f6; scrollbar-darkshadow-color: #f1f3f6;
+}
+
+/* ===================================================== state restatements */
+/* win11.css writes its state variants as ".axmb.collapsed", ".btn.icon",
+   ".imgbox.round" and so on -- two classes on one element, specificity
+   (0,2,0). Every rule in this sheet carries "body.sheet-inset" in front of it,
+   so a plain ".btn" or ".axmb" here is (0,2,1) and silently OUT-RANKS them:
+   the menu bar would not collapse when it is toggled off, an icon button
+   would take text padding, a round image box would come out square. Any
+   state this sheet steps on has to be restated at this sheet's own weight.
+   Adding a rule above for a bare class means checking win11.css for its
+   variants and adding them here too. */
+
+/* the menu bar has to be able to go away entirely */
+body.sheet-inset .axmb.collapsed {
+    height: 0; min-height: 0; padding: 0; margin: 0; overflow: hidden;
+}
+body.sheet-inset.theme-dark .axmb.collapsed,
+body.sheet-inset.theme-light .axmb.collapsed { border: 0; }
+
+/* an icon button is a square of icon font, not a padded label */
+body.sheet-inset .btn.icon {
+    padding: 0; text-align: center;
+    font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets";
+}
+body.sheet-inset .btn.icon.text { font-family: inherit; font-size: 15px; }
+
+/* round means round */
+body.sheet-inset .imgbox.round { border-radius: 50%; }
+
+/* hover feedback the bare-class rules above would have swallowed */
+body.sheet-inset.theme-dark .tile:hover, body.sheet-inset.theme-dark .sort-list .drag-item:hover {
+    background: #2b2e33;
+}
+body.sheet-inset.theme-light .tile:hover, body.sheet-inset.theme-light .sort-list .drag-item:hover {
+    background: #eff1f5;
+}
+body.sheet-inset .axmb-item.disabled, body.sheet-inset .axctx-item.disabled { opacity: .45; }
+body.sheet-inset .axmb-item.disabled:hover, body.sheet-inset .axctx-item.disabled:hover {
+    background: none; color: inherit;
+}
+
+body.sheet-inset .btn.danger:hover, body.sheet-inset .axdlg-btn.danger:hover {
+    background: #dd5f5a; border-color: #c44743;
+}
+
+/* ------------------------------------------- title-bar items and popovers */
+/* An item that is on is a channel, not a fill: pressed into the chrome with
+   the same 1px ring and catch of light the sheet uses everywhere. */
+body.sheet-inset .axtb-item { height: 26px; min-width: 26px; border-radius: 4px; }
+body.sheet-inset.theme-dark .axtb-item:hover  { background: rgba(255,255,255,.05); }
+body.sheet-inset.theme-light .axtb-item:hover { background: rgba(0,0,0,.04); }
+body.sheet-inset.theme-dark .axtb-item.on, body.sheet-inset.theme-dark .axtb-item.open,
+body.sheet-inset.theme-dark .axtb-item.pop-open {
+    background: #16181b; box-shadow: inset 0 1px 2px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.05);
+}
+body.sheet-inset.theme-light .axtb-item.on, body.sheet-inset.theme-light .axtb-item.open,
+body.sheet-inset.theme-light .axtb-item.pop-open {
+    background: #e2e6ec; box-shadow: inset 0 1px 2px rgba(20,26,36,.16), 0 1px 0 #ffffff;
+}
+body.sheet-inset #axPop { border-radius: 4px; padding: 12px 14px; font-size: 12px; }
+body.sheet-inset.theme-dark #axPop  { background: #272a2e; color: #dfe3e9; border: 1px solid #3e4249; box-shadow: 0 10px 26px rgba(0,0,0,.55); }
+body.sheet-inset.theme-light #axPop { background: #ffffff; color: #1d2126; border: 1px solid #d5dae2; box-shadow: 0 10px 26px rgba(0,0,0,.14); }

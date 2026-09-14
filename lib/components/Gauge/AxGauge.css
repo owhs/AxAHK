@@ -1,0 +1,59 @@
+/* AxGauge.css -- the dial.
+
+   A semicircle is a box half as tall as it is wide with overflow hidden, and
+   the fill is a half-disc hanging below it, pivoted on the centre point and
+   rotated 0..180 degrees up into view. No SVG: Trident will not animate a
+   stroke-dasharray, but it rotates a div happily, and -ms-transform is there
+   because IE9 needs the prefix. */
+
+.gauge { display: inline-block; width: 120px; vertical-align: middle; }
+
+/* The face is the top half of the dial's square, and hides the rest. */
+.gauge-face { position: relative; width: 100%; padding-bottom: 50%; overflow: hidden; }
+
+/* The rings are borders round nothing, so the middle is a real hole and
+   whatever the gauge sits on -- the page, a card, a tinted panel -- shows
+   through it. A painted disc for a hub matched one background and no other.
+   Each ring is a square (padding-bottom: 100%) with a round border inside
+   it; 22px is 18% of the usual 120px, and a gauge of another width says its
+   own border-width on the <i>. */
+.gauge-track, .gauge-ring { position: absolute; left: 0; width: 100%; padding-bottom: 100%; }
+.gauge-track { top: 0; }
+.gauge-track i, .gauge-ring i {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    border-radius: 50%; border: 22px solid rgba(128, 128, 128, .22);
+    -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+body.theme-light .gauge-track i { border-color: rgba(0, 0, 0, .1); }
+
+/* The fill is the lower half of a ring, hanging below the diameter and
+   pivoted on its centre: rotated 0..180 degrees it comes up into view. */
+.gauge-fill {
+    position: absolute; left: 0; top: 100%; width: 100%; padding-bottom: 50%; overflow: hidden;
+    /* exactly on the diameter, not a pixel above it: one pixel of overlap
+       shows as a blue line across an empty gauge */
+    -ms-transform-origin: 50% 0; transform-origin: 50% 0;
+    -ms-transform: rotate(0deg); transform: rotate(0deg);
+    transition: transform .18s ease-out;
+}
+.gauge-ring { top: -100%; }
+.gauge-ring i { border-color: #60cdff; }
+body.theme-light .gauge-ring i { border-color: #005fb8; }
+
+.gauge-text {
+    text-align: center; font-size: 13px; margin-top: -2px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Ticks: three marks across the arc, drawn as a repeating background on a
+   strip laid over the face. */
+.gauge.ticks .gauge-face:after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px;
+    background-image: linear-gradient(to right,
+        rgba(255,255,255,.35) 0, rgba(255,255,255,.35) 1px, transparent 1px);
+    background-size: 25% 100%;
+}
+body.theme-light .gauge.ticks .gauge-face:after {
+    background-image: linear-gradient(to right,
+        rgba(0,0,0,.3) 0, rgba(0,0,0,.3) 1px, transparent 1px);
+}

@@ -1,0 +1,13 @@
+/* AxHotkey.css -- the shape of the hotkey box.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.hotkeybox { display: inline-block; position: relative; }
+.hotkeybox .kb { pointer-events: none; position: absolute; }
+.hotkeybox .clear { display: none; position: absolute; }
+/* the keyboard glyph on the left and the x on the right sit inside the field:
+   their room is structure, so a theme's own field padding cannot take it */
+.hotkeybox input { padding-left: 34px !important; padding-right: 32px !important; }
+.hotkeybox .kb { left: 10px !important; top: 50% !important; margin-top: -10px; height: 20px; line-height: 20px; }
+.hotkeybox .clear { top: 50% !important; margin-top: -12px; }

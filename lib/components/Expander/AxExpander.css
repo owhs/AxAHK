@@ -1,0 +1,8 @@
+/* AxExpander.css -- the shape of the expander.
+
+   The base layer: the page loads this before the theme, so it says
+   what the control *is* and the theme says what it looks like. */
+
+.exp-header { align-items: center; display: flex; }
+.exp-body { display: none; }
+.expander.open .exp-body { display: block; }

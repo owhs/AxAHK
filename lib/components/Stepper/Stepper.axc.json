@@ -1,0 +1,47 @@
+{
+  "name": "Stepper",
+  "description": "The steps of a wizard: done, now, still to come.",
+  "order": 2021,
+  "css": "AxStepper.css",
+  "include": "lib\\components\\Stepper\\AxStepper.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Stepper",
+      "label": "Steps",
+      "icon": "E9D5",
+      "category": "Common",
+      "prefix": "stp",
+      "arg": {
+        "key": "items",
+        "label": "Steps (Label:a line under it, per line)",
+        "kind": "options",
+        "default": "Account\nProfile\nConfirm"
+      },
+      "props": [
+        {
+          "key": "value",
+          "label": "On step",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "vertical",
+          "label": "Stacked",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "free",
+          "label": "Any step can be clicked",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Change",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

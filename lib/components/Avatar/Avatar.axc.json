@@ -1,0 +1,67 @@
+{
+  "name": "Avatar",
+  "description": "A person: picture or initials on their own colour, a status dot, and a name beside it.",
+  "order": 4021,
+  "css": "AxAvatar.css",
+  "include": "lib\\components\\Avatar\\AxAvatar.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Avatar",
+      "label": "Avatar",
+      "icon": "E77B",
+      "category": "Display",
+      "prefix": "av",
+      "arg": {
+        "key": "name",
+        "label": "Name",
+        "kind": "text",
+        "default": "Ada Lovelace"
+      },
+      "props": [
+        {
+          "key": "size",
+          "label": "Size",
+          "kind": "num",
+          "emit": "kv"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "|online|away|busy|offline"
+        },
+        {
+          "key": "image",
+          "label": "Picture",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "named",
+          "label": "Name beside it",
+          "kind": "flag",
+          "emit": "flag"
+        },
+        {
+          "key": "sub",
+          "label": "Line under the name",
+          "kind": "text",
+          "emit": "kv"
+        },
+        {
+          "key": "square",
+          "label": "Rounded square",
+          "kind": "flag",
+          "emit": "flag"
+        }
+      ],
+      "events": [
+        "Click",
+        "DoubleClick",
+        "ContextMenu"
+      ]
+    }
+  ]
+}

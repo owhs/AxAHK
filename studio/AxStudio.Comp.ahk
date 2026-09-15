@@ -198,7 +198,7 @@ class AxComp {
                         W: AxJson.Get(p, "word", AxCat._Word(AxJson.Get(p, "key", ""))),
                         Opts: AxJson.Get(p, "options", ""), Def: AxJson.Get(p, "default", "")})
         }
-        e.Props := props
+        e.PropList := props
         ev := []
         ; An event is a name the catalogue knows ("Click"), or one the pack
         ; brings: {name, sig, wire, filter, help} -- sig is the handler's

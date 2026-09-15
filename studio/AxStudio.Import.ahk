@@ -654,7 +654,7 @@ class AxImport {
             }
             got := false
             if on {
-                for pr in e.Props {
+                for pr in e.PropList {
                     if (pr.Emit = "flag" && StrLower(pr.W) = k) {
                         n.P[pr.K] := 1, got := true
                         break
@@ -677,7 +677,7 @@ class AxImport {
                 continue
             }
             got := false
-            for pr in e.Props
+            for pr in e.PropList
                 if (pr.Emit = "kv" && StrLower(pr.W) = k) {
                     n.P[pr.K] := v, got := true
                     break

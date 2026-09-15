@@ -269,7 +269,7 @@ class AxMapGraph {
         this.Ctls := Map(), this.Ctls.CaseSense := false     ; control variable -> design node
         this.Handlers := Map(), this.Handlers.CaseSense := false   ; handler fn -> {Node, Ev}
         this.Wins := Map(), this.Wins.CaseSense := false     ; Show/Make fn -> window index
-        this.Props := Map()                                  ; Class.prop -> Map(method -> "r"|"w")
+        this.PropUses := Map()                                  ; Class.prop -> Map(method -> "r"|"w")
         this.Plumbing := Map(), this.Plumbing.CaseSense := false   ; the studio's own functions
         this.WinVars := Map(), this.WinVars.CaseSense := false
         ; what the libraries the script includes offer: a function or a class
@@ -516,9 +516,9 @@ class AxMapGraph {
                 o := t.FirstChild(k)
                 if (t.Type(o) = "This" && !this.Meths.Has(cls "." t.Value(k))) {
                     pk := cls "." t.Value(k)
-                    if !this.Props.Has(pk)
-                        this.Props[pk] := Map()
-                    this.Props[pk][from] := this.IsWrite(k) ? "w" : (this.Props[pk].Has(from) ? this.Props[pk][from] : "r")
+                    if !this.PropUses.Has(pk)
+                        this.PropUses[pk] := Map()
+                    this.PropUses[pk][from] := this.IsWrite(k) ? "w" : (this.PropUses[pk].Has(from) ? this.PropUses[pk][from] : "r")
                 }
             }
             k++
@@ -621,7 +621,7 @@ class AxMapGraph {
     ; A class's own state, as data: only what one method writes and another
     ; reads, so the map shows what connects them rather than every field
     SharedProps() {
-        for pk, uses in this.Props {
+        for pk, uses in this.PropUses {
             w := 0, r := 0
             for fn, how in uses {
                 if (how = "w")

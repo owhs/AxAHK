@@ -583,7 +583,7 @@ class AxProject {
         if (IsObject(e) && IsObject(e.Arg))
             n.Arg := e.Arg.HasOwnProp("Def") ? e.Arg.Def : ""
         if IsObject(e)
-            for p in e.Props
+            for p in e.PropList
                 if (p.Def != "")
                     n.P[p.K] := p.Def
         n.L["place"] := "flow"

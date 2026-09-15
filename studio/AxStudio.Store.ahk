@@ -53,7 +53,7 @@ class AxStore {
         e := AxCat.Get(type)
         if (IsObject(e.Arg) && e.Arg.HasOwnProp("Def"))
             n.Arg := e.Arg.Def
-        for p in e.Props
+        for p in e.PropList
             if (p.Def != "")
                 n.P[p.K] := p.Def
         n.Name := ""
@@ -74,7 +74,7 @@ class AxStore {
         e := AxCat.Get(type)
         n := AxNode(type, "x")
         n.Name := e.Prefix "1"
-        for p in e.Props
+        for p in e.PropList
             if (p.Def != "")
                 n.P[p.K] := p.Def
         opts := AxGen.OptString(n, false)

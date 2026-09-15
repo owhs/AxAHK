@@ -640,9 +640,9 @@ class AxPanes {
             if (extra != "")
                 h .= AxPanes.Group(s, "Also available as", extra)
         }
-        if e.Props.Length {
+        if e.PropList.Length {
             body := ""
-            for p in e.Props
+            for p in e.PropList
                 body .= '<div class="axd-p"><label>' AxTags.E(p.L) '</label>'
                      .  '<div class="axd-static">' AxTags.E(p.Kind) '</div></div>'
             h .= AxPanes.Group(s, "Properties", body)
@@ -919,7 +919,7 @@ class AxPanes {
 
         if IsObject(e) {
             body := ""
-            for pr in e.Props
+            for pr in e.PropList
                 if !(n.Type = "Radio" && pr.K = "group")
                 body .= add({Id: "p_c_" pr.K, L: pr.L, Kind: pr.Kind, Opts: AxPanes.ChoiceOpts(pr),
                              Get: AxPanes.PropGet(n, pr.K), Set: AxPanes.PropSet(n, pr.K),

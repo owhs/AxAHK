@@ -32,7 +32,7 @@ if (A_LineFile = A_ScriptFullPath) {
 ;      Box      true for a container (children are allowed)
 ;      Arg      the second argument to Add*: {K, L, Kind, Def, Raw}
 ;               Raw = it is an AHK expression, not a quoted string (ActiveX, DataView)
-;      Props    [{K, L, Kind, Emit, W, Opts, Def}]
+;      PropList [{K, L, Kind, Emit, W, Opts, Def}]
 ;               Emit "flag"    -> the bare word W when truthy
 ;                    "flagset" -> the chosen value as a bare word
 ;                    "kv"      -> W=Value
@@ -50,8 +50,8 @@ class AxCat {
     static Add(e) {
         if !e.HasOwnProp("Box")
             e.Box := false
-        if !e.HasOwnProp("Props")
-            e.Props := []
+        if !e.HasOwnProp("PropList")
+            e.PropList := []
         if !e.HasOwnProp("Events")
             e.Events := ["Click", "DoubleClick", "ContextMenu"]
         if !e.HasOwnProp("Arg")
@@ -117,7 +117,7 @@ class AxCat {
     ; control: the export writes it out as it stands, and the canvas shows it
     ; as a chip. Importing a script puts its loops and set-up code in these.
     static CodeEntry() => {T: "Code", Label: "Code", Icon: "E943", Cat: "Advanced", Prefix: "code",
-        Box: false, Pack: "", Needs: "", Props: [], Events: [],
+        Box: false, Pack: "", Needs: "", PropList: [], Events: [],
         Arg: {K: "code", L: "Code", Kind: "multiline", Def: ""}}
 
     static Sig(name) => AxCat.IsPart(name) ? "el, ev" : AxCat.Events.Has(name) ? AxCat.Events[name].Sig : "ctl, ev, el"

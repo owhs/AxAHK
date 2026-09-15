@@ -119,7 +119,7 @@ class AxGen {
 
         e := AxCat.Has(n.Type) ? AxCat.Get(n.Type) : ""
         if IsObject(e) {
-            for pr in e.Props {
+            for pr in e.PropList {
                 v := n.Prop(pr.K, "")
                 if (canvas && pr.HasOwnProp("NoCanvas") && pr.NoCanvas)
                     continue

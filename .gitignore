@@ -39,3 +39,4 @@ _*
 *.txt
 *.ini
 studio/data/
+!_all.ahk

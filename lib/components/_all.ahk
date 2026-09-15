@@ -1,0 +1,64 @@
+#Requires AutoHotkey v2.0
+; Written by AxStudio from the .axc.json manifests it found.
+; Edited by hand, it will be overwritten -- add a folder instead.
+; #Include takes a path and not a glob, which is why this file exists.
+
+#Include %A_LineFile%\..\..\AxRich.ahk
+#Include %A_LineFile%\..\ActiveX\AxActiveX.ahk
+#Include %A_LineFile%\..\Audio\AxAudio.ahk
+#Include %A_LineFile%\..\AutoComplete\AxAutoComplete.ahk
+#Include %A_LineFile%\..\Avatar\AxAvatar.ahk
+#Include %A_LineFile%\..\Badge\AxBadge.ahk
+#Include %A_LineFile%\..\Breadcrumb\AxBreadcrumb.ahk
+#Include %A_LineFile%\..\Button\AxButton.ahk
+#Include %A_LineFile%\..\Canvas\AxCanvas.ahk
+#Include %A_LineFile%\..\Card\AxCard.ahk
+#Include %A_LineFile%\..\Chart\AxChart.ahk
+#Include %A_LineFile%\..\CheckBox\AxCheckBox.ahk
+#Include %A_LineFile%\..\Chip\AxChip.ahk
+#Include %A_LineFile%\..\CodeEditor\AxCodeEditor.ahk
+#Include %A_LineFile%\..\ScreenPick\AxScreenPick.ahk
+#Include %A_LineFile%\..\ColorPicker\AxColorPicker.ahk
+#Include %A_LineFile%\..\Console\AxConsole.ahk
+#Include %A_LineFile%\..\DDL\AxDDL.ahk
+#Include %A_LineFile%\..\DataView\AxDataView.ahk
+#Include %A_LineFile%\..\Date\AxDate.ahk
+#Include %A_LineFile%\..\DropZone\AxDropZone.ahk
+#Include %A_LineFile%\..\Edit\AxEdit.ahk
+#Include %A_LineFile%\..\Expander\AxExpander.ahk
+#Include %A_LineFile%\..\FileList\AxFileList.ahk
+#Include %A_LineFile%\..\Game\AxGame.ahk
+#Include %A_LineFile%\..\Gauge\AxGauge.ahk
+#Include %A_LineFile%\..\Grid\AxGrid.ahk
+#Include %A_LineFile%\..\GroupBox\AxGroupBox.ahk
+#Include %A_LineFile%\..\Hotkey\AxHotkey.ahk
+#Include %A_LineFile%\..\Html\AxHtml.ahk
+#Include %A_LineFile%\..\Image\AxImage.ahk
+#Include %A_LineFile%\..\InfoBar\AxInfoBar.ahk
+#Include %A_LineFile%\..\Link\AxLink.ahk
+#Include %A_LineFile%\..\ListBox\AxListBox.ahk
+#Include %A_LineFile%\..\ListView\AxListView.ahk
+#Include %A_LineFile%\..\Number\AxNumber.ahk
+#Include %A_LineFile%\..\Palette\AxPalette.ahk
+#Include %A_LineFile%\..\Password\AxPassword.ahk
+#Include %A_LineFile%\..\Picture\AxPicture.ahk
+#Include %A_LineFile%\..\Progress\AxProgress.ahk
+#Include %A_LineFile%\..\Radio\AxRadio.ahk
+#Include %A_LineFile%\..\RangeSlider\AxRangeSlider.ahk
+#Include %A_LineFile%\..\Rating\AxRating.ahk
+#Include %A_LineFile%\..\RichText\AxRichText.ahk
+#Include %A_LineFile%\..\Row\AxRow.ahk
+#Include %A_LineFile%\..\Search\AxSearch.ahk
+#Include %A_LineFile%\..\Segmented\AxSegmented.ahk
+#Include %A_LineFile%\..\Separator\AxSeparator.ahk
+#Include %A_LineFile%\..\Slider\AxSlider.ahk
+#Include %A_LineFile%\..\Splitter\AxSplitter.ahk
+#Include %A_LineFile%\..\Stat\AxStat.ahk
+#Include %A_LineFile%\..\Stepper\AxStepper.ahk
+#Include %A_LineFile%\..\Svg\AxSvg.ahk
+#Include %A_LineFile%\..\Switch\AxSwitch.ahk
+#Include %A_LineFile%\..\Tab\AxTab.ahk
+#Include %A_LineFile%\..\Tags\AxTagBox.ahk
+#Include %A_LineFile%\..\Text\AxText.ahk
+#Include %A_LineFile%\..\Thumbs\AxThumbs.ahk
+#Include %A_LineFile%\..\Tile\AxTile.ahk

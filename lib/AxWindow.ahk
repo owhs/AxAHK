@@ -1110,7 +1110,8 @@ class AxWindow {
         else if (this.Accent != "")
             this.SetAccent(this.Accent)
         if !this.AllowZoom
-            try this.WB.ExecWB(63, 2, 100, 0)              ; OLECMDID_OPTICAL_ZOOM -> 100%
+            try  DPI := A_ScreenDPI / 96 * 100
+              ,  this.WB.ExecWB(63, 2, Round(A_ScreenDPI / 96 * DPI), 0)             ; OLECMDID_OPTICAL_ZOOM -> 100%             
         this._RevealAx()
         ; IOleInPlaceActiveObject of the browser: key messages are routed
         ; through its TranslateAccelerator (see _SubclassProc)

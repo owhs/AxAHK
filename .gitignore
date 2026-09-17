@@ -40,3 +40,4 @@ _*
 *.ini
 studio/data/
 !_all.ahk
+!AstHost.exe

@@ -25,7 +25,7 @@ g := AxGui({
 
 Accent := "#60cdff"
 
-Log(msg) {
+EventLogger(msg) {
     if !g.Ready
         return
     g.Append("logBox", "<div>[" FormatTime(, "HH:mm:ss") "] " AxWindow._Esc(msg) "</div>")
@@ -44,26 +44,26 @@ g.AddInfoBar('Title="One click from a swatch to a colour."',
 
 g.AddRow("Icon=E790", "Window accent", "The picker result is applied the moment it is chosen")
 g.AddColorButton("vcbAccent", "#60cdff")
-    .OnChange((c, v, *) => (g.SetAccent(v), Log("Accent -> " v)))
+    .OnChange((c, v, *) => (g.SetAccent(v), EventLogger("Accent -> " v)))
 g.Use()
 
 g.AddRow("Icon=E7E7", "Surface tint", "Same control, different job")
 g.AddColorButton("vcbTint", "#4c4a48")
-    .OnChange((c, v, *) => (g.SetTint(v = "#4C4A48" ? "" : v, 0.14), Log("Tint -> " v)))
+    .OnChange((c, v, *) => (g.SetTint(v = "#4C4A48" ? "" : v, 0.14), EventLogger("Tint -> " v)))
 g.Use()
 
 g.AddRow("Icon=E771", "Chip only", "NoHex hides the label when the swatch says enough")
 g.AddColorButton("vcbPlain NoHex", "#e3008c")
-    .OnChange((c, v, *) => Log("Plain button -> " v))
+    .OnChange((c, v, *) => EventLogger("Plain button -> " v))
 g.AddColorButton("x+8 vcbPlain2 NoHex", "#10893e")
-    .OnChange((c, v, *) => Log("Plain button 2 -> " v))
+    .OnChange((c, v, *) => EventLogger("Plain button 2 -> " v))
 g.AddColorButton("x+8 vcbPlain3 NoHex", "#f7630c")
-    .OnChange((c, v, *) => Log("Plain button 3 -> " v))
+    .OnChange((c, v, *) => EventLogger("Plain button 3 -> " v))
 g.Use()
 
 g.AddText("Caption", "The same value is readable as a control value, so OnValue and Value work")
 g.AddButton("", "Read every button")
-    .OnClick((*) => Log("Buttons: " g.Value("cbAccent") " / " g.Value("cbTint") " / " g.Value("cbPlain")))
+    .OnClick((*) => EventLogger("Buttons: " g.Value("cbAccent") " / " g.Value("cbTint") " / " g.Value("cbPlain")))
 g.AddButton("x+8", "Set the accent button to red")
     .OnClick((*) => g.Value("cbAccent", "#e74856"))
 
@@ -90,14 +90,14 @@ g.Use()
 
 g.AddRow("Icon=E713", "Trimmed down", "Fields, swatches and the heading are all optional")
 g.AddButton("", "Minimal")
-    .OnClick((*) => Log("Minimal -> " (AxColorPicker.Show({Owner: g, Value: Accent, Size: 240,
+    .OnClick((*) => EventLogger("Minimal -> " (AxColorPicker.Show({Owner: g, Value: Accent, Size: 240,
         Fields: false, Swatches: false, Heading: "", Title: "Colour", Height: 420}) || "(cancelled)")))
 g.Use()
 
 g.AddRow("Icon=E81C", "Recently chosen", "Every accepted colour joins the Recent row")
 g.AddButton("", "Pick, twice")
     .OnClick((*) => (AxColorPicker.Show({Owner: g, Current: Accent}),
-        Log("Recent: " Join(AxColorPicker.Recent))))
+        EventLogger("Recent: " Join(AxColorPicker.Recent))))
 g.AddButton("x+8", "Without the row")
     .OnClick((*) => AxColorPicker.Show({Owner: g, Current: Accent, Recent: false}))
 g.Use()
@@ -120,17 +120,17 @@ IconDemo(icon) => (*) => AxColorPicker.Show({Owner: g, Current: Accent, Icon: ic
 ShowDual() {
     got := AxColorPicker.Show({Owner: g, Current: Accent, Value: Accent})
     if (got = "") {
-        Log("Dialog cancelled")
+        EventLogger("Dialog cancelled")
         return
     }
     global Accent := got
     g.SetAccent(got), g.Value("cbAccent", got)
-    Log("Dialog -> " got)
+    EventLogger("Dialog -> " got)
 }
 
 ShowSolo() {
     got := g.PickColor({Value: "#8764b8", Title: "Choose a colour", Heading: "Choose a colour"})
-    Log("Solo dialog -> " (got = "" ? "(cancelled)" : got))
+    EventLogger("Solo dialog -> " (got = "" ? "(cancelled)" : got))
 }
 
 LivePreview() {
@@ -138,7 +138,7 @@ LivePreview() {
     got := AxColorPicker.Show({Owner: g, Current: before, Value: before,
         OnChange: (hex, cp) => g.SetAccent(hex)})
     g.SetAccent(got != "" ? got : before)
-    Log("Live preview -> " (got = "" ? "(reverted)" : got))
+    EventLogger("Live preview -> " (got = "" ? "(reverted)" : got))
 }
 
 
@@ -162,7 +162,7 @@ g.AddButton("", "Refresh recent")
     .OnClick((*) => g.Ctl("cpInline").Component.RefreshRecent())
 g.AddButton("x+8", "Forget recent")
     .OnClick((*) => (AxColorPicker.Recent := [], g.Ctl("cpInline").Component.RefreshRecent(),
-        Log("Recent colours cleared")))
+        EventLogger("Recent colours cleared")))
 
 
 ; ==============================================================================
@@ -182,7 +182,7 @@ g.Use()
 
 g.AddRow("Icon=E71E", "Start zoomed in", "Zoom, magnifier size and the pixel grid are all options")
 g.AddButton("", "24x, no grid")
-    .OnClick((*) => Log("Screen -> " (g.PickScreenColor({Zoom: 24, Grid: false, Size: 200}) || "(cancelled)")))
+    .OnClick((*) => EventLogger("Screen -> " (g.PickScreenColor({Zoom: 24, Grid: false, Size: 200}) || "(cancelled)")))
 g.Use()
 
 g.AddText("Caption", "Inside the picker the same thing is one click away: the pipette on the New "
@@ -193,11 +193,11 @@ g.AddText("Hint", "Clicking Current runs the eyedropper by default; CurrentActio
 GrabColor() {
     got := AxScreenPick.Color({Owner: g})
     if (got = "") {
-        Log("Eyedropper cancelled")
+        EventLogger("Eyedropper cancelled")
         return
     }
     g.Value("cbPlain", got)
-    Log("Eyedropper -> " got " (copied into the third colour button)")
+    EventLogger("Eyedropper -> " got " (copied into the third colour button)")
 }
 
 
@@ -218,7 +218,7 @@ g.AddButton("", "Clear")
 g.OnReady((app) => (
     app.Ctl("cpInline").Component.OnChange((hex, cp) => (inlineOut.Text := hex,
         app.Style("inlineOut", "color", hex))),
-    Log("Ready. Rich components loaded: " Join(AxRich.Names()))
+    EventLogger("Ready. Rich components loaded: " Join(AxRich.Names()))
 ))
 
 Join(arr, sep := ", ") {

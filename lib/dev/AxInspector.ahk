@@ -1318,7 +1318,7 @@ class AxInspector {
             case "cssseed":  this._CssSeed()
             case "csscopy":
                 try A_Clipboard := this.W.El("cssEdit").value
-                this.Log("CSS copied to the clipboard", "i")
+                this.EvLogger("CSS copied to the clipboard", "i")
             case "csssave":
                 f := FileSelect("S24", A_ScriptDir "\custom.css", "Save CSS", "CSS (*.css)")
                 if (f = "")
@@ -1327,16 +1327,16 @@ class AxInspector {
                     if FileExist(f)
                         FileDelete(f)
                     FileAppend(this.W.El("cssEdit").value, f, "UTF-8")
-                    this.Log("saved " f, "i")
+                    this.EvLogger("saved " f, "i")
                 } catch as e
-                    this.Log(e.Message, "e")
+                    this.EvLogger(e.Message, "e")
             case "cssload":
                 f := FileSelect(3, A_ScriptDir "\custom.css", "Load CSS", "CSS (*.css)")
                 if (f = "")
                     return
                 try this._CssSet(FileRead(f, "UTF-8"))
                 catch as e
-                    this.Log(e.Message, "e")
+                    this.EvLogger(e.Message, "e")
         }
     }
     ; A starting rule for whatever is selected, specific enough to actually
@@ -1345,7 +1345,7 @@ class AxInspector {
     _CssSeed() {
         el := this.Sel
         if !IsObject(el) {
-            this.Log("select an element first", "e")
+            this.EvLogger("select an element first", "e")
             return
         }
         id := AxWindow._Attr(el, "id")
@@ -1627,7 +1627,7 @@ class AxInspector {
         this.Mon := true
         try this.W.AddClass("insmon", "on")
         this.ShowDrawer(true)
-        this.Log("monitoring click, dblclick, mousedown, change, focusin, keydown, "
+        this.EvLogger("monitoring click, dblclick, mousedown, change, focusin, keydown, "
                . "contextmenu on the target", "i")
     }
     StopMonitor() {
@@ -1640,7 +1640,7 @@ class AxInspector {
         }
         this._monFns := Map()
         try this.W.RemoveClass("insmon", "on")
-        this.Log("monitor stopped", "i")
+        this.EvLogger("monitor stopped", "i")
     }
     _MakeMon(type) => (*) => this._MonHit(type)
     _MonHit(type) {
@@ -1656,7 +1656,7 @@ class AxInspector {
             if this.T.Hooks.Has(type)
                 who := this._HookOwner(el, this.T.Hooks[type])
             site := (who != "") ? AxInspector.SiteOf(this.T, type, who) : ""
-            this.Log(type extra "  " AxInspector.Describe(el)
+            this.EvLogger(type extra "  " AxInspector.Describe(el)
                    . (who != "" ? "   -> #" who (site != "" ? "  " site : "")
                                 : "   (no AHK hook)"),
                      who != "" ? "" : "i")
@@ -1671,33 +1671,33 @@ class AxInspector {
         el := this.Sel, id := AxWindow._Attr(el, "id")
         try {
             switch act {
-                case "click":  el.click(), this.Log("clicked " AxInspector.Describe(el))
-                case "focus":  el.focus(), this.Log("focused " AxInspector.Describe(el))
-                case "scroll": el.scrollIntoView(), this.Log("scrolled into view")
+                case "click":  el.click(), this.EvLogger("clicked " AxInspector.Describe(el))
+                case "focus":  el.focus(), this.EvLogger("focused " AxInspector.Describe(el))
+                case "scroll": el.scrollIntoView(), this.EvLogger("scrolled into view")
                 case "flash":  this._Flash(el)
                 case "copysel":
                     A_Clipboard := AxInspector.Describe(el)
-                    this.Log("copied " A_Clipboard)
+                    this.EvLogger("copied " A_Clipboard)
                 case "cssseed":
                     this._CssSeed()
                 case "setval":
                     if (id = "")
-                        return this.Log("no id, so no control to set", "e")
+                        return this.EvLogger("no id, so no control to set", "e")
                     v := this.W.El("insVal").value
                     this.T.Value(id, v)
-                    this.Log("g.Value(" Chr(34) id Chr(34) ", " Chr(34) v Chr(34) ")", "c")
+                    this.EvLogger("g.Value(" Chr(34) id Chr(34) ", " Chr(34) v Chr(34) ")", "c")
                 case "addcls", "delcls":
                     c := Trim(this.W.El("insCls").value)
                     if (c = "")
                         return
                     if (act = "addcls")
-                        AxWindow._SetClass(el, c, true), this.Log("+ ." c)
+                        AxWindow._SetClass(el, c, true), this.EvLogger("+ ." c)
                     else
-                        AxWindow._SetClass(el, c, false), this.Log("- ." c)
+                        AxWindow._SetClass(el, c, false), this.EvLogger("- ." c)
                     this._FillTab(1)
             }
         } catch as e
-            this.Log(e.Message, "e")
+            this.EvLogger(e.Message, "e")
     }
     ; three quick pulses of the highlight: finds an element on a busy page
     ; faster than reading a rectangle off the screen
@@ -1738,7 +1738,7 @@ class AxInspector {
     ; there is instead is a small verb language over the things the inspector
     ; already holds -- the document and the AxWindow -- which covers most of
     ; what a console gets used for and cannot go wrong quietly.
-    Log(msg, cls := "") {
+    EvLogger(msg, cls := "") {
         try {
             this.W.Append("insLog", "<div class='" cls "'>"
                 . AxWindow._Esc(String(msg)) "</div>")
@@ -1760,7 +1760,7 @@ class AxInspector {
             if (line = "")
                 return
             this.Hist.Push(line), this.HistAt := this.Hist.Length + 1
-            this.Log("> " line, "c")
+            this.EvLogger("> " line, "c")
             this._Run(line)
             return
         }
@@ -1779,11 +1779,11 @@ class AxInspector {
         verb := StrLower(sp ? SubStr(line, 1, sp - 1) : line)
         rest := sp ? Trim(SubStr(line, sp + 1)) : ""
         el := this.Sel
-        needs := (*) => IsObject(el) ? true : (this.Log("select an element first", "e"), false)
+        needs := (*) => IsObject(el) ? true : (this.EvLogger("select an element first", "e"), false)
         try {
             switch verb {
                 case "help", "?":
-                    this.Log("sel <css>          select the first match in the page`n"
+                    this.EvLogger("sel <css>          select the first match in the page`n"
                            . "count <css>        how many match`n"
                            . "html               outerHTML of the selection`n"
                            . "text <s>           set innerText`n"
@@ -1800,71 +1800,71 @@ class AxInspector {
                 case "clear":
                     this.W.Html("insLog", "")
                 case "refresh":
-                    this.Refresh(), this.Log("tree rebuilt: " this.Nodes.Length " nodes", "i")
+                    this.Refresh(), this.EvLogger("tree rebuilt: " this.Nodes.Length " nodes", "i")
                 case "sel":
                     n := this.T.Doc.querySelector(rest)
                     if !IsObject(n)
-                        return this.Log("no match", "e")
+                        return this.EvLogger("no match", "e")
                     this._Show(n, this._IndexOf(n))
-                    this.Log(AxInspector.Describe(n))
+                    this.EvLogger(AxInspector.Describe(n))
                 case "count":
-                    this.Log(this.T.Doc.querySelectorAll(rest).length " match(es)")
+                    this.EvLogger(this.T.Doc.querySelectorAll(rest).length " match(es)")
                 case "html":
                     if needs()
-                        this.Log(el.outerHTML)
+                        this.EvLogger(el.outerHTML)
                 case "text":
                     if needs()
-                        el.innerText := rest, this.Log("ok")
+                        el.innerText := rest, this.EvLogger("ok")
                 case "attr":
                     if !needs()
                         return
                     if (eq := InStr(rest, "=")) {
                         n := Trim(SubStr(rest, 1, eq - 1)), v := Trim(SubStr(rest, eq + 1))
-                        el.setAttribute(n, v), this.Log("ok"), this._FillTab(1)
+                        el.setAttribute(n, v), this.EvLogger("ok"), this._FillTab(1)
                     } else
-                        this.Log(AxWindow._Attr(el, rest))
+                        this.EvLogger(AxWindow._Attr(el, rest))
                 case "css":
                     if !needs()
                         return
                     c := InStr(rest, ":")
                     if !c
-                        return this.Log("css prop: value", "e")
+                        return this.EvLogger("css prop: value", "e")
                     el.style.setAttribute(AxInspector._Camel(Trim(SubStr(rest, 1, c - 1))),
                                           Trim(SubStr(rest, c + 1)))
-                    this.Log("ok")
+                    this.EvLogger("ok")
                 case "class":
                     if !needs()
                         return
                     op := SubStr(rest, 1, 1), nm := Trim(SubStr(rest, 2))
                     if (op != "+" && op != "-")
-                        return this.Log("class +name  or  class -name", "e")
-                    AxWindow._SetClass(el, nm, op = "+"), this.Log("ok"), this._FillTab(1)
+                        return this.EvLogger("class +name  or  class -name", "e")
+                    AxWindow._SetClass(el, nm, op = "+"), this.EvLogger("ok"), this._FillTab(1)
                 case "value":
                     if !needs()
                         return
                     id := AxWindow._Attr(el, "id")
                     if (id = "")
-                        return this.Log("the selection has no id", "e")
-                    this.T.Value(id, rest), this.Log("ok")
+                        return this.EvLogger("the selection has no id", "e")
+                    this.T.Value(id, rest), this.EvLogger("ok")
                 case "click":
                     if needs()
-                        el.click(), this.Log("ok")
+                        el.click(), this.EvLogger("ok")
                 case "focus":
                     if needs()
-                        el.focus(), this.Log("ok")
+                        el.focus(), this.EvLogger("ok")
                 case "toast":
-                    this.T.Toast(rest), this.Log("ok")
+                    this.T.Toast(rest), this.EvLogger("ok")
                 case "theme":
-                    this.T.SetTheme(rest), this.Log("ok")
+                    this.T.SetTheme(rest), this.EvLogger("ok")
                 case "accent":
-                    this.T.SetAccent(rest), this.Log("ok")
+                    this.T.SetAccent(rest), this.EvLogger("ok")
                 case "tint":
-                    this.T.SetTint(rest = "off" ? "" : rest), this.Log("ok")
+                    this.T.SetTint(rest = "off" ? "" : rest), this.EvLogger("ok")
                 default:
-                    this.Log("unknown verb " Chr(34) verb Chr(34) " -- try help", "e")
+                    this.EvLogger("unknown verb " Chr(34) verb Chr(34) " -- try help", "e")
             }
         } catch as e
-            this.Log(e.Message, "e")
+            this.EvLogger(e.Message, "e")
     }
     ; "background-color" -> "backgroundColor": IE's style object is camelCase
     static _Camel(prop) {

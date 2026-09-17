@@ -194,7 +194,7 @@ g.AddStatusBar([
 
 g.OnClose((*) => (CloseShape(), CloseHud()))
 g.Show()
-Log("Ready. Screen is " A_ScreenWidth "x" A_ScreenHeight ".")
+EvLogger("Ready. Screen is " A_ScreenWidth "x" A_ScreenHeight ".")
 
 
 ; ─────────────────────────────────────────────────────────────────────────────
@@ -206,10 +206,10 @@ SetAlpha(v) {
     v := Round(v)
     if (v >= 255) {
         WinSetTransparent("Off", g.Gui)
-        Log("Alpha off (window is no longer layered).")
+        EvLogger("Alpha off (window is no longer layered).")
     } else {
         WinSetTransparent(v, g.Gui)
-        Log("Alpha " v "/255 — note the text fades with the panel: this is not per-pixel.")
+        EvLogger("Alpha " v "/255 — note the text fades with the panel: this is not per-pixel.")
     }
     g.Status("msg", "Alpha " (v >= 255 ? "off" : v))
 }
@@ -255,7 +255,7 @@ OpenShape() {
     shapeWin.WaitReady()
     shapeWin.On("click", "btnClose", (*) => CloseShape())
     g.Text("BtnShape", "Close")
-    Log("Shaped window open (" shapeMode ").")
+    EvLogger("Shaped window open (" shapeMode ").")
     ApplyShape()
 }
 
@@ -266,7 +266,7 @@ CloseShape() {
     try shapeWin.Close()
     shapeWin := ""
     try g.Text("BtnShape", "Open")
-    Log("Shaped window closed.")
+    EvLogger("Shaped window closed.")
 }
 
 SetKey(hex) {
@@ -276,7 +276,7 @@ SetKey(hex) {
         shapeWin.SetBackColor(KEY)
     ApplyShape()
     g.Status("key", "key #" KEY)
-    Log("Key colour -> #" hex
+    EvLogger("Key colour -> #" hex
         . (hex = "FF00FE" ? " — watch the rounded corners fringe pink" : " — fringe reads as a dark edge"))
 }
 
@@ -284,7 +284,7 @@ SetShapeMode(v) {
     global shapeMode
     shapeMode := v
     ApplyShape()
-    Log("Shape mode -> " v)
+    EvLogger("Shape mode -> " v)
 }
 
 ; Clear whatever the last mode set, then apply the new one. Both mechanisms
@@ -307,7 +307,7 @@ ApplyShape() {
         ; non-client frame, and every region coordinate below is off by it.
         rc := Buffer(16, 0)
         DllCall("GetClientRect", "Ptr", hwnd, "Ptr", rc)
-        Log("apply " shapeMode ": win " w "x" h ", client "
+        EvLogger("apply " shapeMode ": win " w "x" h ", client "
             . NumGet(rc, 8, "Int") "x" NumGet(rc, 12, "Int"))
         ; Only the colour-key mode wants the page painted magenta; in the region
         ; modes nothing removes it, so it would just be a magenta window.
@@ -320,11 +320,11 @@ ApplyShape() {
             case "poly":
                 PolyRegion(hwnd, [[w // 2, 0], [w, h // 3], [w - 40, h], [40, h], [0, h // 3]])
             case "none":
-                Log("no shape: the window is a plain rectangle again")
+                EvLogger("no shape: the window is a plain rectangle again")
         }
         Repaint()
     } catch as e
-        Log("ApplyShape FAILED in " e.What ": " e.Message)
+        EvLogger("ApplyShape FAILED in " e.What ": " e.Message)
 }
 
 ; The page paints the key colour itself rather than leaving html/body
@@ -335,10 +335,10 @@ SetPageBg(w, color) {
     try {
         w.Doc.documentElement.style.backgroundColor := color
         w.Doc.body.style.backgroundColor := color
-        Log("page background -> " color
+        EvLogger("page background -> " color
             . " (body now reports " w.Doc.body.currentStyle.backgroundColor ")")
     } catch as e
-        Log("SetPageBg FAILED: " e.Message)
+        EvLogger("SetPageBg FAILED: " e.Message)
 }
 
 ; SetWindowRgn takes ownership of the region — deleting it here would be a
@@ -347,7 +347,7 @@ RoundRegion(hwnd, w, h, r) {
     rgn := DllCall("Gdi32\CreateRoundRectRgn", "Int", 0, "Int", 0,
                    "Int", w + 1, "Int", h + 1, "Int", r, "Int", r, "Ptr")
     ok := DllCall("User32\SetWindowRgn", "Ptr", hwnd, "Ptr", rgn, "Int", 1)
-    Log("CreateRoundRectRgn -> " (rgn ? "ok" : "NULL")
+    EvLogger("CreateRoundRectRgn -> " (rgn ? "ok" : "NULL")
         . " | SetWindowRgn -> " (ok ? "ok" : "FAILED err " A_LastError))
 }
 
@@ -360,7 +360,7 @@ PolyRegion(hwnd, pts) {
     rgn := DllCall("Gdi32\CreatePolygonRgn", "Ptr", buf, "Int", pts.Length,
                    "Int", 1, "Ptr")            ; 1 = ALTERNATE
     ok := DllCall("User32\SetWindowRgn", "Ptr", hwnd, "Ptr", rgn, "Int", 1)
-    Log("CreatePolygonRgn -> " (rgn ? "ok" : "NULL")
+    EvLogger("CreatePolygonRgn -> " (rgn ? "ok" : "NULL")
         . " | SetWindowRgn -> " (ok ? "ok" : "FAILED err " A_LastError))
 }
 
@@ -369,7 +369,7 @@ PolyRegion(hwnd, pts) {
 SetShadow(on) {
     global shapeWin
     if !IsObject(shapeWin) {
-        Log("Open the shaped window first.")
+        EvLogger("Open the shaped window first.")
         return
     }
     if on
@@ -379,7 +379,7 @@ SetShadow(on) {
         DllCall("dwmapi\DwmExtendFrameIntoClientArea", "Ptr", shapeWin.Gui.Hwnd, "Ptr", m)
     }
     Repaint()
-    Log("Drop shadow " (on ? "on" : "off") " — watch whether it follows the shape.")
+    EvLogger("Drop shadow " (on ? "on" : "off") " — watch whether it follows the shape.")
 }
 
 Repaint() {
@@ -453,14 +453,14 @@ OpenHud() {
     ; the keyed pixels go transparent AND stop hit-testing, which is the whole
     ; trick: no WS_EX_TRANSPARENT needed for the gaps to pass clicks through
     WinSetTransColor(KEY, hudWin.Gui)
-    hudWin.On("click", "hudBtn", (*) => (Log("HUD button clicked — painted pixels still hit-test."),
+    hudWin.On("click", "hudBtn", (*) => (EvLogger("HUD button clicked — painted pixels still hit-test."),
                                           hudWin.Html("hudMsg", "clicked at " FormatTime(, "HH:mm:ss")),
                                           Repaint()))
     hudWin.On("click", "hudClose", (*) => CloseHud())
     SetTimer(HudClock, 1000)
     Hotkey("~Escape", (*) => CloseHud(), "On")
     g.Text("BtnHud", "Close")
-    Log("Overlay open. Click a card, then click the desktop through a gap.")
+    EvLogger("Overlay open. Click a card, then click the desktop through a gap.")
 }
 
 CloseHud() {
@@ -473,7 +473,7 @@ CloseHud() {
     hudWin := ""
     try g.Text("BtnHud", "Open")
     try g.Ctl("PassAll").Checked := false
-    Log("Overlay closed.")
+    EvLogger("Overlay closed.")
 }
 
 ; A layered window does not re-composite just because Trident repainted a
@@ -494,11 +494,11 @@ HudClock() {
 SetPassThrough(on) {
     global hudWin
     if !IsObject(hudWin) {
-        Log("Open the overlay first.")
+        EvLogger("Open the overlay first.")
         return
     }
     WinSetExStyle((on ? "+" : "-") "0x20", hudWin.Gui)
-    Log("WS_EX_TRANSPARENT " (on ? "on — the cards have stopped responding too."
+    EvLogger("WS_EX_TRANSPARENT " (on ? "on — the cards have stopped responding too."
                                 : "off — the cards are live again."))
 }
 
@@ -583,7 +583,7 @@ HudHtml() {
 ;  Console
 ; ─────────────────────────────────────────────────────────────────────────────
 
-Log(msg) {
+EvLogger(msg) {
     global g, logBox
     if (!IsObject(g) || !g.Ready)
         return

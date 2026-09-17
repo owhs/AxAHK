@@ -88,7 +88,7 @@ class AxActs {
         case "Progress":
             AxActs._A(out, "prg.drive", "Drive it from a timer")
         case "Console":
-            AxActs._A(out, "log.fn", "Add a Log() helper that writes to it")
+            AxActs._A(out, "log.fn", "Add a Logger() helper that writes to it")
         case "AutoComplete":
             AxActs._A(out, "opt.fill", "Fill its suggestions from code")
         case "Image", "Picture":

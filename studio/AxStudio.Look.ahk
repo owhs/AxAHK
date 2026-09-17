@@ -383,7 +383,7 @@ class AxLook {
             s.SetExtraCss("axdSpecCss", AxStudio.Unleak(comp spec own, comp spec, "#axdSpec") comp spec)
             AxLook.ShowLooks(s, el, o)
         } catch as e
-            s.Log("Look preview: " e.Message)
+            s.EventLogger("Look preview: " e.Message)
     }
     ; A colour left to the look shows the look's colour, read off the window in
     ; the middle, instead of an empty hatch: the swatch and, faintly, its hex.

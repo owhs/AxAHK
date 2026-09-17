@@ -54,7 +54,7 @@ g := AxGui({
 
 LogLines := 0
 
-Log(msg) {
+EvLogger(msg) {
     global logBox, LogLines
     if (!g.Ready)
         return
@@ -103,13 +103,13 @@ ShowNotifyResult(arg, label) {
             . "This rich dialog is the in-UI result that follows the Windows toast.",
             "Notification result: " label, ["OK"], {Kind: kind})
     }
-    Log("Notify click -> " arg " / " label)
+    EvLogger("Notify click -> " arg " / " label)
 }
 
 ShowNotifyDismiss(reason) {
     g.Dialog("The notification was dismissed.`nReason: " reason ".`n(no button was pressed)",
         "Notification dismissed", ["OK"], {Kind: "info"})
-    Log("Notify dismiss -> " reason)
+    EvLogger("Notify dismiss -> " reason)
 }
 
 ; ------------------------------------------------------------------------------
@@ -197,7 +197,7 @@ ToggleOnTop() {
     g.AlwaysOnTop(g._onTop)
     try g.Value("swAOT", g._onTop)
     g.Status("msg", g._onTop ? "Always on top" : "Ready")
-    Log("Always on top: " (g._onTop ? "ON" : "OFF"))
+    EvLogger("Always on top: " (g._onTop ? "ON" : "OFF"))
 }
 
 SheetIs(name) => AxGui.SheetName(g.HasOwnProp("Stylesheet") ? g.Stylesheet : "win11") = name
@@ -211,7 +211,7 @@ SetSheet(name) {
     g.SetStylesheet(name)
     try g.Value("ddSheet", name)             ; the menu and the dropdown stay in step
     SyncSchemes()
-    Log("Stylesheet -> " name)
+    EvLogger("Stylesheet -> " name)
 }
 ; the classic schemes are only meaningful on win98, so the picker follows the
 ; stylesheet: live there, greyed out everywhere else, and the layer is dropped
@@ -231,7 +231,7 @@ SetReveal(mode) {
     g.ShowMenuBar(mode = "always")
     g.Value("rgMenuBar", mode)
     g.Status("hint", mode = "alt" ? "Tap Alt" : "")
-    Log("Menu bar -> " (mode = "always" ? "always visible" : "hidden until Alt"))
+    EvLogger("Menu bar -> " (mode = "always" ? "always visible" : "hidden until Alt"))
 }
 
 
@@ -254,7 +254,7 @@ g.Use()
 sec := Section("This window")
 g.AddRow("NoCard Icon=E718", "Always on top", "WinSetAlwaysOnTop, from a toggle switch")
 g.AddSwitch("vswAOT")
-    .OnChange((c, v, *) => (g._onTop := v, g.AlwaysOnTop(v), Log("Always on top: " (v ? "ON" : "OFF"))))
+    .OnChange((c, v, *) => (g._onTop := v, g.AlwaysOnTop(v), EvLogger("Always on top: " (v ? "ON" : "OFF"))))
 sec.Use()
 Rule()
 g.AddRow("NoCard Icon=E700", "Menu bar", "Always there, or tucked away until Alt is tapped")
@@ -311,44 +311,44 @@ g.AddButton("x+8 Disabled", "Disabled")
 g.AddButton('x+8 Icon Icon=E713 Tip="An icon button"', "")
     .OnClick((*) => g.Toast("Icon button"))
 g.AddLink("x+16", "Hyperlink button")
-    .OnClick((*) => Log("Hyperlink clicked"))
+    .OnClick((*) => EvLogger("Hyperlink clicked"))
 g.Use()
 
 Section("Toggles", "A switch, check boxes and a radio group; Change hands AHK the new value.")
 g.AddSwitch("vswDemo Checked")
-    .OnChange((c, v, *) => Log("Switch -> " (v ? "On" : "Off")))
+    .OnChange((c, v, *) => EvLogger("Switch -> " (v ? "On" : "Off")))
 g.AddCheckBox("x+24 vchkDemo Checked", "Enable notifications")
-    .OnChange((c, v, *) => Log("Checkbox -> " v))
+    .OnChange((c, v, *) => EvLogger("Checkbox -> " v))
 g.AddCheckBox("x+16", "Use system sound")
 g.AddRadio("vrgSize Choose2", "small:Small|default:Default|large:Large")
-    .OnChange((c, v, *) => Log("Radio -> " v))
+    .OnChange((c, v, *) => EvLogger("Radio -> " v))
 g.Use()
 
 Section("Segmented control and rating", "One of a few, as a strip of buttons; and stars, with the value beside them.")
 g.AddSegmented("vsegView Choose1", "grid:Grid:E80A|list:List:E8FD|details:Details:E9D5")
-    .OnChange((c, v, *) => Log("View -> " v))
+    .OnChange((c, v, *) => EvLogger("View -> " v))
 g.AddRating("x+32 vrateDemo out=rateOut", 3)
-    .OnChange((c, v, *) => Log("Rating -> " v))
+    .OnChange((c, v, *) => EvLogger("Rating -> " v))
 g.AddText("vrateOut x+8 Caption", "3")
 g.Use()
 
 Section("Chips", "Click one to switch it on or off — a filter bar is a row of these.")
 for i, n in ["Documents", "Pictures", "Music", "Video", "Archives"]
     g.AddChip((i = 1 ? "On" : "x+8"), n)
-        .OnClick((c, *) => (g.ToggleClass(c.Id, "on"), Log("Chip -> " c.Text)))
+        .OnClick((c, *) => (g.ToggleClass(c.Id, "on"), EvLogger("Chip -> " c.Text)))
 g.Use()
 
 Section("Pick from a list", "A dropdown (AddDDL — or AddDropDownList and AddComboBox, Gui's own names) and a list box.")
 g.AddText("w90", "User role")
 g.AddDDL("vddRole x+8 w180 Choose1", "admin:Administrator|editor:Editor|viewer:Viewer")
-    .OnChange((c, v, *) => Log("Role -> " v))
+    .OnChange((c, v, *) => EvLogger("Role -> " v))
 g.AddText("x+32 w70", "Text size")
 g.AddDropDownList("vddSize x+8 w150 Choose1", "auto:Auto|small:Small|default:Default|large:Large|125:Custom 125%")
-    .OnChange((c, v, *) => Log("Text size -> " v))
+    .OnChange((c, v, *) => EvLogger("Text size -> " v))
 lst := g.AddListBox("vlstLang w300 Choose1",
     "en-US:English (US)|en-GB:English (UK)|es:Español|de:Deutsch|fr:Français")
 lstOut := g.AddText("x+24 Hint", "Selected: en-US")
-lst.OnChange((c, v, *) => (lstOut.Text := "Selected: " v, Log("Language -> " v)))
+lst.OnChange((c, v, *) => (lstOut.Text := "Selected: " v, EvLogger("Language -> " v)))
 g.Use()
 
 
@@ -372,14 +372,14 @@ g.AddSearch('vtxtSearch x+8 Fill Placeholder="Search your files"')
 g.AddText("w140", "City")
 g.AddAutoComplete('vacCity x+8 Fill placeholder="Suggestions as you type; any text is fine"',
     "London|Paris|Berlin|Madrid|Rome|Lisbon|Vienna|Prague|Dublin|Oslo")
-    .OnChange((c, v, *) => Log("City -> " v))
+    .OnChange((c, v, *) => EvLogger("City -> " v))
 g.AddText("w140", "Country")
 g.AddAutoComplete('vacCountry x+8 Fill Strict placeholder="Strict: only a listed country sticks"',
     "gb:United Kingdom|fr:France|de:Germany|es:Spain|it:Italy|pt:Portugal|at:Austria|cz:Czechia|ie:Ireland|no:Norway")
-    .OnChange((c, v, *) => Log("Country -> " (v = "" ? "(cleared)" : v)))
+    .OnChange((c, v, *) => EvLogger("Country -> " (v = "" ? "(cleared)" : v)))
 g.AddText("w140", "Start date")
 g.AddDate('vdtStart x+8 Placeholder="Type a date or pick one"', "today")
-    .OnChange((c, v, *) => Log("Start date -> " (v = "" ? "(cleared)" : v)))
+    .OnChange((c, v, *) => EvLogger("Start date -> " (v = "" ? "(cleared)" : v)))
 g.AddText("x+12 Hint", "try “next mon” or “+2w”")
 g.AddText("w140", "Notes")
 notes := g.AddEdit("vtxtNotes x+8 Fill Rows=3", "Type here — AHK reads every keystroke.")
@@ -391,7 +391,7 @@ form.Use()                                  ; out of the group box, still in the
 g.AddGroupBox("", "Region")
 region := g.AddRadio("vrgRegion Vertical Choose1",
     "en-US:English (US)|en-GB:English (UK)|es-ES:Español (ES)")
-region.OnChange((c, v, *) => Log("Region -> " v))
+region.OnChange((c, v, *) => EvLogger("Region -> " v))
 form.Use()
 g.AddGroupBox("", "Display")
 g.AddText("w140", "Scale")
@@ -403,7 +403,7 @@ g.AddSwitch("x+8 Checked")
 form.Use()
 g.AddButton("Accent", "Apply")
     .OnClick((*) => (
-        Log("Apply: profile=" profile.Value " scale=" scale.Value " region=" region.Value
+        EvLogger("Apply: profile=" profile.Value " scale=" scale.Value " region=" region.Value
             . " start=" g.Value("dtStart")),
         g.Toast("Settings applied", 2000, "success")))
 g.AddButton("x+8", "Restore defaults")
@@ -415,17 +415,17 @@ g.Use()
 sec := Section("Numbers and ranges")
 g.AddRow("NoCard Icon=E81C", "Refresh every", "Up and Down step 5; with Shift 30, with Ctrl 1 — or type it")
 g.AddNumber('vnbInterval Min=1 Max=120 Step=5 BigStep=30 SmallStep=1 Suffix=" min"', 15)
-    .OnChange((c, v, *) => Log("Interval -> " v " min"))
+    .OnChange((c, v, *) => EvLogger("Interval -> " v " min"))
 sec.Use()
 Rule()
 g.AddRow("NoCard Icon=E767", "Volume", "A slider, with its value beside it")
 g.AddSlider('vslVolume w240 Suffix="%"', 75)
-    .OnChange((c, v, *) => Log("Volume -> " v "%"))
+    .OnChange((c, v, *) => EvLogger("Volume -> " v "%"))
 sec.Use()
 Rule()
 g.AddRow("NoCard Icon=E9E9", "Price range", "Two thumbs: drag either, or press the track and the nearer one jumps")
 g.AddRangeSlider("vrsPrice w240 Min=0 Max=1000 Step=10 Prefix=$", "200,750")
-    .OnChange((c, v, *) => Log("Price range -> $" StrReplace(v, ",", " to $")))
+    .OnChange((c, v, *) => EvLogger("Price range -> $" StrReplace(v, ",", " to $")))
 g.Use()
 
 Section("Tags", "Each tag is a chip. Double-click one to edit it; paste a list and every item becomes a chip; "
@@ -450,12 +450,12 @@ g.AddText("Hint", "Split= says what ends a tag as you type (Split=" Chr(34) "com
     . "Clear adds the x at the end of the box. The value is one string, the tags joined by |.")
 g.Use()
 
-TagsSay(what, v) => Log(what " -> " (v = "" ? "(none)" : StrReplace(v, "|", ", ")))
+TagsSay(what, v) => EvLogger(what " -> " (v = "" ? "(none)" : StrReplace(v, "|", ", ")))
 
 Section("Hotkey box", "Click it and press a combination; AHK binds it at once, and pressing it anywhere shows a toast.")
 hk := g.AddHotkey("vhkDemo", "^!h")
 hk.OnEvent("Hotkey", (c) => g.Toast("Hotkey " AxWindow.HotkeyDisplay(c.Value) " pressed", 2000, "success"))
-hk.OnChange((c, v, *) => Log("Hotkey -> " (v = "" ? "(none)" : v)))
+hk.OnChange((c, v, *) => EvLogger("Hotkey -> " (v = "" ? "(none)" : v)))
 g.AddText("x+16 Hint", "Backspace or the x clears it, which unbinds it too.")
 g.Use()
 
@@ -524,14 +524,14 @@ g.Use()
 IsoStamp(v) => SubStr(RegExReplace(v, "\D") "00000000000000", 1, 14)
 
 DateSays(what, v) {
-    Log(what " -> " (v = "" ? "(cleared)" : v))
+    EvLogger(what " -> " (v = "" ? "(cleared)" : v))
     g.Status("msg", what ": " (v = "" ? "none" : v))
 }
 StaySays(v) {
     days := g.Ctl("dtStay").Component.Days
     stayOut.Text := (v = "" || !days) ? "No range yet."
         : StrReplace(v, "/", " to ") "  ·  " days " day" (days = 1 ? "" : "s")
-    Log("Holiday -> " (v = "" ? "(cleared)" : v))
+    EvLogger("Holiday -> " (v = "" ? "(cleared)" : v))
 }
 CalendarSays(v) {
     if (v = "")
@@ -540,12 +540,12 @@ CalendarSays(v) {
     n := DateDiff(ts, FormatTime(, "yyyyMMdd"), "Days")
     calOut.Text := FormatTime(ts, "dddd, d MMMM yyyy") " — "
         . (n = 0 ? "today" : n = 1 ? "tomorrow" : n = -1 ? "yesterday" : n > 0 ? "in " n " days" : -n " days ago")
-    Log("Calendar -> " v)
+    EvLogger("Calendar -> " v)
 }
 PickDateSays(opts) {
     v := g.PickDate(opts)
     pickOut.Text := (v = "") ? "Cancelled." : "Picked " StrReplace(v, "/", " to ")
-    Log("PickDate(" opts.Mode ") -> " (v = "" ? "(cancelled)" : v))
+    EvLogger("PickDate(" opts.Mode ") -> " (v = "" ? "(cancelled)" : v))
 }
 
 
@@ -608,7 +608,7 @@ g.AddButton("", "Tick all")
 g.AddButton("x+8", "Clear ticks")
     .OnClick((*) => g.Ctl("dvFiles").Component.CheckAll(false))
 g.AddButton("x+8", "Ticked to console")
-    .OnClick((*) => Log("Ticked: " (Join(g.Ctl("dvFiles").Component.CheckedKeys()) || "(none)")))
+    .OnClick((*) => EvLogger("Ticked: " (Join(g.Ctl("dvFiles").Component.CheckedKeys()) || "(none)")))
 g.AddButton("x+8", "Select the pictures")
     .OnClick((*) => SelectPictures())
 g.AddButton("", "Sort by size")
@@ -627,7 +627,7 @@ SelectPictures() {
         if (r.kind = "Picture")
             keys.Push(r.Key)
     g.Value("dvFiles", keys)
-    Log("Selected " keys.Length " pictures through Value()")
+    EvLogger("Selected " keys.Length " pictures through Value()")
 }
 
 Section("Tree", "A row with Children is a branch, and filtering opens the path to a hit. CheckTree makes a branch "
@@ -682,9 +682,9 @@ for r in FileRows
 lvNative.ModifyCol()                        ; every column fitted to what is in it, as on Gui
 lvNative.ModifyCol(2, "Integer")
 lvNative.ModifyCol(1, "Sort")
-lvNative.OnEvent("DoubleClick", (lv, row) => row ? Log("Row " row ": " lv.GetText(row)) : "")
-lvNative.OnEvent("ItemCheck", (lv, row, on) => Log(lv.GetText(row) (on ? " ticked" : " unticked")))
-lvNative.OnEvent("ColClick", (lv, col) => Log("Sorted by " lv.GetText(0, col)))
+lvNative.OnEvent("DoubleClick", (lv, row) => row ? EvLogger("Row " row ": " lv.GetText(row)) : "")
+lvNative.OnEvent("ItemCheck", (lv, row, on) => EvLogger(lv.GetText(row) (on ? " ticked" : " unticked")))
+lvNative.OnEvent("ColClick", (lv, col) => EvLogger("Sorted by " lv.GetText(0, col)))
 
 tvNative := g.AddTreeView("vtvNative x+16 w240 h250 Checked")
 libItem := tvNative.Add("lib", 0, "Expand")
@@ -696,8 +696,8 @@ for f in ["win11.css", "win98.css", "winxp.css"]
 exampleItem := tvNative.Add("example")
 tvNative.Add("Showcase.ahk", exampleItem, "Select")
 tvNative.Add("Todo.ahk", exampleItem)
-tvNative.OnEvent("ItemSelect", (tv, id) => Log("Tree: " TreePath(tv, id)))
-tvNative.OnEvent("ItemCheck", (tv, id, on) => Log(TreePath(tv, id) (on ? " ticked" : " unticked")))
+tvNative.OnEvent("ItemSelect", (tv, id) => EvLogger("Tree: " TreePath(tv, id)))
+tvNative.OnEvent("ItemCheck", (tv, id, on) => EvLogger(TreePath(tv, id) (on ? " ticked" : " unticked")))
 
 g.AddButton("", "Ticked to console").OnClick((*) => LogTicked(lvNative))
 g.AddButton("x+8", "Add a row").OnClick((*) => lvNative.Add("Select Vis", "new-" A_TickCount ".txt", 0, "Document"))
@@ -717,13 +717,13 @@ LogTicked(lv) {
     out := "", row := 0
     while (row := lv.GetNext(row, "C"))
         out .= (out = "" ? "" : ", ") lv.GetText(row)
-    Log("Ticked: " (out != "" ? out : "(none)"))
+    EvLogger("Ticked: " (out != "" ? out : "(none)"))
 }
 DeleteSelected(lv) {
     n := 0
     while (row := lv.GetNext(0))
         lv.Delete(row), n++
-    Log("Deleted " n " row" (n = 1 ? "" : "s"))
+    EvLogger("Deleted " n " row" (n = 1 ? "" : "s"))
 }
 OpenTree(tv) {
     id := 0
@@ -755,7 +755,7 @@ sec := Section("Setting rows", "AddRow is an icon, a title, a line under it and 
     . "NoCard rows share one card, with a Separator between them — as here.")
 g.AddRow("NoCard Icon=E7C1", "Notifications", "From apps and from Windows")
 g.AddSwitch("vswNotify Checked")
-    .OnChange((c, v, *) => Log("Notifications -> " (v ? "on" : "off")))
+    .OnChange((c, v, *) => EvLogger("Notifications -> " (v ? "on" : "off")))
 sec.Use()
 Rule()
 g.AddRow("NoCard Icon=E706", "Brightness", "The built-in display")
@@ -769,7 +769,7 @@ g.Use()
 Section("Group box", "A legend over a frame, as on Gui.")
 g.AddGroupBox("", "Delivery")
 g.AddRadio("vrgShip Choose1", "std:Standard (3–5 days)|fast:Express (next day)|pick:Collect in store")
-    .OnChange((c, v, *) => Log("Delivery -> " v))
+    .OnChange((c, v, *) => EvLogger("Delivery -> " v))
 g.AddCheckBox("", "Leave it with a neighbour if nobody is in")
 g.Use()
 g.Use()
@@ -789,7 +789,7 @@ g.Use()
 
 Section("Tabs", "Every tab is a box of its own: UseTab(n) fills it, and OnChange tells AHK which one is showing.")
 lt := g.AddTab("vtabsLayout", ["General:E713", "Sharing:E72D", "History:E81C"])
-g.Ctl("tabsLayout").OnChange((c, v, *) => Log("Tab -> " v))
+g.Ctl("tabsLayout").OnChange((c, v, *) => EvLogger("Tab -> " v))
 lt.UseTab(1)
 g.AddText("", "Show this folder in Quick access")
 g.AddSwitch("x+12 Checked")
@@ -806,7 +806,7 @@ crumb := g.AddBreadcrumb("vcrumb Home", "root:AHK2-ActiveX-Gui")
 crumb.OnChange((c, v, *) => CrumbBack(v))
 spTree := g.AddTreeView("vspTree w240 h260")
 g.AddSplitter('vspV x+4 Target=spTree Min=150 Max=460 Tip="Drag to resize the tree"')
-    .OnChange((c, v, *) => Log("Tree pane -> " v "px"))
+    .OnChange((c, v, *) => EvLogger("Tree pane -> " v "px"))
 spList := g.AddListView("vspList x+4 h260 Style=min-width:200px", "Name|Size|Modified")
 spOut := g.AddText("vspOut Hint", "The splitter sizes the pane before it; the list fills the line, so it takes the rest.")
 g.Use()
@@ -853,7 +853,7 @@ g.AddCard('vspTop h110 Style="overflow:auto"', "Top pane")
 g.AddText("Hint", "OnChange hands the new height to AHK once you let go, and g.SplitterSize(id) reads or sets it from code.")
 sec.Use()
 g.AddSplitter("vspH Horizontal Target=spTop Min=60 Max=320")
-    .OnChange((c, v, *) => Log("Top pane -> " v "px"))
+    .OnChange((c, v, *) => EvLogger("Top pane -> " v "px"))
 g.AddCard("", "Bottom pane")
 g.AddButton("", "Top pane to 200px").OnClick((*) => g.SplitterSize("spH", 200))
 g.AddButton("x+8", "Back to 110px").OnClick((*) => g.SplitterSize("spH", 110))
@@ -872,7 +872,7 @@ g.Use()
 StepSays(n) {
     st := g.Ctl("steps").Component
     stepOut.Text := st.IsDone ? "All four done." : "Step " n " of " st.Count ": " st.List[n].L
-    Log("Steps -> " (st.IsDone ? "finished" : n))
+    EvLogger("Steps -> " (st.IsDone ? "finished" : n))
 }
 
 
@@ -968,7 +968,7 @@ CycleStatus() {
     states := ["online", "away", "busy", "offline"]
     AdaStatus := Mod(AdaStatus, states.Length) + 1
     g.Ctl("av1").Component.SetStatus(states[AdaStatus])
-    Log("Ada Lovelace is " states[AdaStatus])
+    EvLogger("Ada Lovelace is " states[AdaStatus])
 }
 
 ; -- the readings --------------------------------------------------------------
@@ -1061,18 +1061,18 @@ g.Use()
 Section("Image buttons", "A picture is a control like any other — these three are clickable, and the last is "
     . "a plain button with an <svg> glyph in it, coloured by currentColor.")
 g.AddImageButton('vbtnPic1 w72 h72 Fit=contain Tip="assets/logo.png"', "assets/logo.png")
-    .OnClick((*) => (g.Toast("Logo button", 1600), Log("Image button -> logo.png")))
+    .OnClick((*) => (g.Toast("Logo button", 1600), EvLogger("Image button -> logo.png")))
 g.AddImageButton('vbtnPic2 x+8 w72 h72 Round Tip="assets/photo.jpg (round, cropped)"', "assets/photo.jpg")
-    .OnClick((*) => (g.Toast("Round photo button", 1600), Log("Image button -> photo.jpg")))
+    .OnClick((*) => (g.Toast("Round photo button", 1600), EvLogger("Image button -> photo.jpg")))
 g.AddImageButton('vbtnPic3 x+8 w72 h72 Fit=contain Tip="assets/badge.svg"', "assets/badge.svg")
-    .OnClick((*) => (g.Toast("SVG button", 1600, "success"), Log("Image button -> badge.svg")))
+    .OnClick((*) => (g.Toast("SVG button", 1600, "success"), EvLogger("Image button -> badge.svg")))
 g.AddHtml("x+24",
     '<span class="btn accent" id="btnSvgIcon" tabindex="0">'
     . '<svg width="14" height="14" viewBox="0 0 16 16" style="vertical-align:-2px">'
     . '<path d="M8 1l2.1 4.5 4.9.6-3.6 3.4.9 4.9L8 12.1 3.7 14.4l.9-4.9L1 6.1l4.9-.6z" fill="currentColor"/>'
     . '</svg><span style="margin-left:8px">Inline SVG icon</span></span>')
 g.On("click", "btnSvgIcon", (*) => (g.Toast("An <svg> glyph inside an ordinary button", 2200),
-    Log("Inline SVG button clicked")))
+    EvLogger("Inline SVG button clicked")))
 g.Use()
 
 Section("A plain picture", "AddPicture, Gui's own name for it, writes an <img> and nothing more: give it a "
@@ -1105,12 +1105,12 @@ LoadImageUrl(url) {
     if (url = "")
         return
     urlStatus.Text := "Loading " url " …"
-    Log("Image request: " url)
+    EvLogger("Image request: " url)
     g.SetImage("imgUrl", url, {
         Timeout: 8000,
-        OnLoad:  (id, src) => (urlStatus.Text := "Loaded: " src, Log("Image loaded: " src),
+        OnLoad:  (id, src) => (urlStatus.Text := "Loaded: " src, EvLogger("Image loaded: " src),
             g.Toast("Image loaded", 1800, "success")),
-        OnError: (id, src) => (urlStatus.Text := "Failed: " src, Log("Image failed: " src),
+        OnError: (id, src) => (urlStatus.Text := "Failed: " src, EvLogger("Image failed: " src),
             g.Toast("Could not load that image", 2800, "error"))
     })
 }
@@ -1166,7 +1166,7 @@ ShuffleBars() {
     BarValues := fresh
     UpdateBars()
     SelectBar(BarPicked)
-    Log("SVG chart shuffled -> " Join(BarValues))
+    EvLogger("SVG chart shuffled -> " Join(BarValues))
 }
 
 SelectBar(n) {
@@ -1175,7 +1175,7 @@ SelectBar(n) {
         g.Attr("bar" A_Index, "fill", A_Index = n ? "#60cdff" : "#3a6ea5")
     chartOut.Text := n ? (BarNames[n] " = " BarValues[n]) : "No bar selected."
     if n
-        Log("SVG bar -> " BarNames[n] " = " BarValues[n])
+        EvLogger("SVG bar -> " BarNames[n] " = " BarValues[n])
 }
 
 SetBarRadius(r) {
@@ -1194,7 +1194,7 @@ g.AddDropZone('vdzImages Accept=images Browse Icon=EB9F '
 g.AddText("vdzImagesCount Hint", "")
 strip := g.AddThumbs("vimgStrip h240", "Dropped pictures land here.")
 ; through SetDropped: an assignment inside a fat arrow would only make a local
-strip.OnChange((c, order, *) => (SetDropped(order), Log("Thumbnails -> " order.Length " left")))
+strip.OnChange((c, order, *) => (SetDropped(order), EvLogger("Thumbnails -> " order.Length " left")))
 shotCount := g.AddText("vshotCount Caption", "0 pictures")
 g.AddButton("x+16 Subtle", "Clear all")
     .OnClick((*) => (SetDropped([]), strip.SetThumbs([])))
@@ -1212,7 +1212,7 @@ AddDroppedImages(files, id := "", info := "") {
     strip.SetThumbs(DroppedImages, {Size: 108, Removable: true, IdPrefix: "shot"})
     UpdateShotCount()
     g.Text("dzImagesCount", "")
-    Log("Images dropped: " files.Length " (" DroppedImages.Length " in the strip)")
+    EvLogger("Images dropped: " files.Length " (" DroppedImages.Length " in the strip)")
     g.Toast(files.Length " picture" (files.Length = 1 ? "" : "s") " added", 2000, "success")
 }
 
@@ -1236,7 +1236,7 @@ g.Use()
 
 AxNavigate(dir) {
     try g.Ctl("axAssets").Object.Navigate(dir)
-    Log("ActiveX -> " dir)
+    EvLogger("ActiveX -> " dir)
 }
 ; A folder view takes Explorer a quarter of a second to open -- as long as the
 ; rest of this window's start put together -- so it opens when its page is
@@ -1287,7 +1287,7 @@ g.Use()
 ShowFolder(files, id := "", info := "") {
     global CurrentFolder := files[1]
     RefreshFolder()
-    Log("Folder dropped: " CurrentFolder)
+    EvLogger("Folder dropped: " CurrentFolder)
 }
 
 PickFolder() {
@@ -1331,19 +1331,19 @@ Section("Zones that choose", "Each zone decides for itself what it will take, an
     . "of anything it will not.")
 g.AddDropZone('vdzText Accept=text Compact Browse Icon=E8A5 '
     . 'Desc="txt, log, md, csv, json, xml, ini, ahk…"', "Text files only")
-    .OnDrop((files, id, info) => (Log("Text zone <- " Join(files)),
+    .OnDrop((files, id, info) => (EvLogger("Text zone <- " Join(files)),
         g.Toast(files.Length " text file" (files.Length = 1 ? "" : "s"), 2000, "success")))
 g.AddDropZone('vdzOne Single Compact Icon=E7C3 '
     . 'Desc="Drop two or more and the zone turns red."', "Exactly one file")
-    .OnDrop((files, id, info) => (Log("Single-file zone <- " files[1]),
+    .OnDrop((files, id, info) => (EvLogger("Single-file zone <- " files[1]),
         g.Alert("You dropped a single file:`n`n" files[1], "One file")))
 g.AddDropZone('vdzScripts Accept="*.ahk;*.ahk2" Compact Browse Icon=E943 '
     . 'Desc="An explicit extension list instead of a named group."', "AutoHotkey scripts")
-    .OnDrop((files, id, info) => (Log("Script zone <- " Join(files)),
+    .OnDrop((files, id, info) => (EvLogger("Script zone <- " Join(files)),
         g.Toast(files.Length " script" (files.Length = 1 ? "" : "s") " accepted", 2000, "success")))
 g.AddDropZone('vdzExpand Expand Recurse Compact Icon=E8B7 '
     . 'Desc="Folders are unpacked into their files before the callback runs."', "Files, folders unpacked")
-    .OnDrop((files, id, info) => (Log("Expanding zone <- " files.Length " file(s)"),
+    .OnDrop((files, id, info) => (EvLogger("Expanding zone <- " files.Length " file(s)"),
         g.Toast(files.Length " file" (files.Length = 1 ? "" : "s") " after unpacking folders", 2600)))
 g.Use()
 
@@ -1359,7 +1359,7 @@ g.Use()
 
 ToggleAnywhereDrop(on) {
     if on {
-        g.DropZone("*", (files, id, info) => (Log("Window-wide drop (" files.Length "): " Join(files)),
+        g.DropZone("*", (files, id, info) => (EvLogger("Window-wide drop (" files.Length "): " Join(files)),
             g.Toast(files.Length " file" (files.Length = 1 ? "" : "s") " dropped on page '" g.CurrentPage "'", 2600)))
         g.Toast("Any file dropped on this window now reaches the console", 2600)
     } else {
@@ -1382,7 +1382,7 @@ for t in [
 g.Use()
 gridOrder := g.AddText("vgridOrder Hint", "")
 g.Ctl("gridTiles").OnChange((c, order, *) => (gridOrder.Text := "Order: " Join(order),
-    Log("Tiles -> " Join(order))))
+    EvLogger("Tiles -> " Join(order))))
 g.AddButton("Icon=E710", "Add a tile")
     .OnClick((*) => AddTile())
 g.Use()
@@ -1417,7 +1417,7 @@ AddTask() {
         return
     g.Append("listTasks", TaskHtml(txt))
     taskInput.Value := ""
-    Log("Task added: " txt)
+    EvLogger("Task added: " txt)
 }
 
 taskInput.OnEvent("KeyDown", (c, ev, *) => ev.keyCode = 13 ? AddTask() : "")
@@ -1440,7 +1440,7 @@ sec.Use()
 Rule()
 g.AddRow("NoCard Icon=E897", "Confirm", "Yes or No; the answer goes to the Console")
 g.AddButton("", "Show")
-    .OnClick((*) => Log("Confirm -> " (g.Confirm("Do you like custom dialogs?", "Question") ? "Yes" : "No")))
+    .OnClick((*) => EvLogger("Confirm -> " (g.Confirm("Do you like custom dialogs?", "Question") ? "Yes" : "No")))
 sec.Use()
 Rule()
 g.AddRow("NoCard Icon=E8AC", "Prompt", "A line of text — this one renames the window")
@@ -1450,7 +1450,7 @@ sec.Use()
 Rule()
 g.AddRow("NoCard Icon=E74D", "Custom", "Three buttons, a destructive default, Escape for Cancel")
 g.AddButton("Danger", "Delete…")
-    .OnClick((*) => Log("Delete dialog -> " g.Dialog(
+    .OnClick((*) => EvLogger("Delete dialog -> " g.Dialog(
         "This will permanently remove 3 items.`nThere is no undo.",
         "Delete items?",
         ["Delete", "Keep", "Cancel"],
@@ -1559,7 +1559,7 @@ g.Use()
 ClickSays(what) {
     g.Text("clickOut", what)
     g.Status("msg", what)
-    Log(what)
+    EvLogger(what)
 }
 
 
@@ -1575,7 +1575,7 @@ Lead("How the whole window looks: light or dark, one of twelve stylesheets, an a
 sec := Section("Theme")
 g.AddRow("NoCard Icon=E793", "App mode", "Dark, light, or follow the Windows setting")
 g.AddRadio("vrgTheme Choose2", "light:Light|dark:Dark|system:System")
-    .OnChange((c, v, *) => (g.SetTheme(v), Log("Theme -> " v " (" g.Theme ")")))
+    .OnChange((c, v, *) => (g.SetTheme(v), EvLogger("Theme -> " v " (" g.Theme ")")))
 sec.Use()
 Rule()
 sheetList := ""
@@ -1617,14 +1617,14 @@ g.AddButton("", "Use the Windows accent")
     .OnClick((*) => SetAccent(AxWindow.SystemAccent()))
 g.AddButton("x+8 Subtle", "Back to the default")
     .OnClick((*) => (g.SetAccent(""), g.Text("palAccent_hex", "default"),
-        Log("Accent -> the stylesheet's own")))
+        EvLogger("Accent -> the stylesheet's own")))
 g.Use()
 
 SetAccent(hex) {
     g.SetAccent(hex)
     g.Value("cbAccent", hex)
     try g.Text("palAccent_hex", hex)
-    Log("Accent -> " hex)
+    EvLogger("Accent -> " hex)
 }
 
 Section("The whole colour picker", "The wheel the swatch buttons open, as a control of its own: drag the ring "
@@ -1644,10 +1644,10 @@ g.Use()
 
 PickInto(hex, how) {
     if (hex = "")
-        return Log("Colour from the " how " -> cancelled")
+        return EvLogger("Colour from the " how " -> cancelled")
     g.Ctl("cpInline").Component.Value := hex
     g.Text("cpInlineOut", "Picked " hex)
-    Log("Colour from the " how " -> " hex)
+    EvLogger("Colour from the " how " -> " hex)
 }
 
 sec := Section("Surface tint", "Mixes a colour into every surface of the window.")
@@ -1667,7 +1667,7 @@ g.AddColorButton("vcbTint", "#4c4a48")
     .OnChange((c, v, *) => SetTint(v))
 sec.Use()
 g.AddButton("", "Follow the accent")
-    .OnClick((*) => (g.SetTint("accent", TintStrength), Log("Tint -> follows the accent")))
+    .OnClick((*) => (g.SetTint("accent", TintStrength), EvLogger("Tint -> follows the accent")))
 g.AddButton("x+8 Subtle", "No tint")
     .OnClick((*) => SetTint(""))
 g.Use()
@@ -1679,14 +1679,14 @@ TintStrength := 0.12
 SetTintStrength(pct) {
     global TintStrength := pct / 100
     g.SetTint(g.Tint = "" ? "accent" : g.Tint, TintStrength)
-    Log("Tint strength -> " pct "%")
+    EvLogger("Tint strength -> " pct "%")
 }
 
 SetTint(hex) {
     g.SetTint(hex, TintStrength)
     if (hex != "")
         g.Value("cbTint", hex)
-    Log("Tint -> " (hex = "" ? "none" : hex) " at " Round(TintStrength * 100) "%")
+    EvLogger("Tint -> " (hex = "" ? "none" : hex) " at " Round(TintStrength * 100) "%")
 }
 
 Schemes := Map(
@@ -1778,7 +1778,7 @@ SetScheme(name) {
     }
 
     g.SetExtraCss("scheme", g.Stylesheet = "win98" ? css : "")
-    Log("Classic scheme -> " name)
+    EvLogger("Classic scheme -> " name)
 }
 
 
@@ -1831,8 +1831,8 @@ g.AddButton("x+8", "Find and replace").OnClick((*) => scCode.Find("", true))
 scCode := g.AddCodeEditor("vscCode h300 Lang=ahk Theme=auto", CodeSamples["ahk"])
 scCode.UseAhk({Lint: true})              ; AutoHotkey's service; it stands aside for the other languages
 scLang.OnChange((c, v, *) => CodeLanguage(v))
-scTheme.OnChange((c, v, *) => (scCode.SetTheme(v), Log("Code editor theme -> " v)))
-scCode.OnEvent("Change", (c, text, *) => Log("Code: " StrLen(text) " characters"))
+scTheme.OnChange((c, v, *) => (scCode.SetTheme(v), EvLogger("Code editor theme -> " v)))
+scCode.OnEvent("Change", (c, text, *) => EvLogger("Code: " StrLen(text) " characters"))
 g.Use()
 
 Section("Rich text", "The toolbar, or Markdown as you type: `"# `" a heading, `"- `" a list, **bold**. `"/`" on an empty "
@@ -1841,7 +1841,7 @@ scNotes := g.AddRichText("vscNotes h300 Tools=full Format=md",
     "# Notes`n`nWrite **here** -- the Markdown comes out below as you go.`n`n- one`n- two`n`n"
     . "| Name | Done |`n| --- | --- |`n| Showcase | yes |")
 scMd := g.AddCodeEditor("vscMd h120 Preset=notes ReadOnly", "")
-scNotes.OnEvent("Change", (c, md, *) => (scMd.Value := md, Log("Rich text: " StrLen(md) " characters of Markdown")))
+scNotes.OnEvent("Change", (c, md, *) => (scMd.Value := md, EvLogger("Rich text: " StrLen(md) " characters of Markdown")))
 g.OnReady((*) => scMd.Value := scNotes.Value)
 g.Use()
 
@@ -1851,7 +1851,7 @@ CodeLanguage(lang) {
     scCode.SetLanguage(lang)
     if CodeSamples.Has(lang)
         scCode.Load(CodeSamples[lang])
-    Log("Code editor language -> " lang)
+    EvLogger("Code editor language -> " lang)
 }
 
 
@@ -1864,13 +1864,13 @@ g.AddPage("console", "Console", "E756")
 Lead("Everything the other pages did, as it happened.")
 logBox := g.AddConsole("vlogBox")
 
-ClearLog() {
+ClearEvLogger() {
     global LogLines := 0
     logBox.Text := "", g.Text("logCount", 0)
 }
 
 g.AddButton('Tip="Empties the log"', "Clear")
-    .OnClick((*) => ClearLog())
+    .OnClick((*) => ClearEvLogger())
 
 
 ; ==============================================================================
@@ -1884,7 +1884,7 @@ g.OnReady((app) => (
     app.El("listTasks").setAttribute("data-handle", "1"),
     app.Html("listTasks",
         TaskHtml("Review pull requests") TaskHtml("Write release notes") TaskHtml("Update dependencies")),
-    app.OnValue("listTasks", (order, *) => Log("Tasks -> " Join(order))),
+    app.OnValue("listTasks", (order, *) => EvLogger("Tasks -> " Join(order))),
     app.ContextMenu("*", [
         ["Home",            (*) => app.ShowPage("home")],
         ["Console",         (*) => app.ShowPage("console")],
@@ -1892,7 +1892,7 @@ g.OnReady((app) => (
         ["Toggle maximize", (*) => app.ToggleMaximize()],
         ["Exit",            (*) => app.Close()]
     ]),
-    app.OnPage((id, *) => Log("Page -> " id)),
+    app.OnPage((id, *) => EvLogger("Page -> " id)),
     app.OnPage((id, *) => app.Status("page", id)),
     app.OnPage((id, *) => id = "status" ? StatusTick() : ""),
     app.Status("page", app.CurrentPage),
@@ -1902,7 +1902,7 @@ g.OnReady((app) => (
         app.Status("clock", FormatTime(, "HH:mm:ss"))), 1000),
     SysCpu(),                                   ; the first reading only sets the baseline
     SetTimer(StatusTick, 1000),
-    Log("Ready. Trident document mode: " app.DocMode)
+    EvLogger("Ready. Trident document mode: " app.DocMode)
 ))
 
 WireDataViews(app) {
@@ -1910,14 +1910,14 @@ WireDataViews(app) {
     lv.OnSelect((rows, dv) => dvOut.Text := rows.Length
         ? rows.Length " selected: " Join(Names(rows))
         : "Nothing selected.")
-    lv.OnCheck((rows, dv) => Log("Ticked " rows.Length " file" (rows.Length = 1 ? "" : "s")))
-    lv.OnActivate((row, dv) => (g.Toast("Opening " row.name, 2000), Log("Activated " row.name)))
-    lv.OnSort((key, dir, dv) => Log("Sorted by " key " " (dir > 0 ? "ascending" : "descending")))
-    lv.OnPage((n, dv) => Log("Page " n))
+    lv.OnCheck((rows, dv) => EvLogger("Ticked " rows.Length " file" (rows.Length = 1 ? "" : "s")))
+    lv.OnActivate((row, dv) => (g.Toast("Opening " row.name, 2000), EvLogger("Activated " row.name)))
+    lv.OnSort((key, dir, dv) => EvLogger("Sorted by " key " " (dir > 0 ? "ascending" : "descending")))
+    lv.OnPage((n, dv) => EvLogger("Page " n))
     tv := app.Ctl("dvTree").Component
     tv.OnSelect((rows, dv) => treeOut.Text := rows.Length ? "Selected: " rows[1].name : "Nothing selected.")
-    tv.OnExpand((row, open, dv) => Log("Tree " (open ? "opened " : "closed ") row.name))
-    Log("Data views ready: " lv.Count " files, " tv.Count " tree rows")
+    tv.OnExpand((row, open, dv) => EvLogger("Tree " (open ? "opened " : "closed ") row.name))
+    EvLogger("Data views ready: " lv.Count " files, " tv.Count " tree rows")
 }
 
 g.Show()

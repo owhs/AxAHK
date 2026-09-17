@@ -90,7 +90,7 @@ g.AddButton("x+8", "Scan")
     .OnClick((*) => StartScan())
 
 g.AddButton("vok Accent", "OK")
-    .OnClick((*) => (g.Toast("Settings saved.", 1500), Log("OK")))
+    .OnClick((*) => (g.Toast("Settings saved.", 1500), EvLogger("OK")))
 
 g.AddButton("x+6", "Cancel")
     .OnClick((*) => g.Confirm("Discard changes?", "Control Panel") ? g.Toast("Discarded", 1200) : "")
@@ -108,12 +108,12 @@ g.AddPage("programs", "Programs", "E8FD")
 g.AddText("Caption", "Installed programs (Ctrl+click to select several)")
 
 progs := g.AddListBox("vprogs w320 h120 Multi", "ie:Internet Explorer 6|wmp:Windows Media Player 9|paint:Paint|solitaire:Solitaire|minesweeper:Minesweeper|pinball:3D Pinball for Windows")
-progs.OnChange((c, v, *) => Log("Selected: " (v.Length ? Join(v) : "(none)")))
+progs.OnChange((c, v, *) => EvLogger("Selected: " (v.Length ? Join(v) : "(none)")))
 
 g.AddText("Caption", "Windows components (checkbox list)")
 
 g.AddListBox("vcomps w320 h100 Checklist Value=ie|games", "ie:Internet Explorer|games:Games|msn:MSN Messenger|fax:Fax Services|iis:Internet Information Services")
-    .OnChange((c, v, *) => Log("Components: " Join(v)))
+    .OnChange((c, v, *) => EvLogger("Components: " Join(v)))
 
 g.AddButton("", "Add/Remove…")
     .OnClick((*) => g.Prompt("Program name:", "Add program", "") != "" ? g.Toast("Installed.", 1500, "success") : "")
@@ -153,7 +153,7 @@ g.AddConsole("vlog")
 ; ─────────────────────────────────────────────────────────────────────────────
 
 g.OnReady((app) => (
-    Log("Ready — theme: " app.Stylesheet),
+    EvLogger("Ready — theme: " app.Stylesheet),
     app.Ctl("scheme").Enabled := (app.Stylesheet = "win98")
 ))
 
@@ -172,7 +172,7 @@ Join(arr, sep := ", ") {
     return s
 }
 
-Log(msg) {
+EvLogger(msg) {
     if (g.Ready)
         g.Append("log", "<div>[" FormatTime(, "HH:mm:ss") "] " AxWindow._Esc(msg) "</div>")
 }
@@ -226,7 +226,7 @@ SetScheme(name) {
     }
 
     g.SetExtraCss("scheme", g.Stylesheet = "win98" ? css : "")
-    Log("Scheme -> " name)
+    EvLogger("Scheme -> " name)
 }
 
 SwitchTheme(name) {
@@ -235,7 +235,7 @@ SwitchTheme(name) {
     SetScheme(g.Value("scheme"))
     g.SetTheme(name = "win11" ? "dark" : "light")
     g.Toast(name = "win98" ? "It is now safe to turn off your computer." : name = "winxp" ? "Welcome" : "Windows 11", 1500)
-    Log("Theme -> " name)
+    EvLogger("Theme -> " name)
 }
 
 

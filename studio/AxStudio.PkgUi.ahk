@@ -84,10 +84,10 @@ class AxPkgUi {
                  . '<div class="axd-pkbtns"><span class="axd-hbtn axd-go" data-pkg="getaris">Get Aris</span> '
                  . '<span class="axd-hbtn" data-pkg="web|https://github.com/Descolada/Aris">What is it?</span>'
                  . '</div></div></div>'
-        dir := AxPkg.ProjDir(s.P)
-        if (dir = "")
-            h .= '<div class="axd-note axd-pkwarn"><span class="ico">&#xE7BA;</span> Save the project to install one: '
-               . "its libraries go in a Lib folder beside the project file.</div>"
+        ; No warning here any more: a library installs once, for everything,
+        ; and an unsaved project can use it straight away. Saving only matters
+        ; for the other kind of install -- the copy that travels with the
+        ; program -- and the card says so where the choice is made.
         h .= '<div class="axd-pkbar"><span class="ico axd-pkq">&#xE721;</span>'
            . '<input id="axdPkgFind" class="axd-rfindbox" autocomplete="off" '
            . 'placeholder="What should it do? -- json, click a button in another program, screenshot, sqlite..." value="' E(AxPkgUi.Q) '">'
@@ -109,7 +109,7 @@ class AxPkgUi {
     ; rule do without code, and its adaptors -- each a way to use it now.
     static MineTab(s) {
         E := (t) => AxTags.E(t)
-        dir := AxPkg.ProjDir(s.P), have := AxPkg.Installed(dir)
+        dir := AxPkg.ProjDir(s.P), have := AxPkg.Have(s.P)
         used := AxPkg.Used(s.P), ad := AxNet.List(s.P)
         if (!used.Length && !ad.Length)
             return '<div class="axd-rpempty"><span class="ico axd-rpbig">&#xE82D;</span><div class="axd-rpemptyt">Nothing yet</div>'
@@ -137,13 +137,20 @@ class AxPkgUi {
             }
         }
         if ad.Length {
-            h .= '<div class="axd-rpsub">Your adaptors (' ad.Length ') -- each one of your functions</div>'
+            h .= '<div class="axd-rpsub">Your adaptors (' ad.Length ') -- each one of your functions'
+               . '<span class="axd-ract axd-go" data-pkg="net.new">Write one myself...</span></div>'
             for a in ad
                 h .= '<div class="axd-lbmine"><div class="axd-pkname"><b>' E(a.Name) '()</b><span>' E(a.Kind = "ahk" ? a.Source
-                   : a.Kind = "nuget" ? "NuGet " a.Source : ".NET") '</span></div>'
+                   : a.Kind = "nuget" ? "NuGet " a.Source : ".NET") '</span>'
+                   . (AxNet.IsAsync(a) ? '<span class="axd-pkbg" title="It runs in the background and hands back the work">'
+                                       . '&#xE916; in the background</span>' : "") '</div>'
                    . '<div class="axd-pkdesc">' E(a.Doc) ' -- takes ' E(AxNet.Words(a.Params)) '</div>'
-                   . '<div class="axd-lbacts"><span class="axd-ract" data-do="steps.show">Use it in a step</span>'
-                   . '<span class="axd-ract" data-pkg="net.del|' E(a.Name) '">Take it out</span></div></div>'
+                   . '<div class="axd-pkwhat">' E(a.Target) '</div>'
+                   . '<div class="axd-lbacts"><span class="axd-ract axd-go" data-pkg="net.edit|' E(a.Name) '">Change it...</span>'
+                   . '<span class="axd-ract" data-pkg="net.bg|' E(a.Name) '">'
+                   . (AxNet.IsAsync(a) ? "Run it here and then" : "Run it in the background") '</span>'
+                   . '<span class="axd-ract" data-do="steps.show">Use it in a step</span>'
+                   . '<span class="axd-ract" data-pkg="net.del|' E(a.Name) '">Remove</span></div></div>'
         }
         return h
     }
@@ -152,7 +159,7 @@ class AxPkgUi {
         n := AxPkg.Counts()
         mine := 0
         if IsObject(s)
-            mine := AxPkgUi.MineMap(s, AxPkg.Installed(AxPkg.ProjDir(s.P))).Count
+            mine := AxPkgUi.MineMap(s, AxPkg.Have(s.P)).Count
         cur := AxPkgUi.Mine ? "mine" : AxPkgUi.Show
         it := (key, ico, label, cnt, tip) => '<div class="axd-pkshelf' (cur = key ? " on" : "") '" data-pkg="show|' key
             . '" title="' tip '"><span class="ico">&#x' ico ';</span><span class="axd-pkst">' label '</span><i>' cnt '</i></div>'
@@ -176,7 +183,7 @@ class AxPkgUi {
     }
     static ListHtml(s) {
         dir := AxPkg.ProjDir(s.P)
-        have := AxPkg.Installed(dir)
+        have := AxPkg.Have(s.P)
         list := AxPkg.Filter(AxPkgUi.Q, AxPkgUi.Cat, AxPkgUi.Mine ? AxPkgUi.MineMap(s, have) : "",
                              {Show: AxPkgUi.Mine ? "all" : AxPkgUi.Show, Sort: AxPkgUi.Sort, Hidden: AxPkgUi.Hidden})
         if !list.Length
@@ -239,7 +246,7 @@ class AxPkgUi {
             return '<div class="axd-pkhint"><span class="ico">&#xE82D;</span>Pick one to see what it is, '
                  . "what it offers and how to use it.</div>"
         dir := AxPkg.ProjDir(s.P)
-        have := AxPkg.Installed(dir)
+        have := AxPkg.Have(s.P)
         inst := have.Has(e.Name), used := AxPkg.IsUsed(s.P, e.Name)
         busy := AxPkg.Busy()
         h := '<div class="axd-pkhd"><b>' Esc(e.Short) '</b><span>by ' Esc(e.Author) '</span></div>'
@@ -265,11 +272,17 @@ class AxPkgUi {
         b := ""
         if (busy != "")
             b .= '<span class="axd-dim">Aris is busy with ' Esc(busy) '...</span>'
-        else if (dir = "")
-            b .= '<span class="axd-hbtn axd-go" data-pkg="save">Save the project, then install</span>'
-        else if !inst
-            b .= '<span class="axd-hbtn axd-go" data-pkg="install|' Esc(e.Name) '">Install and use it</span>'
-        else {
+        else if !inst {
+            ; Once, for everything, by default. The project does not have to be
+            ; a file on disk for that -- and most of the time you are trying
+            ; something out rather than shipping it. Into the project is the
+            ; other one, and is what a program being handed to someone wants,
+            ; because then the library travels with it.
+            b .= '<span class="axd-hbtn axd-go" data-pkg="install|' Esc(e.Name) '">Install it</span> '
+               . '<span class="axd-hbtn" data-pkg="installp|' Esc(e.Name)
+               . '" data-tip="It goes in a Lib folder beside the project file, and is carried with it">'
+               . 'Into this project only</span>'
+        } else {
             b .= used ? '<span class="axd-hbtn" data-pkg="unuse|' Esc(e.Name) '">Stop including it</span> '
                       : '<span class="axd-hbtn axd-go" data-pkg="use|' Esc(e.Name) '">Include it in the script</span> '
             nv := AxUpdate.Latest(e.Name)
@@ -286,7 +299,9 @@ class AxPkgUi {
             deps .= (deps = "" ? "" : ", ") d
         h .= kv("Licence", e.License != "" ? e.License : "not stated")
            . kv("Also brings", deps)
-           . kv("Here", inst ? "version " have[e.Name] " in Lib\Aris" : "")
+           . kv("Here", inst ? "version " have[e.Name] " -- "
+                . (AxPkg.Where(s.P, e.Name) = "project" ? "in this project's Lib folder, carried with it"
+                                                        : "installed once, for every project") : "")
            . kv("The script", used ? "#Include <Aris/" e.Name ">" : "")
         ; what it lets a rule or a macro do, with no code: its steps, as they
         ; read in the "does" list
@@ -311,13 +326,15 @@ class AxPkgUi {
         ; written into the code with a click, or made a step of your own --
         ; before it is even installed (installing is offered as it is needed)
         if (e.Fn.Length && !inst) {
-            h .= '<div class="axd-rpsub">What it can do (' e.Fn.Length ')</div>'
+            h .= '<div class="axd-rpsub">What it can do (' e.Fn.Length ')'
+               . '<span class="axd-ract axd-go" data-pkg="adaptall" title="Add every one that can stand '
+               . 'alone as a function of this program">Add them all as functions</span></div>'
                . '<div class="axd-note">Click one to put it in the code, or make it a step you can pick in any rule or flowchart.</div>'
             for i, f in e.Fn
                 h .= AxPkgUi.FnRow(e, f, i)
         }
         if inst {
-            api := AxPkg.Api(dir, e.Name)
+            api := AxPkg.ApiOf(s.P, e.Name)
             h .= '<div class="axd-rpsub">What it offers (' api.Length ')</div>'
             if !api.Length
                 h .= '<div class="axd-note axd-dim">' (AxHost.Ready ? "The parser found no classes or functions in it."
@@ -332,11 +349,74 @@ class AxPkgUi {
         }
         return h
     }
+    ; Every function a library offers that can be called on its own, made a
+    ; function of this program in one go -- named, said, and ready to pick in
+    ; any rule, timer, hotkey or flowchart. Anything already there is left
+    ; alone, so pressing it twice is safe.
+    static AdaptAll(s) {
+        e := AxPkg.Find(AxPkgUi.Sel)
+        if !IsObject(e)
+            return
+        can := []
+        for f in e.Fn
+            if AxPkgUi.FnCan(e, f)
+                can.Push(f)
+        if !can.Length
+            return s.Alert(e.Short " has nothing that can stand on its own: everything it offers is done "
+                . "on something the library makes first. Click one to put it in the code instead.", "Libraries")
+        names := ""
+        for f in can
+            names .= (names = "" ? "" : ", ") AxPkgUi.AdaptName(s, f)
+        r := AxForm.Show(s, {Title: "Add them all as functions", Icon: "E8F4", Width: 620,
+            Intro: e.Short " offers " can.Length " that can be called on their own. Each one becomes a "
+                 . "function of this program, ready to pick in any rule, timer, hotkey or flowchart.",
+            Fields: [{Id: "n", Kind: "note", L: names},
+                     {Id: "d", Kind: "divider"},
+                     {Id: "note", Kind: "note",
+                      L: "They are written as adaptors, so each one stays one line you can change on "
+                       . "App > Libraries -- rename it, say what it does, or remove it."}],
+            Buttons: ["Add all " can.Length, "Cancel"]})
+        if !r.Ok
+            return
+        s.Mark()
+        made := 0, skipped := 0
+        for f in can {
+            nm := AxPkgUi.AdaptName(s, f)
+            if IsObject(AxNet.Find(s.P, nm)) {
+                skipped++
+                continue
+            }
+            it := AxPkgUi.FnItem(f)
+            params := ""
+            for x in StrSplit(it.Params, ",", " ") {
+                pn := RegExReplace(Trim(x), "\s*:=.*$|[*?&]")
+                if (pn != "")
+                    params .= (params = "" ? "" : ", ") pn ":object"
+            }
+            AxNet.Add(s.P, {Name: nm, Kind: "ahk", Source: e.Name,
+                            Target: (it.Owner != "" ? it.Owner "." : "") it.Name,
+                            Params: params, Returns: "object",
+                            Doc: f.Does != "" ? SubStr(f.Does, 1, 80) : AxNet.Title(it.Name) " (" e.Short ")"})
+            made++
+        }
+        s.PushCompletions()
+        s.QueueLive()
+        if !AxPkg.Have(s.P).Has(e.Name)
+            AxPkgUi.NeedLib(s, e, AxPkgUi.RedrawFn(s))
+        s.Reflect(false)
+        s.Status("msg", made " function" (made = 1 ? "" : "s") " from " e.Short " added"
+            . (skipped ? ", " skipped " already there" : "") " -- they are in every rule and flowchart now.")
+    }
+    static AdaptName(s, f) {
+        it := AxPkgUi.FnItem(f)
+        nm := AxProject.CleanName(it.Owner it.Name)
+        return (nm = "") ? "Call" : nm
+    }
     static FnRow(pk, f, i) {
         E := (t) => AxTags.E(t)
         can := AxPkgUi.FnCan(pk, f)
         return '<div class="axd-pkapi axd-pk-function" data-pkg="fnwrite|' i '" title="' E(f.Name f.Sig) '">'
-             . (can ? '<span class="axd-ract axd-pkmake" data-pkg="fnadapt|' i '" title="Make it one of your functions -- a step in any rule or flowchart">Make it a step</span>' : "")
+             . (can ? '<span class="axd-ract axd-pkmake" data-pkg="fnadapt|' i '" title="Add it as a function -- a step in any rule or flowchart">Make it a step</span>' : "")
              . '<span class="ico">&#xE943;</span><b>' E(f.Name) '</b><span class="axd-sig">' E(f.Sig) '</span>'
              . '<div>' E(f.Does) (f.Returns != "" ? " -- gives " E(f.Returns) : "") '</div></div>'
     }
@@ -375,7 +455,7 @@ class AxPkgUi {
         ; a function, or a static method: one of your functions in a click
         can := (it.Kind = "function" || (it.Kind = "method" && it.Static)) && SubStr(act, 1, 4) = "api|"
         return '<div class="axd-pkapi axd-pk-' it.Kind '" data-pkg="' act '" title="' E(it.Insert) '">'
-             . (can ? '<span class="axd-ract axd-pkmake" data-pkg="adapt|' SubStr(act, 5) '" title="Make it one of your functions -- a step in any rule or flowchart">Make it a step</span>' : "")
+             . (can ? '<span class="axd-ract axd-pkmake" data-pkg="adapt|' SubStr(act, 5) '" title="Add it as a function -- a step in any rule or flowchart">Make it a step</span>' : "")
              . '<span class="ico">&#x' (ico.Has(it.Kind) ? ico[it.Kind] : "E943") ';</span>'
              . '<b>' E(who it.Name) '</b><span class="axd-sig">' E(sig) '</span>'
              . (it.Doc != "" ? '<div>' E(it.Doc) '</div>' : "") '</div>'
@@ -426,7 +506,7 @@ class AxPkgUi {
             return s.Reflect(false)
         case "adapt":
             e := AxPkg.Find(AxPkgUi.Sel)
-            api := IsObject(e) ? AxPkg.Api(AxPkg.ProjDir(s.P), e.Name) : []
+            api := IsObject(e) ? AxPkg.ApiOf(s.P, e.Name) : []
             i := Integer(arg)
             if (i >= 1 && i <= api.Length)
                 AxNetUi.MakeAhk(s, e.Name, api[i])
@@ -481,7 +561,12 @@ class AxPkgUi {
                 return s.Alert(msg, "Libraries")
             s.Status("msg", "The list is up to date: " AxPkg.List().Length " libraries.")
             s.Reflect(false)
-        case "install", "remove", "update":
+        case "install", "installp":
+            ; installp is the per-project one, and the only one that needs the
+            ; project to be a file somewhere
+            if AxPkgUi.Ready(s, arg, verb = "installp")
+                AxPkgUi.RunAris(s, "install", arg, "", verb = "install")
+        case "remove", "update":
             AxPkgUi.RunAris(s, verb, arg)
         case "checkup":
             AxUpdate.Show(s)
@@ -502,6 +587,12 @@ class AxPkgUi {
             i := Integer(arg)
             if IsObject(e) && i >= 1 && i <= e.Snippets.Length
                 AxPkgUi.Write(s, e.Snippets[i].Code, e)
+        case "adaptall":
+            ; The auto-adaptor. Reading a library's list, deciding which of
+            ; its forty functions can stand alone, and filling in a dialog
+            ; for each one is an afternoon; the studio already knows all
+            ; three things, so it can simply do it.
+            return AxPkgUi.AdaptAll(s)
         case "fnwrite", "fnadapt":
             e := AxPkg.Find(AxPkgUi.Sel)
             i := Integer(arg)
@@ -514,24 +605,30 @@ class AxPkgUi {
                 return s.Alert(f.Name " is done on something the library makes first, so it cannot be a step by itself. "
                     . "Click it to put it in the code instead.", "Libraries")
             AxNetUi.MakeAhk(s, e.Name, AxPkgUi.FnItem(f))
-            if !AxPkg.Installed(AxPkg.ProjDir(s.P)).Has(e.Name)
+            if !AxPkg.Have(s.P).Has(e.Name)
                 AxPkgUi.NeedLib(s, e, AxPkgUi.RedrawFn(s))
             return s.Reflect(false)
         case "api":
             e := AxPkg.Find(AxPkgUi.Sel)
-            api := IsObject(e) ? AxPkg.Api(AxPkg.ProjDir(s.P), e.Name) : []
+            api := IsObject(e) ? AxPkg.ApiOf(s.P, e.Name) : []
             i := Integer(arg)
             if (i >= 1 && i <= api.Length)
                 AxPkgUi.Write(s, api[i].Insert, e)
         }
     }
-    static RunAris(s, verb, name, then := "") {
+    ; shared: install into the folder every project shares, rather than into
+    ; this one's. Removing and updating work on whichever folder the library is
+    ; actually in, so they need no such thing.
+    static RunAris(s, verb, name, then := "", shared := false) {
         e := AxPkg.Find(name)
         if !IsObject(e)
             return
-        dir := AxPkg.ProjDir(s.P)
-        if (verb = "remove" && !s.Confirm("Remove " name " from this project's Lib folder?"
-                . (AxPkg.IsUsed(s.P, name) ? "`n`nThe script stops including it." : ""),
+        dir := (verb = "install" && shared) ? AxPkg.SharedDir()
+             : (AxPkg.Where(s.P, name) = "shared") ? AxPkg.SharedDir() : AxPkg.ProjDir(s.P)
+        where := (dir = AxPkg.SharedDir()) ? "the shared Lib folder" : "this project's Lib folder"
+        if (verb = "remove" && !s.Confirm("Remove " name " from " where "?"
+                . (AxPkg.IsUsed(s.P, name) ? "`n`nThe script stops including it." : "")
+                . ((dir = AxPkg.SharedDir()) ? "`n`nEvery project that uses it loses it." : ""),
                 "Libraries", "Remove", "Keep it", "warning"))
             return
         words := Map("install", "Installing", "remove", "Removing", "update", "Updating")
@@ -580,40 +677,100 @@ class AxPkgUi {
             pc := ""
         return pc
     }
+    ; Everything installing needs, got rather than described.
+    ;
+    ; Installing a library has two preconditions -- the project has to have
+    ; been saved somewhere (its libraries go in a Lib folder beside it) and
+    ; Aris has to be on the machine -- and what used to happen when one of
+    ; them was unmet was a sentence saying so. The button on an uninstalled
+    ; library read "Save the project, then install" and did the first half:
+    ; it opened Save As and stopped, leaving you back where you started with
+    ; no idea what to press next.
+    ;
+    ; So it is one button now, and this does whatever is in the way first.
+    ; Each step says what it is about to do and can be turned down; turning
+    ; one down stops the install rather than half-doing it.
+    static Ready(s, what, intoProject := false) {
+        if (AxPkg.Busy() != "") {
+            s.Status("msg", "Aris is busy with " AxPkg.Busy() " -- try again in a moment.")
+            return false
+        }
+        if (intoProject && AxPkg.ProjDir(s.P) = "") {
+            r := AxForm.Show(s, {Title: "Save the project first", Icon: "E74E", Width: 520,
+                Intro: "A library is installed INTO a project: it goes in a Lib folder beside the "
+                     . "project file, and this one has not been saved anywhere yet.",
+                Fields: [{Id: "n", Kind: "note", L: "Saving it is the only thing in the way. "
+                         . "Nothing outside the folder you pick is touched."}],
+                Buttons: ["Save it now", "Cancel"], CancelIndex: 2})
+            if (!r.Ok || r.Label != "Save it now")
+                return false
+            if !s.SaveAs() {
+                s.Status("msg", "Not saved, so there is nowhere to install " what " yet.")
+                return false
+            }
+            s.Reflect(false)
+        }
+        if !AxPkg.HasAris() {
+            r := AxForm.Show(s, {Title: "Aris is not here yet", Icon: "E896", Width: 520,
+                Intro: "Libraries come through Aris, AutoHotkey's package manager. It is one script, "
+                     . "and the studio keeps its own copy.",
+                Fields: [{Id: "n", Kind: "note", L: "It is downloaded from github.com/Descolada/Aris "
+                         . "and kept with the studio's settings. Nothing is installed on the machine."}],
+                Buttons: ["Get Aris, then install " what, "Cancel"], CancelIndex: 2})
+            if (!r.Ok || r.Label = "Cancel")
+                return false
+            s.Status("msg", "Getting Aris from github.com/Descolada/Aris...")
+            msg := AxPkg.GetAris()
+            if (msg != "") {
+                s.Alert(msg, "Libraries")
+                return false
+            }
+            s.Status("msg", "Aris is here. Installing " what "...")
+            s.Reflect(false)
+        }
+        return true
+    }
+
     ; A library's code, asked for while the library is not in the project:
     ; install it first (and then do what was asked), use the code as it is,
     ; or leave it. then(installed) does the rest.
     static NeedLib(s, e, then) {
-        dir := AxPkg.ProjDir(s.P)
-        why := dir = "" ? "Save the project first: libraries go in a Lib folder beside it, so installing one needs somewhere to go."
-             : !AxPkg.HasAris() ? "Libraries come through Aris, which is not here yet (App > Libraries gets it)."
-             : AxPkg.Busy() != "" ? "Aris is busy with " AxPkg.Busy() " -- try again in a moment." : ""
+        ; Saving the project and getting Aris are things Ready can do, so they
+        ; are no longer reasons to take the offer away -- only Aris already
+        ; being busy is, and that one passes.
+        busy := AxPkg.Busy()
+        steps := (AxPkg.ProjDir(s.P) = "" ? "save the project, " : "")
+               . (AxPkg.HasAris() ? "" : "get Aris, ")
         r := AxForm.Show(s, {Title: "This needs " e.Short, Icon: "E896", Width: 540,
             Intro: e.Short " by " e.Author " is not in this project yet, and this code uses it.",
-            Fields: [{Id: "n", Kind: "note", L: why != "" ? why
-                : "Installing downloads it through Aris into this project's Lib folder, and the script includes it. "
-                . "Nothing else on this machine changes. When it is in, this is added."}],
-            Buttons: why = "" ? ["Install it, then add this", "Add the code anyway", "Cancel"] : ["Add the code anyway", "Cancel"],
-            CancelIndex: why = "" ? 3 : 2})
+            Fields: [{Id: "n", Kind: "note", L: busy != ""
+                ? "Aris is busy with " busy " -- try again in a moment."
+                : (steps != "" ? "It will " steps "then install it. " : "")
+                . "Installing downloads it through Aris into this project's Lib folder, and the script "
+                . "includes it. Nothing else on this machine changes. When it is in, this is added."}],
+            Buttons: busy = "" ? ["Install it, then add this", "Add the code anyway", "Cancel"]
+                               : ["Add the code anyway", "Cancel"],
+            CancelIndex: busy = "" ? 3 : 2})
         if !r.Ok || r.Label = "Cancel"
             return
         if (r.Label = "Add the code anyway")
             return then.Call(false)
-        AxPkgUi.RunAris(s, "install", e.Name, then)
+        if AxPkgUi.Ready(s, e.Short)
+            AxPkgUi.RunAris(s, "install", e.Name, then)
     }
     static WriteFn(s, code, e) => (ok) => AxPkgUi.Put(s, code, e)
     ; Code from a library: the library first, then into the piece being
     ; worked on -- as a step when Steps is how pieces are open, at the caret
     ; in Code otherwise, and into the startup code when nothing is open.
     static Write(s, code, e := "") {
-        if IsObject(e) && !AxPkg.Installed(AxPkg.ProjDir(s.P)).Has(e.Name)
+        if IsObject(e) && !AxPkg.Have(s.P).Has(e.Name)
             return AxPkgUi.NeedLib(s, e, AxPkgUi.WriteFn(s, code, e))
         AxPkgUi.Put(s, code, e)
     }
     static Put(s, code, e := "") {
         s.Mark()
         inc := ""
-        if (IsObject(e) && !AxPkg.IsUsed(s.P, e.Name) && AxPkg.Installed(AxPkg.ProjDir(s.P)).Has(e.Name)) {
+        if (IsObject(e) && !AxPkg.IsUsed(s.P, e.Name) && AxPkg.Have(s.P).Has(e.Name)) {
             AxPkg.Use(s.P, e.Name)
             s.PushCompletions()
             inc := " The script includes " e.Name " now."
@@ -650,11 +807,18 @@ class AxPkgUi {
                  . 'Add a library...</div>'
         dir := AxPkg.ProjDir(s.P)
         for name in used {
+            ; wherever the copy is: in this project, or installed once for
+            ; every project. Looking only beside the project file called a
+            ; library that was sitting right there "not installed", and read
+            ; its members out of a folder that has none.
+            where := AxPkg.Where(s.P, name)
+            from := (where = "shared") ? AxPkg.SharedDir() : dir
             open := AxPkgUi.Open.Has(name)
-            api := open ? AxPkg.Api(dir, name) : []
+            api := (open && where != "") ? AxPkg.Api(from, name) : []
             h .= '<div class="axd-cnitem" data-cn="pkg.open.' AxTags.E(name) '"><span class="ico">&#x'
                . (open ? "E70D" : "E76C") ';</span>' AxTags.E(name)
-               . (FileExist(AxPkg.Stub(dir, name)) ? "" : '<span class="axd-dim">not installed</span>') '</div>'
+               . (where = "" ? '<span class="axd-dim">not installed</span>'
+                  : where = "shared" ? '<span class="axd-dim">shared</span>' : "") '</div>'
             for i, it in api
                 if (it.Kind != "class")
                     h .= '<div class="axd-cnitem axd-cnapi" data-cn="pkg.api.' i '.' AxTags.E(name) '" title="'
@@ -678,7 +842,7 @@ class AxPkgUi {
             s.CodeNav()
         case "api":
             q := StrSplit(p[3], ".", , 2)
-            api := AxPkg.Api(AxPkg.ProjDir(s.P), q[2])
+            api := AxPkg.ApiOf(s.P, q[2])
             i := Integer(q[1])
             if (i >= 1 && i <= api.Length)
                 AxPkgUi.Write(s, api[i].Insert)
@@ -742,7 +906,7 @@ class AxUiaUi {
         AxUiaUi.Proc := 0
         s := AxUiaUi.S
         if !FileExist(AxUiaUi.Out)
-            return s.Status("msg", "Nothing was picked.")
+            return s.Status("msg", "Nothing was selected.")
         r := ""
         try r := AxJson.Parse(FileRead(AxUiaUi.Out, "UTF-8"))
         try FileDelete(AxUiaUi.Out)

@@ -217,15 +217,39 @@ class AxRich {
     static _Fwd(ctl, name, args) {
         c := AxRich.At(ctl.G, ctl.Id)
         if !IsObject(c) {
-            if ctl.G.Ready
-                throw MethodError("Unknown method: " name, -1)
-            ctl.G.OnReady((w) => AxRich._Later(ctl, name, args))
+            ; Ready is NOT "every component exists": a component is built in
+            ; an OnReady handler, and Ready is already true while that queue
+            ; is still draining. A timer set in the startup code can fire in
+            ; that gap and ask a chart to take a new point before the chart
+            ; has been made -- which threw "Unknown method: Push" at a chart
+            ; that has had Push all along, once, a second into the program.
+            ;
+            ; Not ready yet: queue it, as before. Ready but not built yet:
+            ; try again at the end of this message, by which time the queue
+            ; has drained. Still missing then, and it really is missing.
+            if !ctl.G.Ready {
+                ctl.G.OnReady((w) => AxRich._Later(ctl, name, args))
+                return ctl
+            }
+            SetTimer(AxRich._SoonFn(ctl, name, args), -1)
             return ctl
         }
         if !c.HasMethod(name)
             throw MethodError("Unknown method: " name, -1)
         r := c.%name%(args*)
         return (r == c) ? ctl : r
+    }
+    static _SoonFn(ctl, name, args) => (*) => AxRich._Soon(ctl, name, args)
+    ; The second and last attempt. Whatever the answer is now, it is the
+    ; truth: a component that is still not there is one that never will be.
+    static _Soon(ctl, name, args) {
+        c := AxRich.At(ctl.G, ctl.Id)
+        if !IsObject(c)
+            throw MethodError("Unknown method: " name " -- " ctl.Id
+                . " has no rich component behind it", -1)
+        if !c.HasMethod(name)
+            throw MethodError("Unknown method: " name, -1)
+        c.%name%(args*)
     }
     static _Later(ctl, name, args) {
         c := AxRich.At(ctl.G, ctl.Id)

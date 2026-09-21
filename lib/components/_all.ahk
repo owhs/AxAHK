@@ -27,6 +27,8 @@
 #Include %A_LineFile%\..\Edit\AxEdit.ahk
 #Include %A_LineFile%\..\Expander\AxExpander.ahk
 #Include %A_LineFile%\..\FileList\AxFileList.ahk
+#Include %A_LineFile%\..\FileSource\AxFileSource.ahk
+#Include %A_LineFile%\..\FileView\AxFileView.ahk
 #Include %A_LineFile%\..\Game\AxGame.ahk
 #Include %A_LineFile%\..\Gauge\AxGauge.ahk
 #Include %A_LineFile%\..\Grid\AxGrid.ahk
@@ -46,6 +48,7 @@
 #Include %A_LineFile%\..\Radio\AxRadio.ahk
 #Include %A_LineFile%\..\RangeSlider\AxRangeSlider.ahk
 #Include %A_LineFile%\..\Rating\AxRating.ahk
+#Include %A_LineFile%\..\Ribbon\AxRibbon.ahk
 #Include %A_LineFile%\..\RichText\AxRichText.ahk
 #Include %A_LineFile%\..\Row\AxRow.ahk
 #Include %A_LineFile%\..\Search\AxSearch.ahk

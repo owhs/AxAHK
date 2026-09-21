@@ -1,0 +1,237 @@
+{
+ "format": "axstudio/2",
+ "name": "Archive workshop",
+ "desc": "A .zip read entry by entry into a table, unpacked and made -- and every handler in it is a flowchart on the Steps tab rather than a page of code: a repeat over the archive, a row added for each entry, totals kept as it goes. The rest are rules. All of it is System.IO.Compression through AHK#, with the slow two in the background.",
+ "uid": 9,
+ "cur": 1,
+ "vars": "zipPath = \"\"\nentries = 0\npacked = 0\nunpacked = 0\nsaved <- (unpacked > 0 ? Round((unpacked - packed) * 100 / unpacked) : 0)\nhasZip <- (zipPath != \"\" && FileExist(zipPath) != \"\")\nsaid <- (entries ? entries \" entries, \" saved \"% smaller\" : \"No archive open\")\nunpackTo = A_Desktop \"\\\\unpacked\"\npackFrom = \"\"",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Archive workshop",
+   "width": 1040,
+   "height": 700,
+   "minwidth": 460,
+   "minheight": 380,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E7C4",
+   "menus": "",
+   "status": "msg | Open a .zip, or pack a folder into one | grow icon=F012",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "Archive workshop",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": 1,
+   "importlayout": "",
+   "importresize": "",
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "unpackBtn Click -> status msg Unpacking in the background...\nunpackBtn Click -> call Unpack zipPath, unpackTo\nunpackBtn Click -> status msg Unpacked.\nclearBtn Click -> clearlist entriesTable\nclearBtn Click -> assign entries 0\nclearBtn Click -> assign packed 0\nclearBtn Click -> assign unpacked 0",
+   "states": "",
+   "binds": "pathBox <-> zipPath\nreadBtn.Enabled <- hasZip\nunpackBtn.Enabled <- hasZip\nsumLabel.Text <- said",
+   "hotkeys": "",
+   "init": "",
+   "script": "",
+   "root": {
+    "id": "r",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "InfoBar",
+      "name": "tip",
+      "arg": "Open a .zip and every entry becomes a row. Read it is a flowchart on the Steps tab -- a repeat over the archive, a row added for each entry, the totals kept as it goes -- and the other buttons are rules on the Logic tab. The three things it does are .NET methods made into your own functions on App > Libraries.",
+      "layout": {},
+      "props": {
+       "title": "Steps and rules, over .NET."
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Edit",
+      "name": "pathBox",
+      "arg": "",
+      "layout": {
+       "fill": 1
+      },
+      "props": {
+       "placeholder": "The .zip to look inside"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Button",
+      "name": "browseBtn",
+      "arg": "Open a .zip...",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8E5"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "zipPath := FileSelect(3, , \"Which archive?\", \"Archives (*.zip;*.nupkg;*.docx;*.jar)\")\nAxBindSync()\nif (zipPath != \"\") {\n    readBtn_Click(readBtn, 0, 0)\n}"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Button",
+      "name": "readBtn",
+      "arg": "Read it",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E72C"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "entriesTable.Component.Clear()\nentries := 0\npacked := 0\nunpacked := 0\nfor item in OpenArchive(zipPath).Entries {\n    entriesTable.Component.AddRow({Key: item.FullName, name: item.FullName, size: item.Length, packed: item.CompressedLength})\n    entries += 1\n    unpacked += item.Length\n    packed += item.CompressedLength\n}\nAxBindSync()"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "DataView",
+      "name": "entriesTable",
+      "arg": "{Columns: [{Key: \"name\", Title: \"Inside the archive\", Width: 420, Icon: true},\n           {Key: \"size\", Title: \"Size\", Width: 130, Align: \"right\", Sort: \"number\",\n            Format: (v, *) => AxWindow.FileSize(v)},\n           {Key: \"packed\", Title: \"Packed\", Width: 130, Align: \"right\", Sort: \"number\",\n            Format: (v, *) => AxWindow.FileSize(v)}],\n Rows: [], Empty: \"Open a .zip, or pack a folder into one.\"}",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 280
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "Text",
+      "name": "sumLabel",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "style": "opacity:.7"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Button",
+      "name": "unpackBtn",
+      "arg": "Unpack all of it",
+      "layout": {},
+      "props": {
+       "icon": "E896"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n8",
+      "type": "Button",
+      "name": "packBtn",
+      "arg": "Pack a folder...",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8B7"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "if (packFrom = \"\") {\n    MsgBox(\"Pick a folder to pack first.\")\n    return\n}\nWaitFor(PackFolder(packFrom, zipPath))\nreadBtn_Click(readBtn, 0, 0)"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n9",
+      "type": "Button",
+      "name": "clearBtn",
+      "arg": "Clear",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E711"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ],
+ "adaptors": "OpenArchive | static |  | System.IO.Compression.ZipFile.OpenRead | path:string | object | Open a .zip and read what is inside it, without unpacking anything\nUnpack | static |  | System.IO.Compression.ZipFile.ExtractToDirectory | source:string, target:string | void@async | Unpack the whole archive, in the background\nPackFolder | static |  | System.IO.Compression.ZipFile.CreateFromDirectory | folder:string, target:string | void@async | Pack a folder into a .zip, in the background",
+ "packages": "owhs/ahksharp"
+}

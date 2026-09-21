@@ -146,12 +146,21 @@ class AxJson {
         static key := 'SA)[ \t\r\n]*+(?:(\})|("[^"\\]*+(?:\\.[^"\\]*+)*+")[ \t\r\n]*+:)'
         static sep := 'SA)[ \t\r\n]*+([,}])'
         obj := Map()
+        first := true
         loop {
             if !RegExMatch(s, key, &m, pos)
                 throw Error("JSON: expected a key at " pos, -1)
             pos += m.Len
-            if (m[1] != "")
+            ; "}" closes an object that is empty, not one that has just had a
+            ; comma: {"a":1,} is not JSON, and reading it as though it were
+            ; means a file with a stray comma in it loads here and is refused
+            ; by everything else that reads JSON.
+            if (m[1] != "") {
+                if !first
+                    throw Error("JSON: a comma with nothing after it at " (pos - m.Len), -1)
                 return obj
+            }
+            first := false
             obj[AxJson._S(m[2])] := AxJson._V(&s, &pos)
             if !RegExMatch(s, sep, &m, pos)
                 throw Error("JSON: expected ',' or '}' at " pos, -1)
@@ -164,6 +173,8 @@ class AxJson {
         static close := 'SA)[ \t\r\n]*+\]'
         static sep := 'SA)[ \t\r\n]*+([,\]])'
         arr := []
+        ; the same for a list: [] is empty, [1,] is a mistake, and _V below
+        ; refuses the "]" that follows the comma
         if RegExMatch(s, close, &m, pos)
             return (pos += m.Len, arr)
         loop {

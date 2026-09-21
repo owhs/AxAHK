@@ -116,13 +116,13 @@ class AxSteps {
         if (ty = "Method") {
             nm := (cls != "" ? cls "." : "") t.Value(i)
             out.Push({Name: nm, Label: nm "()", Sub: cls != "" ? "method" : "your function", Icon: "E8F4",
-                      Lines: t.EndLine(i) - t.StartLine(i) + 1})
+                      Lines: t.EndLine(i) - t.StartLine(i) + 1, Line: t.StartLine(i)})
         } else if (ty = "Class") {
             for c in t.Children(i)
                 AxSteps._Def(t, src, c, (cls != "" ? cls "." : "") t.Value(i), out)
         } else if (ty = "Hotkey") {
             out.Push({Name: "hk:" t.Value(i), Label: t.Value(i), Sub: "hotkey", Icon: "E765",
-                      Lines: t.EndLine(i) - t.StartLine(i) + 1})
+                      Lines: t.EndLine(i) - t.StartLine(i) + 1, Line: t.StartLine(i)})
         }
     }
     static Key(pc) {
@@ -669,7 +669,14 @@ class AxSay {
         "ProcessClose", "Close the program {1}", "Shutdown", "Shut down or restart Windows", "BlockInput", "Block the keyboard and mouse",
         "SetTitleMatchMode", "Match window names this way: {1}", "DetectHiddenWindows", "Find hidden windows: {1}",
         "SetWorkingDir", "Work in the folder {1}", "TraySetIcon", "Use the tray icon {1}", "A_TrayMenu.Add", "Add {1} to the tray menu",
-        "Critical", "Do not let anything interrupt this", "SetKeyDelay", "Type with a delay of {1}")
+        "Critical", "Do not let anything interrupt this", "SetKeyDelay", "Type with a delay of {1}",
+        ; background work -- the five helpers any background adaptor brings
+        ; with it. A flowchart that says "Start Fetch in the background; when
+        ; it is done, Fetched" is the whole point of running it there.
+        "WhenDone", "Start {1} in the background -- when it is done, {2}",
+        "WaitFor", "Wait for {1}", "AllOf", "Wait for all of them to finish",
+        "AnyOf", "Wait for the first of them to finish",
+        "AfterAWhile", "After {1}, {2}")
     ; what a method call does, by the method's name
     static Meths := Map("Show", "Show {0}", "Hide", "Hide {0}", "Destroy", "Close {0} for good", "Focus", "Put the keyboard in {0}",
         "Push", "Add {1} to the end of {0}", "Pop", "Take the last one off {0}", "InsertAt", "Put {2} into {0} at {1}",
@@ -826,7 +833,11 @@ class AxSay {
                     "StrLen", "the length of {1}", "Trim", "{1} without spaces round it", "StrUpper", "{1} in capitals",
                     "StrLower", "{1} in small letters", "Round", "{1} rounded", "Random", "a random number from {1} to {2}",
                     "FormatTime", "the date and time", "WinGetTitle", "the title of {1}", "ControlGetText", "the text of {1}",
-                    "Map", "a new list of pairs", "Array", "a new list", "Integer", "{1} as a whole number", "String", "{1} as text")
+                    "Map", "a new list of pairs", "Array", "a new list", "Integer", "{1} as a whole number", "String", "{1} as text",
+                    ; and the answers background work gives back
+                    "WaitFor", "the answer to {1}, waited for", "AllOf", "the answers to all of them",
+                    "AnyOf", "the answer to whichever finished first", "IsDone", "whether {1} has finished",
+                    "WhyItFailed", "why {1} failed", "GiveUpAfter", "{1}, given up on after {2}")
                 for k, w in gives
                     if (k = nm)
                         return AxSay.Fill(w, args, "")

@@ -1,0 +1,9 @@
+{
+  "name": "FileSource",
+  "description": "Where a file view gets its files: the disk, a made-up tree, the registry, a zip.",
+  "order": 6010,
+  "css": "",
+  "include": "lib\\components\\FileSource\\AxFileSource.ahk",
+  "requires": [],
+  "controls": []
+}

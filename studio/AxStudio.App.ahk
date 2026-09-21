@@ -8,6 +8,7 @@
 #Include %A_LineFile%\..\..\lib\AxRichAll.ahk
 #Include %A_LineFile%\..\AxStudio.Gen.ahk
 #Include %A_LineFile%\..\AxStudio.Panes.ahk
+#Include %A_LineFile%\..\AxStudio.RibbonUi.ahk
 #Include %A_LineFile%\..\AxStudio.Templates.ahk
 #Include %A_LineFile%\..\AxStudio.Complete.ahk
 #Include %A_LineFile%\..\AxStudio.Form.ahk
@@ -30,6 +31,7 @@
 #Include %A_LineFile%\..\AxStudio.Titlebar.ahk
 #Include %A_LineFile%\..\AxStudio.Menus.ahk
 #Include %A_LineFile%\..\AxStudio.Update.ahk
+#Include %A_LineFile%\..\AxStudio.Snips.ahk
 
 ; Part of AxStudio, not a program on its own. Running this file directly would
 ; only load a class and stop, so it hands over to the entry point instead.
@@ -91,7 +93,7 @@ class AxStudio extends AxGui {
             AxStudioPaths.Adopt(this.Store)
         this.SettingsPath := this.Store "\studio.ini"
         this.AutoPath := this.Store "\autosave.axs.json"
-        this.EventLoggerPath := this.Store "\studio.EventLogger"
+        this.LogPath := this.Store "\studio.log"
         this.TrimLog()
 
         ; Component packs before anything reads the catalogue: they add
@@ -113,7 +115,7 @@ class AxStudio extends AxGui {
         this.Issues := []        ; what AxLint found on the last refresh
         this._skin := ""         ; the look the canvas is currently dressed for
         this.Out := []           ; what the running preview has said
-        this.EventLoggerPos := 0
+        this.LogPos := 0
         this.RunX := 0, this.RunY := 0, this.RunW := 0, this.RunH := 0, this.RunPage := ""
         this._tailFn := ObjBindMethod(this, "TailLog")   ; _Tail() is the method
         this.Testing := false     ; the canvas left alone, so the design can be tried
@@ -179,12 +181,12 @@ class AxStudio extends AxGui {
         this.Dense := 0                     ; inspector rows packed tight, as they used to be
         this.AutoHideBar := 0               ; the bottom bar out of the way until the pointer is near
         this.LeftTab := "tools"             ; the left pane shows the Toolbox, or the Outline
-        this.EventLoggericSec := "values"           ; the section Logic shows
+        this.LogicSec := "values"           ; the section Logic shows
         this.MacroSel := ""                 ; the macro open under Macros
         this.LookSel := "design"            ; what the Look workspace shows
         this.TabMode := false               ; setting the tab order on the canvas
         this.Zoom := 1                      ; the canvas, scaled
-        this.AlAnchor := "each"             ; lining up: to each other | the last one picked | the page
+        this.AlAnchor := "each"             ; lining up: to each other | the last selected | the page
         this.TabSeq := []                   ; the controls clicked so far, in order
         this.OpenMax := false
         this.LookMode := "dark"             ; and how it shows a built-in look
@@ -290,7 +292,7 @@ class AxStudio extends AxGui {
         AxStudio.CodeAt := AxStudio.NewestCode().At
         this.OpenMax := !AxStudio.Probing
         v := AxStudio.CodeVersion()
-        this.EventLogger("start  AxStudio " AxStudio.Ver (v.Hash != "" ? ", code " v.Hash : "")
+        this.WriteLog("start  AxStudio " AxStudio.Ver (v.Hash != "" ? ", code " v.Hash : "")
                . (AxStudio.Probing ? " (probe)" : ""))
         this.Show()
         ; A probe keeps out of the way: shown without taking focus, then put
@@ -492,21 +494,21 @@ class AxStudio extends AxGui {
     ; ------------------------------------------------------------ logging
     TrimLog() {
         try {
-            if (FileExist(this.EventLoggerPath) && FileGetSize(this.EventLoggerPath) > 400000)
-                FileDelete(this.EventLoggerPath)
+            if (FileExist(this.LogPath) && FileGetSize(this.LogPath) > 400000)
+                FileDelete(this.LogPath)
         }
     }
-    EventLogger(msg) {
-        try FileAppend(FormatTime(, "yyyy-MM-dd HH:mm:ss") "  " msg "`n", this.EventLoggerPath, "UTF-8")
+    WriteLog(msg) {
+        try FileAppend(FormatTime(, "yyyy-MM-dd HH:mm:ss") "  " msg "`n", this.LogPath, "UTF-8")
     }
     ; Everything a person asks for goes through here. Without it a command
     ; that raises is simply nothing happening -- the hardest fault there is to
     ; report and the easiest to ship, because it looks like a dead button.
     ;
-    ; The name goes into studio.EventLogger on the way IN, before the work. If the
+    ; The name goes into studio.log on the way IN, before the work. If the
     ; studio then hangs or vanishes, the log still says what was asked for.
     Try(what, fn) {
-        this.EventLogger("do  " what)
+        this.WriteLog("do  " what)
         try
             return fn()
         catch as e {
@@ -521,12 +523,12 @@ class AxStudio extends AxGui {
                     if (Trim(line) != "")
                         this.Say("error", "    " Trim(line))
             }
-            this.EventLogger("    " e.File " line " e.Line)
+            this.WriteLog("    " e.File " line " e.Line)
             this.SetMid("out")
         }
     }
     Problem(msg) {
-        this.EventLogger("PROBLEM  " msg)
+        this.WriteLog("PROBLEM  " msg)
         this.Status("msg", msg)
         this.CodeMsg(msg, "err")
     }
@@ -541,7 +543,7 @@ class AxStudio extends AxGui {
             head.appendChild(s)
             head.removeChild(s)
         } catch as e
-            this.EventLogger("Js failed: " e.Message)
+            this.WriteLog("Js failed: " e.Message)
     }
     Send(obj) {
         try this.El("axdIn").value := AxJson.Stringify(obj, "")
@@ -556,7 +558,7 @@ class AxStudio extends AxGui {
         if IsObject(this.Ce)
             try this.Ce.SetWordSet("studio", AxComplete.Words(this.P), "ahk")
             catch as e
-                this.EventLogger("completions: " e.Message " (" e.What ", line " e.Line ")")
+                this.WriteLog("completions: " e.Message " (" e.What ", line " e.Line ")")
     }
     ; the code editor's settings: the whole of the Code workspace's body
     static CeCfg() => {lang: "ahk", theme: "auto", gutter: true, fold: true, suggest: true, status: true,
@@ -718,7 +720,7 @@ class AxStudio extends AxGui {
         case "jserr":
             this.Problem("Canvas: " G("msg"))
         default:
-            this.EventLogger("unknown message: " t)
+            this.WriteLog("unknown message: " t)
         }
     }
 
@@ -1432,9 +1434,10 @@ class AxStudio extends AxGui {
         ; which left a light design's accent button white, and still one fewer
         ; than a sheet's own "body.sheet-x .btn.accent"
         css .= this.ReadSheet(".btn.accent.accent{background:" hex ";border-color:" hex ";color:" (AxWindow._Luma(hex) > 0.45 ? "#000" : "#fff") "}"
-             . ".switch input:checked+.sw-track,.check input:checked+.box{background:" hex ";border-color:" hex "}"
-             . ".segmented .seg.active,.progress .bar,.nav-item.active:before,.tab.active:after{background:" hex "}"
-             . ".link,.hyperlink{color:" hex "}", "axdAccRead")
+             . ".switch input:checked+.sw-track.sw-track,.check input:checked+.box.box{background:" hex ";border-color:" hex "}"
+             . ".segmented .seg.active.active,.progress .bar.bar,.nav-item.active.active:before,"
+             . ".tab.active.active:after{background:" hex "}"
+             . ".link.link,.hyperlink.hyperlink{color:" hex "}", "axdAccRead")
         ; the design's own small stylesheet, on top of the one it picked
         look := AxTheme.Css(P.W)
         if (Trim(look) != "")
@@ -1854,12 +1857,12 @@ class AxStudio extends AxGui {
     AlignItems() {
         A := (k, l) => {Label: l, Click: this.AlignFn(k)}
         R := (v, l) => {Label: l, Radio: true, Checked: this.AlAnchor = v, Click: this.AnchorFn(v)}
-        return [R("each", "Line up with &each other"), R("last", "Line up with the &last one picked"),
+        return [R("each", "Line up with &each other"), R("last", "Align with the &last selected"),
                 R("page", "Line up with the &page"), "-",
                 A("left", "Left edges"), A("hcenter", "Centres, across"),
                 A("right", "Right edges"), "-",
                 A("top", "Top edges"), A("vcenter", "Middles"), A("bottom", "Bottom edges"), "-",
-                A("samew", "Same width as the last one picked"), A("sameh", "Same height as the last one picked"), "-",
+                A("samew", "Same width as the last selected"), A("sameh", "Same height as the last selected"), "-",
                 A("distx", "Even out the space across"), A("disty", "Even out the space down"),
                 A("gapx", "The same gap across (the Line them up box, or 8)"),
                 A("gapy", "The same gap down (the Line them up box, or 8)")]
@@ -2010,6 +2013,10 @@ class AxStudio extends AxGui {
         ; a link to where something else is set: data-do="go.<place>"
         if (SubStr(what, 1, 3) = "go.")
             return this.GoTo(SubStr(what, 4))
+        ; the ribbon tree. Every row carries its path on the action --
+        ; "rib.up.2-1-3" -- so this cannot be a case in the switch below.
+        if (SubStr(what, 1, 4) = "rib.")
+            return AxRibUi.Do(this, what)
         switch what {
         case "arrange":
             return AxArrange.Form(this, this.Primary())
@@ -2378,10 +2385,25 @@ class AxStudio extends AxGui {
     }
     SnippetMenu() {
         items := []
+        ; Yours first, and in their groups. They are the ones you wrote, so
+        ; they are the ones you are looking for.
+        for grp in AxSnips.Grouped() {
+            if (grp.G = "") {
+                for sn in grp.Items
+                    items.Push({Label: sn.N, Click: this.MySnipFn(sn.N)})
+                continue
+            }
+            sub := []
+            for sn in grp.Items
+                sub.Push({Label: sn.N, Click: this.MySnipFn(sn.N)})
+            items.Push({Label: grp.G, Items: sub})
+        }
+        if items.Length
+            items.Push("-")
         for i, sn in AxStudio.SnipList()
             items.Push({Label: sn.N, Click: this.SnipFn(i)})
         ; the snippets of the libraries this project has, under each library
-        have := AxPkg.Installed(AxPkg.ProjDir(this.P))
+        have := AxPkg.Have(this.P)
         for name, v in have {
             e := AxPkg.Find(name)
             if !IsObject(e) || !e.Snippets.Length
@@ -2392,27 +2414,37 @@ class AxStudio extends AxGui {
             items.Push("-"), items.Push({Label: e.Short, Items: sub})
         }
         items.Push("-")
+        items.Push({Label: "Keep what is being edited as a snippet...", Click: (*) => AxSnips.FromEditor(this)})
+        items.Push({Label: "Your snippets...", Click: (*) => AxSnips.Manage(this)})
         items.Push({Label: "Find ready code and libraries...    Ctrl+I", Click: (*) => AxGallery.Open(this)})
         this.ShowMenu(items)
     }
     SnipFn(i) => (*) => this.InsertSnippet(i)
+    MySnipFn(name) => (*) => this.InsertHere(AxSnips.CodeOf(name), name)
     InsertSnippet(i) {
         list := AxStudio.SnipList()
         if (i < 1 || i > list.Length)
             return
-        if !IsObject(this.CodeTarget) || this.CodeTarget.Kind = "readonly" {
+        this.InsertHere(list[i].C, list[i].N)
+    }
+    ; Any code, into whatever is being edited -- the studio's snippets,
+    ; yours, and anything else that wants to hand the editor some lines.
+    ; There was one of these per caller before, each with its own idea of
+    ; what to do when nothing was open.
+    InsertHere(add, say := "") {
+        if (Trim(String(add)) = "")
+            return
+        if (!IsObject(this.CodeTarget) || this.CodeTarget.Kind = "readonly")
             this.EditScript("script")
-        }
         cur := this.EditorText()
-        add := list[i].C
         next := (Trim(cur) = "") ? add : RTrim(cur, "`r`n") "`n`n" add
         this.SetEditor(next, false)
         this.CodeTyped(true)
-        this.Status("msg", "Inserted: " list[i].N)
+        this.Status("msg", say != "" ? "Inserted: " say : "Inserted.")
     }
     ; A hotkey is the one thing people reach for that has nothing to do with
     ; the page, so it gets a wizard of its own rather than a snippet.
-    HotkeyWizard() => (this.EventLoggericSec := "hotkeys", AxWiz.Hotkey(this))
+    HotkeyWizard() => (this.LogicSec := "hotkeys", AxWiz.Hotkey(this))
 
     ; --------------------------------------------------------------- tabs
     UpAttr(el, attr) {
@@ -2530,7 +2562,7 @@ class AxStudio extends AxGui {
             if (this.Ws = "code" && IsObject(this.CodeTarget) && this.CodeTarget.Kind = "readonly")
                 pl.Pc := "gen"
         } else if (this.Ws = "logic")
-            pl.Sec := this.EventLoggericSec
+            pl.Sec := this.LogicSec
         else if (this.Ws = "app")
             pl.Sec := this.AppSec
         return pl
@@ -2679,11 +2711,11 @@ class AxStudio extends AxGui {
         if (this.PanelTab = "lint") {
             try this.Html("axdIssues", '<div class="axd-midbody">' AxPanes.LintHtml(this) '</div>')
             catch as e
-                this.EventLogger("Problems: " e.Message)
+                this.WriteLog("Problems: " e.Message)
         } else {
             try this.Html("axdOut", '<div class="axd-midbody">' AxPanes.OutHtml(this) '</div>')
             catch as e
-                this.EventLogger("Output: " e.Message)
+                this.WriteLog("Output: " e.Message)
         }
     }
     ; Either side pane can be put away. With both gone the canvas -- or the
@@ -2791,6 +2823,19 @@ class AxStudio extends AxGui {
               .  AxTags.E(w.Name) '</div>'
               .  item("init." i, "E7C4", "Startup code", AxStudio.LinesNote(w.Init), cur && tk = "init")
               .  item("script." i, "E943", "Your own functions", AxStudio.LinesNote(w.Script), cur && tk = "script")
+            ; and what is IN them. A program with six functions in it showed
+            ; one row saying "44 lines", so the only way to find anything was
+            ; to open it and scroll -- which is what made a template's code
+            ; feel like a locked blob rather than something you could read.
+            ; The parser already knows them (bin\AstHost.exe); this is the
+            ; same list the Steps tab has, in the place people look for code.
+            try {
+                for d in AxSteps.Defs(w.Script)
+                    h .= '<div class="axd-cnsub">'
+                      .  item("fn." i "." d.Name, d.Icon, AxTags.E(d.Label),
+                              d.Lines " line" (d.Lines = 1 ? "" : "s"), false)
+                      .  '</div>'
+            }
             nodes := []
             this.P.Walk(w.Root, AxStudio.HasEvFn(nodes))
             for n in nodes {
@@ -2803,6 +2848,28 @@ class AxStudio extends AxGui {
             if !nodes.Length
                 h .= '<div class="axd-cnnone">No handlers yet.</div>'
             h .= item("add." i, "E710", "Add a handler...", "", false)
+            ; The adaptors, where anyone would look for them.
+            ;
+            ; They ARE functions of this program -- every rule and flowchart
+            ; offers them by name -- and until now they appeared nowhere in
+            ; the Code tab at all, which listed "Your own functions: empty"
+            ; over a program with four of them. They are not editable here
+            ; (they are one line each, written from what App > Libraries
+            ; knows), so they are shown for what they are and a click goes to
+            ; where they are made.
+            if (i = 1) {
+                ad := AxNet.List(this.P)
+                if ad.Length {
+                    h .= '<div class="axd-cnwin"><span class="ico">&#xE8F4;</span>From libraries</div>'
+                    for a in ad
+                        h .= '<div class="axd-cnitem" data-cn="net.' AxTags.E(a.Name) '" title="'
+                           . AxTags.E(a.Name "(" AxNet.Words(a.Params) ")"
+                                      (a.Doc != "" ? "`n`n" a.Doc : "")) '">'
+                           . '<span class="ico">&#x' (AxNet.IsAsync(a) ? "E916" : "E8F4") ';</span>'
+                           . AxTags.E(a.Name) '()'
+                           . '<span class="axd-dim">' AxTags.E(a.Doc != "" ? a.Doc : a.Target) '</span></div>'
+                }
+            }
         }
         h .= AxPkgUi.CodeNavHtml(this)
         h .= '<div class="axd-cnwin"><span class="ico">&#xE8A7;</span>Read only</div>'
@@ -2844,6 +2911,13 @@ class AxStudio extends AxGui {
         n := AxLogic.CountLines(text)
         return n ? n " line" (n = 1 ? "" : "s") : "empty"
     }
+    ; An adaptor in the navigator: it is made on App > Libraries, so that is
+    ; where a click on it goes, with that one picked.
+    GoToAdaptor(name) {
+        AxPkgUi.Tab := "mine"
+        this.GoSec("libraries", "app")
+        this.Status("msg", name "() is made here: it is one .NET method, written as one of your functions.")
+    }
     CodeNavClick(ev) {
         v := this.UpAttr(ev.srcElement, "data-cn")
         if (v = "")
@@ -2852,6 +2926,8 @@ class AxStudio extends AxGui {
             return this.ShowGenerated()
         if (SubStr(v, 1, 4) = "pkg.")
             return AxPkgUi.CodeNavClick(this, v)
+        if (SubStr(v, 1, 4) = "net.")
+            return this.GoToAdaptor(SubStr(v, 5))
         p := StrSplit(v, ".")
         i := Integer(p[2])
         if (i != this.P.Cur)
@@ -2860,6 +2936,19 @@ class AxStudio extends AxGui {
             return AxWiz.AddHandler(this)
         if (p[1] = "init" || p[1] = "script")
             return this.EditScript(p[1])
+        ; one function of the script, by name: open the script and put the
+        ; caret on it
+        if (p[1] = "fn") {
+            name := SubStr(v, InStr(v, ".", , , 2) + 1)
+            this.EditScript("script")
+            for d in AxSteps.Defs(this.P.W.Script)
+                if (d.Name = name && d.HasOwnProp("Line")) {
+                    try this.Ce.GoTo(d.Line, 1)
+                    try this.Ce.Focus()
+                    return this.Status("msg", d.Label " -- line " d.Line " of your own functions.")
+                }
+            return
+        }
         n := this.P.Find(p[3])
         if IsObject(n)
             this.EditEvent(n, Integer(p[4]))
@@ -3642,7 +3731,7 @@ class AxStudio extends AxGui {
             {Label: "&Command palette", Shortcut: "Ctrl+Shift+P",
              Click: (*) => this.Js("AXD.palOpen('cmd');")},
             {Label: "Open the studio lo&g", Icon: "E7C3",
-             Click: (*) => Run('notepad.exe "' this.EventLoggerPath '"')},
+             Click: (*) => Run('notepad.exe "' this.LogPath '"')},
             "-",
             {Label: "Check for &updates...", Icon: "E895", Click: (*) => AxUpdate.Show(this)},
             {Label: "&About AxStudio", Icon: "E946", Click: (*) => this.AboutDialog()}]}]
@@ -3682,7 +3771,7 @@ class AxStudio extends AxGui {
         if (r.Label = "Check for updates") {
             AxUpdate.Show(this)
         } else if (r.Label = "Open the log") {
-            try Run('notepad.exe "' this.EventLoggerPath '"')
+            try Run('notepad.exe "' this.LogPath '"')
         } else if (r.Label = "Open the studio folder") {
             try Run('explorer.exe "' this.Store '"')
         }
@@ -3819,7 +3908,7 @@ class AxStudio extends AxGui {
         else if (ws = "look")
             this.LookSel := sec
         else
-            this.EventLoggericSec := sec
+            this.LogicSec := sec
         if (this.Ws != ws)
             return this.SetWs(ws)
         this.Reflect(false)
@@ -3827,7 +3916,7 @@ class AxStudio extends AxGui {
     }
     ; Where a "see also" link goes. Every setting lives in one place, and the
     ; places that touch it link there rather than repeating it:
-    ;   a workspace       go.design  go.EventLoggeric  go.code  go.app  go.look  go.map
+    ;   a workspace       go.design  go.logic  go.code  go.app  go.look  go.map
     ;   a section         go.rules  go.files  go.script  go.tray ...  (either rail)
     ;   the window        go.window, or go.window.<group> -- the window's own
     ;                     properties on the Design tab, that group opened
@@ -3862,7 +3951,7 @@ class AxStudio extends AxGui {
                                    "arguments", "modes", "tray", "script"])
     StepSec(d) {
         list := AxStudio.Sections[this.Ws]
-        cur := (this.Ws = "app") ? this.AppSec : this.EventLoggericSec
+        cur := (this.Ws = "app") ? this.AppSec : this.LogicSec
         i := 1
         for j, k in list
             if (k = cur)
@@ -4277,12 +4366,12 @@ class AxStudio extends AxGui {
             return this.Alert("That script could not be brought in.`n`n" e.Message, "Import")
         ; then what it does: hotkeys, hotstrings, timers, values, settings...
         ; -- the ones ticked become the studio's lists instead of code
-        r.EventLoggeric := Map()
+        r.Logic := Map()
         try {
             found := AxImportLogic.Scan(r.Project)
             kinds := AxImportLogic.Wizard(this, found, name)
             if kinds.Length
-                r.EventLoggeric := AxImportLogic.Apply(r.Project, found, kinds)
+                r.Logic := AxImportLogic.Apply(r.Project, found, kinds)
         } catch as e
             r.Notes.Push("What the script does was left as code: " e.Message)
         this.Adopt(r, path)
@@ -4307,11 +4396,11 @@ class AxStudio extends AxGui {
            : "Brought in " n.Controls " control" (n.Controls = 1 ? "" : "s")
            . (n.Pages ? " on " n.Pages " page" (n.Pages = 1 ? "" : "s") : "")
            . ", with " n.Events " handler" (n.Events = 1 ? "" : "s") "." nl
-        if (r.HasOwnProp("Logic") && r.EventLoggeric.Count) {
+        if (r.HasOwnProp("Logic") && r.Logic.Count) {
             s .= nl "Brought in without code:" nl
             for k in AxImportLogic.Kinds
-                if r.EventLoggeric.Has(k[1]) && r.EventLoggeric[k[1]]
-                    s .= "  " r.EventLoggeric[k[1]] " " StrLower(k[2]) " -- " k[3] nl
+                if r.Logic.Has(k[1]) && r.Logic[k[1]]
+                    s .= "  " r.Logic[k[1]] " " StrLower(k[2]) " -- " k[3] nl
         }
         if (n.HasOwnProp("Windows") && n.Windows > 1)
             s .= nl n.Windows " windows: one window of the design each." nl
@@ -4582,6 +4671,8 @@ class AxStudio extends AxGui {
         A("cmd:flow", "Add a rule, without writing code...", "Wizards", "E945")
         A("cmd:state", "Add a state...", "Wizards", "E81E")
         A("cmd:snip", "Insert a snippet...", "Wizards", "E943")
+        A("cmd:mysnips", "Your snippets...", "Wizards", "E8A5")
+        A("cmd:keepsnip", "Keep what is being edited as a snippet...", "Wizards", "E8A5")
         A("cmd:test", "Try the design out, here", "Run", "E7C4", "F6")
         A("cmd:run", "Run it", "Run", "E768", "F5")
         A("cmd:stop", "Stop it", "Run", "E71A")
@@ -4712,6 +4803,8 @@ class AxStudio extends AxGui {
         case "flow":       return this.FlowWizard()
         case "state":      return this.StateWizard()
         case "snip":       return this.SnippetMenu()
+        case "mysnips":    return AxSnips.Manage(this)
+        case "keepsnip":   return AxSnips.FromEditor(this)
         case "test":       return this.ToggleTest()
         case "run":        return this.Preview()
         case "stop":       return this.StopPreview()
@@ -4743,7 +4836,7 @@ class AxStudio extends AxGui {
         case "win.link":   return this.LinkWizard()
         case "page.add":   return this.AddNewPage()
         }
-        this.EventLogger("palette: nothing does " id)
+        this.WriteLog("palette: nothing does " id)
     }
     ; The prerendered body, when the project asks for one. Off unless the
     ; compile settings say otherwise, because it is a copy of the markup and a
@@ -5261,7 +5354,7 @@ class AxStudio extends AxGui {
         st := this.P.Main().StartState
         if (st = "max" || st = "min" || !(this.RunW > 0))
             how := "design"
-        dbg := {Log: this.Store "\preview.EventLogger",
+        dbg := {Log: this.Store "\preview.log",
                 X: (how != "design") ? this.RunX : 0, Y: (how != "design") ? this.RunY : 0,
                 W: (how = "last") ? this.RunW : 0, H: (how = "last") ? this.RunH : 0,
                 At: (how = "place"), Page: (how = "last") ? this.RunPage : ""}
@@ -5291,7 +5384,7 @@ class AxStudio extends AxGui {
             ; Problems is a full-size view now, so the message has somewhere
             ; to be read rather than needing a dialog to carry it.
             b := this.RunBlock := AxStudio.BlockOf(r.Msg, code)
-            this.EventLogger("check said: " r.Msg)
+            this.WriteLog("check said: " r.Msg)
             this.Problem("Will not run: " b.Msg (b.Fn != "" ? "  -- in " b.Fn "(), see Problems" : "  -- see Problems"))
             this.SetMid("lint")
             return
@@ -5309,8 +5402,8 @@ class AxStudio extends AxGui {
             ; the files on App > Files beside it, as they will be beside the exe
             try AxFilesUi.Stage(this, this.Store)
             ; a fresh log, so what is read back belongs to this run
-            try FileDelete(dbg.EventLogger)
-            this.EventLoggerPos := 0
+            try FileDelete(dbg.Log)
+            this.LogPos := 0
             this.Out := []
             Run('"' A_AhkPath '" "' p '"', this.Store, , &pid)
             this.PreviewPid := pid
@@ -5353,11 +5446,11 @@ class AxStudio extends AxGui {
             this.Problem("Reading the preview log: " e.Message)
     }
     _Tail() {
-        r := AxDbg.Read(this.Store "\preview.EventLogger", this.EventLoggerPos)
-        this.EventLoggerPos := r.At
+        r := AxDbg.Read(this.Store "\preview.log", this.LogPos)
+        this.LogPos := r.At
         touched := false
         for line in r.Lines
-            touched := this.EventLoggerLine(line) || touched
+            touched := this.LogLine(line) || touched
         if touched
             this.RenderPanel()
         if (this.PreviewPid && !ProcessExist(this.PreviewPid))
@@ -5398,10 +5491,10 @@ class AxStudio extends AxGui {
     ; AxStudio.Wizards.ahk, with the answers alongside each other and the line
     ; they will write shown underneath as you fill them in.
     ; each shows the section it adds to, wherever it was started from
-    ValueWizard() => (this.EventLoggericSec := "values", AxWiz.Value(this))
-    BindWizard() => (this.EventLoggericSec := "bindings", AxWiz.Bind(this))
-    FlowWizard() => (this.EventLoggericSec := "rules", AxWiz.Flow(this))
-    StateWizard() => (this.EventLoggericSec := "states", AxWiz.State(this))
+    ValueWizard() => (this.LogicSec := "values", AxWiz.Value(this))
+    BindWizard() => (this.LogicSec := "bindings", AxWiz.Bind(this))
+    FlowWizard() => (this.LogicSec := "rules", AxWiz.Flow(this))
+    StateWizard() => (this.LogicSec := "states", AxWiz.State(this))
 
     NamedIn(w) {
         out := []
@@ -5549,7 +5642,7 @@ class AxStudio extends AxGui {
                   . "the right. Logic is values, bindings, rules, states and hotkeys. Code is "
                   . "every piece of code. App is the windows, the files and the build. Problems "
                   . "and Output are along the bottom of all four."}],
-            Buttons: ["Right you are"], CancelIndex: 0})
+            Buttons: ["OK"], CancelIndex: 0})
     }
     static KeyTable(title, rows) {
         h := '<div class="axd-keyh">' title '</div><table class="axd-keys">'

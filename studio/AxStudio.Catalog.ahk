@@ -111,7 +111,39 @@ class AxCat {
         "ItemCheck",    {Sig: "ctl, item, checked",  Wire: ""},
         "ItemExpand",   {Sig: "ctl, item, expanded", Wire: ""},
         "ItemFocus",    {Sig: "ctl, item",           Wire: ""},
-        "ColClick",     {Sig: "ctl, column",         Wire: ""})
+        "ColClick",     {Sig: "ctl, column",         Wire: ""},
+        ; A ribbon raises its own, and they are attached to the component
+        ; behind the control rather than to the control -- which does not
+        ; exist until the window is up, hence Via.
+        ; Filter is what makes "one button, one rule" possible: a rule or a
+        ; handler written for Command:bold runs only when the id is bold. A
+        ; ribbon raises ONE event for forty buttons, so without this every
+        ; ribbon in the world needs a hand-written switch -- which is exactly
+        ; what the ribbon template had, and the reason it showed none of the
+        ; studio off.
+        "Command",      {Sig: "id, item, theRibbon",   Wire: "OnCommand",  Via: "component", Filter: "id",
+                         Help: "One rule per button: rib Command:bold -> ..."},
+        "Toggle",       {Sig: "id, on, theRibbon",     Wire: "OnToggle",   Via: "component", Filter: "id",
+                         Help: "A button that stays in or out. `on` says which way it went."},
+        "TabPicked",    {Sig: "tabId, theRibbon",      Wire: "OnTab",      Via: "component", Filter: "tabId",
+                         Help: "Narrow it to one tab: rib TabPicked:home -> ..."},
+        "Launcher",     {Sig: "groupId, theRibbon",    Wire: "OnLauncher", Via: "component", Filter: "groupId",
+                         Help: "The little arrow in the corner of a group."},
+        "Collapse",     {Sig: "rolledUp, theRibbon",   Wire: "OnCollapse", Via: "component"},
+        ; A file window raises what it is doing, and a rule can answer it.
+        ; These are the state's own, handed out by the control.
+        "WentTo",       {Sig: "path, fileState",       Wire: "OnPath",     Via: "component", Hands: true,
+                         Help: "Somewhere else is being shown. `path` is where."},
+        "Opened",       {Sig: "item, fileState",       Wire: "OnActivate", Via: "component", Hands: true,
+                         Help: "Something was double-clicked. `item` is what."},
+        "Picked",       {Sig: "items, fileState",      Wire: "OnSelect",   Via: "component", Hands: true,
+                         Help: "What is selected changed. `items` is the list."},
+        "Dropped",      {Sig: "paths, onto, fileState", Wire: "OnDrop",    Via: "component", Hands: true,
+                         Help: "Files were dropped on it. `paths` is what, `onto` is where."},
+        "ModeChanged",  {Sig: "viewMode, fileState",   Wire: "OnMode",     Via: "component", Hands: true,
+                         Help: "It was switched between icons, list, details and the rest."},
+        "Input",        {Sig: "id, value, theRibbon",  Wire: "OnInput",    Via: "component", Filter: "id",
+                         Help: "A box, a colour or a gallery in the ribbon. `value` is what it now holds."})
 
     ; Code that runs where it sits while the window is being built. Not a
     ; control: the export writes it out as it stands, and the canvas shows it
@@ -122,13 +154,23 @@ class AxCat {
 
     static Sig(name) => AxCat.IsPart(name) ? "el, ev" : AxCat.Events.Has(name) ? AxCat.Events[name].Sig : "ctl, ev, el"
     static Wire(name) => AxCat.Events.Has(name) ? AxCat.Events[name].Wire : ""
+    ; "component": wired to the rich object behind the control, once the
+    ; window is up. Everything else is wired to the control itself.
+    static Via(name) => (AxCat.Events.Has(name) && AxCat.Events[name].HasOwnProp("Via"))
+                      ? AxCat.Events[name].Via : ""
     ; A pack's own event can name the parameter a rule picks on: a rule for
     ; "Hit:coin" runs only when the handler's `tag` is "coin".
     static Filter(name) => (AxCat.Events.Has(name) && AxCat.Events[name].HasOwnProp("Filter")) ? AxCat.Events[name].Filter : ""
     static Help(name) => (AxCat.Events.Has(name) && AxCat.Events[name].HasOwnProp("Help")) ? AxCat.Events[name].Help : ""
-    ; whether the rules of this event take the handler's own parameters --
-    ; true for a pack's events, which is where a rule needs the thing it hit
-    static FlowArgs(name) => (AxCat.Events.Has(name) && AxCat.Events[name].HasOwnProp("Filter")) ? AxCat.Events[name].Sig : ""
+    ; Whether the rules of this event take the handler's own parameters.
+    ; Filter implies it -- a rule cannot be narrowed to a value it cannot
+    ; see -- and Hands says so for an event that has something worth handing
+    ; on without anything to narrow: a file window's `path`, the list of
+    ; things dropped on it. Without this a rule for such an event was handed
+    ; nothing, and "assign where =path" quietly wrote an empty value.
+    static FlowArgs(name) => (AxCat.Events.Has(name)
+        && (AxCat.Events[name].HasOwnProp("Filter") || AxCat.Events[name].HasOwnProp("Hands")))
+        ? AxCat.Events[name].Sig : ""
     ; A click on something inside a control's popover, by the id it has there:
     ; "Pop_popSignOut". Written as g.On("click", "popSignOut", handler).
     static IsPart(name) => SubStr(name, 1, 4) = "Pop_"

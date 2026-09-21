@@ -721,7 +721,7 @@ class AxAuto2Ui {
                 {Id: "opts", L: "The choices", Kind: "text", V: O("Options", "dark,light,system"),
                  When: (V) => V["kind"] = "choice", Hint: "With commas between."}],
             Buttons: [IsObject(old) ? "Save" : "Add it", "Cancel"],
-            Check: (V) => AxProject.CleanName(V["name"]) = "" ? "Give it a name." : ""})
+            Check: (V) => AxProject.CleanName(V["name"]) = "" ? "Enter a name." : ""})
         if !r.Ok
             return
         s.PutLine("Settings", IsObject(old) ? old.Line : "",
@@ -855,7 +855,7 @@ class AxAuto2Ui {
                 {Id: "steps", L: "Does", Kind: "text", V: O("Text", "toast New: {name}"),
                  Hint: AxAutoUi.StepHint " {file} is the whole path, {name} the file's name, {kind} what happened."}],
             Buttons: [IsObject(old) ? "Save" : "Add it", "Cancel"],
-            Check: (V) => AxProject.CleanName(V["name"]) = "" ? "Give it a name."
+            Check: (V) => AxProject.CleanName(V["name"]) = "" ? "Enter a name."
                         : Trim(V["folder"]) = "" ? "Say which folder."
                         : !(V["added"] || V["changed"] || V["removed"] || V["renamed"]) ? "Tick at least one kind of change." : ""})
         if !r.Ok

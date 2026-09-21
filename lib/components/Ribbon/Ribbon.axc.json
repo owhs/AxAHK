@@ -1,0 +1,74 @@
+{
+  "name": "Ribbon",
+  "description": "The band of commands across the top: tabs over grouped panels, one compact line, a plain strip, or tabs in the window's own title bar.",
+  "order": 5200,
+  "css": "AxRibbon.css",
+  "include": "lib\\components\\Ribbon\\AxRibbon.ahk",
+  "requires": [],
+  "controls": [
+    {
+      "type": "Ribbon",
+      "label": "Ribbon",
+      "icon": "E7C4",
+      "category": "Containers",
+      "prefix": "rib",
+      "props": [
+        {
+          "key": "mode",
+          "label": "Shape",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "office|simple|strip|titlebar",
+          "default": "office"
+        },
+        {
+          "key": "collapsed",
+          "label": "Start rolled up",
+          "kind": "flag"
+        },
+        {
+          "key": "style2",
+          "label": "Style",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "fluent|classic|flat|outlined",
+          "default": "fluent"
+        },
+        {
+          "key": "density",
+          "label": "Density",
+          "kind": "choice",
+          "emit": "kv",
+          "options": "comfortable|compact|roomy",
+          "default": "comfortable"
+        },
+        {
+          "key": "color",
+          "label": "Accent colour",
+          "kind": "color",
+          "emit": "kv"
+        },
+        {
+          "key": "inset",
+          "label": "Keep the page margins",
+          "kind": "flag"
+        }
+      ],
+      "events": [
+        "Command",
+        "Toggle",
+        "TabPicked",
+        "Launcher",
+        "Collapse",
+        "Input"
+      ],
+      "arg": {
+        "key": "data",
+        "label": "Tabs and options (an AHK expression)",
+        "kind": "multiline",
+        "raw": true,
+        "default": "{Tabs: [{Id: \"home\", Title: \"Home\", Groups: [\n    {Id: \"g1\", Title: \"Clipboard\", Items: [\n        {Id: \"paste\", Label: \"Paste\", Icon: \"E77F\", Size: \"large\"},\n        {Id: \"copy\", Label: \"Copy\", Icon: \"E8C8\"}]}]}]}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,430 @@
+/* =============================================================================
+   AxFileView.css — the shape of a file window and its parts.
+
+   The base layer: the page loads this before the theme, so it says what each
+   part *is* and the theme says what it looks like. Two things here are older
+   than they look, and both are Trident:
+
+   * the details view is two tables — a clipped head over a scrolling body,
+     kept in step from AHK — because IE11 has no position:sticky;
+   * the tool rows are inline-block rather than flex, because IE11 computes
+     flex-basis:auto from an item's CONTENT box even under border-box, so a
+     padded button in a flex row lays out narrower than its own label.
+
+   Accent material is written as #60cdff so AxSys.RecolourCss finds it and
+   SetAccent moves it with everything else.
+   ============================================================================= */
+
+/* ---------------------------------------------------------- scrollbars ---
+   Trident paints a scrolling element's native scrollbar outside the normal
+   z-order, so a context menu or a popover -- position:fixed, z-index 100000 --
+   comes out UNDER the scrollbar of the pane it is over. Giving every scrolling
+   pane here its own stacking context at z-index 0 puts its scrollbar back
+   inside that context, and the overlays sit above it again. */
+.fv-scroll, .ft, .fpv, .fv-headwrap, .fp-poplist { position: relative; z-index: 0; }
+
+/* ============================================================== the viewer */
+.fv { position: relative; -ms-user-select: none; user-select: none;
+      border: 1px solid rgba(255,255,255,.0698); border-radius: 6px; overflow: hidden;
+      background: rgba(255,255,255,.0345); display: block; }
+body.theme-light .fv { border-color: rgba(0,0,0,.0578); background: #fbfbfb; }
+.fv.fill { width: 100%; }
+.fv.focus { border-color: rgba(128,128,128,.65); }
+.fv-headwrap { overflow: hidden; border-bottom: 1px solid rgba(255,255,255,.0698); }
+body.theme-light .fv-headwrap { border-bottom-color: rgba(0,0,0,.0578); }
+.fv-scroll { overflow: auto; outline: none; }
+.fv-canvas { min-height: 40px; }
+.fv-table { table-layout: fixed; border-collapse: collapse; border-spacing: 0; }
+
+/* ------------------------------------------------------------- the header */
+.fv-h { position: relative; height: 32px; padding: 0 10px; text-align: left; font-weight: 600;
+        font-size: 12px; color: rgba(255,255,255,.786); white-space: nowrap; overflow: hidden;
+        text-overflow: ellipsis; background: rgba(255,255,255,.0345); cursor: default; }
+body.theme-light .fv-h { color: rgba(0,0,0,.6); background: #f6f6f6; }
+.fv-h:hover { background: rgba(255,255,255,.0605); }
+body.theme-light .fv-h:hover { background: #efefef; }
+.fv-h.right { text-align: right; } .fv-h.center { text-align: center; }
+.fv-sortmark { font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 9px;
+               margin-left: 6px; opacity: 0; }
+.fv-h.sorted .fv-sortmark { opacity: .9; }
+/* the grip straddles the column edge so it is easy to grab */
+.fv-grip { position: absolute; top: 0; right: -3px; width: 7px; height: 100%; cursor: col-resize; z-index: 3; }
+.fv-grip:hover, .fv-grip:active { background: rgba(128,128,128,.6); }
+
+/* --------------------------------------------------------- details: rows */
+.fv-row { height: 30px; }
+.fv-row:hover > .fv-c { background: rgba(255,255,255,.0605); }
+body.theme-light .fv-row:hover > .fv-c { background: rgba(0,0,0,.0373); }
+.fv-row.sel > .fv-c { background: rgba(255,255,255,.0837); }
+body.theme-light .fv-row.sel > .fv-c { background: rgba(0,0,0,.0578); }
+.fv-row.cursor > .fv-c { box-shadow: inset 0 0 0 1px rgba(128,128,128,.45); }
+.fv-row.droptarget > .fv-c { background: rgba(96,205,255,.18); box-shadow: inset 0 0 0 1px #60cdff; }
+.fv-c { padding: 0 10px; font-size: 13px; white-space: nowrap; overflow: hidden;
+        text-overflow: ellipsis; border-top: 1px solid rgba(255,255,255,.035); }
+body.theme-light .fv-c { border-top-color: rgba(0,0,0,.035); }
+.fv-c.right { text-align: right; } .fv-c.center { text-align: center; }
+.fv-c.dim { color: rgba(255,255,255,.55); }
+body.theme-light .fv-c.dim { color: rgba(0,0,0,.45); }
+.fv-c.editable:hover { box-shadow: inset 0 0 0 1px rgba(128,128,128,.35); }
+/* a row is a <tr>: never give it a :before. Generated content on a table row
+   gets wrapped in an anonymous table-cell, which adds a phantom column and
+   shifts every real cell out of line with the <col> widths. */
+.fv-row.hidden-item { opacity: .45; }
+.fv-row.hidden-item .fv-glyph { opacity: .5; }
+
+/* groups, in the table and in the flowed modes alike */
+.fv-group > td { background: rgba(255,255,255,.055); font-weight: 600; height: 28px;
+                 padding: 0 10px; border-top: 1px solid rgba(255,255,255,.07); }
+body.theme-light .fv-group > td { background: #f1f1f1; border-top-color: rgba(0,0,0,.06); }
+.fv-ghead { padding: 14px 10px 4px; font-weight: 600; font-size: 12px;
+            color: rgba(255,255,255,.786); }
+body.theme-light .fv-ghead { color: rgba(0,0,0,.6); }
+.fv-gname { vertical-align: middle; }
+.fv-gcount { margin-left: 8px; font-weight: 400; font-size: 12px; opacity: .55; vertical-align: middle; }
+
+.fv-empty { padding: 34px 14px; text-align: center; font-size: 12px; color: rgba(255,255,255,.45); }
+body.theme-light .fv-empty { color: rgba(0,0,0,.4); }
+
+/* ------------------------------------------ list, tiles, icons and thumbs */
+/* inline-block rather than flex-wrap: IE11 wraps flex items but will not give
+   the last line of a wrapped row the same alignment, and a file grid notices. */
+.fv-flow { padding: 6px; font-size: 0; }
+.fv-flow:after { content: ""; display: block; clear: both; height: 0; }
+.fv-box { display: inline-block; vertical-align: top; position: relative; margin: 2px;
+          padding: 6px; border-radius: 5px; font-size: 13px; cursor: default;
+          overflow: hidden; }
+.fv-box:hover { background: rgba(255,255,255,.0605); }
+body.theme-light .fv-box:hover { background: rgba(0,0,0,.0373); }
+.fv-box.sel { background: rgba(255,255,255,.0837); }
+body.theme-light .fv-box.sel { background: rgba(0,0,0,.0578); }
+.fv-box.cursor { box-shadow: inset 0 0 0 1px rgba(128,128,128,.45); }
+.fv-box.droptarget { background: rgba(96,205,255,.18); box-shadow: inset 0 0 0 1px #60cdff; }
+.fv-box.hidden-item { opacity: .45; }
+.fv-art { display: block; text-align: center; }
+.fv-label { display: block; overflow: hidden; }
+.fv-name { vertical-align: middle; }
+.fv-meta { display: block; font-size: 11px; color: rgba(255,255,255,.5); overflow: hidden;
+           white-space: nowrap; text-overflow: ellipsis; }
+body.theme-light .fv-meta { color: rgba(0,0,0,.42); }
+.fv-thumb { border-radius: 3px; vertical-align: middle; }
+.fv-glyph { font-size: 15px; margin-right: 8px; vertical-align: middle; opacity: .85; }
+.fv-glyph.folder { color: #e8b44a; opacity: 1; }
+
+/* list: one narrow column of rows that flow down and then across */
+.fv.list .fv-flow { padding: 4px; }
+.fv.list .fv-box { display: block; width: auto; padding: 3px 8px; margin: 0; }
+.fv.list .fv-art { display: inline-block; vertical-align: middle; }
+.fv.list .fv-label { display: inline-block; vertical-align: middle; max-width: 70%; }
+.fv.list .fv-meta { display: inline-block; margin-left: 10px; }
+.fv.list .fv-name { display: inline-block; max-width: 100%; overflow: hidden;
+                    text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+
+/* tiles: the icon beside two lines of detail */
+.fv.tiles .fv-box { text-align: left; }
+.fv.tiles .fv-art { display: inline-block; vertical-align: middle; width: 40px; text-align: center; }
+.fv.tiles .fv-art .fv-glyph { font-size: 28px; margin: 0; }
+.fv.tiles .fv-label { display: inline-block; vertical-align: middle; width: 76%; padding-left: 8px; }
+.fv.tiles .fv-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* icons and thumbs: the picture over the name, centred */
+.fv.icons .fv-box, .fv.thumbs .fv-box { text-align: center; }
+.fv.icons .fv-name, .fv.thumbs .fv-name { display: block; word-wrap: break-word;
+    max-height: 32px; overflow: hidden; line-height: 16px; }
+.fv.icons .fv-glyph, .fv.thumbs .fv-glyph { margin: 0; }
+
+/* the tick boxes, when they are on */
+.fv-check { display: inline-block; width: 16px; height: 16px; margin-right: 8px; border-radius: 3px;
+            vertical-align: middle; border: 1px solid rgba(255,255,255,.55); text-align: center;
+            line-height: 14px; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 10px; }
+body.theme-light .fv-check { border-color: rgba(0,0,0,.45); }
+.fv-row.ticked .fv-check:before, .fv-box.ticked .fv-check:before { content: "\E73E"; }
+.fv-row.ticked .fv-check, .fv-box.ticked .fv-check { background: #60cdff; border-color: #60cdff; color: #000; }
+/* on a box the tick sits in the corner, over the picture */
+.fv.icons .fv-check, .fv.thumbs .fv-check, .fv.tiles .fv-check {
+    position: absolute; top: 5px; left: 5px; margin: 0; z-index: 2;
+    background: rgba(32,32,32,.6); }
+body.theme-light .fv.icons .fv-check, body.theme-light .fv.thumbs .fv-check,
+body.theme-light .fv.tiles .fv-check { background: rgba(255,255,255,.8); }
+/* ...and the ticked look has to come after those, and outrank them. Written
+   earlier at the same weight it lost the cascade, and a ticked box in a
+   picture view kept the chip's own grey with a black mark on it -- ticking
+   worked perfectly and looked like nothing had happened. */
+.fv .fv-row.ticked .fv-check, .fv .fv-box.ticked .fv-check {
+    background: #60cdff; border-color: #60cdff; color: #000; }
+.fv .fv-row.ticked .fv-check:before, .fv .fv-box.ticked .fv-check:before { content: "\E73E"; }
+/* and again for light, which carries a body element selector in its corner
+   rule and so outranks the line above. The mark is white there because the
+   light accent is a dark blue, where a black tick would not read. */
+body.theme-light .fv .fv-row.ticked .fv-check,
+body.theme-light .fv .fv-box.ticked .fv-check {
+    background: #60cdff; border-color: #60cdff; color: #fff; }
+
+/* ---------------------------------------------------- the rich cell parts */
+.fv-text, .fv-num, .fv-path { vertical-align: middle; }
+.fv-path { opacity: .6; }
+.fv-cico { font-size: 14px; vertical-align: middle; opacity: .8; }
+/* a bar and its number, side by side, the bar taking whatever is left */
+.fv-bar { display: inline-block; vertical-align: middle; width: 58%; height: 6px; border-radius: 3px;
+          background: rgba(128,128,128,.28); overflow: hidden; }
+.fv-bar-fill { display: block; height: 100%; background: #60cdff; border-radius: 3px; }
+.fv-bar-text { display: inline-block; vertical-align: middle; margin-left: 8px; font-size: 12px;
+               opacity: .75; }
+.fv-stars { vertical-align: middle; white-space: nowrap; }
+.fv-star { font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 12px;
+           opacity: .35; margin-right: 1px; }
+.fv-star.on { opacity: 1; color: #f3c623; }
+.fv-stars.live .fv-star:hover { opacity: 1; }
+.fv-chip { display: inline-block; vertical-align: middle; height: 18px; line-height: 18px;
+           padding: 0 8px; margin-right: 4px; border-radius: 9px; font-size: 11px;
+           background: rgba(255,255,255,.09); }
+body.theme-light .fv-chip { background: rgba(0,0,0,.06); }
+.fv-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+             vertical-align: middle; margin-right: 8px; box-shadow: inset 0 0 0 1px rgba(128,128,128,.4); }
+.fv-swtext { vertical-align: middle; }
+.fv-toggle { display: inline-block; vertical-align: middle; width: 30px; height: 16px;
+             border-radius: 8px; background: rgba(128,128,128,.35); position: relative; }
+.fv-toggle .knob { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px;
+                   border-radius: 6px; background: #fff; }
+.fv-toggle.on { background: #60cdff; }
+.fv-toggle.on .knob { left: 16px; }
+.fv-spark { display: inline-block; vertical-align: middle; height: 18px; }
+.fv-spark-b { display: inline-block; width: 3px; margin-right: 2px; background: #60cdff;
+              vertical-align: bottom; opacity: .8; }
+.fv-badges { display: block; margin-top: 3px; }
+.fv-badge { display: inline-block; margin-right: 6px; font-size: 11px; opacity: .8; }
+/* the editor that replaces a cell's contents while you type into it */
+.fv-input { width: 100%; height: 22px; line-height: 22px; padding: 0 4px; font-size: 13px;
+            font-family: inherit; color: inherit; border-radius: 3px;
+            border: 1px solid #60cdff; background: rgba(0,0,0,.35); outline: none; }
+body.theme-light .fv-input { background: #fff; color: #1b1b1b; }
+body.fv-dragging, body.fv-dragging * { cursor: copy !important; }
+
+/* ================================================================ the tree */
+.ft { overflow: auto; -ms-user-select: none; user-select: none;
+      border-right: 1px solid rgba(255,255,255,.0698); }
+body.theme-light .ft { border-right-color: rgba(0,0,0,.0578); }
+.ft-body { padding: 4px 0 8px; outline: none; }
+/* the pane shows where the keyboard is, as the viewer's frame does */
+.ft.focus .ft-row.cur { box-shadow: inset 0 0 0 1px rgba(128,128,128,.55); }
+.ft-row { height: 28px; line-height: 28px; padding-right: 8px; white-space: nowrap;
+          overflow: hidden; text-overflow: ellipsis; cursor: default; font-size: 13px;
+          border-radius: 4px; margin: 0 4px 1px; }
+.ft-row:hover { background: rgba(255,255,255,.0605); }
+body.theme-light .ft-row:hover { background: rgba(0,0,0,.0373); }
+.ft-row.cur { background: rgba(255,255,255,.0837); font-weight: 600; }
+body.theme-light .ft-row.cur { background: rgba(0,0,0,.0578); }
+.ft-twisty { display: inline-block; width: 16px; text-align: center; vertical-align: middle;
+             font-size: 8px; opacity: .7; }
+.ft-twisty.open { transform: rotate(90deg); }
+.ft-twisty.leaf { opacity: 0; }
+.ft-ico { font-size: 14px; margin-right: 7px; vertical-align: middle; color: #e8b44a; }
+.ft-name { vertical-align: middle; }
+
+/* ============================================================== the places */
+.fpl { -ms-user-select: none; user-select: none; flex: 0 0 auto; max-height: 45%; overflow: auto;
+       position: relative; z-index: 0; }
+.fpl-body { padding: 6px 0 4px; outline: none; }
+.fpl-head { padding: 8px 10px 3px; font-size: 11px; font-weight: 600; letter-spacing: .02em;
+            text-transform: uppercase; color: rgba(255,255,255,.45); }
+body.theme-light .fpl-head { color: rgba(0,0,0,.4); }
+.fpl-row { height: 28px; line-height: 28px; padding: 0 6px 0 10px; margin: 0 4px 1px;
+           border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+           cursor: default; font-size: 13px; position: relative; }
+.fpl-row:hover { background: rgba(255,255,255,.0605); }
+body.theme-light .fpl-row:hover { background: rgba(0,0,0,.0373); }
+.fpl-row.cur { background: rgba(255,255,255,.0837); font-weight: 600; }
+body.theme-light .fpl-row.cur { background: rgba(0,0,0,.0578); }
+.fpl-ico { font-size: 14px; margin-right: 9px; vertical-align: middle; color: #e8b44a; }
+.fpl-name { vertical-align: middle; }
+/* the pin shows on hover, or whenever it is stuck in */
+.fpl-pin { position: absolute; right: 6px; top: 0; height: 28px; line-height: 28px; width: 20px;
+           text-align: center; font-size: 11px; opacity: 0; }
+.fpl-row:hover .fpl-pin { opacity: .55; }
+.fpl-pin:hover { opacity: 1 !important; }
+.fpl-pin.on { opacity: .9; color: #60cdff; }
+.fpl-none { padding: 18px 12px; text-align: center; font-size: 12px; opacity: .45; }
+body.sheet-win98 .fpl-row, body.sheet-winxp .fpl-row { border-radius: 0; color: #000; }
+body.sheet-win98 .fpl-row.cur { background: #000080; color: #fff; }
+body.sheet-winxp .fpl-row.cur { background: #316ac5; color: #fff; }
+body.sheet-win98.theme-dark .fpl-row, body.sheet-winxp.theme-dark .fpl-row { color: #e8e8e8; }
+
+/* ============================================================ the path bar */
+.fp { position: relative; height: 32px; }
+.fp.fill { width: 100%; }
+.fp-crumbs { display: block; height: 32px; line-height: 32px; white-space: nowrap;
+             overflow: hidden; border-radius: 4px; background: rgba(255,255,255,.0345);
+             border: 1px solid rgba(255,255,255,.0698); }
+body.theme-light .fp-crumbs { background: #fbfbfb; border-color: rgba(0,0,0,.0578); }
+.fp-step { display: inline-block; height: 26px; line-height: 26px; padding: 0 7px; margin: 2px 0 0 2px;
+           border-radius: 4px; vertical-align: middle; cursor: default; font-size: 13px;
+           color: rgba(255,255,255,.786); }
+body.theme-light .fp-step { color: rgba(0,0,0,.62); }
+.fp-step:hover { background: rgba(255,255,255,.0605); color: #fff; }
+body.theme-light .fp-step:hover { background: rgba(0,0,0,.0373); color: #1b1b1b; }
+.fp-step .ico { font-size: 13px; margin-right: 6px; vertical-align: -1px; }
+.fp-step.cur { font-weight: 600; color: #fff; }
+body.theme-light .fp-step.cur { color: #1b1b1b; }
+.fp-chev { display: inline-block; width: 18px; height: 26px; line-height: 26px; text-align: center;
+           font-size: 8px; vertical-align: middle; opacity: .5; border-radius: 4px; cursor: default; }
+.fp-chev:hover { background: rgba(255,255,255,.0837); opacity: 1; }
+body.theme-light .fp-chev:hover { background: rgba(0,0,0,.0578); }
+/* the empty stretch after the last step: click it and the bar becomes a box */
+.fp-rest { display: inline-block; vertical-align: middle; height: 30px; width: 60%;
+           cursor: text; }
+.fp-box { display: none; width: 100%; height: 32px; line-height: 30px; padding: 0 9px;
+          font-size: 13px; font-family: inherit; color: inherit; border-radius: 4px;
+          border: 1px solid #60cdff; background: rgba(0,0,0,.28); outline: none; }
+body.theme-light .fp-box { background: #fff; color: #1b1b1b; }
+#axPop.fp-pop { padding: 4px; }
+.fp-poplist { min-width: 190px; max-height: 320px; overflow: auto; }
+.fp-pi { height: 30px; line-height: 30px; padding: 0 12px 0 10px; border-radius: 4px;
+         white-space: nowrap; cursor: default; font-size: 13px; }
+.fp-pi .ico { font-size: 14px; margin-right: 9px; vertical-align: -2px; color: #e8b44a; }
+.fp-pi:hover { background: rgba(255,255,255,.0605); }
+body.theme-light .fp-pi:hover { background: rgba(0,0,0,.0373); }
+.fp-pi.on { font-weight: 600; }
+.fp-pi.empty { opacity: .5; font-style: italic; }
+.fp-pi.empty .ico { display: none; }
+
+/* ======================================================== the preview pane */
+.fpv { overflow: auto; border-left: 1px solid rgba(255,255,255,.0698); }
+body.theme-light .fpv { border-left-color: rgba(0,0,0,.0578); }
+.fpv-head { padding: 12px 14px 8px; font-weight: 600; font-size: 14px; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; }
+.fpv-body { padding: 0 14px 16px; font-size: 12px; }
+.fpv-art { text-align: center; padding: 6px 0 12px; }
+.fpv-art img { max-width: 100%; border-radius: 5px; }
+.fpv-big { text-align: center; padding: 18px 0 10px; }
+.fpv-big .ico { font-size: 64px; opacity: .55; }
+.fpv-big .ico.folder { color: #e8b44a; opacity: 1; }
+.fpv-sum { text-align: center; opacity: .7; padding-bottom: 12px; }
+.fpv-list { padding-bottom: 12px; }
+.fpv-mini { height: 24px; line-height: 24px; white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis; }
+.fpv-mini .ico { font-size: 13px; margin-right: 8px; vertical-align: -2px; opacity: .75; }
+.fpv-mini.more { opacity: .5; font-style: italic; }
+.fpv-text, .fpv-data { max-height: 260px; overflow: auto; padding: 8px 10px; border-radius: 5px;
+            background: rgba(0,0,0,.22); font-family: Consolas, "Courier New", monospace;
+            font-size: 11px; line-height: 16px; white-space: pre-wrap; word-wrap: break-word;
+            margin: 0 0 12px; }
+body.theme-light .fpv-text, body.theme-light .fpv-data { background: rgba(0,0,0,.045); }
+.fpv-data { white-space: pre-wrap; max-height: 160px; }
+.fpv-facts { border-top: 1px solid rgba(255,255,255,.07); padding-top: 8px; }
+body.theme-light .fpv-facts { border-top-color: rgba(0,0,0,.06); }
+.fpv-row { padding: 3px 0; overflow: hidden; }
+.fpv-k { display: inline-block; width: 38%; vertical-align: top; opacity: .55; }
+.fpv-v { display: inline-block; width: 60%; vertical-align: top; word-wrap: break-word; }
+.fpv-none { padding: 30px 8px; text-align: center; opacity: .45; }
+
+/* ======================================================== the status strip */
+.fst { height: 28px; line-height: 28px; font-size: 12px; overflow: hidden;
+       color: rgba(255,255,255,.62); }
+body.theme-light .fst { color: rgba(0,0,0,.5); }
+.fst.fill { width: 100%; }
+.fst-l { float: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+.fst-r { float: right; white-space: nowrap; }
+.fst-v { display: inline-block; width: 26px; height: 24px; line-height: 24px; text-align: center;
+         border-radius: 4px; vertical-align: middle; cursor: default; opacity: .65; }
+.fst-v .ico { font-size: 13px; }
+.fst-v:hover { background: rgba(255,255,255,.0605); opacity: 1; }
+body.theme-light .fst-v:hover { background: rgba(0,0,0,.0373); }
+.fst-v.on { background: rgba(255,255,255,.0837); opacity: 1; }
+body.theme-light .fst-v.on { background: rgba(0,0,0,.0578); }
+
+/* ============================================================ the toolbar */
+/* inline-block, not flex — see the note at the top of this file. */
+.fx-tools { display: block; white-space: nowrap; }
+.fx-tools > * { display: inline-block; vertical-align: middle; }
+.fx-b { min-width: 30px; height: 28px; line-height: 26px; padding: 0 8px; text-align: center;
+        margin-right: 2px; }
+.fx-b .ico { font-size: 13px; vertical-align: -1px; }
+.fx-b.disabled { opacity: .35; }
+.fx-gap { width: 10px; }
+.fx-search { width: 220px; }
+
+/* ====================================================== the whole explorer */
+/* The explorer is a column: a toolbar and path bar at the top, the file area
+   in the middle, a status strip at the bottom. The middle was given a fixed
+   height in the markup, so an explorer told to fill its box grew the BOX and
+   left the file area where it was -- a band of nothing three hundred pixels
+   deep under the status strip. As a flex column the inline height becomes a
+   starting size instead of a limit: it still stands at that height when
+   nothing is stretching it, and fills when something is. */
+.fx { display: flex; flex-direction: column; position: relative; min-height: 0; }
+.fx > .fx-top, .fx > .fst { flex: 0 0 auto; }
+.fx.fill { width: 100%; }
+/* the toolbar and the path bar take a row each. Side by side they would have
+   to share a width neither of them knows, and a percentage for the path bar
+   runs it off the end the moment the toolbar grows a button. */
+.fx-top { display: block; padding-bottom: 8px; }
+.fx-top > .fx-tools { display: block; }
+.fx-top > .fp { display: block; margin-top: 6px; }
+/* the middle is the one place flex earns its keep: two fixed panes and a
+   middle that takes what is left, at any window width */
+.fx-mid { display: flex; align-items: stretch; height: 420px; flex: 1 1 auto; min-height: 120px;
+          border: 1px solid rgba(255,255,255,.0698); border-radius: 6px; overflow: hidden; }
+body.theme-light .fx-mid { border-color: rgba(0,0,0,.0578); }
+.fx-mid > .fpv { flex: 0 0 auto; }
+/* the side column: places at their natural height, the tree under them */
+.fx-side { flex: 0 0 auto; display: flex; flex-direction: column; min-height: 0;
+           border-right: 1px solid rgba(255,255,255,.0698); }
+body.theme-light .fx-side { border-right-color: rgba(0,0,0,.0578); }
+.fx-side > .ft { flex: 1 1 0%; min-height: 0; border-right: 0; }
+.fx-side > .fpl + .ft { border-top: 1px solid rgba(255,255,255,.0698); }
+body.theme-light .fx-side > .fpl + .ft { border-top-color: rgba(0,0,0,.0578); }
+/* inside the explorer the viewer is a column of its own, so the head stays
+   put and only the body scrolls, however tall the band is */
+.fx-mid > .fv { flex: 1 1 0%; min-width: 0; border: 0; border-radius: 0; background: transparent;
+                display: flex; flex-direction: column; }
+.fx-mid > .fv > .fv-headwrap { flex: 0 0 auto; }
+.fx-mid > .fv > .fv-scroll { flex: 1 1 0%; }
+.fx-grip { flex: 0 0 auto; width: 5px; cursor: col-resize; background: transparent; }
+.fx-grip:hover, .fx-grip:active { background: rgba(128,128,128,.5); }
+.fx > .fst { margin-top: 6px; }
+
+/* ------------------------------------------- the retro stylesheets ------- */
+/* win98 and winxp are their own palettes rather than a light/dark pair, so
+   these say their colours outright instead of leaning on translucent Fluent
+   ones, which vanish against a solid surface. */
+body.sheet-win98 .fv, body.sheet-winxp .fv, body.sheet-win98 .fx-mid, body.sheet-winxp .fx-mid { border-radius: 0; }
+body.sheet-win98 .fv, body.sheet-win98 .fx-mid { background: #fff; border: 1px solid; border-color: #808080 #fff #fff #808080; }
+body.sheet-winxp .fv, body.sheet-winxp .fx-mid { background: #fff; border: 1px solid #7f9db9; }
+body.sheet-win98 .fv-h { background: #c0c0c0; color: #000; border-right: 1px solid #808080;
+    border-bottom: 1px solid #808080; height: 22px; font-weight: normal; }
+body.sheet-winxp .fv-h { background: #f1f1f1; color: #000; border-right: 1px solid #d4d0c8;
+    border-bottom: 1px solid #aca899; height: 22px; }
+body.sheet-win98 .fv-headwrap, body.sheet-winxp .fv-headwrap { border-bottom: 0; }
+body.sheet-win98 .fv-c, body.sheet-winxp .fv-c { border-top: 0; color: #000; }
+body.sheet-win98 .fv-row, body.sheet-winxp .fv-row { height: 20px; }
+body.sheet-win98 .fv-c.dim, body.sheet-winxp .fv-c.dim { color: #444; }
+body.sheet-win98 .fv-row.sel > .fv-c, body.sheet-win98 .fv-box.sel { background: #000080; color: #fff; }
+body.sheet-winxp .fv-row.sel > .fv-c, body.sheet-winxp .fv-box.sel { background: #316ac5; color: #fff; }
+body.sheet-win98 .fv-row.sel > .fv-c.dim, body.sheet-winxp .fv-row.sel > .fv-c.dim { color: #dfe8fb; }
+body.sheet-win98 .fv-group > td { background: #c0c0c0; color: #000; }
+body.sheet-winxp .fv-group > td { background: #ece9d8; color: #000; }
+body.sheet-win98 .ft, body.sheet-winxp .ft { background: #fff; }
+body.sheet-win98 .ft-row, body.sheet-winxp .ft-row { color: #000; border-radius: 0; }
+body.sheet-win98 .ft-row.cur { background: #000080; color: #fff; }
+body.sheet-winxp .ft-row.cur { background: #316ac5; color: #fff; }
+body.sheet-win98 .fp-crumbs, body.sheet-winxp .fp-crumbs { background: #fff; border-radius: 0; }
+body.sheet-win98 .fp-step, body.sheet-winxp .fp-step { color: #000; border-radius: 0; }
+body.sheet-win98 .fpv, body.sheet-winxp .fpv { background: #fff; color: #000; }
+body.sheet-win98 .fst, body.sheet-winxp .fst { color: #000; }
+body.sheet-win98 .fv-empty, body.sheet-winxp .fv-empty { color: #666; }
+body.sheet-win98 .fv-check, body.sheet-winxp .fv-check { background: #fff; border: 1px solid #808080;
+    border-radius: 0; color: #000; }
+body.sheet-win98 .fv-row.ticked .fv-check, body.sheet-winxp .fv-row.ticked .fv-check { background: #fff; color: #000; }
+
+/* and the same again once those sheets are in dark mode */
+body.sheet-win98.theme-dark .fv, body.sheet-win98.theme-dark .fx-mid { background: #232323; border-color: #101010 #6e6e6e #6e6e6e #101010; }
+body.sheet-winxp.theme-dark .fv, body.sheet-winxp.theme-dark .fx-mid { background: #262626; border-color: #6a6a6a; }
+body.sheet-win98.theme-dark .fv-h { background: #4a4a4a; color: #e8e8e8; border-right-color: #202020; border-bottom-color: #202020; }
+body.sheet-winxp.theme-dark .fv-h { background: #4d4d4d; color: #eaeaea; border-right-color: #5a5a5a; border-bottom-color: #5a5a5a; }
+body.sheet-win98.theme-dark .fv-c, body.sheet-winxp.theme-dark .fv-c { color: #e8e8e8; }
+body.sheet-win98.theme-dark .fv-c.dim, body.sheet-winxp.theme-dark .fv-c.dim { color: #b0b0b0; }
+body.sheet-win98.theme-dark .ft, body.sheet-winxp.theme-dark .ft { background: transparent; }
+body.sheet-win98.theme-dark .ft-row, body.sheet-winxp.theme-dark .ft-row { color: #e8e8e8; }
+body.sheet-win98.theme-dark .fp-crumbs, body.sheet-winxp.theme-dark .fp-crumbs { background: #262626; }
+body.sheet-win98.theme-dark .fp-step, body.sheet-winxp.theme-dark .fp-step { color: #e8e8e8; }
+body.sheet-win98.theme-dark .fpv, body.sheet-winxp.theme-dark .fpv { background: transparent; color: #e8e8e8; }
+body.sheet-win98.theme-dark .fst, body.sheet-winxp.theme-dark .fst { color: #d0d0d0; }

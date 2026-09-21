@@ -251,7 +251,7 @@ class AxStepsUi {
                . btn("wrap", "Only do it if...")
                . btn("uiapick", "After it: pick something in another program...")
                . btn("up", "Move up", "Alt+Up") btn("down", "Move down", "Alt+Down")
-               . btn("delete", "Take it out", "Del", "axd-danger") '</div>'
+               . btn("delete", "Remove", "Del", "axd-danger") '</div>'
         }
         h .= '<div class="axs-btns">' btn("code", "Show it in the code") '</div>'
         return h
@@ -452,7 +452,7 @@ class AxStepsUi {
             {Label: "Move down", Icon: "E74B", Click: D("down")},
             "-",
             {Label: "Show it in the code", Icon: "E943", Click: D("code")},
-            {Label: "Take it out", Icon: "E74D", Click: D("delete")}])
+            {Label: "Remove", Icon: "E74D", Click: D("delete")}])
     }
     ; A rule of the piece's event, changed where it is shown -- i is its
     ; place among them; 0 adds one.
@@ -522,6 +522,7 @@ class AxStepsUi {
             {V: "note",   L: "Show a notification",       Icon: "EA8F", Desc: "The small note in the corner of the screen."},
             {V: "set",    L: "Change a value",            Icon: "E70F", Desc: "Set, add to, or switch one of the program's values."},
             {V: "ctl",    L: "Change a control",          Icon: "E71D", Desc: "Its text, its value, show it, hide it, grey it out."},
+            {V: "list",   L: "Change a list or table",     Icon: "E80A", Desc: "Add a row, empty it, fill it from a folder, save it, load it."},
             {V: "menu",   L: "Show a menu",               Icon: "E700", Desc: "One of the window's menus (Logic > Menus), where the pointer is."},
             {V: "if",     L: "Only if...",                Icon: "E8AB", Desc: "A test: the steps inside run only when it is true."},
             {V: "repeat", L: "Repeat",                    Icon: "E8EE", Desc: "A number of times, while something is true, or once for each item."},
@@ -532,7 +533,8 @@ class AxStepsUi {
             {V: "win",    L: "Work another window",       Icon: "E737", Desc: "Bring it to the front, close it, wait for it."},
             {V: "uia",    L: "A button or box in another program", Icon: "E7C4", Desc: "Click it, type into it or read it -- found by what it is, not where."},
             {V: "lib",    L: "Use a library",             Icon: "E82D", Desc: "What other people's libraries do in one step: JSON files, screenshots, the volume, the web..."},
-            {V: "call",   L: "Do one of your functions",  Icon: "E8F4", Desc: "Yours, or an adaptor from Libraries -- .NET and more."},
+            {V: "call",   L: "Call one of your functions",  Icon: "E8F4", Desc: "Yours, or an adaptor from Libraries -- .NET and more."},
+            {V: "bg",     L: "In the background",         Icon: "E916", Desc: "Start something long without the window freezing -- and say what happens when it is done."},
             {V: "stop",   L: "Stop",                      Icon: "E71A", Desc: "Stop here, or stop repeating."},
             {V: "code",   L: "Write the code myself",     Icon: "E943", Desc: "Any AutoHotkey, as it is typed."}]
         ; only is a kind's name, never a flag: false would compare unequal to ""
@@ -548,7 +550,12 @@ class AxStepsUi {
         Of := (V, want*) => AxStepsUi.In(V["kind"], want*)
         vk := "words:Words|value:A value or a sum"
         fields := [
-            {Id: "kind", Kind: "pick", L: "", V: P0("kind", kinds[1].V), Items: kinds, Tiles: kinds.Length > 3},
+            ; The kinds scroll in a box of their own rather than pushing the
+            ; questions off the bottom of the dialog: picking a kind and then
+            ; having to scroll back down to answer it was most of what made
+            ; adding a step feel like work.
+            {Id: "kind", Kind: "pick", L: "", V: P0("kind", kinds[1].V), Items: kinds,
+             Tiles: kinds.Length > 3, Scroll: kinds.Length > 9},
             ; a message
             {Id: "m_text", L: "Says", Kind: "text", V: P0("m_text", "Saved."), When: (V) => Of(V, "msg")},
             {Id: "m_vk", L: "It is", Kind: "seg", V: P0("m_vk", "words"), Opts: vk, When: (V) => Of(V, "msg")},
@@ -634,13 +641,82 @@ class AxStepsUi {
             {Id: "l_new", L: "Called", Kind: "text", V: P0("l_new", "result"), When: (V) => Of(V, "lib") && V["l_who"] = "new"},
             {Id: "l_arg", L: "With", Kind: "text", V: P0("l_arg", ""), When: (V) => Of(V, "lib") && AxStepsUi.LibNeeds(V, "arg"),
              Hint: "What the step needs, as the label says. A file without a folder is beside the program."},
+            ; a list or a table
+            {Id: "li_ctl", L: "Which", Kind: "choice", V: P0("li_ctl", ""), When: (V) => Of(V, "list"),
+             Fill: (V) => AxWiz.ListOpts(s)},
+            {Id: "li_do", L: "Do", Kind: "choice", V: P0("li_do", "addrow"), When: (V) => Of(V, "list"),
+             Opts: "addrow:Add a row|removerow:Remove the selected row|clearlist:Empty it"
+                 . "|folderrows:Fill it from a folder|loadrows:Load it from a file|saverows:Save it to a file"
+                 . "|tickall:Tick every row|untickall:Untick every row"},
+            {Id: "li_cells", L: "The row", Kind: "text", V: P0("li_cells", ""),
+             When: (V) => Of(V, "list") && V["li_do"] = "addrow",
+             Hint: "One cell per column, with | between them. {nameBox} is what that control holds, "
+                 . "=something is an expression (=item.Name inside a repeat), and anything else is text."},
+            {Id: "li_path", L: "Where", Kind: "text", V: P0("li_path", ""),
+             When: (V) => Of(V, "list") && AxStepsUi.In(V["li_do"], "folderrows", "loadrows", "saverows"),
+             Hint: "A folder or a file. Without a folder of its own it is beside the program."},
             ; a function
             {Id: "k_fn", L: "Function", Kind: "choice", V: P0("k_fn", ""), Opts: fns != "" ? fns : "-:(this program has none yet)", When: (V) => Of(V, "call")},
-            {Id: "k_args", L: "Give it", Kind: "text", V: P0("k_args", ""), Ph: "nothing, or values with commas between", When: (V) => Of(V, "call"),
-             Hint: "Text in quotes (" Chr(34) "Hello" Chr(34) "), a number, or a value's name."},
+            ; A box per value it takes, named. It used to be one text box
+            ; holding "a, b, c" -- so using an adaptor meant knowing what it
+            ; took, in what order, and writing the commas yourself. The
+            ; workbench knows what it takes; this asks for them one at a time.
+            {Id: "k_args", Kind: "rows", L: "Give it", When: (V) => Of(V, "call"), Sep: Chr(1),
+             V: AxStepsUi.ArgRows(s, P0("k_fn", ""), P0("k_args", "")),
+             Seeded: AxStepsUi.ArgRows(s, P0("k_fn", ""), ""),
+             Seed: (V) => AxStepsUi.ArgRows(s, V["k_fn"], ""),
+             AddLabel: "One more value", Empty: "It takes nothing.",
+             Cols: [{Id: "n", L: "Which", W: "32%", Kind: "label"},
+                    {Id: "v", L: "What to give it", W: "58%",
+                     Ph: Chr(34) "some text" Chr(34) ", a number, or a value" "'" "s name"}],
+             Hint: "Text in quotes (" Chr(34) "Hello" Chr(34) "), a number, a value" "'" "s name, or {aBox} for "
+                 . "what a control holds."},
             {Id: "k_into", L: "Keep what it gives in", Kind: "choice", V: P0("k_into", "-"), When: (V) => Of(V, "call"),
              Opts: "-:(nothing -- it just does it)" (vals != "" ? "|" vals : "") "|new:A new value..."},
             {Id: "k_new", L: "Called", Kind: "text", V: P0("k_new", "result"), When: (V) => Of(V, "call") && V["k_into"] = "new"},
+            ; --------------------------------------------- in the background
+            ; The one thing that makes a program feel broken is a window that
+            ; stops answering, and every long call does it. An adaptor set to
+            ; run in the background hands back the WORK rather than the
+            ; answer, and these are the four things anyone ever does with
+            ; that -- said in words, with the flowchart to match.
+            {Id: "g_how", L: "How", Kind: "choice", V: P0("g_how", "then"), When: (V) => Of(V, "bg"),
+             Opts: "then:Start it, and when it is done...|start:Start it and carry straight on"
+                 . "|wait:Wait here for it -- the window keeps answering"
+                 . "|all:Wait for several that are already going|any:Carry on when the first of them is done"
+                 . "|done:Ask whether it has finished yet|why:Ask why it failed"},
+            {Id: "g_fn", L: "Do", Kind: "choice", V: P0("g_fn", ""), Fill: (V) => AxStepsUi.BgOpts(s),
+             When: (V) => Of(V, "bg") && AxStepsUi.In(V["g_how"], "then", "start", "wait")},
+            {Id: "g_args", Kind: "rows", L: "Give it", Sep: Chr(1),
+             When: (V) => Of(V, "bg") && AxStepsUi.In(V["g_how"], "then", "start", "wait"),
+             V: AxStepsUi.ArgRows(s, P0("g_fn", ""), P0("g_args", "")),
+             Seeded: AxStepsUi.ArgRows(s, P0("g_fn", ""), ""),
+             Seed: (V) => AxStepsUi.ArgRows(s, V["g_fn"], ""),
+             AddLabel: "One more value", Empty: "It takes nothing.",
+             Cols: [{Id: "n", L: "Which", W: "32%", Kind: "label"},
+                    {Id: "v", L: "What to give it", W: "58%"}]},
+            {Id: "g_when", L: "Then run", Kind: "text", V: P0("g_when", ""),
+             When: (V) => Of(V, "bg") && V["g_how"] = "then",
+             Hint: "A flowchart of its own, with the answer in it. It is made now if it is not there "
+                 . "already, and it is on the Steps list beside this one."},
+            {Id: "g_works", L: "Which", Kind: "text", V: P0("g_works", ""),
+             When: (V) => Of(V, "bg") && AxStepsUi.In(V["g_how"], "all", "any"),
+             Hint: "The values the work was kept in, with commas between -- the ones Start it and carry "
+                 . "straight on made."},
+            {Id: "g_work", L: "Which", Kind: "choice", V: P0("g_work", ""), Fill: (V) => AxStepsUi.ValueOpts(s),
+             When: (V) => Of(V, "bg") && AxStepsUi.In(V["g_how"], "done", "why")},
+            {Id: "g_ms", L: "Give up after", Kind: "int", V: P0("g_ms", 0), Suffix: "ms", Min: 0, Step: 500,
+             When: (V) => Of(V, "bg") && AxStepsUi.In(V["g_how"], "then", "start", "wait"),
+             Hint: "0 waits for as long as it takes. Anything else and it fails instead of hanging."},
+            {Id: "g_into", L: "Keep it in", Kind: "choice", V: P0("g_into", "-"), When: (V) => Of(V, "bg") && V["g_how"] != "then",
+             Opts: "-:(nothing)" (vals != "" ? "|" vals : "") "|new:A new value...",
+             Hint: "Start it keeps the WORK, so a later step can wait for it. The rest keep the answer."},
+            {Id: "g_new", L: "Called", Kind: "text", V: P0("g_new", "work"),
+             When: (V) => Of(V, "bg") && V["g_how"] != "then" && V["g_into"] = "new"},
+            {Id: "g_note", Kind: "note", When: (V) => Of(V, "bg"),
+             L: "Only an adaptor set to Run it in the background can be started this way "
+              . "(Libraries > .NET, or Edit on the adaptor). Anything else runs there and then, and the "
+              . "window waits for it."},
             ; stopping
             {Id: "z_how", L: "Stop", Kind: "choice", V: P0("z_how", "return"), When: (V) => Of(V, "stop"),
              Opts: "return:Here -- the rest of this piece is skipped|break:Repeating -- carry on after the repeat|continue:This time round -- go straight to the next"},
@@ -654,6 +730,10 @@ class AxStepsUi {
         if !r.Ok
             return ""
         code := AxStepsUi.Code(s, r.V, only != "", false)
+        ; "when it is done, run this" makes the flowchart it names, if there
+        ; is not one already -- so the step never points at nothing
+        if (r.V["kind"] = "bg" && r.V["g_how"] = "then")
+            AxStepsUi.MakeThen(s, AxProject.CleanName(r.V["g_when"]), r.V["g_fn"])
         ; a step that uses a library brings it with it -- installed first
         ; when it is not in the project yet
         lib := (r.V["kind"] = "uia") ? AxPkg.UiaLib : (r.V["kind"] = "lib" && IsObject(st := AxPkg.Step(r.V["l_step"]))) ? st.Lib : ""
@@ -673,7 +753,7 @@ class AxStepsUi {
         return o != "" ? o : "-:(this window has no menus yet -- Logic > Menus)"
     }
     static BringLib(s, lib) {
-        if AxPkg.Installed(AxPkg.ProjDir(s.P)).Has(lib)
+        if AxPkg.Have(s.P).Has(lib)
             return AxPkg.Use(s.P, lib)
         e := AxPkg.Find(lib)
         if IsObject(e)
@@ -683,7 +763,7 @@ class AxStepsUi {
     ; every library step: this project's libraries first, then the rest,
     ; each said as "Library: what it does"
     static LibOpts(s) {
-        have := AxPkg.Installed(AxPkg.ProjDir(s.P))
+        have := AxPkg.Have(s.P)
         a := "", b := ""
         for st in AxPkg.Steps() {
             e := AxPkg.Find(st.Lib)
@@ -751,6 +831,171 @@ class AxStepsUi {
                     o .= (o = "" ? "" : "|") "ctl:" AxProject.CleanName(n.Name) ":What " n.Name " holds"
         return o
     }
+    ; ------------------------------------------------- what a function takes
+    ; The names of the values a function wants, in order. An adaptor says so
+    ; itself; one of the program's own functions is read off its line.
+    static FnParams(s, fn) {
+        out := []
+        if (fn = "" || fn = "-")
+            return out
+        a := AxNet.Find(s.P, fn)
+        if IsObject(a) {
+            for x in AxNet.Split(a.Params)
+                out.Push(x.N)
+            return out
+        }
+        short := RegExReplace(fn, "^.*\.")
+        for w in s.P.Wins {
+            if !RegExMatch(String(w.Script), "im)^[ \t]*(?:static[ \t]+)?" short "[ \t]*\(([^)\r\n]*)\)", &m)
+                continue
+            for x in StrSplit(m[1], ",") {
+                nm := Trim(RegExReplace(Trim(x), "\s*:=.*$|[*&?]"))
+                if (nm != "")
+                    out.Push(nm)
+            }
+            return out
+        }
+        return out
+    }
+    ; A row per value it takes -- the name on the left, what to give it on the
+    ; right. `args` is what a step already says, as it was written in the code.
+    static ArgRows(s, fn, args) {
+        names := AxStepsUi.FnParams(s, fn)
+        had := (Trim(String(args)) = "") ? [] : AxStepsUi.SplitArgs(args)
+        out := ""
+        for i, nm in names {
+            v := (i <= had.Length) ? Trim(had[i]) : ""
+            out .= (out = "" ? "" : "`n") nm Chr(1) v
+        }
+        ; more written than it says it takes (or a function nothing knows
+        ; about): they are kept, unnamed, rather than quietly dropped
+        loop Max(had.Length - names.Length, 0)
+            out .= (out = "" ? "" : "`n") "and then" Chr(1) Trim(had[names.Length + A_Index])
+        return out
+    }
+    ; The rows, back into the code between the brackets. A value left empty
+    ; at the end is not written at all; one left empty in the middle is left
+    ; out by name, which is what AutoHotkey does with a missing argument.
+    static ArgCode(rows) {
+        vals := []
+        for line in StrSplit(StrReplace(String(rows), "`r"), "`n") {
+            if (Trim(line) = "")
+                continue
+            p := StrSplit(line, Chr(1))
+            v := Trim(p.Length >= 2 ? p[2] : "")
+            ; {aBox} -- what that control holds, the way a rule says it
+            if RegExMatch(v, "^\{(\w+)\}$", &m)
+                v := m[1] ".Text"
+            vals.Push(v)
+        }
+        while (vals.Length && Trim(vals[vals.Length]) = "")
+            vals.Pop()
+        out := ""
+        for i, v in vals
+            out .= (i = 1 ? "" : ", ") v
+        return out
+    }
+    ; Commas that are not inside brackets or a string.
+    static SplitArgs(text) {
+        out := [], depth := 0, cur := "", q := ""
+        loop parse String(text) {
+            c := A_LoopField
+            if (q != "") {
+                cur .= c
+                if (c = q)
+                    q := ""
+                continue
+            }
+            if (c = Chr(34) || c = "'") {
+                q := c, cur .= c
+                continue
+            }
+            if (c = "(" || c = "[" || c = "{")
+                depth++
+            else if (c = ")" || c = "]" || c = "}")
+                depth--
+            if (c = "," && depth <= 0) {
+                out.Push(cur), cur := ""
+                continue
+            }
+            cur .= c
+        }
+        if (Trim(cur) != "")
+            out.Push(cur)
+        return out
+    }
+    ; ------------------------------------------------------ the background
+    ; What can be started there: the adaptors set to run in the background
+    ; first, then the rest -- which run there and then, and are said to.
+    static BgOpts(s) {
+        a := "", b := ""
+        for x in AxNet.List(s.P) {
+            if AxNet.IsAsync(x)
+                a .= "|" x.Name ":" x.Name "() -- " x.Doc
+            else
+                b .= "|" x.Name ":" x.Name "() (runs there and then)"
+        }
+        for w in s.P.Wins
+            for d in AxSteps.Defs(w.Script)
+                if (SubStr(d.Name, 1, 3) != "hk:")
+                    b .= "|" d.Name ":" d.Label " (runs there and then)"
+        o := SubStr(a b, 2)
+        return o != "" ? o : "-:(nothing to start -- make an adaptor first, Libraries > .NET)"
+    }
+    static BgCode(s, V) {
+        how := V["g_how"]
+        into := (V["g_into"] = "new") ? AxProject.CleanName(V["g_new"]) : (V["g_into"] = "-" ? "" : V["g_into"])
+        keep := (x) => (into != "" ? into " := " : "") x
+        if AxStepsUi.In(how, "all", "any") {
+            names := ""
+            for x in StrSplit(V["g_works"], ",", " `t")
+                if (Trim(x) != "")
+                    names .= (names = "" ? "" : ", ") Trim(x)
+            return (names = "") ? "" : keep((how = "all" ? "AllOf(" : "AnyOf(") names ")")
+        }
+        if AxStepsUi.In(how, "done", "why") {
+            w := V["g_work"]
+            if (w = "" || w = "-")
+                return ""
+            return keep((how = "done" ? "IsDone(" : "WhyItFailed(") w ")")
+        }
+        fn := V["g_fn"]
+        if (fn = "" || fn = "-")
+            return ""
+        call := fn "(" AxStepsUi.ArgCode(V["g_args"]) ")"
+        ms := 0
+        try ms := Integer(V["g_ms"])
+        if (ms > 0)
+            call := "GiveUpAfter(" call ", " ms ")"
+        if (how = "then") {
+            nm := AxProject.CleanName(V["g_when"])
+            return (nm = "") ? "" : "WhenDone(" call ", " nm ")"
+        }
+        if (how = "wait")
+            return keep("WaitFor(" call ")")
+        return keep(call)
+    }
+    ; The flowchart the background step names. Written into the window the
+    ; piece belongs to, so it shows up on the Steps list next to it -- empty,
+    ; because what happens next is the next thing to say.
+    static MakeThen(s, name, fn) {
+        if (name = "")
+            return
+        w := AxStepsUi.PcWin(s)
+        for d in AxSteps.Defs(w.Script)
+            if (d.Name = name)
+                return
+        if RegExMatch(String(w.Script), "im)^[ \t]*" name "[ \t]*\(")
+            return
+        body := "`; When " (fn != "" ? fn "()" : "the background work") " finishes. The answer is in `"answer`"."
+              . "`n" name "(answer) {"
+              . "`n    `; What happens next goes here -- open it on the Steps tab."
+              . "`n}"
+        cur := RTrim(String(w.Script), " `t`r`n")
+        w.Script := (Trim(cur) = "") ? body : cur "`n`n" body
+        s.QueueLive()
+        s.Status("msg", name "() is a flowchart of its own now -- it is on the Steps list.")
+    }
     static FnOpts(s) {
         o := ""
         for w in s.P.Wins
@@ -776,18 +1021,18 @@ class AxStepsUi {
         switch V["kind"] {
         case "set":
             if (V["s_who"] = "" || V["s_who"] = "new" && AxProject.CleanName(V["s_new"]) = "")
-                return "Say which value."
+                return "Choose a value."
         case "ctl":
             if (V["c_ctl"] = "" || V["c_ctl"] = "-")
-                return "Pick a control -- give one a name on the canvas first (F2)."
+                return "Choose a control. Name one on the canvas first (F2)."
         case "if":
             if (V["i_left"] = "")
-                return "Say what the test looks at."
+                return "Choose what the test looks at."
             if (V["i_left"] = "expr" && Trim(V["i_expr"]) = "")
-                return "Write the test."
+                return "Enter the test."
         case "repeat":
             if (V["p_how"] = "times" && Trim(V["p_n"]) = "")
-                return "Say how many times."
+                return "Enter how many times."
         case "call":
             if (V["k_fn"] = "" || V["k_fn"] = "-")
                 return "This program has no functions of its own yet."
@@ -797,20 +1042,32 @@ class AxStepsUi {
         case "lib":
             st := AxPkg.Step(V["l_step"])
             if !IsObject(st)
-                return "Pick what the library should do."
+                return "Choose what the library should do."
             if (st.Who != "" && (V["l_who"] = "" || V["l_who"] = "new" && AxProject.CleanName(V["l_new"]) = ""))
-                return st.Who = "ctl" ? "Pick the control." : "Say which value."
+                return st.Who = "ctl" ? "Choose the control." : "Choose a value."
             if (st.Arg && Trim(V["l_arg"]) = "")
                 return "Fill in " st.ArgL "."
+        case "bg":
+            if (AxStepsUi.In(V["g_how"], "then", "start", "wait")) {
+                if (V["g_fn"] = "" || V["g_fn"] = "-")
+                    return "Pick what to start. It has to be an adaptor set to run in the background "
+                         . "(Libraries > .NET)."
+                if (V["g_how"] = "then" && AxProject.CleanName(V["g_when"]) = "")
+                    return "Say what to run when it is done -- a name, and the flowchart is made for you."
+            } else if (AxStepsUi.In(V["g_how"], "all", "any")) {
+                if (Trim(V["g_works"]) = "")
+                    return "Say which ones, with commas between."
+            } else if (V["g_work"] = "" || V["g_work"] = "-")
+                return "Choose one."
         case "code":
             if (Trim(V["q_code"]) = "")
-                return "Write the code."
+                return "Enter the code."
         case "uia":
             if (Trim(V["u_win"]) = "" || Trim(V["u_what"]) = "")
                 return "Say which window, and what the thing in it says or is called."
         case "file":
             if (Trim(V["f_path"]) = "")
-                return "Say which file."
+                return "Choose a file."
         }
         return ""
     }
@@ -888,9 +1145,29 @@ class AxStepsUi {
             code := AxPkg.StepCode(s.P, s.P.W, {Verb: st.V, Arg: Trim((who != "" ? who " " : "") (st.Arg ? V["l_arg"] : ""))})
             ; a rule's step keeps a bound value in step; here it is a line of its own
             return RegExReplace(code, ", AxBindSync\(\)$")
+        case "list":
+            ; the very same generator a rule uses, so "add a row" written as a
+            ; step and "add a row" written as a rule are one behaviour with
+            ; one bug surface, rather than two that drift
+            nm := V["li_ctl"]
+            if (nm = "" || nm = "-")
+                return ""
+            rest := (V["li_do"] = "addrow") ? Trim(V["li_cells"]) : Trim(V["li_path"])
+            return AxFlow.ListCode(s.P, V["li_do"], nm, rest)
         case "call":
             into := (V["k_into"] = "new") ? AxProject.CleanName(V["k_new"]) : (V["k_into"] = "-" ? "" : V["k_into"])
-            return (into != "" ? into " := " : "") V["k_fn"] "(" Trim(V["k_args"]) ")"
+            call := V["k_fn"] "(" AxStepsUi.ArgCode(V["k_args"]) ")"
+            ; An adaptor that runs in the background hands back the work rather
+            ; than the answer, and steps run one after another -- so the step
+            ; after it almost always depends on it having finished. A rule
+            ; already waits; a step did not, and the next step raced the one
+            ; before it. WaitFor keeps the window answering while it waits.
+            a := AxNet.Find(s.P, V["k_fn"])
+            if (IsObject(a) && AxNet.IsAsync(a))
+                call := "WaitFor(" call ")"
+            return (into != "" ? into " := " : "") call
+        case "bg":
+            return AxStepsUi.BgCode(s, V)
         case "stop":
             return V["z_how"]
         case "code":

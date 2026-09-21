@@ -273,6 +273,8 @@ class AxGen {
             return g.AddActiveX(opts, "Shell.Explorer.2")       ; never really docked at design time
         if (n.Type = "DataView")
             return AxGen._DesignDataView(g, opts, n)
+        if (n.Type = "Ribbon")
+            return AxGen._DesignRibbon(g, opts, n)
         if (n.Type = "Tab")
             return g.AddTab(opts, arg)
         m := "Add" n.Type
@@ -318,6 +320,45 @@ class AxGen {
         catch as err
             return g.AddHtml(opts, '<span class="axd-bad">&lt;DataView&gt; ' AxTags.E(err.Message)
                  . ' <span class="axd-dim">(' AxTags.E(RegExReplace(err.File, ".*\\") ":" err.Line) ')</span></span>')
+    }
+    ; A ribbon wants a real object, and at design time the expression the user
+    ; typed has not been evaluated -- it is text. AxLit reads the literal part
+    ; of it without running anything, and Design is what makes it appear at
+    ; all: AddRibbon normally builds an empty shell and fills it in from the
+    ; instance it creates OnReady, and a designer never shows its window, so
+    ; OnReady never runs. Without this the canvas had a dark empty band on it.
+    static _DesignRibbon(g, opts, n) {
+        cfg := AxLit.Read(n.Arg)
+        cfg := (cfg is Map) ? cfg.Clone() : Map()
+        cfg["Design"] := true
+        ; Nothing readable there -- an empty box, or a function of the user's
+        ; own that builds the tabs at run time. A band with nothing in it reads
+        ; as a broken ribbon rather than an unfilled one, so it says which it is.
+        if !(cfg.Has("Tabs") && cfg["Tabs"] is Array && cfg["Tabs"].Length)
+            cfg["Tabs"] := AxGen.RibbonStub(n.Arg)
+        if AxGen.RibTab.Has(n.Id) {
+            k := AxGen.RibTab[n.Id]
+            if (k >= 1 && k <= cfg["Tabs"].Length && cfg["Tabs"][k] is Map
+                && cfg["Tabs"][k].Has("Id"))
+                cfg["Tab"] := cfg["Tabs"][k]["Id"]
+        }
+        try return g.AddRibbon(opts, cfg)
+        catch as err
+            return g.AddHtml(opts, '<span class="axd-bad">&lt;Ribbon&gt; ' AxTags.E(err.Message)
+                 . ' <span class="axd-dim">(' AxTags.E(RegExReplace(err.File, ".*\\\\") ":" err.Line) ')</span></span>')
+    }
+    ; Which tab of which ribbon the designer is editing. A ribbon shows one
+    ; tab at a time, so a canvas that always drew the first one would make
+    ; editing the second look like it did nothing at all.
+    static RibTab := Map()
+    static RibbonStub(text) {
+        said := (Trim(String(text)) = "")
+              ? "Nothing here yet -- open the ribbon editor"
+              : "Built by the expression above, when the program runs"
+        return [Map("Id", "axdstub", "Title", "Tab",
+                    "Groups", [Map("Id", "axdstubg", "Title", "Group",
+                                   "Items", [Map("Id", "axdstubi", "Label", said,
+                                                 "Icon", "E7C4", "Size", "large")])])]
     }
     ; The rows of a grid's data, as objects -- or "" when they cannot be read.
     static DataRows(text) {
@@ -861,6 +902,23 @@ class AxGen {
         }
         return out
     }
+    ; The same, without the names that are parameters of `sig`.
+    static _GlobalsBut(names, pad, sig) {
+        skip := Map()
+        skip.CaseSense := false
+        for one in StrSplit(String(sig), ",") {
+            nm := RegExReplace(Trim(one), "[\s:=*].*$")
+            if (nm != "")
+                skip[nm] := true
+        }
+        if !skip.Count
+            return AxGen._Globals(names, pad)
+        keep := []
+        for v in names
+            if !skip.Has(v)
+                keep.Push(v)
+        return AxGen._Globals(keep, pad)
+    }
     ; A global declaration, wrapped so no single line runs away.
     static _Globals(names, pad) {
         decl := "", chunk := "", n := 0
@@ -981,8 +1039,7 @@ class AxGen {
                 out .= pad var " := " call nl
             else
                 out .= pad call nl
-            for e in n.Ev
-                AxGen._Event(state, n, var, e)
+            AxGen._Events(state, n, var)
             ; rules can name an event the control has no handler for: that
             ; still has to be wired, or the rules never run
             AxGen._ExtraEvents(state, n, var)
@@ -1102,6 +1159,46 @@ class AxGen {
                 AxGen._Event(state, n, var, Map("name", ev, "code", ""))
         }
     }
+    ; A control's handlers, with the narrowed ones folded in.
+    ;
+    ; A ribbon has one OnCommand for the whole band, and what anyone actually
+    ; wants is "this button does this". So an item's handler is written as a
+    ; narrowed event -- Command:paste -- and the two are reconciled here: one
+    ; function per item, and one handler on the event itself that sends each id
+    ; to its own. Which keeps a ribbon button exactly as capable as a plain
+    ; one: same code editor, same Steps view, same rules.
+    static _Events(state, n, var) {
+        bases := Map(), order := []
+        for e in n.Ev {
+            b := AxFlow.EvBase(e["name"])
+            if !bases.Has(b)
+                bases[b] := [], order.Push(b)
+            bases[b].Push(e)
+        }
+        for b in order {
+            plain := "", narrow := []
+            for e in bases[b]
+                (AxFlow.EvQual(e["name"]) = "") ? plain := e : narrow.Push(e)
+            if !narrow.Length {
+                AxGen._Event(state, n, var, plain)
+                continue
+            }
+            sig := AxCat.Sig(b)
+            args := AxFlow.ArgNames(sig)
+            on := StrSplit(args, ",")[1]
+            sw := "switch " Trim(on) " {`n"
+            for e in narrow {
+                fn := AxGen.HandlerName(n, e["name"], state)
+                sw .= "case " AxGen.S(AxFlow.EvQual(e["name"])) ": return " fn "(" args ")`n"
+                body := Trim(e["code"], " `t`r`n") != "" ? AxGen.Block(e["code"], "    ")
+                                                        : "    `; nothing here yet"
+                state.handlerList.Push({Name: fn, Sig: sig, Body: body})
+            }
+            sw .= "}"
+            code := IsObject(plain) ? Trim(plain["code"], " `t`r`n") : ""
+            AxGen._Event(state, n, var, Map("name", b, "code", (code != "" ? code "`n" : "") sw))
+        }
+    }
     static _Event(state, n, var, e) {
         name := e["name"], code := e["code"]
         fnName := AxGen.HandlerName(n, name, state)
@@ -1109,6 +1206,11 @@ class AxGen {
         target := (var != "") ? var : (state.g '.Ctl(' AxGen.S(n.Name) ')')
         if AxCat.IsPart(name)                 ; a part of its popover, by its id there
             state.wiring .= state.g '.On("click", ' AxGen.S(AxCat.PartId(name)) ", " fnName ")`n"
+        ; a rich component's own event: the object behind the control raises it,
+        ; and that object is made when the window opens, not when it is built
+        else if (AxCat.Via(name) = "component")
+            state.wiring .= state.g '.OnReady((*) => ' state.g '.Ctl(' AxGen.S(n.Name)
+                         .  ').Component.' wire "(" fnName "))`n"
         else if (wire != "")
             state.wiring .= target "." wire "(" fnName ")`n"
         else
@@ -1137,10 +1239,9 @@ class AxGen {
         names := []
         for v in state.all
             names.Push(v)
-        decl := AxGen._Globals(names, "    ")
         out := ""
         for w in project.Wins
-            out .= AxFlow.Funcs(project, w, decl)
+            out .= AxFlow.Funcs(project, w, names)
         return out
     }
     static _Handlers(state) {
@@ -1149,8 +1250,15 @@ class AxGen {
             names.Push(v)
         decl := AxGen._Globals(names, "    ")
         out := ""
+        ; The globals, minus anything this handler already has as a parameter.
+        ; AutoHotkey will not have a parameter and a global of one name, and
+        ; the parameter is the one that was meant: a ribbon's handler is given
+        ; (id, item, rib), and a ribbon named rib -- which is what the studio
+        ; names it -- would otherwise declare `global rib` over the top of it
+        ; and refuse to load. The same was true of a button called ctl.
         for h in state.handlerList
-            out .= h.Name "(" h.Sig ") {`n" decl h.Body "`n}`n`n"
+            out .= h.Name "(" h.Sig ") {`n" AxGen._GlobalsBut(names, "    ", h.Sig)
+                .  h.Body "`n}`n`n"
         ; One startup function per window, written whether or not it has any
         ; code in it: it is the labelled place startup code goes, and the only
         ; way an edit made in the file finds its way back to the project.

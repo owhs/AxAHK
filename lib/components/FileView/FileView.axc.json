@@ -1,0 +1,253 @@
+{
+ "name": "FileView",
+ "description": "A file window in parts: a state, a viewer with five modes, a tree, a path bar, a preview pane, a status strip and a toolbar.",
+ "order": 6020,
+ "css": "AxFileView.css",
+ "include": "lib\\components\\FileView\\AxFileView.ahk",
+ "requires": [
+  "FileSource"
+ ],
+ "controls": [
+  {
+   "type": "FileExplorer",
+   "label": "File explorer",
+   "icon": "EC50",
+   "category": "Files",
+   "prefix": "fx",
+   "props": [
+    {
+     "key": "tree",
+     "label": "Folder pane width",
+     "kind": "num",
+     "emit": "kv",
+     "default": "220"
+    },
+    {
+     "key": "preview",
+     "label": "Preview pane width",
+     "kind": "num",
+     "emit": "kv"
+    },
+    {
+     "key": "notree",
+     "label": "No folder pane",
+     "kind": "flag"
+    },
+    {
+     "key": "notools",
+     "label": "No toolbar",
+     "kind": "flag"
+    },
+    {
+     "key": "nopath",
+     "label": "No path bar",
+     "kind": "flag"
+    },
+    {
+     "key": "nostatus",
+     "label": "No status strip",
+     "kind": "flag"
+    }
+   ],
+   "events": [
+    "Click",
+    "DoubleClick",
+    "ContextMenu",
+    "WentTo",
+    "Opened",
+    "Picked",
+    "Dropped",
+    "ModeChanged"
+   ],
+   "arg": {
+    "key": "data",
+    "label": "Source and options (an AHK expression)",
+    "kind": "multiline",
+    "raw": true,
+    "default": "{Source: AxFileLocal(), Path: A_MyDocuments, Preview: true}"
+   }
+  },
+  {
+   "type": "FileView",
+   "label": "File view",
+   "icon": "E8B7",
+   "category": "Files",
+   "prefix": "fv",
+   "props": [
+    {
+     "key": "state",
+     "label": "State name",
+     "kind": "text",
+     "emit": "kv"
+    },
+    {
+     "key": "badges",
+     "label": "Badge columns",
+     "kind": "text",
+     "emit": "kv"
+    },
+    {
+     "key": "fixed",
+     "label": "Fixed height",
+     "kind": "flag"
+    },
+    {
+     "key": "nodrop",
+     "label": "No file drops",
+     "kind": "flag"
+    },
+    {
+     "key": "nodrag",
+     "label": "No dragging items",
+     "kind": "flag"
+    }
+   ],
+   "events": [
+    "Change",
+    "Click",
+    "DoubleClick",
+    "ContextMenu",
+    "Focus",
+    "Blur",
+    "WentTo",
+    "Opened",
+    "Picked",
+    "Dropped",
+    "ModeChanged"
+   ]
+  },
+  {
+   "type": "FileTree",
+   "label": "Folder tree",
+   "icon": "E8A9",
+   "category": "Files",
+   "prefix": "ft",
+   "props": [
+    {
+     "key": "state",
+     "label": "State name",
+     "kind": "text",
+     "emit": "kv"
+    }
+   ],
+   "events": [
+    "Click",
+    "ContextMenu"
+   ]
+  },
+  {
+   "type": "FilePath",
+   "label": "Path bar",
+   "icon": "E8DE",
+   "category": "Files",
+   "prefix": "fp",
+   "props": [
+    {
+     "key": "state",
+     "label": "State name",
+     "kind": "text",
+     "emit": "kv"
+    },
+    {
+     "key": "noedit",
+     "label": "Steps only",
+     "kind": "flag"
+    },
+    {
+     "key": "nochevrons",
+     "label": "No chevrons",
+     "kind": "flag"
+    }
+   ],
+   "events": [
+    "Click"
+   ]
+  },
+  {
+   "type": "FilePreview",
+   "label": "Preview pane",
+   "icon": "E8FF",
+   "category": "Files",
+   "prefix": "fpv",
+   "props": [
+    {
+     "key": "state",
+     "label": "State name",
+     "kind": "text",
+     "emit": "kv"
+    }
+   ],
+   "events": [
+    "Click"
+   ]
+  },
+  {
+   "type": "FileStatus",
+   "label": "File status strip",
+   "icon": "E9D9",
+   "category": "Files",
+   "prefix": "fst",
+   "props": [
+    {
+     "key": "state",
+     "label": "State name",
+     "kind": "text",
+     "emit": "kv"
+    },
+    {
+     "key": "noviews",
+     "label": "No view buttons",
+     "kind": "flag"
+    }
+   ],
+   "events": [
+    "Click"
+   ]
+  },
+  {
+   "type": "FileTools",
+   "label": "File toolbar",
+   "icon": "E712",
+   "category": "Files",
+   "prefix": "fxt",
+   "props": [
+    {
+     "key": "state",
+     "label": "State name",
+     "kind": "text",
+     "emit": "kv"
+    },
+    {
+     "key": "buttons",
+     "label": "Buttons",
+     "kind": "text",
+     "emit": "kv"
+    },
+    {
+     "key": "placeholder",
+     "label": "Search placeholder",
+     "kind": "text",
+     "emit": "kv"
+    },
+    {
+     "key": "nosearch",
+     "label": "No search box",
+     "kind": "flag"
+    },
+    {
+     "key": "nonav",
+     "label": "No navigation buttons",
+     "kind": "flag"
+    },
+    {
+     "key": "nooptions",
+     "label": "No options button",
+     "kind": "flag"
+    }
+   ],
+   "events": [
+    "Click"
+   ]
+  }
+ ]
+}

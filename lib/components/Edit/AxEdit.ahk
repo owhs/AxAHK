@@ -40,7 +40,22 @@ class AxEdit {
             return '<div' Root(el, "textbox", false) '><input type="text"' (id != "" ? ' id="' E(id) '"' : "") ' value="' E(A(el, "value")) '"'
                 . ' placeholder="' E(A(el, "placeholder")) '"' (Has(el, "readonly") ? " readonly" : "") '></div>'
         case "ax-textarea":
-            return '<div' Root(el, "textbox", false) '><textarea' (id != "" ? ' id="' E(id) '"' : "") ' rows="' E(A(el, "rows", "3")) '"'
+            ; Two things wanted to decide how tall this is: the box, which was
+            ; given a height by the layout, and the textarea inside it, which
+            ; sizes itself from `rows`. When they disagreed the textarea won
+            ; and spilled out of its box -- and everything under it had
+            ; already been placed using the height the box claimed, so the
+            ; next control sat ON TOP of the overflow. A design that says
+            ; "this box is 92 tall" and "show five lines" drew five lines and
+            ; three buttons across the bottom of them.
+            ;
+            ; The box owns the height. When it has one, the textarea fills it
+            ; exactly (inline, because every sheet sets textarea height:auto)
+            ; and `rows` only decides the height when nothing else has.
+            fill := RegExMatch(A(el, "style"), "i)(^|;)\s*height\s*:")
+                 ? ' style="height:100%;box-sizing:border-box;-ms-box-sizing:border-box"' : ""
+            return '<div' Root(el, "textbox", false, ' data-multi="1"') '><textarea'
+                . (id != "" ? ' id="' E(id) '"' : "") ' rows="' E(A(el, "rows", "3")) '"' fill
                 . ' placeholder="' E(A(el, "placeholder")) '"' (Has(el, "readonly") ? " readonly" : "") '>' inner '</textarea></div>'
         }
         return inner

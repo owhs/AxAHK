@@ -49,13 +49,15 @@ class AxForm {
         return '<div id="axdFormOv" class="axd-formov" style="display:none">'
             .  '<div class="axd-form" id="axdForm">'
             .    '<div class="axd-fhead">'
-            .      '<span class="ico" id="axdFormIcon"></span>'
+            .      '<span class="axd-ficon"><span class="ico" id="axdFormIcon"></span></span>'
             .      '<span class="axd-ftitle" id="axdFormTitle"></span>'
             .      '<span class="axd-fx ico" id="axdFormX">&#xE8BB;</span>'
             .    '</div>'
             .    '<div class="axd-fintro" id="axdFormIntro"></div>'
             .    '<div class="axd-fbody" id="axdFormBody"></div>'
-            .    '<div class="axd-fprev" id="axdFormPrev"></div>'
+            .    '<div class="axd-fprevwrap" id="axdFormPrevWrap" style="display:none">'
+            .      '<span class="axd-fprevh">It writes</span>'
+            .      '<div class="axd-fprev" id="axdFormPrev"></div></div>'
             .    '<div class="axd-ffoot">'
             .      '<span class="axd-ferr" id="axdFormErr"></span>'
             .      '<span id="axdFormBtns"></span>'
@@ -87,7 +89,13 @@ class AxForm {
         }
     }
     static Show(s, spec) {
-        blank := {Ok: false, Btn: 0, Label: "", V: Map()}
+        O := (n, d) => spec.HasOwnProp(n) ? spec.%n% : d
+        ; A form that does not open still has to answer for every field it
+        ; would have had. It used to hand back an empty Map, and every caller
+        ; reads its answers straight -- r.V["ask"] -- so "a dialog is already
+        ; open" came out as "Item has no value" from somewhere else entirely.
+        ; The answers are what the form was going to show.
+        blank := {Ok: false, Btn: 0, Label: "", V: AxForm.Defaults(O("Fields", [])), Go: ""}
         if !IsObject(s.Doc)
             return blank
         ; One at a time -- a second form would orphan the first. Said out loud,
@@ -99,7 +107,6 @@ class AxForm {
                 . " did not open.")
             return blank
         }
-        O := (n, d) => spec.HasOwnProp(n) ? spec.%n% : d
         fields := O("Fields", [])
         buttons := O("Buttons", [O("Ok", "OK"), O("Cancel", "Cancel")])
         st := {Done: false, Btn: 0, Fields: fields, Buttons: buttons,
@@ -118,7 +125,7 @@ class AxForm {
             ico := O("Icon", "")
             try {
                 s.Html("axdFormIcon", ico != "" ? "&#x" ico ";" : "")
-                s.El("axdFormIcon").style.display := (ico != "" ? "inline-block" : "none")
+                s.El("axdFormIcon").parentElement.style.display := (ico != "" ? "inline-block" : "none")
             }
             intro := O("Intro", "")
             try {
@@ -128,8 +135,24 @@ class AxForm {
             try s.El("axdForm").style.width := O("Width", 460) "px"
 
             body := ""
-            for f in fields
+            seen := Map()
+            seen.CaseSense := false
+            for f in fields {
+                if (f.HasOwnProp("Id") && f.Id != "") {
+                    ; The second one is left out rather than drawn: it could
+                    ; never be shown, hidden or read anyway, and drawing it
+                    ; put two boxes on screen with only the first obeying
+                    ; When -- which is what "with" and "give it" both showing
+                    ; on the rule dialog was. Said out loud, not swallowed.
+                    if seen.Has(f.Id) {
+                        try s.Problem('Two fields in "' O("Title", "this form") '" are both called "'
+                            . f.Id '" -- only the first is shown.')
+                        continue
+                    }
+                    seen[f.Id] := true
+                }
                 body .= AxForm.Row(f)
+            }
             s.Html("axdFormBody", body)
 
             btns := ""
@@ -205,7 +228,7 @@ class AxForm {
             Fields: [{Id: "c", Kind: "pick", L: "", V: O("V", items[1].V), Items: items,
                       Scroll: O("Scroll", items.Length > 8)}],
             Buttons: [O("Ok", "Choose"), "Cancel"],
-            Check: (V) => (V["c"] = "") ? "Pick one." : ""})
+            Check: (V) => (V["c"] = "") ? "Choose one." : ""})
         return r.Ok ? r.V["c"] : ""
     }
 
@@ -217,8 +240,17 @@ class AxForm {
     static Rid(id) => "axfr_" id
 
     static Wide(kind) {
-        static w := "|multiline|code|pick|note|heading|divider|list|flag|radio|"
+        static w := "|multiline|code|pick|note|heading|divider|list|flag|radio|rows|tabs|panel|acts|"
         return InStr(w, "|" kind "|") > 0
+    }
+    ; The tabs field of the form on screen, or "". A form with tabs shows only
+    ; the fields of the tab that is open -- which is what turns a wizard with
+    ; twenty questions from a scroll into a tool window.
+    static TabsId(fields) {
+        for f in fields
+            if (f.HasOwnProp("Kind") && f.Kind = "tabs" && f.HasOwnProp("Id"))
+                return f.Id
+        return ""
     }
     static Typeable(f) {
         static t := "|text|multiline|code|num|search|color|"
@@ -241,8 +273,12 @@ class AxForm {
         case "note":
             ; Mono for anything laid out in columns with spaces -- a key list
             ; in a proportional font is not a list, it is a paragraph.
+            ; A note says what it was given: L for one that never changes,
+            ; V for one that follows another answer (Seed) -- what the event
+            ; picked above hands its rule, for instance.
+            nt := (String(v) != "") ? v : Fv("L")
             return '<div class="axd-fnote' (Fv("Mono") ? ' axd-fmono' : '') '" id="' row '">'
-                 . (Fv("Html") ? Fv("L") : E(Fv("L"))) '</div>'
+                 . (Fv("Html") ? nt : E(nt)) '</div>'
         case "divider":
             return '<div class="axd-fdiv" id="' row '"></div>'
         case "text":
@@ -282,19 +318,141 @@ class AxForm {
             body := '<div class="axd-fstatic">' E(v) '</div>'
         case "pick":
             body := AxForm.Pick(fld, id, v)
+        case "tabs":
+            ; A strip, not a dropdown: every page is named and one click away.
+            h := '<div class="axd-ftabs" id="' id '" data-value="' E(v) '">'
+            for it in Fv("Items", []) {
+                iv := AxForm.It(it, "V"), ic := AxForm.It(it, "Icon")
+                h .= '<div class="axd-ftab' (iv = v ? " on" : "") '" data-ftab="' id '" data-fval="' E(iv) '">'
+                  .  (ic != "" ? '<span class="ico">&#x' ic ';</span>' : "")
+                  .  E(AxForm.It(it, "L")) '</div>'
+            }
+            return h '</div>'
+        case "acts":
+            ; Buttons that do something to the form itself -- look it up, paste
+            ; a signature, try it -- rather than closing it.
+            h := '<div class="axd-facts" id="' id '">'
+            if (Fv("L") != "")
+                h .= '<span class="axd-factlab">' E(Fv("L")) '</span>'
+            for it in Fv("Items", []) {
+                ic := AxForm.It(it, "Icon")
+                h .= '<span class="axd-fact' (AxForm.It(it, "Go") ? " axd-go" : "") '" data-fact="' id
+                  .  '" data-fval="' E(AxForm.It(it, "V")) '"'
+                  .  (AxForm.It(it, "Tip") != "" ? ' title="' E(AxForm.It(it, "Tip")) '"' : "") '>'
+                  .  (ic != "" ? '<span class="ico">&#x' ic ';</span>' : "") E(AxForm.It(it, "L")) '</span>'
+            }
+            h .= '</div>'
+            return '<div class="axd-f axd-f-wide axd-f-acts" id="' row '">' h
+                 . (hint != "" ? '<div class="axd-fhint">' E(hint) '</div>' : "") '</div>'
+        case "panel":
+            ; Somewhere for an answer to land: what a lookup found, what a try
+            ; gave back. Written by the caller with AxForm.Panel, so nothing
+            ; slow runs on a keystroke.
+            return '<div class="axd-f axd-f-wide axd-f-panel" id="' row '"'
+                 . (v = "" && !Fv("Keep") ? ' style="display:none"' : "") '>'
+                 . (Fv("L") != "" ? '<label class="axd-flab">' E(Fv("L")) '</label>' : "")
+                 . '<div class="axd-fpanel" id="' id '">' v '</div></div>'
+        case "rows":
+            body := AxForm.Rows(fld, id, v)
         default:
             body := '<ax-text id="' id '" value="' E(v) '"></ax-text>'
         }
         wide := AxForm.Wide(kind) || Fv("Wide", false)
+        ; A dropdown holding "is clicked" does not need to be as wide as the
+        ; dialog. W is what the control itself gets; Inline puts the field on
+        ; the same line as the one before it, which is what turns four boxes
+        ; stacked down the page into a sentence you can read across.
+        wantW := Fv("W", "")
+        inline := Fv("Inline", false)
         ; The class matters: a check box and a radio ARE labels, so a rule
         ; written as ".axd-f > label" catches the control itself and turns a
         ; 20px tick box into a 2px sliver.
         lbl := (Fv("L") != "") ? '<label class="axd-flab" for="' id '">' E(Fv("L")) '</label>' : ""
-        return '<div class="axd-f' (wide ? " axd-f-wide" : "") ' axd-f-' kind '" id="' row '">'
-             . lbl '<div class="axd-fctl">' body
+        return '<div class="axd-f' (wide ? " axd-f-wide" : "") (inline ? " axd-f-inline" : "")
+             . ' axd-f-' kind '" id="' row '">'
+             . lbl '<div class="axd-fctl"' (wantW != "" ? ' style="width:' wantW '"' : "") '>' body
              . (hint != "" ? '<div class="axd-fhint">' E(hint) '</div>' : "")
              . '</div></div>'
     }
+    ; ------------------------------------------------------- a list of rows
+    ; A question with as many answers as it needs: the parameters a method
+    ; takes, the columns of a table, the headers of a request. Every wizard
+    ; that wanted one of these asked for "name:type, name:type" in a text box
+    ; instead -- a syntax you had to know before you could answer, which is
+    ; the very thing this file was written to stop.
+    ;
+    ; The value is one row per line, the cells of a row joined by Sep.
+    static RowVals(f) {
+        out := []
+        for line in StrSplit(StrReplace(String(AxForm.It(f, "V", "")), "`r"), "`n")
+            if (Trim(line) != "")
+                out.Push(StrSplit(line, AxForm.It(f, "Sep", "|")))
+        return out
+    }
+    static Cell(row, i) => (i <= row.Length) ? row[i] : ""
+    static Rows(f, id, v) {
+        cols := AxForm.It(f, "Cols", [])
+        rows := AxForm.RowVals(f)
+        min := AxForm.It(f, "Min", 0)
+        while (rows.Length < min)
+            rows.Push([])
+        E := (x) => AxTags.E(x)
+        h := '<div class="axd-frows" id="' id '" data-rows="' rows.Length '">'
+        if (rows.Length && AxForm.It(f, "Heads", true)) {
+            h .= '<div class="axd-frhead">'
+            for c in cols
+                h .= '<span style="width:' AxForm.It(c, "W", "40%") '">' E(AxForm.It(c, "L")) '</span>'
+            h .= '</div>'
+        }
+        for ri, row in rows {
+            h .= '<div class="axd-frow">'
+            for ci, c in cols {
+                cid := id "_r" ri "_" AxForm.It(c, "Id", ci)
+                cv := AxForm.Cell(row, ci)
+                h .= '<span class="axd-frcell" style="width:' AxForm.It(c, "W", "40%") '">'
+                if (AxForm.It(c, "Kind") = "label")
+                    h .= '<span class="axd-frlab" id="' cid '">' E(cv) '</span>'
+                else if (AxForm.It(c, "Kind", "text") = "choice")
+                    h .= '<ax-dropdown id="' cid '" options="' E(AxForm.It(c, "Opts")) '" value="' E(cv) '"></ax-dropdown>'
+                else if (AxForm.It(c, "Kind") = "flag")
+                    h .= '<ax-check id="' cid '"' (cv && cv != "0" ? " checked" : "") '></ax-check>'
+                else
+                    h .= '<ax-text id="' cid '" value="' E(cv) '" placeholder="' E(AxForm.It(c, "Ph")) '"></ax-text>'
+                h .= '</span>'
+            }
+            h .= '<span class="axd-frx ico" data-frow="up|' id '|' ri '" title="Move it up">&#xE70E;</span>'
+              .  '<span class="axd-frx ico" data-frow="del|' id '|' ri '" title="Remove this one">&#xE711;</span></div>'
+        }
+        if !rows.Length
+            h .= '<div class="axd-frempty">' E(AxForm.It(f, "Empty", "None.")) '</div>'
+        h .= '<span class="axd-fact" data-frow="add|' id '|0">&#xE710; ' E(AxForm.It(f, "AddLabel", "Add one")) '</span>'
+        return h '</div>'
+    }
+    ; What the rows hold now, straight from the page.
+    static ReadRows(s, f) {
+        id := AxForm.Eid(f.Id)
+        n := 0
+        try n := Integer(s.Attr(id, "data-rows"))
+        cols := AxForm.It(f, "Cols", []), sep := AxForm.It(f, "Sep", "|")
+        out := ""
+        loop n {
+            ri := A_Index, line := "", any := false
+            for ci, c in cols {
+                cid := id "_r" ri "_" AxForm.It(c, "Id", ci)
+                cv := ""
+                try cv := (AxForm.It(c, "Kind") = "label") ? s.El(cid).innerText
+                        : (AxForm.It(c, "Kind", "text") = "text") ? s.El(cid).value : s.Value(cid)
+                cv := StrReplace(StrReplace(String(cv), sep, " "), "`n", " ")
+                if (Trim(cv) != "")
+                    any := true
+                line .= (ci = 1 ? "" : sep) cv
+            }
+            if any
+                out .= (out = "" ? "" : "`n") line
+        }
+        return out
+    }
+
     ; The cards. A radio group with room to say what each choice means, which
     ; is the difference between choosing and guessing.
     static Pick(f, id, v) {
@@ -329,10 +487,14 @@ class AxForm {
     }
     static One(s, f) {
         kind := f.HasOwnProp("Kind") ? f.Kind : "text"
-        if (kind = "heading" || kind = "note" || kind = "divider")
+        if (kind = "heading" || kind = "note" || kind = "divider" || kind = "acts" || kind = "panel")
             return ""
+        if (kind = "rows") {
+            try return AxForm.ReadRows(s, f)
+            return f.HasOwnProp("V") ? f.V : ""
+        }
         try {
-            if (kind = "pick")
+            if (kind = "pick" || kind = "tabs")
                 return s.Attr(AxForm.Eid(f.Id), "data-value")
             if (kind = "static")
                 return f.HasOwnProp("V") ? f.V : ""
@@ -342,6 +504,14 @@ class AxForm {
             return (v is Array) ? AxForm.Join(v, "|") : v
         }
         return f.HasOwnProp("V") ? f.V : ""
+    }
+    ; What a form would hold before anyone touched it.
+    static Defaults(fields) {
+        m := Map()
+        for f in fields
+            if f.HasOwnProp("Id")
+                m[f.Id] := f.HasOwnProp("V") ? f.V : ""
+        return m
     }
     static Read(s, fields) {
         m := Map()
@@ -365,9 +535,14 @@ class AxForm {
             if !f.HasOwnProp("Id")
                 continue
             kind := f.HasOwnProp("Kind") ? f.Kind : "text"
-            if (kind = "heading" || kind = "note" || kind = "divider" || kind = "static")
+            if (kind = "heading" || kind = "note" || kind = "divider" || kind = "static"
+                || kind = "acts" || kind = "panel" || kind = "tabs")
                 continue
             eid := AxForm.Eid(f.Id)
+            if (kind = "rows") {
+                AxForm.HookRows(s, f, on)
+                continue
+            }
             if !on {
                 s.Off("keyup", eid), s.Off("change", eid)
                 s.OffValue(eid)
@@ -380,6 +555,88 @@ class AxForm {
                 s.OnValue(eid, (*) => AxForm.Sync(s))
         }
     }
+    ; Every cell of every row, one at a time: they come and go with the rows.
+    static HookRows(s, f, on) {
+        id := AxForm.Eid(f.Id)
+        n := 0
+        try n := Integer(s.Attr(id, "data-rows"))
+        cols := AxForm.It(f, "Cols", [])
+        loop n {
+            ri := A_Index
+            for ci, c in cols {
+                cid := id "_r" ri "_" AxForm.It(c, "Id", ci)
+                if !on {
+                    s.Off("keyup", cid), s.Off("change", cid), s.OffValue(cid)
+                    continue
+                }
+                if (AxForm.It(c, "Kind") = "label")
+                    continue
+                if (AxForm.It(c, "Kind", "text") = "text") {
+                    s.On("keyup", cid, (*) => AxForm.Sync(s))
+                    s.On("change", cid, (*) => AxForm.Sync(s))
+                } else
+                    s.OnValue(cid, (*) => AxForm.Sync(s))
+            }
+        }
+    }
+    ; One field drawn again where it stands, with its hooks renewed. Used by
+    ; the rows editor and by anything that fills a field from outside.
+    static Again(s, f) {
+        if !AxForm.Cur
+            return
+        AxForm.Hook(s, [f], false)
+        try {
+            s.El(AxForm.Rid(f.Id)).outerHTML := AxForm.Row(f)
+            AxTags.Expand(s.Doc)
+            s._MakeFocusable()
+        }
+        AxForm.Hook(s, [f], true)
+        AxForm.FitBody(s)
+    }
+    static Field(st, id) {
+        if !IsObject(st)
+            return ""
+        for f in st.Fields
+            if (f.HasOwnProp("Id") && f.Id = id)
+                return f
+        return ""
+    }
+    ; Write a value into a field from outside -- what a lookup found, what a
+    ; pasted signature says. The one way anything but the user changes a form.
+    static Put(s, id, value) {
+        st := AxForm.Cur
+        if !st
+            return
+        f := AxForm.Field(st, id)
+        if !IsObject(f)
+            return
+        kind := f.HasOwnProp("Kind") ? f.Kind : "text"
+        f.V := value
+        if (kind = "rows" || kind = "pick" || kind = "tabs" || kind = "panel")
+            return AxForm.Again(s, f)
+        try {
+            if AxForm.Plain(kind)
+                s.El(AxForm.Eid(id)).value := value
+            else
+                s.Value(AxForm.Eid(id), value)
+            return
+        }
+        AxForm.Again(s, f)
+    }
+    ; An answer into a panel: shown when there is one, gone when there is not.
+    static Panel(s, id, html) {
+        st := AxForm.Cur
+        if !st
+            return
+        f := AxForm.Field(st, id)
+        if IsObject(f)
+            f.V := html
+        try {
+            s.Html(AxForm.Eid(id), html)
+            s.El(AxForm.Rid(id)).style.display := (html != "" ? "block" : "none")
+        }
+        AxForm.FitBody(s)
+    }
     static BodyClick(s, ev) {
         if !AxForm.Cur
             return
@@ -387,6 +644,76 @@ class AxForm {
         if (go != "") {
             AxForm.Cur.Go := go
             return AxForm.End(s, 0)
+        }
+        ; a tab strip: the fields of the other pages go, the ones of this
+        ; page come back -- Sync does the showing, from Tab on each field
+        tid := s.UpAttr(ev.srcElement, "data-ftab")
+        if (tid != "") {
+            v := s.UpAttr(ev.srcElement, "data-fval")
+            try {
+                s.Attr(tid, "data-value", v)
+                items := s.El(tid).querySelectorAll(".axd-ftab")
+                loop items.length {
+                    it := items.item(A_Index - 1)
+                    it.className := (it.getAttribute("data-fval") = v) ? "axd-ftab on" : "axd-ftab"
+                }
+            }
+            AxForm.Sync(s)
+            return
+        }
+        ; a button inside the form: it acts on the form and the form stays up
+        aid := s.UpAttr(ev.srcElement, "data-fact")
+        if (aid != "") {
+            st := AxForm.Cur
+            f := AxForm.Field(st, RegExReplace(aid, "^axf_"))
+            if (IsObject(f) && f.HasOwnProp("Do")) {
+                which := s.UpAttr(ev.srcElement, "data-fval")
+                try {
+                    fn := f.Do
+                    fn(AxForm.Read(s, st.Fields), which)
+                } catch as e
+                    try s.Problem(e.Message)
+                AxForm.Sync(s)
+            }
+            return
+        }
+        ; the rows editor: one more, one fewer, one further up
+        rw := s.UpAttr(ev.srcElement, "data-frow")
+        if (rw != "") {
+            p := StrSplit(rw, "|")
+            st := AxForm.Cur
+            f := AxForm.Field(st, RegExReplace(p[2], "^axf_"))
+            if IsObject(f) {
+                f.V := AxForm.ReadRows(s, f)          ; whatever is typed stays typed
+                rows := AxForm.RowVals(f)
+                i := (p.Length >= 3) ? Integer(p[3]) : 0
+                sep := AxForm.It(f, "Sep", "|")
+                if (p[1] = "del" && i >= 1 && i <= rows.Length)
+                    rows.RemoveAt(i)
+                else if (p[1] = "up" && i >= 2 && i <= rows.Length) {
+                    was := rows[i]
+                    rows[i] := rows[i - 1], rows[i - 1] := was
+                }
+                ; A row with nothing typed in it yet still has to be drawn,
+                ; or "Add one" would look like it did nothing -- so an empty
+                ; row is written as its separators rather than as no line.
+                blank := ""
+                loop Max(AxForm.It(f, "Cols", []).Length - 1, 1)
+                    blank .= sep
+                out := ""
+                for r in rows {
+                    line := ""
+                    for ci, c in r
+                        line .= (ci = 1 ? "" : sep) c
+                    out .= (out = "" ? "" : "`n") (Trim(line, sep " ") = "" ? blank : line)
+                }
+                if (p[1] = "add")
+                    out .= (out = "" ? "" : "`n") blank
+                f.V := out
+                AxForm.Again(s, f)
+                AxForm.Sync(s)
+            }
+            return
         }
         id := s.UpAttr(ev.srcElement, "data-fpick")
         if (id != "") {
@@ -492,6 +819,38 @@ class AxForm {
         }
         return moved
     }
+    ; A field can belong to more than one page: Tab: "what|takes".
+    static OnTab(tab, page) {
+        for t in StrSplit(String(tab), "|")
+            if (Trim(t) = page)
+                return true
+        return false
+    }
+    ; A field whose VALUE -- not only its choices -- follows another answer:
+    ; the boxes a function's parameters need, once a function is picked. It is
+    ; filled again only when what it would be changes, so what is typed into
+    ; it stays typed until the answer it follows really moves.
+    ;
+    ; Seed(V) gives what the field should hold. A form that starts with a
+    ; value of its own sets Seeded to what Seed WOULD have said, so the first
+    ; pass leaves it alone.
+    static Reseed(s, st, V) {
+        moved := false
+        for f in st.Fields {
+            if !f.HasOwnProp("Seed") || !f.HasOwnProp("Id")
+                continue
+            fn := f.Seed, want := ""
+            try want := fn(V)
+            was := f.HasOwnProp("Seeded") ? f.Seeded : Chr(1)
+            if (want = was)
+                continue
+            f.Seeded := want
+            f.V := want
+            AxForm.Again(s, f)
+            moved := true
+        }
+        return moved
+    }
     static HasOpt(opts, v) {
         if (v = "")
             return false
@@ -513,18 +872,33 @@ class AxForm {
         if (!st || st.Done)
             return
         V := AxForm.Read(s, st.Fields)
+        ; which page is open, when the form has pages
+        tabs := AxForm.TabsId(st.Fields)
+        page := (tabs != "" && V.Has(tabs)) ? V[tabs] : ""
         for f in st.Fields {
-            if !f.HasOwnProp("When") || !f.HasOwnProp("Id")
+            if !f.HasOwnProp("Id")
                 continue
-            try {
-                w := f.When
-                s.El(AxForm.Rid(f.Id)).style.display := w(V) ? "" : "none"
+            onTab := (tabs != "" && f.HasOwnProp("Tab"))
+            if (!f.HasOwnProp("When") && !onTab)
+                continue
+            show := onTab ? AxForm.OnTab(f.Tab, page) : true
+            ; An empty panel is not a panel: showing the page it sits on must
+            ; not turn an answer box that has no answer in it yet into a bar
+            ; of grey nothing.
+            if (show && f.HasOwnProp("Kind") && f.Kind = "panel")
+                show := (String(f.HasOwnProp("V") ? f.V : "") != "" || AxForm.It(f, "Keep", false))
+            if (show && f.HasOwnProp("When")) {
+                try {
+                    w := f.When
+                    show := w(V) ? true : false
+                }
             }
+            try s.El(AxForm.Rid(f.Id)).style.display := show ? "" : "none"
         }
         ; A field whose choices depend on another answer -- which events this
         ; control has, which pages that window contains. Refilled in place
         ; rather than by rebuilding the form, so nothing under a caret moves.
-        if (!st.Filling && AxForm.Refill(s, st, V)) {
+        if (!st.Filling && (AxForm.Refill(s, st, V) | AxForm.Reseed(s, st, V))) {
             st.Filling := true
             AxForm.Sync(s)
             st.Filling := false
@@ -555,7 +929,7 @@ class AxForm {
         }
         try {
             s.Html("axdFormPrev", prev != "" ? AxTags.E(prev) : "")
-            s.El("axdFormPrev").style.display := (prev != "" ? "block" : "none")
+            s.El("axdFormPrevWrap").style.display := (prev != "" ? "block" : "none")
         }
     }
 }

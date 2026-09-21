@@ -62,6 +62,16 @@ code** and so on).
 <td align="center"><img src="../studio/templates/17-sketch.png" width="260"><br><b>Sketchpad</b><br>A canvas to draw on, with colours, undo and save</td>
 <td align="center"><img src="../studio/templates/18-quest.png" width="260"><br><b>Quest</b><br>A small top-down adventure game</td>
 </tr>
+<tr>
+<td align="center"><img src="../studio/templates/19-explorer.png" width="260"><br><b>File window</b><br>Its own events as rules, and a flowchart that branches</td>
+<td align="center"><img src="../studio/templates/20-ribbon.png" width="260"><br><b>Ribbon</b><br>Forty buttons, forty rules, no code</td>
+<td align="center"><img src="../studio/templates/21-archive.png" width="260"><br><b>Archive</b><br>A .zip read entry by entry -- every handler a flowchart</td>
+</tr>
+<tr>
+<td align="center"><img src="../studio/templates/22-fetch.png" width="260"><br><b>Fetch and read</b><br>Not one line of code: .NET and NuGet, in the background</td>
+<td align="center"><img src="../studio/templates/23-speak.png" width="260"><br><b>Read it out</b><br>Windows' own voice, without writing any code</td>
+<td align="center"><b>Site check</b><br>Several addresses at once, each answer down one of three branches</td>
+</tr>
 </table>
 
 Templates are ordinary project files in `studio/templates/`. To add your own,
@@ -338,10 +348,26 @@ write for the same event.
 | `save settings`, `load settings`, `reset settings` | The program's remembered settings |
 | `addrow`, `removerow`, `clearlist`, `tickall`, `untickall` | Change a list's rows; `{box}` means what `box` holds |
 | `saverows`, `loadrows`, `folderrows` | Save rows to a file, load them, list a folder |
+| `ribmode`, `ribstyle`, `ribdensity`, `ribcolour` | A ribbon's shape, style, how tight it is, its accent |
+| `ribtab`, `ribshowtab`, `ribhidetab`, `ribshowgroup`, `ribhidegroup` | Go to a tab, show or hide a contextual tab or a group |
+| `ribcheck`, `ribuncheck`, `ribenable`, `ribdisable`, `riblabel` | One button of a ribbon: in, out, greyed, renamed |
+| `ribcollapse`, `ribexpand`, `ribkeytips` | Roll a ribbon up or down, show the key tips |
+| `goto`, `goup`, `goback`, `goforward`, `refresh` | A file window: where it looks |
+| `viewmode`, `viewsort`, `viewfilter`, `pickall`, `pin` | A file window: how it shows it, what it shows |
+| `alert "text"` | A message with an OK button |
 
 Use `assign` rather than `set` on a bound control: setting a control from code
 fires no Change event, so the binding would not notice. Installed libraries
 can add verbs of their own.
+
+**Worked out rather than said.** A value that starts with `=` is an
+expression, not text -- the same convention a row's cells use:
+
+```
+files WentTo -> assign where =path                 the event's own value
+rib Toggle:bold -> assign bold =on                 which way the toggle went
+sumBtn Click -> status msg =(a + b) " in all"      arithmetic, without code
+```
 
 **A control's own events.** Some controls bring events of their own. The Game
 view has `Tick`, `Hit` and `Key`, and they appear in its Events tab like
@@ -357,6 +383,26 @@ world Key:space -> do Attack(eng)                 Space pressed
 `Hit:coin` runs only when the thing hit is tagged `coin`, and `Key:space` only
 for Space. The handler's own names (`eng`, `a`, `b`, `tag`, `key`) can be
 used in a `do` line.
+
+A **ribbon** works the same way, and it is what makes forty buttons forty
+readable lines instead of one hand-written switch:
+
+```
+rib Command:bold -> ribcheck rib bold              one button, one rule
+rib Command:m_strip -> ribmode rib strip
+rib Toggle:italic -> assign italic =on
+rib TabPicked:home -> status msg On the Home tab
+rib Launcher:font -> alert A Font dialog would open here.
+```
+
+A **file window** raises what it is doing, and a rule can answer it:
+
+```
+files WentTo -> assign where =path                 somewhere else is shown
+files Picked -> assign chosen =items.Length        the selection changed
+files Opened -> status msg =("Opened " item.Name)  something was opened
+files Dropped -> status msg =(paths.Length " dropped")
+```
 
 ![A rule on the game's Hit event, only for coins](images/studio-rule.png)
 
@@ -465,6 +511,28 @@ window, a library, a function, or plain code), and answer what it asks.
 Changes go into the code text itself, so your comments stay put. **Ctrl+4**
 shows the same piece as code.
 
+### In the background
+
+Long work freezes a window, and that is the one thing that makes a program
+feel broken. An adaptor set to **Run it in the background** (App > Libraries)
+hands back the *work* rather than the answer, and the **In the background**
+step is everything anyone does with that:
+
+| How | What it writes |
+|---|---|
+| Start it, and when it is done... | `WhenDone(Fetch(url), Fetched)` -- and it **makes** `Fetched()` for you, as a flowchart of its own on the Steps list |
+| Start it and carry straight on | `job := Fetch(url)` |
+| Wait here for it | `body := WaitFor(Fetch(url))` -- the window keeps answering |
+| Give up after | `WaitFor(GiveUpAfter(Fetch(url), 5000))` |
+| Wait for several that are already going | `answers := AllOf(one, two, three)` |
+| Carry on when the first is done | `AnyOf(one, two)` |
+| Has it finished / why it failed | `IsDone(job)`, `WhyItFailed(job)` |
+
+Several at once is the difference between starting them all and *then*
+waiting, and waiting for each in turn -- two steps apart in the shapes. The
+**Site check** template does exactly that, and sorts each answer down one of
+three branches.
+
 ## Code
 
 The Code workspace lists every piece of code by window: startup code, your own
@@ -489,6 +557,13 @@ needing, and shows you the result first:
 | Tray and alerts | A tray menu, a Windows notification with buttons |
 | Files and settings | An ini beside the script, watching a folder, files dropped on the window |
 | The script itself | One copy only, restart as administrator, start with Windows, the command line |
+
+### Your own snippets
+
+**Insert a snippet** offers the studio's ready lines, and yours above them.
+**Your snippets...** is where you write, change and group them; **Keep what
+is being edited as a snippet...** takes whatever is in the editor. They live
+in `studio\data\snippets.json`, so they are there in every project.
 
 ## Map
 
@@ -575,10 +650,88 @@ The **.NET, through AHK#** tab lets your script use .NET Framework 4: speech,
 zip, the web, dates and more, plus NuGet packages built for .NET Framework
 4.x or .NET Standard. **Get AHK#** installs the small library it needs.
 
+**A library installs once, for everything.** It goes where AutoHotkey itself
+looks for libraries — `Documents\AutoHotkey\Lib\Aris` — so a project that has
+never been saved can use one straight away, and the script includes it as
+`#Include <Aris/author/name>`, which resolves on any machine that has it.
+(Aris's own `--global` puts the library there but writes the little include
+stub into the *project* you ran it from, so the studio writes one into the
+global folder as well. That one file is what makes it reachable from
+anywhere.)
+
+**Into this project only** is the other kind, on every library's card. It puts
+the library in a `Lib` folder beside the project file and includes it
+relatively, so it travels with the program — which is what you want for
+something you are going to hand to someone or compile. A project's own copy
+always wins over the shared one.
+
 Any .NET method, or any library function (**Make it a step**), can become an
 **adaptor**: a plainly named function that rules and flowcharts use as a step.
 A compiled program needs AHK#'s bridge DLL beside it; **carry it with the
 program** adds it to Files.
+
+**The adaptor workbench** is the one dialog behind all of it — whether you
+got there from **Use this** on a method, **New one...**, or **Edit** on one
+you already have. Three pages:
+
+- **The method.** Type its full name and press **Look it up**: what it takes,
+  what it gives back and how it is reached come from .NET itself, and every
+  overload is offered as a button. Or copy a line from any documentation page
+  and press **Read a signature off the clipboard** —
+  `public static string ReadAllText(string path)` fills the form in.
+- **What it takes.** A row each, with the kind of value as a choice, instead
+  of a notation you have to know.
+- **Try it.** Runs the method, now, with values you type, and says what came
+  back and what type it is — offering to correct *It gives back* if you had
+  it wrong. It runs in Windows PowerShell, which is the same .NET Framework 4
+  the program will use, so what works there works in the program. An
+  AutoHotkey library's function cannot be tried this way; everything else can.
+
+**Add them all as functions** is on every AutoHotkey library's card: every
+function it offers that can be called on its own becomes an adaptor in one
+go, named and ready to pick in any rule or flowchart.
+
+**In this program** is where they are kept. Every adaptor has a card showing
+the .NET method it really is, whether it runs in the background, and four
+things to do with it: **Edit** (the workbench, above — every part of it can
+change, and Try it runs it), run it in the background or not, **Duplicate**,
+or **Remove**. **New one...** opens the same workbench empty, for when you
+already know the method you want.
+
+**Run it in the background** is a switch on the adaptor, and the one thing
+worth knowing about this tab. A long call — unpacking an archive, fetching a
+page, hashing a folder — freezes the window for as long as it takes, and .NET
+will run it on a thread pool instead for the price of one word. Tick it when
+you make the adaptor, or click the ⟳ beside one you already have.
+
+A background adaptor hands back the **work** rather than the answer, so six
+functions come with it, each a step like any other:
+
+| | |
+|---|---|
+| `WhenDone(work, then, ifItFails)` | What happens when it lands. The answer is the handler's first parameter |
+| `WaitFor(work, timeoutMs)` | Wait here instead — timers, hotkeys and the window all keep running |
+| `IsDone(work)` / `WhyItFailed(work)` | Ask, without waiting |
+| `AllOf(work…)` / `AnyOf(work…)` | Several at once: every answer in order, or the first to finish |
+| `GiveUpAfter(work, ms)` | Fail with a timeout rather than hang |
+| `AfterAWhile(ms, then)` | Later, without a timer of your own |
+
+A rule can call one too. **call** takes what the function needs — `call Speak
+words` passes the *value* `words`, and a control's name passes what the control
+holds — and **assign** keeps what it gives back: `assign page Fetch address`.
+A background adaptor used from a rule is wrapped in `WaitFor` on the way, so
+the call still happens off the AutoHotkey thread and the window still answers,
+but the rule reads as one thing that finishes.
+
+Three templates are built this way. **Read it out** has **no code in it at
+all** — speech, a file written and read back, every button a rule and every
+box bound to a value. **Archive workshop** reads a .zip entry by entry, unpacks
+it and makes one, the slow two in the background. **Fetch and read** fetches an
+address in the background, several at a time, and tidies the JSON with a
+package pulled from nuget.org as the program runs.
+`example\DotNet.ahk` is the same ground without the studio: background work,
+archives, NuGet, a real web server and a C# box — and a page that explains
+itself when AHK# is not installed.
 
 ### Extra controls
 

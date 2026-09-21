@@ -48,7 +48,7 @@
 ;  Blur, KeyDown ...) are the ordinary control's.
 ;
 ;  ------------------------------------------------- managing it, in one call
-;    RemoveSelected()     the picked rows (a tree: the picked item) go
+;    RemoveSelected()     the selected rows (a tree: the picked item) go
 ;    TickAll(on := true)  every row ticked, or none
 ;    ToText() / FromText(text)   the rows as the design's text, and back
 ;    SaveTo(path) / LoadFrom(path)   the same text, in a file -- a list that

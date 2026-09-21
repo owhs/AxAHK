@@ -1,0 +1,208 @@
+{
+ "format": "axstudio/2",
+ "name": "Site check",
+ "desc": "Several addresses checked at once -- every one started in the background before any of them is waited for -- and each answer sorted down one of three branches: up, slow or down. Both flowcharts are on the Steps tab, written in shapes rather than code, and what the window says about itself is worked out from the values.",
+ "uid": 8,
+ "cur": 1,
+ "vars": "sites = \"https://example.com`nhttps://httpbin.org/status/404`nhttps://no-such-host.invalid\"\nchecked = 0\ngood = 0\nslow = 0\nbroken = 0\nrunning = false\nsaid <- (running ? \"Checking \" checked \" at once...\" : checked ? good \" up, \" slow \" slow, \" broken \" down\" : \"Nothing checked yet\")\ncanGo <- (!running && Trim(sites) != \"\")\nanyBroken <- (broken > 0)",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Site check",
+   "width": 900,
+   "height": 640,
+   "minwidth": 460,
+   "minheight": 380,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E968",
+   "menus": "",
+   "status": "msg | One address a line, then Check them all | grow icon=E968",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "Fetch and read",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": 1,
+   "importlayout": "",
+   "importresize": "",
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "clearBtn Click -> clearlist results\nclearBtn Click -> assign checked 0\nclearBtn Click -> assign good 0\nclearBtn Click -> assign slow 0\nclearBtn Click -> assign broken 0\nclearBtn Click -> status msg Cleared.",
+   "states": "",
+   "binds": "sitesBox <-> sites\nsumLabel.Text <- said\ngoBtn.Enabled <- canGo\nclearBtn.Enabled <- (checked > 0)\nagainBtn.Enabled <- anyBroken",
+   "hotkeys": "",
+   "init": "",
+   "script": "; Sort() is the branch, kept on its own so it opens as a flowchart of\n; its own on the Steps tab: one test, three ways out. Every line in it\n; is a shape the step editor itself writes.\nSort(address, body, took) {\n    global g, results, checked, good, slow, broken\n    if (body = \"\") {\n        broken += 1\n        state := \"Down\"\n    } else if (took > 1200) {\n        slow += 1\n        state := \"Slow\"\n    } else {\n        good += 1\n        state := \"Up\"\n    }\n    checked += 1\n    results.Component.AddRow({Key: address, site: address, state: state, took: took, size: StrLen(body)})\n    AxBindSync()\n}\n",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "InfoBar",
+      "name": "tip",
+      "arg": "Two flowcharts, both on the Steps tab. Check them all starts every address in the background BEFORE it waits for any of them -- that is what makes them run together rather than one after another -- and then sorts each answer down one of three branches: up, slow or down. Open either one on Steps and it is shapes, not code.",
+      "layout": {},
+      "props": {
+       "title": "Branching and parallel, without writing code."
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Edit",
+      "name": "sitesBox",
+      "arg": "",
+      "layout": {
+       "fill": 1,
+       "h": 92
+      },
+      "props": {
+       "multi": 1,
+       "rows": 5,
+       "placeholder": "One address a line"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Button",
+      "name": "goBtn",
+      "arg": "Check them all",
+      "layout": {},
+      "props": {
+       "icon": "E768",
+       "kind": "accent"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "results.Component.Clear()\nchecked := 0\ngood := 0\nslow := 0\nbroken := 0\nrunning := true\nAxBindSync()\njobs := []\naddresses := []\n; start them all before waiting for any: this is what makes it parallel\nfor line in StrSplit(StrReplace(sites, \"`r\"), \"`n\") {\n    if (Trim(line) = \"\") {\n        continue\n    }\n    addresses.Push(Trim(line))\n    jobs.Push(Fetch(Trim(line)))\n}\ng.Status(\"msg\", \"Started \" jobs.Length \" at once -- the window still answers\")\n; and now collect them, each one down its own branch\nfor i, job in jobs {\n    started := A_TickCount\n    body := \"\"\n    try {\n        body := WaitFor(GiveUpAfter(job, 8000))\n    }\n    took := A_TickCount - started\n    Sort(addresses[i], body, took)\n}\nrunning := false\nAxBindSync()\ng.Status(\"msg\", \"Done.\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Button",
+      "name": "againBtn",
+      "arg": "Try the ones that were down",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E72C"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "only := \"\"\nfor row in results.Component.Rows {\n    if (row.state = \"Down\") {\n        only .= (only = \"\" ? \"\" : \"`n\") row.site\n    }\n}\nif (only = \"\") {\n    MsgBox(\"Nothing was down.\")\n    return\n}\nsites := only\nAxBindSync()\ngoBtn_Click(goBtn, 0, 0)"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Button",
+      "name": "clearBtn",
+      "arg": "Clear",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E711"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "DataView",
+      "name": "results",
+      "arg": "{Columns: [{Key: \"site\", Title: \"Address\", Width: 380, Icon: true},\n           {Key: \"state\", Title: \"How it went\", Width: 120,\n            Badge: (v, *) => v = \"Up\" ? \"good\" : v = \"Slow\" ? \"warn\" : \"bad\"},\n           {Key: \"took\", Title: \"Took\", Width: 110, Align: \"right\", Sort: \"number\",\n            Format: (v, *) => v \" ms\"},\n           {Key: \"size\", Title: \"Size\", Width: 110, Align: \"right\", Sort: \"number\"}],\n Rows: [], Empty: \"Press Check them all.\"}",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 240
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Text",
+      "name": "sumLabel",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "style": "opacity:.7"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ],
+ "adaptors": "Fetch | new |  | System.Net.WebClient.DownloadString | address:string | string@async | Fetch a page, in the background -- a new WebClient each time, so several can run at once",
+ "packages": "owhs/ahksharp"
+}

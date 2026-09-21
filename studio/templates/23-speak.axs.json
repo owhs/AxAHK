@@ -1,0 +1,236 @@
+{
+ "format": "axstudio/2",
+ "name": "Read it out",
+ "desc": "Speech, a file written and a folder opened -- all of it .NET, and not one line of code in the whole program. The text box is bound to a value, every button is a rule, and the four things it does are .NET methods made into your own functions on App > Libraries. The one that talks runs in the background, so the window keeps answering while it does.",
+ "uid": 11,
+ "cur": 1,
+ "vars": "words = \"Hello from AutoHotkey, by way of the .NET Framework.\"\nfilename = A_Desktop \"\\spoken.txt\"\nhowMany <- StrLen(words) \" character\" (StrLen(words) = 1 ? \"\" : \"s\")\nhasWords <- (Trim(words) != \"\")",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Read it out",
+   "width": 860,
+   "height": 620,
+   "minwidth": 460,
+   "minheight": 380,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E7C4",
+   "menus": "",
+   "status": "msg | Type something and press Read it out | grow icon=E767\ncount |  | right dim",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "Read it out",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": 1,
+   "importlayout": "",
+   "importresize": "",
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "readBtn Click -> call Speak words\nreadBtn Click -> status msg Read it out loud.\nsaveBtn Click -> call SaveText filename, words\nsaveBtn Click -> status msg Saved.\nsaveBtn Click -> toast Saved\nloadBtn Click -> assign words ReadBack filename\nloadBtn Click -> status msg Read back from the file.\nopenBtn Click -> call OpenIt filename\nclearBtn Click -> assign words \nclearBtn Click -> status msg Cleared.",
+   "states": "",
+   "binds": "textBox <-> words\nwhereBox <-> filename\ncountLabel.Text <- howMany\nreadBtn.Enabled <- hasWords\nsaveBtn.Enabled <- hasWords\nclearBtn.Enabled <- hasWords",
+   "hotkeys": "",
+   "init": "",
+   "script": "",
+   "root": {
+    "id": "r",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "InfoBar",
+      "name": "tip",
+      "arg": "Nothing in this program is written by hand. The text box is kept in step with a value, the buttons are rules -- when this is clicked, do that -- and the four things it does are .NET methods made into your own functions on App > Libraries. Reading aloud runs in the background, so the window answers while it talks.",
+      "layout": {},
+      "props": {
+       "title": "No code, and all of it is .NET."
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Edit",
+      "name": "textBox",
+      "arg": "Type anything here and press Read it out. Windows says it in its own voice, through System.Speech -- and because that one is set to run in the background, this window keeps answering while it talks.",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 200
+      },
+      "props": {
+       "multi": 1,
+       "rows": 10
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Text",
+      "name": "countLabel",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "style": "opacity:.7"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Button",
+      "name": "readBtn",
+      "arg": "Read it out",
+      "layout": {},
+      "props": {
+       "icon": "E767",
+       "primary": 1
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Button",
+      "name": "clearBtn",
+      "arg": "Clear",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E711"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "Separator",
+      "name": "sep1",
+      "arg": "",
+      "layout": {},
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Edit",
+      "name": "whereBox",
+      "arg": "",
+      "layout": {
+       "w": 460
+      },
+      "props": {
+       "placeholder": "Where to save it -- a full path"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n8",
+      "type": "Button",
+      "name": "saveBtn",
+      "arg": "Save it",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E74E"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n9",
+      "type": "Button",
+      "name": "loadBtn",
+      "arg": "Read it back",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8E5"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n10",
+      "type": "Button",
+      "name": "openBtn",
+      "arg": "Open it",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8B7"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ],
+ "adaptors": "Speak | new |  | System.Speech.Synthesis.SpeechSynthesizer.Speak | textToSpeak:string | void@async | Say it out loud, in Windows' own voice\nSaveText | static |  | System.IO.File.WriteAllText | path:string, contents:string | void | Write text to a file, making it if it is not there\nReadBack | static |  | System.IO.File.ReadAllText | path:string | object | Read a whole file back as text\nOpenIt | static |  | System.Diagnostics.Process.Start | fileName:string | object | Open something the way Windows would -- a file, a folder, a web page",
+ "packages": "owhs/ahksharp"
+}

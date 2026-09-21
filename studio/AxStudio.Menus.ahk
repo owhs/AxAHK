@@ -27,7 +27,7 @@ if (A_LineFile = A_ScriptFullPath) {
 ;  item with its picture, its tick, its shortcut, greyed out or bold -- and
 ;  under each item, in plain words, what it does. A click on an item opens
 ;  its form; the small buttons on the right move it up and down, into the
-;  submenu above it or back out, and take it out.
+;  submenu above it or back out, and remove it.
 ;
 ;  The text is still the truth (AxStudio.Chrome.ahk for right-click menus
 ;  and the menu bar, AxStudio.Assets.ahk for the tray): the tree is read
@@ -111,7 +111,7 @@ class AxMenuUi {
                    . ((i > 1 && !items[i - 1].Sep && !it.Sep) ? T("in", "E72A", "Into the submenu above it") : "")
                    . (depth ? T("out", "E72B", "Out of this submenu") : "")
                    . (it.Items.Length ? T("addin", "E710", "Add an item to this submenu") : "")
-                   . T("del", "E74D", "Take it out")
+                   . T("del", "E74D", "Remove")
             pad := ' style="padding-left:' (8 + depth * 22) 'px"'
             if it.Sep {
                 h .= '<div class="axd-mrow sep"' pad '><span class="axd-mline"></span><span class="axd-mtools">' tools '</span></div>'
@@ -306,7 +306,7 @@ class AxMenuUi {
         case "code":
             out.Code := Trim(StrReplace(V["code"], "`r"), "`n")
         case "step":
-            st := AxStepsUi.StepForm(s, "What it does", "", "", "When the item is picked, this happens.")
+            st := AxStepsUi.StepForm(s, "What it does", "", "", "What happens when this item is chosen.")
             if !IsObject(st)
                 return ""
             out.Code := st.Code
@@ -437,7 +437,7 @@ class AxMenuUi {
                . '<span class="axd-mon' (bad ? " bad" : "") '" data-mnu="ctxon|ctx|' AxTags.E(m.Name) '" title="What it opens on">'
                . 'opens on ' AxTags.E(on) (bad ? " -- there is no control called that" : "") ' <span class="ico">&#xE70F;</span></span>'
                . '<span class="axd-mhtools"><span class="axd-ract" data-mnu="ctxren|ctx|' AxTags.E(m.Name) '">Rename</span>'
-               . '<span class="axd-ract axd-mdel" data-mnu="ctxdel|ctx|' AxTags.E(m.Name) '">Take it out</span></span></div>'
+               . '<span class="axd-ract axd-mdel" data-mnu="ctxdel|ctx|' AxTags.E(m.Name) '">Remove</span></span></div>'
                . AxMenuUi.Editor(s, "ctx", m.Name, m.Items)
                . '<div class="axd-mcode">In code or a step: <code>' AxTags.E(AxChrome.CtxFn(W, m.Name)) '()</code> gives its items; '
                . '<code>' AxTags.E(W.Var) '.ShowMenu(' AxTags.E(AxChrome.CtxFn(W, m.Name)) '())</code> opens it where the pointer is.</div></div>'
@@ -548,7 +548,7 @@ class AxMenuUi {
         s.Reflect(false)
     }
     static CtxDelete(s, key) {
-        if !s.Confirm("Take out the right-click menu " key "?", "Menus", "Take it out", "Keep it")
+        if !s.Confirm("Remove the right-click menu " key "?", "Menus", "Remove", "Keep it")
             return
         W := s.P.W
         tops := AxChrome.Menus(W.Ctx)

@@ -474,7 +474,7 @@ class AxAutoUi {
                      . "title text.  A value: count > 3, theme = dark.  Times: 09:00-17:30.  A key: CapsLock on, "
                      . "Shift held.  Idle: seconds.  Expression: anything AutoHotkey reads as true."}],
             Buttons: [IsObject(old) ? "Save" : "Add it", "Cancel"],
-            Check: (V) => AxProject.CleanName(V["name"]) = "" ? "Give it a name." : Trim(V["detail"]) = "" ? "Say which." : "",
+            Check: (V) => AxProject.CleanName(V["name"]) = "" ? "Enter a name." : Trim(V["detail"]) = "" ? "Say which." : "",
             Preview: (V) => "Cond_" AxProject.CleanName(V["name"]) "() => " AxAuto.CondExpr({Kind: V["kind"], Detail: Trim(V["detail"])})})
         if !r.Ok
             return
@@ -555,7 +555,7 @@ class AxAutoUi {
                  Opts: "start:With the program|manual:When something starts it"},
                 {Id: "cond", L: "Only when", Kind: "choice", V: (O("Cond", "") = "") ? AxPanes.NONE : O("Cond", ""), Opts: conds}],
             Buttons: [IsObject(old) ? "Save" : "Add it", "Cancel"],
-            Check: (V) => AxProject.CleanName(V["name"]) = "" ? "Give it a name." : Trim(V["steps"]) = "" ? "Say what it does." : "",
+            Check: (V) => AxProject.CleanName(V["name"]) = "" ? "Enter a name." : Trim(V["steps"]) = "" ? "Say what it does." : "",
             Preview: (V) => "SetTimer(Timer_" AxProject.CleanName(V["name"]) ", "
                           . (V["once"] = "once" ? "-" : "") AxAuto.Every(V["every"]).Ms ")"})
         if !r.Ok

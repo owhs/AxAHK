@@ -6,3 +6,11 @@
 .dropdown { display: inline-block; position: relative; }
 .dd-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dd-value:after { position: absolute; }
+
+/* A long option stays inside the menu. Every sheet sets .dd-item's padding
+   and height and every one of them says white-space: nowrap -- which stops
+   the text wrapping without stopping it spilling out of the right-hand edge,
+   because the menu is the width of the control (left: 0; right: 0) and the
+   text is whatever it is. So the clipping belongs here, in the layer that
+   says what the control IS: one rule, and no sheet has to remember it. */
+.dd-item, .list-item { overflow: hidden; text-overflow: ellipsis; }

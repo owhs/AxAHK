@@ -1,4 +1,4 @@
-{
+﻿{
   "format": "axstudio-packages/1",
   "about": "What AxStudio adds on top of Aris's package list (github.com/Descolada/Aris, assets/index.json). Read by AxStudio.Pkg.ahk and merged over the index, never written into it. categories: our own grouping, one package may be in several. packages: per package -- keywords added to its own, a description that replaces a thin one, notes shown beside it (warn: true shows them as a caution), snippets: ready lines of code, each {name, code}, and steps: what a rule (Logic > Rules) can do with it, each {verb, label, who, arg, code, sync} -- who is var, ctl or empty; code takes {who}, {arg} (the typed value, quoted), {path} (it as a path beside the script), {arg1} and {arg2} (its two halves either side of a |) and {g} (the window); sync: true calls AxBindSync() after, so what is bound to the value follows. fn: its most useful functions and methods, each {name, sig, does, returns}, read from its source -- offered as steps before it is even installed. src: where that was checked. hidden: left out, with a reason each (reasons). extra: packages Aris does not list, with what it needs to install them (install: anything 'aris install' takes). recommended: shown first, each {name, why} -- the ones that work well from rules and are easy to use without code. hidden: left out of the list (they build windows, which the studio does), with why.",
   "categories": [
@@ -11631,7 +11631,8 @@
           "name": "Call a .NET method",
           "code": "result := CS.System.Math.Pow(5, 3)"
         }
-      ]
+      ],
+      "main": "lib/ahk#.ahk"
     }
   },
   "recommended": [

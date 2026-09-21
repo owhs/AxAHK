@@ -1,0 +1,239 @@
+{
+ "format": "axstudio/2",
+ "name": "Fetch and read",
+ "desc": "An address fetched in the background and the answer tidied by a NuGet package -- and not one line of code in the whole program. The box is bound to a value, every button is a rule, the table is filled by the rules that fill lists, and what is on screen is worked out from the values rather than set by hand.",
+ "uid": 8,
+ "cur": 1,
+ "vars": "address = \"https://raw.githubusercontent.com/owhs/axahk/main/version.json\"\nbody = \"\"\nfetches = 0\nhowMany <- StrLen(body) \" character\" (StrLen(body) = 1 ? \"\" : \"s\")\nhasBody <- (Trim(body) != \"\")\nlooksLikeJson <- (SubStr(Trim(body), 1, 1) = \"{\" || SubStr(Trim(body), 1, 1) = \"[\")\nsaid <- fetches ? fetches \" fetched\" : \"Nothing fetched yet\"",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Fetch and read",
+   "width": 1000,
+   "height": 700,
+   "minwidth": 460,
+   "minheight": 380,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E7C4",
+   "menus": "",
+   "status": "msg | Type an address and fetch it | grow icon=E896\nsaid |  | right dim",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "Fetch and read",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": 1,
+   "importlayout": "",
+   "importresize": "",
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "goBtn Click -> status msg Fetching...\ngoBtn Click -> assign body Fetch address\ngoBtn Click -> add fetches\ngoBtn Click -> addrow fetched {urlBox}|Fetched|{countLabel}\ngoBtn Click -> status msg Fetched. The window never stopped answering.\ntidyBtn Click -> assign body Pretty body\ntidyBtn Click -> status msg Tidied by Newtonsoft.Json, fetched from nuget.org.\nclearBtn Click -> assign body \nclearBtn Click -> clearlist fetched\nclearBtn Click -> status msg Cleared.\nsaveBtn Click -> saverows fetched fetches.tsv\nsaveBtn Click -> toast Saved beside the program\nopenBtn Click -> loadrows fetched fetches.tsv",
+   "states": "",
+   "binds": "urlBox <-> address\nbodyBox <- body\ncountLabel.Text <- howMany\ntidyBtn.Enabled <- looksLikeJson\nclearBtn.Enabled <- hasBody",
+   "hotkeys": "",
+   "init": "",
+   "script": "",
+   "root": {
+    "id": "r",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "InfoBar",
+      "name": "tip",
+      "arg": "Nothing in this program is written by hand. The address is bound to a value, every button is a rule on the Logic tab, and the two things it does are .NET methods made into your own functions on App > Libraries. Fetching runs in the background, so the window keeps answering while it does.",
+      "layout": {},
+      "props": {
+       "title": "No code, and all of it is .NET."
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Edit",
+      "name": "urlBox",
+      "arg": "",
+      "layout": {
+       "fill": 1
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Button",
+      "name": "goBtn",
+      "arg": "Fetch it",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E896",
+       "kind": "accent"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Button",
+      "name": "tidyBtn",
+      "arg": "Tidy the JSON",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E943"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Button",
+      "name": "clearBtn",
+      "arg": "Clear",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E711"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "DataView",
+      "name": "fetched",
+      "arg": "{Columns: [{Key: \"url\", Title: \"Address\", Width: 460, Icon: true},\n           {Key: \"state\", Title: \"How it went\", Width: 140},\n           {Key: \"chars\", Title: \"Size\", Width: 140, Align: \"right\"}],\n Rows: [], Empty: \"Nothing fetched yet. Press Fetch it.\"}",
+      "layout": {
+       "fill": 1,
+       "h": 180
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Button",
+      "name": "saveBtn",
+      "arg": "Save the list",
+      "layout": {},
+      "props": {
+       "icon": "E74E"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n8",
+      "type": "Button",
+      "name": "openBtn",
+      "arg": "Load it back",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8E5"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n9",
+      "type": "Text",
+      "name": "countLabel",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "style": "opacity:.7"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n10",
+      "type": "Edit",
+      "name": "bodyBox",
+      "arg": "",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 160
+      },
+      "props": {
+       "multi": 1,
+       "readonly": 1,
+       "rows": 10,
+       "style": "font-family:Consolas,monospace;font-size:12px"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ],
+ "adaptors": "Fetch | new |  | System.Net.WebClient.DownloadString | address:string | string@async | Fetch a page or an API, in the background\nPretty | nuget | Newtonsoft.Json@13.0.3 | Newtonsoft.Json.Linq.JToken.Parse | json:string | text | Tidy JSON up, with Newtonsoft.Json fetched from nuget.org as the program runs",
+ "packages": "owhs/ahksharp"
+}

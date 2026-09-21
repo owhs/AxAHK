@@ -1,0 +1,458 @@
+/* =============================================================================
+   AxRibbon.css — the band of commands, in four shapes, four styles and three
+   densities.
+
+   The base layer: the page loads this before the theme, so it says what the
+   ribbon *is* and the theme says what it looks like.
+
+   THE RIBBON IS ONE SURFACE. The strip and the panel share a background and
+   the whole thing carries a single bottom edge. Anything else leaves the page
+   showing between the tabs and the panel, which reads as a gap where a gap
+   makes no sense.
+
+   The metrics are the ones a ribbon has had since 2007, because they are what
+   make it read as a ribbon and not as a toolbar with delusions. Each density
+   scales them together:
+
+                      comfortable   compact   roomy
+       tab strip          36          30        40
+       panel              94          76       112
+       large button     68x68       56x56     76x84
+       small row          22          19        26
+
+   Trident notes, both learned the hard way elsewhere in this library:
+   * the strips are inline-block, never flex — IE11 sizes a padded flex item
+     from its content box and clips the label;
+   * an element with a background must paint it itself; there is no cascade of
+     "inherit the surface".
+   ============================================================================= */
+
+/* --------------------------------------------------------------- the surface */
+/* The bar is the window's own colour and the PANEL carries the surface, so
+   the panel reads as raised out of the strip. The live tab paints that same
+   surface: it is the top of the panel, lighter than the strip it sits in and
+   continuous with the panel below it. */
+.rib { display: block; position: relative; -ms-user-select: none; user-select: none;
+       z-index: 1; font-size: 12px; background: transparent;
+       border-bottom: 1px solid rgba(255,255,255,.08); }
+body.theme-light .rib { border-bottom-color: rgba(0,0,0,.09); }
+.rib.fill { width: 100%; }
+/* Full bleed: the ribbon belongs to the window, not to the page's margins, so
+   it cancels whatever padding the shell put round the content. Three sheets
+   set that padding and the other nine inherit from one of them. */
+/* The bleed is measured and applied from AHK (_Bleed), not written here: each
+   stylesheet sets its own padding on #content, and a hardcoded pair per sheet
+   is three right answers and nine wrong ones. */
+.rib.flush { margin: 0; }
+
+/* ---------------------------------------------------------------- the strip */
+.rib-bar { display: block; white-space: nowrap; height: 36px; position: relative;
+           padding: 0 6px; overflow: hidden; }
+.rib-qat, .rib-tabs { display: inline-block; vertical-align: bottom; }
+.rib-right { position: absolute; right: 8px; bottom: 5px; }
+
+.rib-file { display: inline-block; vertical-align: bottom; height: 28px; line-height: 28px;
+            margin: 0 8px 2px 0; padding: 0 16px; border-radius: 4px; font-size: 12.5px;
+            font-weight: 600; cursor: default; background: #60cdff; color: #06212e; }
+.rib-file:hover { filter: brightness(1.1); }
+
+.rib-tab { display: inline-block; vertical-align: bottom; height: 30px; line-height: 30px;
+           margin: 0 1px 2px; padding: 0 13px; border-radius: 4px; font-size: 12.5px;
+           color: rgba(255,255,255,.72); cursor: default; position: relative; }
+body.theme-light .rib-tab { color: rgba(0,0,0,.6); }
+.rib-tab .ico { font-size: 13px; margin-right: 6px; vertical-align: -1px; }
+.rib-tab:hover { background: rgba(255,255,255,.05); color: #fff; }
+body.theme-light .rib-tab:hover { background: rgba(0,0,0,.028); color: #1b1b1b; }
+.rib-tab:hover.on { background: rgba(255,255,255,.11); }
+.rib-tab.on { color: #fff; font-weight: 600; background: rgba(255,255,255,.11); }
+body.theme-light .rib-tab.on { color: #1b1b1b; background: rgba(0,0,0,.055); }
+
+/* a contextual band sits over the tabs it owns */
+.rib-band { display: inline-block; vertical-align: bottom; height: 14px; line-height: 14px;
+            margin: 0 1px 2px 8px; padding: 0 12px; font-size: 9.5px; font-weight: 700;
+            letter-spacing: .06em; text-transform: uppercase; border-radius: 3px;
+            background: #9b59b6; color: #fff; }
+
+.rib-roll { display: inline-block; width: 26px; height: 24px; line-height: 24px;
+            text-align: center; border-radius: 4px; cursor: default; opacity: .6; }
+.rib-roll .ico { font-size: 11px; }
+.rib-roll:hover { background: rgba(255,255,255,.06); opacity: 1; }
+body.theme-light .rib-roll:hover { background: rgba(0,0,0,.04); }
+.rib-q { display: inline-block; vertical-align: bottom; width: 26px; height: 26px;
+         line-height: 26px; margin: 0 1px 3px; text-align: center; border-radius: 4px;
+         cursor: default; opacity: .75; }
+.rib-q .ico { font-size: 13px; }
+.rib-q:hover { background: rgba(255,255,255,.06); opacity: 1; }
+body.theme-light .rib-q:hover { background: rgba(0,0,0,.04); }
+.rib-q.disabled { opacity: .3; }
+
+/* ---------------------------------------------------------------- the panel */
+/* Same surface as the strip: no seam, no gap, nothing of the page between. */
+.rib-body { display: block; }
+.rib-panel { display: block; white-space: nowrap; position: relative; height: 94px;
+             padding: 4px 6px 0 6px; overflow: hidden;
+             background: rgba(255,255,255,.11); }
+body.theme-light .rib-panel { background: rgba(0,0,0,.055); }
+.rib-panel.line { height: auto; min-height: 0; padding: 3px 6px; }
+.rib.collapsed > .rib-body { display: none; }
+/* rolled up, a tab click floats the panel over the page. It is over the
+   document then, so it needs its own opaque surface and its own edges.
+   The offset and the surface are both written by _FloatBox at render time --
+   measured off the strip and read off the page -- because the strip's height
+   changes with the density and disappears in two of the modes, and the page's
+   colour changes with every sheet and both themes. What is left here is the
+   shape, and a surface for the case where nothing could be measured. */
+.rib.collapsed.floating > .rib-body {
+    display: block; position: absolute; left: 0; right: 0; top: 0; z-index: 60;
+    background: #262626; box-shadow: 0 12px 28px rgba(0,0,0,.55); }
+body.theme-light .rib.collapsed.floating > .rib-body {
+    background: #f6f6f6; box-shadow: 0 12px 28px rgba(0,0,0,.18); }
+.rib.collapsed.floating > .rib-body > .rib-panel {
+    border: 1px solid rgba(255,255,255,.1); border-top: 0; border-radius: 0 0 8px 8px; }
+body.theme-light .rib.collapsed.floating > .rib-body > .rib-panel { border-color: rgba(0,0,0,.1); }
+
+/* --------------------------------------------------------------- the groups */
+.rib-group { display: inline-block; vertical-align: top; height: 88px; padding: 0 7px;
+             text-align: center; position: relative; }
+/* a hairline, not a gap: the gap alone reads as a wide toolbar */
+.rib-group + .rib-group:before { content: ""; position: absolute; left: 0; top: 6px;
+    width: 1px; height: 74px; background: rgba(255,255,255,.08); }
+body.theme-light .rib-group + .rib-group:before { background: rgba(0,0,0,.08); }
+.rib-fold { display: none; width: 54px; height: 68px; padding: 8px 2px 0; text-align: center;
+             border-radius: 4px; cursor: default; }
+.rib-fold .ico { display: block; font-size: 22px; height: 26px; line-height: 26px; }
+.rib-ft { display: block; font-size: 10.5px; line-height: 12px; max-height: 24px;
+          overflow: hidden; }
+.rib-fold .rib-arrow { display: block; font-size: 7px; line-height: 8px; opacity: .6; }
+.rib-fold:hover { background: rgba(255,255,255,.07); }
+body.theme-light .rib-fold:hover { background: rgba(0,0,0,.05); }
+/* folded: the items and the name go, the one button takes their place */
+.rib-group.folded > .rib-gitems, .rib-group.folded > .rib-gfoot { display: none; }
+.rib-group.folded > .rib-fold { display: block; }
+.rib-group.folded { padding: 0 3px; }
+/* off the row entirely: reachable only from the More button */
+.rib-group.gone { display: none; }
+
+/* the drawer a folded group drops: the same panel, in a sheet of its own */
+#axPop.rib-pop { padding: 0; overflow: hidden; }
+.rib-drawer { background: transparent; border-bottom: 0; margin: 0; }
+.rib-drawer .rib-panel { height: auto; padding: 6px 8px 4px; background: transparent; }
+.rib-drawer .rib-group { height: auto; padding: 0; }
+.rib-drawer .rib-group + .rib-group:before { display: none; }
+.rib-drawer .rib-fold { display: none; }
+.rib-drawer .rib-gitems { height: auto; }
+.rib-panel.line .rib-group { height: auto; padding: 0 5px; }
+.rib-panel.line .rib-group + .rib-group:before { top: 4px; height: 22px; }
+.rib-gitems { display: block; white-space: nowrap; height: 70px; }
+.rib-panel.line .rib-gitems { height: auto; }
+.rib-gfoot { display: block; height: 16px; line-height: 16px; font-size: 10.5px;
+             color: rgba(255,255,255,.42); position: relative; padding: 0 14px 0 2px;
+             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.theme-light .rib-gfoot { color: rgba(0,0,0,.42); }
+.rib-launch { position: absolute; right: 0; top: 0; width: 13px; height: 16px;
+              line-height: 16px; text-align: center; font-size: 8px; opacity: .45;
+              border-radius: 2px; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; }
+.rib-launch:hover { opacity: 1; background: rgba(255,255,255,.08); }
+body.theme-light .rib-launch:hover { background: rgba(0,0,0,.06); }
+.rib-col { display: inline-block; vertical-align: top; text-align: left; padding: 1px 0; }
+.rib-vsep { display: inline-block; vertical-align: top; width: 1px; height: 62px; margin: 4px 6px;
+            background: rgba(255,255,255,.08); }
+body.theme-light .rib-vsep { background: rgba(0,0,0,.08); }
+.rib-panel.line .rib-vsep { height: 20px; margin: 5px 4px; }
+.rib-spacer { display: inline-block; width: 12px; }
+
+/* ---------------------------------------------------------------- the items */
+.rib-item { display: inline-block; vertical-align: top; border-radius: 4px; cursor: default;
+            color: inherit; position: relative; white-space: nowrap; }
+.rib-item:hover { background: rgba(255,255,255,.07); }
+body.theme-light .rib-item:hover { background: rgba(0,0,0,.05); }
+.rib-item.on { background: rgba(255,255,255,.115); box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+body.theme-light .rib-item.on { background: rgba(0,0,0,.08); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.rib-item.disabled { opacity: .32; }
+.rib-item.disabled:hover { background: transparent; box-shadow: none; }
+
+.rib-item.large { width: 68px; height: 68px; padding: 6px 3px 0; text-align: center;
+                  white-space: normal; }
+.rib-item.large > .ico { display: block; font-size: 30px; height: 34px; line-height: 34px; }
+.rib-item.large .rib-t { display: block; font-size: 11px; line-height: 13px;
+                         max-height: 26px; overflow: hidden; }
+.rib-item.large .rib-arrow { display: block; font-size: 7px; line-height: 8px; opacity: .65; }
+
+.rib-item.small { display: block; height: 22px; line-height: 22px; padding: 0 7px; margin: 0 0 1px;
+                  font-size: 12px; text-align: left; }
+.rib-panel.line .rib-item.small { display: inline-block; height: 26px; line-height: 26px;
+                                  margin: 1px; padding: 0 9px; }
+.rib-item.small > .ico { font-size: 14px; margin-right: 7px; vertical-align: -2px; opacity: .9; }
+.rib-item.small .rib-t { vertical-align: middle; }
+.rib-item .rib-arrow { font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 7px;
+                       margin-left: 6px; opacity: .65; }
+
+.rib-item.split { padding: 0; }
+.rib-item.split.large { padding: 6px 3px 0; }
+.rib-item.split:hover { background: transparent; }
+.rib-item.split .rib-main { display: inline-block; padding: 0 7px; border-radius: 4px;
+                            line-height: 22px; }
+.rib-item.split.large .rib-main { display: block; padding: 0; line-height: normal; }
+.rib-item.split .rib-drop { display: inline-block; padding: 0 5px; border-radius: 4px;
+                            line-height: 22px; }
+.rib-item.split.large .rib-drop { display: block; padding: 0; line-height: 10px; }
+.rib-item.split .rib-main:hover, .rib-item.split .rib-drop:hover { background: rgba(255,255,255,.09); }
+body.theme-light .rib-item.split .rib-main:hover,
+body.theme-light .rib-item.split .rib-drop:hover { background: rgba(0,0,0,.065); }
+
+.rib-box { display: inline-block; width: 13px; height: 13px; margin-right: 8px; border-radius: 3px;
+           vertical-align: -2px; border: 1px solid rgba(255,255,255,.5); text-align: center;
+           line-height: 11px; font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; font-size: 9px; }
+body.theme-light .rib-box { border-color: rgba(0,0,0,.42); }
+.rib-item.check.on .rib-box:before { content: "\E73E"; }
+.rib-item.check.on .rib-box { background: #60cdff; border-color: #60cdff; color: #000; }
+.rib-item.check.on { background: transparent; box-shadow: none; }
+.rib-item.check.on:hover { background: rgba(255,255,255,.07); }
+
+.rib-swatch { display: inline-block; width: 15px; height: 4px; border-radius: 1px;
+              vertical-align: 3px; margin-right: 6px;
+              box-shadow: inset 0 0 0 1px rgba(128,128,128,.45); }
+.rib-item.large .rib-swatch { display: block; width: 26px; height: 4px; margin: 0 auto 2px; }
+/* A colour button stacks glyph, swatch, label and arrow in the same 68px as
+   everything else, so its glyph is shorter rather than the swatch being
+   dragged up over it with a negative margin. */
+.rib-item.large.rib-colour > .ico { height: 27px; line-height: 27px; font-size: 24px; }
+.rib-item.large.rib-colour .rib-t { max-height: 13px; }
+.rib.density-compact .rib-item.large.rib-colour > .ico { height: 22px; line-height: 22px; font-size: 19px; }
+.rib.density-roomy .rib-item.large.rib-colour > .ico { height: 33px; line-height: 33px; font-size: 28px; }
+
+.rib-gallery { display: inline-block; vertical-align: top; padding: 4px 2px; white-space: normal;
+               max-width: 224px; }
+.rib-cell { display: inline-block; width: 30px; height: 30px; line-height: 30px; margin: 1px;
+            border-radius: 3px; text-align: center; font-size: 11px; cursor: default;
+            box-shadow: inset 0 0 0 1px rgba(128,128,128,.32); overflow: hidden;
+            vertical-align: top; }
+.rib-cell:hover { box-shadow: inset 0 0 0 2px #60cdff; }
+.rib-cell .ico { font-size: 14px; }
+
+.rib-label { display: inline-block; vertical-align: top; height: 22px; line-height: 22px;
+             padding: 0 6px; font-size: 11px; opacity: .55; }
+.rib-input { display: inline-block; vertical-align: top; padding: 2px 3px; }
+.rib-input input { height: 24px; line-height: 24px; padding: 0 7px; font-size: 12px; width: 120px;
+                   font-family: inherit; color: inherit; border-radius: 4px;
+                   border: 1px solid rgba(128,128,128,.4); background: rgba(0,0,0,.22);
+                   outline: none; }
+body.theme-light .rib-input input { background: #fff; color: #1b1b1b; }
+.rib-input input:focus { border-color: #60cdff; }
+
+/* The overflow button is part of the row, not floated over it. Absolutely
+   positioned it sat on top of whatever reached the right edge -- usually the
+   last folded group -- and a control you cannot press because another control
+   is under your cursor is worse than no control. It is the size of a folded
+   group and carries the same hairline, so it reads as one more of them. */
+.rib-more { display: none; vertical-align: top; width: 46px; height: 88px; padding: 0 5px;
+            text-align: center; cursor: default; position: relative; }
+.rib-more.show { display: inline-block; }
+.rib-more:before { content: ""; position: absolute; left: 0; top: 6px; width: 1px; height: 74px;
+                   background: rgba(255,255,255,.08); }
+body.theme-light .rib-more:before { background: rgba(0,0,0,.08); }
+.rib-more .ico { display: block; height: 68px; line-height: 68px; font-size: 18px;
+                 border-radius: 4px; opacity: .8; }
+.rib-more:hover .ico { background: rgba(255,255,255,.07); opacity: 1; }
+body.theme-light .rib-more:hover .ico { background: rgba(0,0,0,.05); }
+.rib-more .rib-mt { display: block; height: 16px; line-height: 16px; font-size: 10.5px;
+                    color: rgba(255,255,255,.42); }
+body.theme-light .rib-more .rib-mt { color: rgba(0,0,0,.42); }
+.rib-panel.line .rib-more { height: auto; padding: 2px 5px; }
+.rib-panel.line .rib-more .ico { height: 26px; line-height: 26px; font-size: 15px; }
+.rib-panel.line .rib-more .rib-mt, .rib-panel.line .rib-more:before { display: none; }
+.rib.density-compact .rib-more { height: 72px; width: 40px; }
+.rib.density-compact .rib-more .ico { height: 56px; line-height: 56px; font-size: 16px; }
+.rib.density-compact .rib-more:before { height: 60px; top: 4px; }
+.rib.density-roomy .rib-more { height: 104px; width: 54px; }
+.rib.density-roomy .rib-more .ico { height: 84px; line-height: 84px; font-size: 21px; }
+.rib.density-roomy .rib-more:before { height: 88px; }
+.rib-drawer .rib-more { display: none !important; }
+
+/* --------------------------------------------------------------- key tips */
+.rib-key { display: none; }
+.rib.keytips .rib-key { display: inline-block; margin-left: 6px; padding: 0 4px; height: 15px;
+    line-height: 15px; font-size: 10px; font-weight: 700; border-radius: 2px;
+    background: #111; color: #fff; box-shadow: 0 0 0 1px rgba(255,255,255,.4); }
+body.theme-light .rib.keytips .rib-key { background: #fff; color: #1b1b1b;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.45); }
+.rib.keytips .rib-item.large .rib-key { position: absolute; left: 50%; top: 1px; margin: 0 0 0 -8px; }
+
+/* ==========================================================================
+   STYLES — how the ribbon is dressed, independent of its shape.
+   ========================================================================== */
+
+/* fluent (default): one flat surface, the live tab marked by an accent rule */
+.rib-rule { display: none; position: absolute; left: 10px; right: 10px; bottom: 2px;
+             height: 2px; border-radius: 1px; }
+.rib.style-fluent .rib-rule, .rib.style-flat .rib-rule { display: block; }
+.rib.style-fluent .rib-tab.ctx .rib-rule,
+.rib.style-flat .rib-tab.ctx .rib-rule { background: currentColor !important; }
+
+/* classic: the 2007 look — the live tab is the top of the panel, outlined, and
+   the panel is a shade lighter than the strip it hangs from */
+/* The live tab IS the top of the panel, so it has to reach the bar's bottom
+   edge exactly: 4 + 32 = 36 for a dead tab, 2 + 34 = 36 for the live one, and
+   the bar keeps no padding under them. Anything less leaves a strip of bar
+   between the tab and the panel, which is the gap.
+
+   The bar is NOT darkened. A darker strip behind the tabs cannot be cancelled
+   by the live tab -- it composites differently from the panel however the tab
+   is tinted -- so the seam shows wherever the tab does not cover. Classic is
+   told apart by its outlined tabs, not by a band. */
+.rib.style-classic .rib-bar { padding-bottom: 0; }
+.rib.style-classic .rib-tab { border-radius: 5px 5px 0 0; height: 32px; line-height: 32px;
+    margin: 4px 1px 0; }
+/* The contrast is carried by the DEAD tabs, not by the bar. Darkening the bar
+   would need the live tab to cancel that darkening to match the panel, which
+   no amount of alpha can do; recessing the others instead leaves the live tab
+   sitting at exactly the panel's own tint, which is the point of the style. */
+.rib.style-classic .rib-tab:not(.on) { box-shadow: inset 0 0 0 1px rgba(255,255,255,.07); }
+body.theme-light .rib.style-classic .rib-tab:not(.on) { box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+/* the live tab keeps the panel's surface and gains the raised edges that make
+   classic classic; it is taller and reaches the panel exactly */
+.rib.style-classic .rib-tab.on { height: 34px; margin-top: 2px;
+    box-shadow: inset 1px 1px 0 rgba(255,255,255,.14), inset -1px 0 0 rgba(255,255,255,.14); }
+body.theme-light .rib.style-classic .rib-tab.on {
+    box-shadow: inset 1px 1px 0 rgba(0,0,0,.1), inset -1px 0 0 rgba(0,0,0,.1); }
+.rib.style-classic .rib-rule { display: none; }
+.rib.style-classic .rib-file { border-radius: 4px 4px 0 0; height: 32px; line-height: 32px;
+    margin: 4px 8px 0 0; }
+.rib.style-classic .rib-q { margin-bottom: 5px; }
+.rib.style-classic .rib-band { margin-bottom: 0; }
+.rib.style-classic .rib-item { border-radius: 3px; }
+
+/* flat: no surface at all, one hairline under the lot — for a window whose
+   chrome is already doing the work */
+.rib.style-flat { background: transparent; }
+body.theme-light .rib.style-flat { background: transparent; }
+.rib.style-flat .rib-body, .rib.style-flat .rib-panel { background: transparent; }
+.rib.style-flat .rib-tab.on { background: transparent; }
+body.theme-light .rib.style-flat .rib-tab.on { background: transparent; }
+.rib.style-flat .rib-group + .rib-group:before { background: rgba(128,128,128,.22); }
+.rib.style-flat .rib-file { background: transparent; color: inherit;
+    box-shadow: inset 0 0 0 1px rgba(128,128,128,.45); }
+/* floating still needs a surface, whatever the style says */
+
+/* outlined: every group in a box of its own instead of a hairline between */
+.rib.style-outlined .rib-group { border: 1px solid rgba(255,255,255,.1); border-radius: 6px;
+    margin: 0 3px; padding: 0 6px; }
+body.theme-light .rib.style-outlined .rib-group { border-color: rgba(0,0,0,.1); }
+.rib.style-outlined .rib-group + .rib-group:before { display: none; }
+.rib.style-outlined .rib-gfoot { padding-bottom: 2px; }
+
+/* ==========================================================================
+   DENSITIES — the same ribbon, packed tighter or looser.
+   ========================================================================== */
+.rib.density-compact .rib-bar { height: 30px; }
+.rib.density-compact .rib-tab { height: 25px; line-height: 25px; padding: 0 10px; font-size: 12px; }
+.rib.density-compact .rib-file { height: 24px; line-height: 24px; padding: 0 12px; }
+.rib.density-compact .rib-panel { height: 76px; padding-top: 3px; }
+.rib.density-compact .rib-group { height: 72px; padding: 0 5px; }
+.rib.density-compact .rib-group + .rib-group:before { height: 60px; top: 4px; }
+.rib.density-compact .rib-gitems { height: 56px; }
+.rib.density-compact .rib-item.large { width: 56px; height: 56px; padding-top: 3px; }
+.rib.density-compact .rib-item.large > .ico { font-size: 24px; height: 27px; line-height: 27px; }
+.rib.density-compact .rib-item.small { height: 18px; line-height: 18px; font-size: 11.5px; }
+.rib.density-compact .rib-item.small > .ico { font-size: 12px; }
+.rib.density-compact .rib-cell { width: 24px; height: 24px; line-height: 24px; }
+.rib.density-compact .rib-gallery { max-width: 184px; }
+.rib.density-compact .rib-vsep { height: 50px; }
+.rib.density-compact .rib-input input { height: 20px; line-height: 20px; }
+.rib.density-compact.style-classic .rib-tab { height: 26px; line-height: 26px; margin: 4px 1px 0; }
+.rib.density-compact.style-classic .rib-tab.on { height: 28px; margin-top: 2px; }
+.rib.density-compact.style-classic .rib-file { height: 26px; line-height: 26px; margin: 4px 8px 0 0; }
+
+.rib.density-roomy .rib-bar { height: 40px; }
+.rib.density-roomy .rib-tab { height: 32px; line-height: 32px; padding: 0 16px; font-size: 13px; }
+.rib.density-roomy .rib-file { height: 32px; line-height: 32px; padding: 0 20px; font-size: 13px; }
+.rib.density-roomy .rib-panel { height: 112px; padding-top: 6px; }
+.rib.density-roomy .rib-group { height: 104px; padding: 0 10px; }
+.rib.density-roomy .rib-group + .rib-group:before { height: 88px; }
+.rib.density-roomy .rib-gitems { height: 84px; }
+.rib.density-roomy .rib-item.large { width: 76px; height: 84px; padding-top: 8px; }
+.rib.density-roomy .rib-item.large > .ico { font-size: 34px; height: 40px; line-height: 40px; }
+.rib.density-roomy .rib-item.small { height: 26px; line-height: 26px; font-size: 12.5px; }
+.rib.density-roomy .rib-cell { width: 34px; height: 34px; line-height: 34px; }
+.rib.density-roomy .rib-gallery { max-width: 260px; }
+.rib.density-roomy .rib-vsep { height: 76px; }
+.rib.density-roomy.style-classic .rib-tab { height: 36px; line-height: 36px; margin: 4px 1px 0; }
+.rib.density-roomy.style-classic .rib-tab.on { height: 38px; margin-top: 2px; }
+.rib.density-roomy.style-classic .rib-file { height: 36px; line-height: 36px; margin: 4px 8px 0 0; }
+
+/* ==========================================================================
+   MODES — how the ribbon is built.
+   ========================================================================== */
+/* one line of commands: the group names go, the hairlines stay */
+.rib.simple .rib-gfoot, .rib.strip .rib-gfoot { display: none; }
+.rib.strip > .rib-bar { display: none; }
+.rib.simple .rib-group, .rib.strip .rib-group { height: auto; }
+
+/* tabs in the title bar */
+.rib.titlebar > .rib-bar { display: none; }
+.rib.titlebar > .rib-body > .rib-panel { border-top: 0; }
+.rib-intitle { display: inline-block; vertical-align: middle; white-space: nowrap; }
+.rib-intitle .rib-tab { height: 24px; line-height: 24px; margin: 0 1px; padding: 0 11px;
+                        border-radius: 4px; font-size: 12px; vertical-align: middle; }
+.rib-intitle .rib-rule { bottom: 1px; }
+.rib-intitle .rib-band { height: 11px; line-height: 11px; font-size: 8.5px; margin: 0 1px 0 6px;
+                         vertical-align: middle; }
+.rib-intitle .rib-file { height: 24px; line-height: 24px; margin: 0 6px 0 0; padding: 0 12px;
+                         border-radius: 4px; vertical-align: middle; }
+/* In the title bar the slot is a flex row that centres what it holds, so the
+   quick access buttons are flex items -- vertical-align does nothing to them
+   and the bottom margin they wear on the ribbon bar shoves them off centre.
+   Each one is a fixed box here, and the glyph inside it is display:block with
+   the box's own line-height, so every icon occupies the same square whatever
+   its own metrics are. Without that the glyphs stagger against each other. */
+.axtb-item.rib-tbtabs, .axtb-item.rib-tbq { padding: 0 2px; }
+.rib-tbq .rib-q, .rib-intitle .rib-tab, .rib-intitle .rib-file, .rib-intitle .rib-band {
+    flex: 0 0 auto; }
+.rib-tbq .rib-q { width: 24px; height: 24px; line-height: 24px; margin: 0 1px;
+                  vertical-align: middle; }
+.rib-tbq .rib-q .ico { display: block; height: 24px; line-height: 24px; font-size: 13px; }
+
+/* ==========================================================================
+   The stylesheets that are their own palettes rather than a light/dark pair.
+   ========================================================================== */
+body.sheet-win98 .rib { background: #c0c0c0; border-bottom: 1px solid #808080; }
+body.sheet-winxp .rib { background: #ece9d8; border-bottom: 1px solid #aca899; }
+body.sheet-win98 .rib-tab, body.sheet-winxp .rib-tab { color: #000; border-radius: 0; }
+body.sheet-win98 .rib-tab { border: 1px solid; border-color: #fff #808080 #808080 #fff; }
+body.sheet-win98 .rib-tab.on { background: #d8d8d8; font-weight: bold; }
+body.sheet-winxp .rib-tab { border: 1px solid #aca899; }
+body.sheet-winxp .rib-tab.on { background: #fff; }
+body.sheet-win98 .rib-rule, body.sheet-winxp .rib-rule { display: none; }
+body.sheet-win98 .rib-item, body.sheet-winxp .rib-item { color: #000; border-radius: 0; }
+body.sheet-win98 .rib-item:hover { background: #d8d8d8; }
+body.sheet-winxp .rib-item:hover { background: #e8f0fb; }
+body.sheet-win98 .rib-item.on { background: #a8a8a8; box-shadow: none; }
+body.sheet-winxp .rib-item.on { background: #cfe0f7; box-shadow: none; }
+body.sheet-win98 .rib-gfoot, body.sheet-winxp .rib-gfoot { color: #444; }
+body.sheet-win98 .rib-group + .rib-group:before { background: #808080; }
+body.sheet-winxp .rib-group + .rib-group:before { background: #aca899; }
+body.sheet-win98 .rib-file { background: #000080; color: #fff; border-radius: 0; }
+body.sheet-winxp .rib-file { background: #316ac5; color: #fff; border-radius: 0; }
+body.sheet-win98 .rib-box, body.sheet-winxp .rib-box { background: #fff; border-radius: 0;
+    border: 1px solid #808080; color: #000; }
+body.sheet-win98 .rib-item.check.on .rib-box, body.sheet-winxp .rib-item.check.on .rib-box {
+    background: #fff; color: #000; }
+body.sheet-win98 .rib-cell, body.sheet-winxp .rib-cell { border-radius: 0; }
+
+body.sheet-win98.theme-dark .rib { background: #3a3a3a; border-bottom-color: #6e6e6e; }
+body.sheet-winxp.theme-dark .rib { background: #3d3d3d; border-bottom-color: #5a5a5a; }
+body.sheet-win98.theme-dark .rib-tab, body.sheet-winxp.theme-dark .rib-tab { color: #e8e8e8; }
+body.sheet-win98.theme-dark .rib-tab { border-color: #6e6e6e #101010 #101010 #6e6e6e; }
+body.sheet-win98.theme-dark .rib-tab.on { background: #565656; }
+body.sheet-winxp.theme-dark .rib-tab { border-color: #5a5a5a; }
+body.sheet-winxp.theme-dark .rib-tab.on { background: #2b2b2b; }
+body.sheet-win98.theme-dark .rib-item, body.sheet-winxp.theme-dark .rib-item { color: #e8e8e8; }
+body.sheet-win98.theme-dark .rib-item:hover, body.sheet-winxp.theme-dark .rib-item:hover { background: #555; }
+body.sheet-win98.theme-dark .rib-gfoot, body.sheet-winxp.theme-dark .rib-gfoot { color: #b0b0b0; }
+body.sheet-win98.theme-dark .rib-group + .rib-group:before,
+body.sheet-winxp.theme-dark .rib-group + .rib-group:before { background: #5a5a5a; }
+
+/* brutalist has no radii anywhere */
+body.sheet-brutalist .rib-tab, body.sheet-brutalist .rib-item, body.sheet-brutalist .rib-file,
+body.sheet-brutalist .rib-cell, body.sheet-brutalist .rib-box,
+body.sheet-brutalist .rib-input input, body.sheet-brutalist .rib-group { border-radius: 0; }

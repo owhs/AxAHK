@@ -206,6 +206,12 @@ class AxPkg {
                       Deps: deps, Snippets: sn, Steps: st, Notes: G(x, "notes", G(m, "notes")),
                       Warn: G(x, "warn", G(m, "warn", false)) ? true : false,
                       Install: G(m, "install", name),
+                      ; Which file in the repository IS the library. Aris works
+                      ; it out when there is one obvious candidate and gives up
+                      ; when there is not -- "Unable to lock onto a specific
+                      ; main file" -- so anything with a lib folder and a pile
+                      ; of examples beside it has to say.
+                      Main: G(m, "main", ""),
                       Script: (scr is Map) && scr.Has("postdownload"),
                       Extra: isExtra, Hidden: hid.Has(name), HideWhy: (hid.Has(name) && hid[name] != true) ? hid[name] : "",
                       Fn: fns, Src: G(x, "src"),
@@ -382,6 +388,111 @@ class AxPkg {
         SplitPath(P.Path, , &d)
         return d
     }
+    ; ------------------------------------------------------------- shared
+    ; A library installed once, for everything.
+    ;
+    ; Aris installs INTO a folder -- that is the right model for a program you
+    ; are going to hand to someone, because the library has to travel with it.
+    ; It is the wrong model for trying something out, and it was the only one
+    ; there was: an unsaved project had nowhere to install to, so the answer to
+    ; "can I use .NET" was "save this first, somewhere, anywhere". Which is a
+    ; question about the file system asked in the middle of a question about
+    ; .NET, and no answer at all.
+    ;
+    ; So there is a second folder, beside the studio's own settings, with the
+    ; same shape as a project's: Lib\Aris\... and a package.json. Every
+    ; function here already takes the folder it works on, so it needs no
+    ; special case -- only somewhere to point.
+    ;
+    ; A shared library is included by its full path, which resolves from any
+    ; script anywhere, saved or not. Installing into the project instead is
+    ; still there and still what a program being shipped wants.
+    ; Aris's own: A_MyDocuments\AutoHotkey\Lib\Aris, which is one of the
+    ; folders AutoHotkey itself searches for <Lib> includes. So a library
+    ; installed there is reachable from any script on the machine, whether or
+    ; not it has ever been saved -- which is the whole point.
+    ; Where a library installed once, for everything, lives. The probe
+    ; points this at a folder of its own: it runs on a machine somebody is
+    ; using, and a test that writes into their Documents is not a test.
+    static SharedOverride := ""
+    static SharedDir() => (AxPkg.SharedOverride != "") ? AxPkg.SharedOverride : A_MyDocuments "\AutoHotkey"
+    static SharedLib() => AxPkg.SharedDir() "\Lib\Aris"
+    ; What is installed globally.
+    ;
+    ; Read off the folders rather than out of Aris's global-dependencies.json,
+    ; which is its own bookkeeping and can be behind what is actually there --
+    ; an install interrupted at the wrong moment leaves the library complete
+    ; and the list empty, and then nothing could see a library sitting right
+    ; in front of it. The two files on disk ARE the answer: the payload in a
+    ; folder named with its version, and the stub that points at it.
+    static InstalledGlobal() {
+        out := Map()
+        out.CaseSense := false
+        lib := AxPkg.SharedLib()
+        if !DirExist(lib)
+            return out
+        loop files lib "\*", "D" {
+            author := A_LoopFileName
+            loop files lib "\" author "\*@*", "D" {
+                name := author "/" RegExReplace(A_LoopFileName, "@.*$")
+                if FileExist(AxPkg.Stub(AxPkg.SharedDir(), name))
+                    out[name] := RegExReplace(A_LoopFileName, "^.*@")
+            }
+        }
+        return out
+    }
+    ; Where a named library actually is: "project", "shared" or "".
+    static Where(P, name) {
+        if AxPkg.Installed(AxPkg.ProjDir(P)).Has(name)
+            return "project"
+        return AxPkg.InstalledGlobal().Has(name) ? "shared" : ""
+    }
+    ; Everything this project can use, wherever it lives. The project's own
+    ; copy wins: a program that carries its libraries means the ones it carries.
+    static Have(P) {
+        out := AxPkg.InstalledGlobal()
+        for name, ver in AxPkg.Installed(AxPkg.ProjDir(P))
+            out[name] := ver
+        return out
+    }
+    ; The one file that makes a globally installed library reachable.
+    ;
+    ; Aris puts the payload in Lib\Aris\<author>\<name>@<version>\ and writes
+    ; the little #include that points at it into the LOCAL project's Lib folder
+    ; -- so a global install is still only usable from a project that has one.
+    ; This writes the same stub into the global folder as well, where
+    ; AutoHotkey's own <Lib> search will find it, and #Include <Aris/a/b> then
+    ; works from any script anywhere.
+    static GlobalStub(name) {
+        lib := AxPkg.SharedLib()
+        parts := StrSplit(name, "/")
+        if (parts.Length < 2 || !DirExist(lib "\" parts[1]))
+            return false
+        ; the newest versioned folder for it
+        best := "", stamp := 0
+        loop files lib "\" parts[1] "\" parts[2] "@*", "D" {
+            if (A_LoopFileTimeModified > stamp)
+                stamp := A_LoopFileTimeModified, best := A_LoopFileName
+        }
+        if (best = "")
+            return false
+        ; and the file inside it that IS the library
+        e := AxPkg.Find(name)
+        main := (IsObject(e) && e.Main != "") ? StrReplace(e.Main, "/", "\") : ""
+        if (main = "" || !FileExist(lib "\" parts[1] "\" best "\" main)) {
+            main := ""
+            loop files lib "\" parts[1] "\" best "\*.ahk"
+                main := A_LoopFileName
+            if (main = "")
+                return false
+        }
+        stub := AxPkg.Stub(AxPkg.SharedDir(), name)
+        try {
+            FileOpen(stub, "w", "UTF-8").Write("#include %A_MyDocuments%\AutoHotkey\Lib\Aris\"
+                . parts[1] "\" best "\" main "`n")
+        }
+        return FileExist(stub) != ""
+    }
     static Stub(dir, name) => dir "\Lib\Aris\" StrReplace(name, "/", "\") ".ahk"
     ; What Aris says is installed in a folder: name -> version.
     static Installed(dir) {
@@ -488,16 +599,36 @@ class AxPkg {
     ; else (the preview, an export elsewhere), the path to the project's Lib.
     static IncludesCode(P, outPath) {
         used := AxPkg.Needed(P)
-        dir := AxPkg.ProjDir(P)
-        if !used.Length || dir = ""
+        if !used.Length
             return ""
+        dir := AxPkg.ProjDir(P)
+        shared := AxPkg.SharedDir()
         SplitPath(outPath, , &od)
         s := ""
         for name in used {
-            if (od = dir)
+            ; the project's own copy first: a program that carries its
+            ; libraries has to include the ones it carries
+            if (dir != "" && FileExist(AxPkg.Stub(dir, name))) {
+                s .= (od = dir) ? ("#Include <Aris/" name ">`n")
+                                : ("#Include " AxPkg._Rel(outPath, AxPkg.Stub(dir, name)) "`n")
+                continue
+            }
+            ; installed once, for everything: the angle-bracket form, because
+            ; the stub sits in A_MyDocuments\AutoHotkey\Lib, which is a folder
+            ; AutoHotkey itself searches. So it resolves from wherever this
+            ; script ends up -- and on anyone else's machine that has the same
+            ; library installed, which an absolute path would not.
+            if (shared != "" && FileExist(AxPkg.Stub(shared, name))) {
                 s .= "#Include <Aris/" name ">`n"
-            else
-                s .= "#Include " AxPkg._Rel(outPath, AxPkg.Stub(dir, name)) "`n"
+                continue
+            }
+            ; Needed and not installed yet. The include is written anyway:
+            ; the script then says what it needs and fails to load with the
+            ; library's name in the message, where before it loaded happily
+            ; and died later on "JSON is not defined" -- and the same script
+            ; starts working the moment the library is installed, unchanged.
+            ; Problems says so too, before it is ever run.
+            s .= "#Include <Aris/" name ">`n"
         }
         return RTrim(s, "`n")
     }
@@ -526,17 +657,30 @@ class AxPkg {
     ; watched rather than waited for, so the studio stays usable. done(r)
     ; gets {Ok, Log, Name, Verb}: Ok is what package.json says afterwards,
     ; not what Aris printed. One at a time.
-    static Run(verb, e, dir, done) {
+    ; global: installed once, into the folder AutoHotkey itself searches,
+    ; rather than into a project. Aris's own --global does the download; the
+    ; working directory it is given is its own folder, because a global install
+    ; still writes a stub into the working directory's Lib and that one is a
+    ; leftover rather than the answer (GlobalStub writes the one that counts).
+    static Run(verb, e, dir, done, shared := false) {
         if IsObject(AxPkg.Job)
             return "Aris is still busy with " AxPkg.Job.Name "."
         if !AxPkg.HasAris()
             return "Aris is not here yet."
+        if shared
+            dir := AxPkg.Dir()
         if (dir = "" || !DirExist(dir))
             return "Save the project first: its libraries go in a Lib folder beside it."
         log := A_Temp "\axaris_" A_TickCount ".log"
         what := (verb = "install") ? e.Install : e.Name
-        cmd := A_ComSpec ' /c ""' A_AhkPath '" "' AxPkg.ArisPath() '" ' verb ' "' what '" --working-dir "'
-             . dir '" > "' log '" 2>&1"'
+        ; Not every caller builds a whole catalogue entry: a bare
+        ; {Name, Install} is a fair thing to ask this to install, and asking
+        ; it for a main file it never had threw from here instead.
+        main := (verb = "install" && e.HasOwnProp("Main")) ? e.Main : ""
+        cmd := A_ComSpec ' /c ""' A_AhkPath '" "' AxPkg.ArisPath() '" ' verb ' "' what '"'
+             . (shared ? " --global" : "")
+             . (main != "" ? ' --main "' main '"' : "")
+             . ' --working-dir "' dir '" > "' log '" 2>&1"'
         clip := ""
         if e.Script                        ; Aris puts the script it runs on the clipboard
             try clip := ClipboardAll()
@@ -545,7 +689,7 @@ class AxPkg {
         catch as err
             return "Could not start Aris: " err.Message
         AxPkg.Job := {Pid: pid, Log: log, Name: e.Name, Verb: verb, Dir: dir, Done: done,
-                      Clip: clip, T0: A_TickCount}
+                      Clip: clip, T0: A_TickCount, Shared: shared, Cmd: cmd}
         SetTimer(AxPkg.WatchFn, 250)
         return ""
     }
@@ -565,11 +709,24 @@ class AxPkg {
         try FileDelete(j.Log)
         if (j.Clip != "")
             try A_Clipboard := j.Clip
-        have := AxPkg.Installed(j.Dir).Has(j.Name)
+        ; a global install is only half done until the stub is there
+        if (j.Shared && j.Verb = "install")
+            try AxPkg.GlobalStub(j.Name)
+        have := j.Shared ? AxPkg.InstalledGlobal().Has(j.Name)
+                         : AxPkg.Installed(j.Dir).Has(j.Name)
         AxPkg.Job := ""
         AxPkg._api := Map()                 ; a new version reads differently
         ok :=(j.Verb = "remove") ? !have : have
-        try j.Done.Call({Ok: ok, Log: Trim(text, "`r`n "), Name: j.Name, Verb: j.Verb})
+        text := Trim(text, "`r`n ")
+        ; Aris is a GUI script, so its output only reaches us when a console
+        ; happened to be attached -- which, started from here, it usually is
+        ; not. "What it said: (nothing)" was the result, and it told nobody
+        ; anything. When there is nothing to quote, quote the command instead:
+        ; it can be pasted into a terminal, where Aris does explain itself.
+        if (!ok && text = "")
+            text := "It printed nothing (Aris only prints when a console is attached). "
+                  . "This is what was run -- in a command prompt it will say why:`n`n" j.Cmd
+        try j.Done.Call({Ok: ok, Log: text, Name: j.Name, Verb: j.Verb})
     }
     static Busy() => IsObject(AxPkg.Job) ? AxPkg.Job.Name : ""
 
@@ -578,6 +735,19 @@ class AxPkg {
     ;   {Kind "class"|"method"|"prop"|"function", Name, Owner, Static,
     ;    Params "a, b := 1", Doc, Insert}
     ; Names starting with _ are the library's own business and left out.
+    ; The folder a library's files are really in: this project's Lib when it
+    ; has its own copy, otherwise the shared one. "" when it is nowhere.
+    static DirOf(project, name) {
+        where := AxPkg.Where(project, name)
+        if (where = "project")
+            return AxPkg.ProjDir(project)
+        return (where = "shared") ? AxPkg.SharedDir() : ""
+    }
+    ; The same, as an Api call: AxPkg.ApiOf(project, name).
+    static ApiOf(project, name) {
+        d := AxPkg.DirOf(project, name)
+        return (d = "") ? [] : AxPkg.Api(d, name)
+    }
     static Api(dir, name) {
         key := dir "|" name
         if AxPkg._api.Has(key)
@@ -694,11 +864,8 @@ class AxPkg {
     ; The code editor's words for every library the script uses.
     static Words(P) {
         out := []
-        dir := AxPkg.ProjDir(P)
-        if (dir = "")
-            return out
         for name in AxPkg.Used(P) {
-            for it in AxPkg.Api(dir, name) {
+            for it in AxPkg.ApiOf(P, name) {
                 switch it.Kind {
                 case "class":
                     out.Push(Map("label", it.Name, "kind", "class", "detail", name))

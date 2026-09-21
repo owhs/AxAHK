@@ -157,7 +157,14 @@ class AxWindow {
         this._ddOpen := ""          ; currently open dropdown element
         this._acFocus := "", this._acLast := "", this._acHandled := false, this._acHover := "", this._acDown := false   ; autocomplete state
         this._accent := ""
-        this.Accent := ""              ; what the caller chose; "" means the sheet's own
+        ; what the caller chose; "" means the sheet's own.
+        ;
+        ; Not cleared here: the options were read further up, and this line
+        ; used to throw away whatever Accent: said -- so the documented option
+        ; did nothing at all, and every generated script that set one was
+        ; quietly using the sheet's default instead.
+        if !this.HasOwnProp("Accent")
+            this.Accent := ""
         this._libCss := Map()          ; our own stylesheets, kept raw for re-hueing
         this._baseCss := Map()         ; the same, for the layer under the theme
         if !this.HasOwnProp("_cssNow")
@@ -434,6 +441,7 @@ class AxWindow {
             this._ApplyAccentCss(this._accent)      ; keep accent rules after the base sheet
             this._UpdateMaxRect()
         }
+        this._FireLook()                            ; a new stylesheet is a new surface
         return this
     }
     ; Re-inject the library's own stylesheets with the accent's hue in place of
@@ -969,6 +977,7 @@ class AxWindow {
             hex := this.DefaultAccent(this.Theme)
         this._accent := hex
         this._ApplyAccentCss(hex)
+        this._FireLook()            ; SetTheme ends here too, so both are covered
         return this
     }
     ; The window colour behind the page for a theme. AxGui overrides this so
@@ -991,6 +1000,25 @@ class AxWindow {
         if IsSet(strength)
             this.TintStrength := strength
         this._ApplyAccentCss(this._accent)
+        this._FireLook()
+        return this
+    }
+    ; OnLook(fn): fn(win) after the theme, the stylesheet, the accent or the
+    ; tint changes. A component that paints anything from AHK rather than from
+    ; its own stylesheet -- an accent applied inline, a surface read off the
+    ; page -- has no other way to hear that the ground moved under it, and the
+    ; alternative is every caller remembering to repaint it by hand.
+    OnLook(fn) {
+        if !this.HasOwnProp("_lookCbs")
+            this._lookCbs := []
+        this._lookCbs.Push(fn)
+        return this
+    }
+    _FireLook() {
+        if !this.HasOwnProp("_lookCbs")
+            return this
+        for fn in this._lookCbs.Clone()
+            try fn(this)
         return this
     }
     ; OnValue(id, fn): fn(value, el) when a data-role component changes
@@ -1973,7 +2001,14 @@ class AxWindow {
     ; character) sent there straight
     static _KeyQueue() {
         while (AxWindow._keyQ.Length && !AxWindow._keyBusy) {
-            q := AxWindow._keyQ.RemoveAt(1)
+            ; Both _TranslateKey and SendMessageW below pump messages, and an
+            ; AHK timer can interrupt between any two statements, so the queue
+            ; can be drained by a re-entrant call between the test above and
+            ; the removal here. RemoveAt(1) on an empty array throws.
+            q := ""
+            try q := AxWindow._keyQ.RemoveAt(1)
+            if !IsObject(q)
+                break
             if !AxWindow._byHwnd.Has(q[5]) || !DllCall("IsWindow", "Ptr", q[1])
                 continue
             if AxWindow._TranslateKey(AxWindow._byHwnd[q[5]], q[1], q[2], q[3], q[4])

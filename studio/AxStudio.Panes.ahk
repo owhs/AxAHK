@@ -9,6 +9,7 @@
 #Include %A_LineFile%\..\AxStudio.Map.ahk
 #Include %A_LineFile%\..\AxStudio.Icons.ahk
 #Include %A_LineFile%\..\AxStudio.Gen.ahk
+#Include %A_LineFile%\..\AxStudio.RibbonUi.ahk
 #Include %A_LineFile%\..\AxStudio.Lint.ahk
 #Include %A_LineFile%\..\AxStudio.Acts.ahk
 #Include %A_LineFile%\..\AxStudio.Theme.ahk
@@ -823,18 +824,40 @@ class AxPanes {
             ; the table editor is the way in; the same data as text is there
             ; for whoever wants it, one click away rather than always open
             raw := s.HasOwnProp("RawOpen") && s.RawOpen
-            if (n.Type = "DataView" || n.Type = "ListView")
+            ; A ribbon is a tree three levels deep, and typing one into a
+            ; box is not an interface. The tree is the way in; the expression
+            ; it stands for is one click away for whoever wants it.
+            ; Its own classes, not the grid's: .axd-gridsum is what the sheet
+            ; script looks for, and it would take this box for a table and
+            ; overwrite the count with "Code, not a table".
+            if (n.Type = "Ribbon")
+                body := '<div class="axd-ribbar">'
+                      . '<span class="ico">&#xE7C4;</span>'
+                      . '<span class="axd-ribbarsay">' AxTags.E(AxRibUi.Said(n)) '</span>'
+                      . '<span class="axd-hbtn axd-rawt' (raw ? " on" : "") '" data-rawt="1"'
+                      . ' data-tip="The same ribbon, as the expression it is">As text</span></div>'
+                      . '<div class="axd-rawbox' (raw ? " on" : "") '">' body
+                      . '<div class="axd-note">This is what the tree below stands for, and the '
+                      . 'two are never out of step: change either. It is written into the script '
+                      . 'exactly as typed, as code.</div></div>'
+            else if (n.Type = "DataView" || n.Type = "ListView")
                 body := '<div class="axd-gridsum" data-field="p_arg"' (n.Type = "ListView" ? ' data-lv="1"' : "") '><span class="ico">&#xE80A;</span>'
                       . '<span class="axd-gridsay"></span>'
                       . '<span class="axd-hbtn axd-rawt' (raw ? " on" : "") '" data-rawt="1" data-tip="The same data, as text">As text</span>'
                       . '<span class="axd-hbtn axd-go" data-do="grid.open">Edit the data...</span></div>'
                       . '<div class="axd-rawbox' (raw ? " on" : "") '">' body '</div>'
-            if (e.Arg.HasOwnProp("Raw") && e.Arg.Raw)
+            if (e.Arg.HasOwnProp("Raw") && e.Arg.Raw && n.Type != "Ribbon")
                 body .= '<div class="axd-note">Written into the script exactly as typed, as code: text needs its own quotes '
                      . '("like this"), and a value of the program can be named as it is.</div>'
             if (n.Type = "Code")
                 body .= '<div class="axd-note">AutoHotkey that runs at this point while the window is built, so anything it adds lands here, between the controls around it.</div>'
             h .= AxPanes.Group(s, "Content", body)
+        }
+        if (n.Type = "Ribbon" && nodes.Length = 1) {
+            h .= AxPanes.Group(s, "Tabs, groups and items", AxRibUi.Pane(s, n, add), "ribtree")
+            sel := AxRibUi.Props(s, n, add)
+            if (sel != "")
+                h .= AxPanes.Group(s, AxRibUi.SelTitle(s, n), sel, "ribsel")
         }
 
         if (n.Type = "Radio" && nodes.Length = 1)
@@ -995,7 +1018,7 @@ class AxPanes {
         a := (v, t) => '<span class="axd-albtn' (s.AlAnchor = v ? " on" : "") '" data-alanchor="' v '">' t '</span>'
         last := s.Primary()
         return '<div class="axd-alrow"><span class="axd-allab">With</span><span class="axd-alseg">'
-             . a("each", "Each other") a("last", "The last picked") a("page", "The page") '</span></div>'
+             . a("each", "Each other") a("last", "The last selected") a("page", "The page") '</span></div>'
              . '<div class="axd-alrow"><span class="axd-allab">Across</span><span class="axd-alseg">'
              . b("left", "Left", "Left edges in line") b("hcenter", "Centre", "Centres in line")
              . b("right", "Right", "Right edges in line") '</span></div>'
@@ -1010,10 +1033,10 @@ class AxPanes {
              . '<span class="axd-alseg">' b("gapx", "Across", "Exactly this gap between each, from the first")
              . b("gapy", "Down", "Exactly this gap between each, from the top one") '</span></div>'
              . '<div class="axd-alrow"><span class="axd-allab">Size</span><span class="axd-alseg">'
-             . b("samew", "Same width", "As wide as the last one picked")
-             . b("sameh", "Same height", "As tall as the last one picked") '</span></div>'
+             . b("samew", "Same width", "As wide as the last selected")
+             . b("sameh", "Same height", "As tall as the last selected") '</span></div>'
              . '<div class="axd-note">Point at a button: the canvas shows where each goes, what <b>stays</b> '
-             . '(with "The last picked" that is <b>' AxTags.E(IsObject(last) ? last.Label : "") '</b>), and '
+             . '(with "The last selected" that is <b>' AxTags.E(IsObject(last) ? last.Label : "") '</b>), and '
              . 'what is <b>in the flow</b> -- a control in the flow cannot be moved sideways, but spacing '
              . 'changes the room before it.</div>'
     }
@@ -1043,12 +1066,12 @@ class AxPanes {
         return add({Id: "p_rgroup", L: "Group", Kind: "text", Hint: n.Name " -- a group of its own",
                     Get: (*) => n.Prop("group", ""), Set: (v) => n.P["group"] := Trim(v), Rebuild: true})
              . '<div class="axd-note">' (mates.Length
-                 ? "Picked together with: " chips "<br>Picking an option in any of them unpicks the rest. "
+                 ? "Selected with: " chips "<br>Picking an option in any of them unpicks the rest. "
                  . "Each still has its own value: the pick if it is in that one, blank if not."
                  : "A group of its own: its options pick against each other. Give another radio group "
                  . "the same group name and their options become one choice.") '</div>'
              . '<div class="axd-align"><span class="axd-hbtn" data-do="rg.more">Add another part to this group</span> '
-             . (Trim(n.Prop("group", "")) != "" ? '<span class="axd-hbtn" data-do="rg.leave">Take it out of the group</span>' : "")
+             . (Trim(n.Prop("group", "")) != "" ? '<span class="axd-hbtn" data-do="rg.leave">Remove from the group</span>' : "")
              . '</div>'
     }
     static RadioMateFn(n, own, mates) => (m) => ((m.Type = "Radio" && m.Id != n.Id
@@ -1243,9 +1266,27 @@ class AxPanes {
         h := "", free := ""
         for name in e.Events {
             idx := 0
-            for i, ev in n.Ev
+            ; handlers narrowed to one part of the control -- a ribbon item's
+            ; Command:paste. They are what this event does, so an event with
+            ; only those is a handled event, not an empty one.
+            narrow := []
+            for i, ev in n.Ev {
                 if (ev["name"] = name)
                     idx := i
+                else if (AxFlow.EvBase(ev["name"]) = name)
+                    narrow.Push(AxFlow.EvQual(ev["name"]))
+            }
+            if (!idx && narrow.Length) {
+                ones := ""
+                for q in narrow
+                    ones .= (ones = "" ? "" : ", ") AxTags.E(q)
+                h .= '<div class="axd-ev on">'
+                  .  '<div class="axd-evname">' AxTags.E(name) '</div>'
+                  .  '<div class="axd-evsig">' AxTags.E(AxGen.HandlerName(n, name) "(" AxCat.Sig(name) ")")
+                  .  ', which sends each to its own</div>'
+                  .  '<div class="axd-evsig">' ones '</div></div>'
+                continue
+            }
             if !idx {
                 free .= '<span class="axd-chip" data-ev="' name '" data-act="add"'
                      .  ' data-tip="' AxTags.E("Write " AxGen.HandlerName(n, name) "(" AxCat.Sig(name) ")") '">'

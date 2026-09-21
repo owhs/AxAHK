@@ -1,0 +1,178 @@
+{
+ "format": "axstudio/2",
+ "name": "Ribbon app",
+ "desc": "A ribbon driven entirely by rules: every button is one line on the Logic tab, narrowed to the command it answers (rib Command:bold), and the shape, the style, the density and the contextual tab are all rule verbs. What the window says about itself is worked out from the values rather than set by hand. Not one line of code.",
+ "uid": 8,
+ "cur": 1,
+ "vars": "doc = \"\"\nmode = \"office\"\nstyle = \"fluent\"\ndensity = \"comfortable\"\npicture = false\nbold = false\nitalic = false\nunder = false\nletters <- StrLen(doc)\nlook <- style \" \" density\nsaid <- (picture ? \"A picture is selected -- the Picture tab is showing\" : letters ? letters \" character\" (letters = 1 ? \"\" : \"s\") : \"Nothing typed yet\")\nstyled <- (bold ? \"bold \" : \"\") (italic ? \"italic \" : \"\") (under ? \"underlined\" : \"\")",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Ribbon app",
+   "width": 1040,
+   "height": 680,
+   "minwidth": 460,
+   "minheight": 380,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "E7C4",
+   "menus": "",
+   "status": "msg | Press Alt for the key tips | grow icon=E7C4\nmode |  | right dim",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": 1,
+   "importlayout": "",
+   "importresize": "",
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "; --- the ribbon's own shape. One button, one line.\nrib Command:m_office -> ribmode rib office\nrib Command:m_office -> assign mode office\nrib Command:m_simple -> ribmode rib simple\nrib Command:m_simple -> assign mode simple\nrib Command:m_strip -> ribmode rib strip\nrib Command:m_strip -> assign mode strip\nrib Command:m_titlebar -> ribmode rib titlebar\nrib Command:m_titlebar -> assign mode titlebar\n; --- how it looks\nrib Command:s_fluent -> ribstyle rib fluent\nrib Command:s_fluent -> assign style fluent\nrib Command:s_classic -> ribstyle rib classic\nrib Command:s_classic -> assign style classic\nrib Command:s_flat -> ribstyle rib flat\nrib Command:s_flat -> assign style flat\nrib Command:s_outlined -> ribstyle rib outlined\nrib Command:s_outlined -> assign style outlined\nrib Command:d_compact -> ribdensity rib compact\nrib Command:d_compact -> assign density compact\nrib Command:d_comfortable -> ribdensity rib comfortable\nrib Command:d_comfortable -> assign density comfortable\nrib Command:d_roomy -> ribdensity rib roomy\nrib Command:d_roomy -> assign density roomy\n; --- the contextual tab: declared with the rest, shown when it applies\nrib Command:picture -> ribshowtab rib pictools\nrib Command:picture -> assign picture true\nrib Command:picture -> ribtab rib pictools\nrib Command:deselect -> ribhidetab rib pictools\nrib Command:deselect -> assign picture false\n; --- the three that stay in or out. `on` is which way it went.\nrib Toggle:bold -> assign bold =on\nrib Toggle:italic -> assign italic =on\nrib Toggle:under -> assign under =on\n; --- the rest\nrib Command:file -> alert A backstage view would open here: New, Open, Save as.\nrib Command:cut -> do docBox.Text := \"\", AxBindSync()\nrib Command:paste -> do docBox.Text := docBox.Text A_Clipboard, AxBindSync()\nrib Command:copy -> do A_Clipboard := docBox.Text\nrib Command:copy -> toast Copied\nrib Launcher:font -> alert The little arrow in a group's corner: a full Font dialog would open here.\nrib TabPicked -> status msg =\"On the \" tabId \" tab\"\nrib Collapse -> status msg =(rolledUp ? \"Rolled up -- double-click a tab to bring it back\" : \"Rolled back down\")\n; --- the key tips, from the button as well as from Alt\nrib Command:keytips -> ribkeytips rib\ndropBtn Click -> ribhidetab rib pictools\ndropBtn Click -> assign picture false",
+   "states": "",
+   "binds": "docBox <-> doc\nsumLabel.Text <- said\nstyleLabel.Text <- styled\ndropBtn.Enabled <- picture\n; the status bar's right-hand cell follows the shape it is in",
+   "hotkeys": "",
+   "init": "",
+   "script": "",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "Ribbon",
+      "name": "rib",
+      "arg": "{Mode: \"office\", File: {Label: \"File\", Color: \"#60cdff\"},\n QuickAccess: [\"save\", \"undo\", \"redo\"],\n Tabs: [\n   {Id: \"home\", Title: \"Home\", Key: \"H\", Groups: [\n     {Id: \"clip\", Title: \"Clipboard\", Launcher: true, Items: [\n       {Id: \"paste\", Label: \"Paste\", Icon: \"E77F\", Size: \"large\", Kind: \"split\", Key: \"V\",\n        Menu: [[\"Keep formatting\", \"\"], [\"Text only\", \"\"]]},\n       {Id: \"cut\",  Label: \"Cut\",  Icon: \"E8C6\", Key: \"X\"},\n       {Id: \"copy\", Label: \"Copy\", Icon: \"E8C8\", Key: \"C\"}]},\n     {Id: \"font\", Title: \"Font\", Launcher: true, Items: [\n       {Id: \"bold\",   Label: \"Bold\",      Icon: \"E8DD\", Kind: \"toggle\", Key: \"1\"},\n       {Id: \"italic\", Label: \"Italic\",    Icon: \"E8DB\", Kind: \"toggle\", Key: \"2\"},\n       {Id: \"under\",  Label: \"Underline\", Icon: \"E8DC\", Kind: \"toggle\", Key: \"3\"},\n       {Kind: \"sep\"},\n       {Id: \"colour\", Label: \"Colour\", Icon: \"E790\", Kind: \"color\", Value: \"#60cdff\"}]},\n     {Id: \"editing\", Title: \"Editing\", Items: [\n       {Id: \"find\", Label: \"Find\", Icon: \"E721\", Size: \"large\", Key: \"F\"},\n       {Id: \"wrap\", Label: \"Word wrap\", Kind: \"check\", Checked: true, Key: \"W\"},\n       {Id: \"selall\", Label: \"Select all\", Icon: \"E8B3\"}]}]},\n   {Id: \"insert\", Title: \"Insert\", Key: \"N\", Groups: [\n     {Id: \"media\", Title: \"Illustrations\", Items: [\n       {Id: \"picture\", Label: \"Picture\", Icon: \"EB9F\", Size: \"large\", Key: \"P\"}]},\n     {Id: \"tables\", Title: \"Tables\", Items: [\n       {Id: \"table\", Label: \"Table\", Icon: \"E80A\", Size: \"large\", Kind: \"menu\",\n        Menu: [[\"2 columns\", \"\"], [\"3 columns\", \"\"]]}]}]},\n   {Id: \"view\", Title: \"View\", Key: \"W\", Groups: [\n     {Id: \"shape\", Title: \"Shape\", Launcher: true, Items: [\n       {Id: \"m_office\", Label: \"Office\", Icon: \"E7C4\", Size: \"large\"},\n       {Id: \"m_simple\", Label: \"Simplified\", Icon: \"E8A9\"},\n       {Id: \"m_strip\",  Label: \"Strip\", Icon: \"E700\"},\n       {Id: \"m_titlebar\", Label: \"In the title bar\", Icon: \"E737\"}]},\n     {Id: \"dress\", Title: \"Style\", Items: [\n       {Id: \"s_fluent\",   Label: \"Fluent\",   Icon: \"E790\"},\n       {Id: \"s_classic\",  Label: \"Classic\",  Icon: \"E7C4\"},\n       {Id: \"s_flat\",     Label: \"Flat\",     Icon: \"E739\"},\n       {Id: \"s_outlined\", Label: \"Outlined\", Icon: \"E80A\"}]},\n     {Id: \"dens\", Title: \"Density\", Items: [\n       {Id: \"d_compact\",     Label: \"Compact\",     Icon: \"E73F\"},\n       {Id: \"d_comfortable\", Label: \"Comfortable\", Icon: \"E73E\"},\n       {Kind: \"sep\"},\n       {Id: \"keytips\", Label: \"Key tips\", Icon: \"E765\", Key: \"K\"},\n       {Id: \"d_roomy\",       Label: \"Roomy\",       Icon: \"E740\"}]}]},\n   {Id: \"pictools\", Title: \"Format\", Contextual: true, Set: \"Picture tools\",\n    Colour: \"#c27bdb\", Hidden: true, Groups: [\n     {Id: \"adjust\", Title: \"Adjust\", Items: [\n       {Id: \"crop\",     Label: \"Crop\",     Icon: \"E7A8\", Size: \"large\"},\n       {Id: \"rotate\",   Label: \"Rotate\",   Icon: \"E7AD\"},\n       {Id: \"deselect\", Label: \"Deselect\", Icon: \"E711\"}]}]}],\n OnCommand: (id, it, r) => Command(id, it, r),\n OnToggle:  (id, on, r) => g.Status(\"msg\", id \" \" (on ? \"on\" : \"off\"))}",
+      "layout": {
+       "fill": 1
+      },
+      "props": {},
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n90",
+      "type": "InfoBar",
+      "name": "tip",
+      "arg": "Every button on this ribbon is one line on the Logic tab -- rib Command:bold -> ... -- because a ribbon raises one event for all of them and the studio can narrow it to each. Nothing here is written by hand: the shape, the style, the contextual tab and the three that stay in or out are all rules, and what the window says about itself is worked out from the values.",
+      "layout": {},
+      "props": {
+       "title": "Forty buttons, forty rules, no code."
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Edit",
+      "name": "docBox",
+      "arg": "A ribbon app: the ribbon above is the command surface, and this is the document.\\n\\nDouble-click a tab to roll the ribbon up, then click one to float it. Press Alt for the key tips. Insert > Picture brings up a contextual tab. View changes the ribbon's shape, style and density.",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 200
+      },
+      "props": {
+       "multi": 1,
+       "rows": "20"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n92",
+      "type": "Text",
+      "name": "styleLabel",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "style": "opacity:.7"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n93",
+      "type": "Text",
+      "name": "sumLabel",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "style": "opacity:.7"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n94",
+      "type": "Button",
+      "name": "dropBtn",
+      "arg": "Deselect the picture",
+      "layout": {},
+      "props": {
+       "icon": "E711"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ],
+ "hotkeys": ""
+}

@@ -74,7 +74,7 @@ class AxWiz {
     static ListOpts(s) {
         out := ""
         for n in s.NamedIn(s.P.W)
-            if RegExMatch(n.Type, "^(ListView|TreeView|DDL|ListBox)$")
+            if RegExMatch(n.Type, "^(DataView|ListView|TreeView|DDL|ListBox)$")
                 out .= (out = "" ? "" : "|") n.Name ":" n.Name " (" AxCat.Get(n.Type).Label ")"
         return out
     }
@@ -550,7 +550,7 @@ class AxWiz {
                 Fields: [{Id: "n", Kind: "note",
                           L: "Give a control a name first -- select it and press F2, or type one in the "
                            . "Properties tab. The name is what the generated code calls it."}],
-                Buttons: ["Right you are"], CancelIndex: 0})
+                Buttons: ["OK"], CancelIndex: 0})
         sel := s.Primary()
         want := ed ? old.Ctl : (IsObject(sel) && sel.Name != "") ? sel.Name : AxForm.FirstOpt(ctls)
         vars := AxBind.Paths(s.P)                   ; a field of an object value too: Hero.HP
@@ -604,7 +604,7 @@ class AxWiz {
     static BindVar(V) => (V["mode"] = "new") ? AxProject.CleanName(V["new"]) : V["old"]
     static BindWhy(s, V) {
         if (Trim(V["ctl"]) = "")
-            return "Pick the control."
+            return "Choose the control."
         if (AxWiz.BindVar(V) = "")
             return "Give the value a name."
         return ""
@@ -690,7 +690,7 @@ class AxWiz {
     static ValueWhy(s, V, old := "") {
         name := AxProject.CleanName(V["name"])
         if (name = "")
-            return "Give it a name."
+            return "Enter a name."
         if (AxBind.HasVar(s.P, name) && !(IsObject(old) && old.Name = name))
             return "There is already a value called " name "."
         if (V["how"] = "derived" && Trim(V["expr"]) = "")
@@ -720,38 +720,62 @@ class AxWiz {
                 Fields: [{Id: "n", Kind: "note",
                           L: "Select a control and press F2 to name it, then come back. "
                            . "The name is how a rule refers to it."}],
-                Buttons: ["Right you are"], CancelIndex: 0})
+                Buttons: ["OK"], CancelIndex: 0})
         sel := s.Primary()
         want := ed ? old.Ctl : IsObject(pre) ? pre.Ctl : (IsObject(sel) && sel.Name != "") ? sel.Name : AxForm.FirstOpt(ctls)
         was := ed ? AxWiz.FlowSplit(old.Verb, old.Arg) : {Who: "", Who2: "", Arg: ""}
-        r := AxForm.Show(s, {Title: ed ? "Change a rule" : "Add a rule", Icon: "E945", Width: 520,
-            Intro: "Behaviour without writing code: when this happens, do that.",
+        r := AxForm.Show(s, {Title: ed ? "Change a rule" : "Add a rule", Icon: "E945", Width: 620,
+            Intro: "When something happens, do something. No code -- the line it writes is underneath.",
             Fields: [
-                {Id: "ctl",  L: "When",      Kind: "choice", V: want, Opts: ctls},
-                {Id: "ev",   L: "and it",    Kind: "choice", V: AxFlow.EvBase(ed ? old.Ev : IsObject(pre) ? pre.Ev : "Click"),
+                ; --- the when, read across as one sentence rather than down
+                {Id: "h1", Kind: "heading", L: "When this happens"},
+                {Id: "ctl",  L: "",        Kind: "choice", V: want, Opts: ctls, Inline: true, W: "230px"},
+                {Id: "ev",   L: "and it",  Kind: "choice", Inline: true, W: "190px",
+                 V: AxFlow.EvBase(ed ? old.Ev : IsObject(pre) ? pre.Ev : "Click"),
                  Fill: (V) => AxWiz.EventOpts(s, V["ctl"])},
-                ; a pack's event can be narrowed: Hit, only for things tagged coin
-                {Id: "qual", L: "only for",  Kind: "text", V: AxFlow.EvQual(ed ? old.Ev : IsObject(pre) ? pre.Ev : ""),
-                 When: (V) => AxCat.Filter(V["ev"]) != "",
-                 Hint: "Leave it empty for every one. Otherwise the rule runs only when the event's "
-                     . "value is this -- a tag for Hit (coin), a key for Key (space)."},
-                {Id: "d1", Kind: "divider", L: ""},
-                {Id: "verb", L: "then",      Kind: "choice", V: ed ? old.Verb : "toast",
+                ; a pack's or a component's event can be narrowed to one of
+                ; its own values: one button of a ribbon, one tag of a hit
+                {Id: "qual", L: "only for", Kind: "text", Inline: true, W: "140px",
+                 V: AxFlow.EvQual(ed ? old.Ev : IsObject(pre) ? pre.Ev : ""),
+                 When: (V) => AxCat.Filter(V["ev"]) != ""},
+                {Id: "evhelp", Kind: "note", L: AxCat.Help(AxFlow.EvBase(ed ? old.Ev : "Click")),
+                 Seeded: AxCat.Help(AxFlow.EvBase(ed ? old.Ev : "Click")),
+                 Seed: (V) => AxCat.Help(V["ev"]),
+                 When: (V) => AxCat.Help(V["ev"]) != ""},
+
+                ; --- the then
+                {Id: "h2", Kind: "heading", L: "Do this"},
+                {Id: "verb", L: "",         Kind: "choice", V: ed ? old.Verb : "toast",
                  Opts: AxWiz.VerbOpts(s)},
-                {Id: "who",  L: "which one", Kind: "choice", V: was.Who,
+                ; Full width, not a short inline box: these hold "Speak() --
+                ; Say it out loud, in Windows' own voice", and a narrow one
+                ; showed "Speak() -- Say it out lou..." with the part that
+                ; tells you which one it is cut off.
+                {Id: "who",  L: "to",       Kind: "choice", V: was.Who, Wide: true,
                  Fill: (V) => AxWiz.VerbList(s, V["verb"]),
                  When: (V) => AxWiz.VerbNeeds(V["verb"], "who")},
-                {Id: "who2", L: "into",      Kind: "choice", V: was.Who2,
+                {Id: "who2", L: "into",     Kind: "choice", V: was.Who2, Wide: true,
                  Fill: (V) => AxWiz.CtlOpts(s), When: (V) => V["verb"] = "copy"},
-                {Id: "arg",  L: "value",     Kind: "text", V: was.Arg,
+                ; One field, which says what THIS verb wants: a call takes a list
+                ; of arguments, everything else takes a value. It used to be
+                ; two fields sharing one name, and both of them showed.
+                {Id: "arg", Kind: "text", V: was.Arg, Wide: true,
+                 L: AxWiz.ArgLabel(ed ? old.Verb : "toast"),
+                 Seeded: AxWiz.ArgLabel(ed ? old.Verb : "toast"),
+                 Seed: (V) => AxWiz.ArgLabel(V["verb"]),
                  When: (V) => AxWiz.VerbNeeds(V["verb"], "arg"),
-                 Hint: "Plain text. It is written into the rule exactly as typed. A file without a folder is beside the program."},
+                 Ph: "what it needs"},
+                {Id: "arghint", Kind: "note", When: (V) => AxWiz.VerbNeeds(V["verb"], "arg"),
+                 L: AxWiz.ArgHint(ed ? old.Verb : "toast"),
+                 Seeded: AxWiz.ArgHint(ed ? old.Verb : "toast"),
+                 Seed: (V) => AxWiz.ArgHint(V["verb"])},
                 ; a file the rule reads can travel with the program
-                {Id: "ship", L: "The finished program", Kind: "choice",
+                {Id: "ship", L: "The file", Kind: "radio", Inline: false,
                  V: (ed && AxWiz.Listed(s, was.Arg)) ? "carry" : "path",
-                 Opts: "path:Looks for the file beside it|carry:Carries the file inside it (App > Files)",
+                 Opts: "path:Sits beside the program|carry:Travels inside it",
                  When: (V) => AxWiz.ReadsFile(V["verb"]),
-                 Hint: "Carried inside, it cannot go missing: it is built into the exe and written out beside it on the first run."}],
+                 Hint: "Carried inside, it cannot go missing: it is built into the exe and written out "
+                     . "beside it on the first run (App > Files)."}],
             Buttons: [ed ? "Save" : "Add the rule", "Cancel"],
             Check: (V) => AxWiz.FlowWhy(V),
             Preview: (V) => AxWiz.FlowLine(V)})
@@ -816,7 +840,8 @@ class AxWiz {
     ;   {V: the word the rule uses, L: how it reads, Who: the list it picks
     ;    from, Arg: whether it also needs a typed value}
     static Verbs := [
-        {V: "toast",   L: "show a message",              Who: "",      Arg: true},
+        {V: "toast",   L: "show a message in the corner",  Who: "",      Arg: true},
+        {V: "alert",   L: "show a message with an OK button", Who: "",    Arg: true},
         {V: "status",  L: "write to the status bar",     Who: "",      Arg: true},
         {V: "set",     L: "set a control's value",       Who: "ctl",   Arg: true},
         {V: "copy",    L: "copy one control into another", Who: "ctl", Arg: false},
@@ -825,13 +850,42 @@ class AxWiz {
         {V: "enable",  L: "enable a control",            Who: "ctl",   Arg: false},
         {V: "disable", L: "disable a control",           Who: "ctl",   Arg: false},
         {V: "addrow",  L: "add a row to a list  (cells: a | b, {box} for what a box holds)", Who: "list", Arg: true},
-        {V: "removerow", L: "remove the picked rows from a list", Who: "list", Arg: false},
+        {V: "removerow", L: "remove the selected rows from a list", Who: "list", Arg: false},
         {V: "clearlist", L: "empty a list",                Who: "list", Arg: false},
         {V: "tickall", L: "tick every row of a list",      Who: "list", Arg: false},
         {V: "untickall", L: "untick every row of a list",  Who: "list", Arg: false},
         {V: "saverows", L: "save a list to a file",        Who: "list", Arg: true},
         {V: "loadrows", L: "load a list from a file",      Who: "list", Arg: true},
         {V: "folderrows", L: "fill a list with a folder's files", Who: "list", Arg: true},
+        ; a file window
+        {V: "goto",       L: "file window: show a folder",            Who: "files", Arg: true},
+        {V: "goup",       L: "file window: go up one folder",         Who: "files", Arg: false},
+        {V: "goback",     L: "file window: go back",                  Who: "files", Arg: false},
+        {V: "goforward",  L: "file window: go forward",               Who: "files", Arg: false},
+        {V: "refresh",    L: "file window: read the folder again",    Who: "files", Arg: false},
+        {V: "viewmode",   L: "file window: how to show it  (icons, list, details, tiles, gallery)", Who: "files", Arg: true},
+        {V: "viewsort",   L: "file window: sort by  (name, size, modified, kind)", Who: "files", Arg: true},
+        {V: "viewfilter", L: "file window: show only what matches",   Who: "files", Arg: true},
+        {V: "pickall",    L: "file window: select everything",        Who: "files", Arg: false},
+        {V: "pin",        L: "file window: pin a folder to the side", Who: "files", Arg: true},
+        ; a ribbon: everything anyone ever does to one, without code
+        {V: "ribmode",     L: "ribbon: change its shape  (office, simple, strip, titlebar)", Who: "ribbon", Arg: true},
+        {V: "ribstyle",    L: "ribbon: change its style  (fluent, classic, flat, outlined)", Who: "ribbon", Arg: true},
+        {V: "ribdensity",  L: "ribbon: change how tight it is  (compact, comfortable, roomy)", Who: "ribbon", Arg: true},
+        {V: "ribcolour",   L: "ribbon: change its accent colour  (#60cdff)", Who: "ribbon", Arg: true},
+        {V: "ribtab",      L: "ribbon: go to a tab  (its id)",       Who: "ribbon", Arg: true},
+        {V: "ribshowtab",  L: "ribbon: show a contextual tab",       Who: "ribbon", Arg: true},
+        {V: "ribhidetab",  L: "ribbon: hide a contextual tab",       Who: "ribbon", Arg: true},
+        {V: "ribshowgroup", L: "ribbon: show a group",               Who: "ribbon", Arg: true},
+        {V: "ribhidegroup", L: "ribbon: hide a group",               Who: "ribbon", Arg: true},
+        {V: "ribcheck",    L: "ribbon: press a button in  (its id)", Who: "ribbon", Arg: true},
+        {V: "ribuncheck",  L: "ribbon: let a button back out",       Who: "ribbon", Arg: true},
+        {V: "ribenable",   L: "ribbon: let a button be pressed",     Who: "ribbon", Arg: true},
+        {V: "ribdisable",  L: "ribbon: grey a button out",           Who: "ribbon", Arg: true},
+        {V: "ribcollapse", L: "ribbon: roll it up",                  Who: "ribbon", Arg: false},
+        {V: "ribexpand",   L: "ribbon: roll it back down",           Who: "ribbon", Arg: false},
+        {V: "ribkeytips",  L: "ribbon: show or hide the key tips",   Who: "ribbon", Arg: false},
+        {V: "riblabel",    L: "ribbon: change what a button says  (id then the words)", Who: "ribbon", Arg: true},
         {V: "page",    L: "go to a page",                Who: "page",  Arg: false},
         {V: "open",    L: "open another window",         Who: "win",   Arg: false},
         {V: "close",   L: "close this window",           Who: "",      Arg: false},
@@ -850,7 +904,7 @@ class AxWiz {
         {V: "stop",    L: "stop a timer",                Who: "",      Arg: true},
         {V: "wait",    L: "wait (milliseconds)",         Who: "",      Arg: true},
         {V: "beep",    L: "beep",                        Who: "",      Arg: false},
-        {V: "call",    L: "call a function",             Who: "",      Arg: true},
+        {V: "call",    L: "call a function",             Who: "fn",   Arg: true},
         {V: "startup", L: "start with Windows: on or off", Who: "",    Arg: true},
         {V: "save",    L: "save the settings",           Who: "",      Arg: false},
         {V: "load",    L: "put back the saved settings", Who: "",      Arg: false},
@@ -867,7 +921,7 @@ class AxWiz {
         for x in AxWiz.Verbs
             out .= (out = "" ? "" : "|") x.V ":" x.L
         if IsObject(s) {
-            have := AxPkg.Installed(AxPkg.ProjDir(s.P))
+            have := AxPkg.Have(s.P)
             for st in AxPkg.Steps()
                 if have.Has(st.Lib)
                     out .= "|" st.V ":" StrSplit(st.Lib, "/")[-1] ": " st.L
@@ -890,8 +944,37 @@ class AxWiz {
         case "page":  return AxWiz.NameOpts(s.PageNames())
         case "var":   return AxWiz.NameOpts(AxBind.Paths(s.P))
         case "state": return AxWiz.NameOpts(AxWiz.StateNames(s))
+        ; the same list the Steps editor offers: this program's own functions,
+        ; then the adaptors -- .NET methods and library functions made yours
+        case "fn":    return AxStepsUi.FnOpts(s)
+        case "ribbon": return AxWiz.OfTypeOpts(s, "Ribbon", "(this window has no ribbon in it)")
+        case "files":  return AxWiz.OfTypeOpts(s, "FileExplorer", "(this window has no file explorer in it)")
         }
         return ""
+    }
+    ; Every control of one type, for a verb that only means anything to that
+    ; type -- the ribbon verbs, and whatever comes next.
+    static OfTypeOpts(s, type, empty) {
+        o := ""
+        Walk(n) {
+            if (n.Type = type && n.Name != "")
+                o .= (o = "" ? "" : "|") n.Name ":" n.Name
+            for k in n.Kids
+                Walk(k)
+        }
+        Walk(s.P.W.Root)
+        return o != "" ? o : "-:" empty
+    }
+    ; What the box under a verb is called, and what it says underneath.
+    static ArgLabel(verb) => (verb = "call") ? "give it" : (verb = "status") ? "say" : "with"
+    static ArgHint(verb) {
+        if (verb = "call")
+            return "What it needs, with commas between. A value's name is that value, {aBox} is what "
+                 . "that control holds, a number is a number, anything else is text."
+        if (verb = "status")
+            return "Which part of the status bar, then what it should say: msg Saved."
+        return "A value's name is that value, {aBox} is what that control holds, =something is worked "
+             . "out, and anything else is text."
     }
     static StateNames(s) {
         out := []
@@ -904,13 +987,13 @@ class AxWiz {
     }
     static FlowWhy(V) {
         if (Trim(V["ctl"]) = "" || Trim(V["ev"]) = "")
-            return "Pick the control and what it does."
+            return "Choose the control and what it does."
         if (AxWiz.VerbNeeds(V["verb"], "who") && Trim(V["who"]) = "")
-            return "Pick the one it applies to."
+            return "Choose the one it applies to."
         if (V["verb"] = "copy" && Trim(V["who2"]) = "")
-            return "Pick the control to copy into."
+            return "Choose the control to copy into."
         if (AxWiz.VerbNeeds(V["verb"], "arg") && Trim(V["arg"]) = "" && !InStr("|set|add|take|", "|" V["verb"] "|"))
-            return "Say what it should be."
+            return "Enter a value."
         return ""
     }
     static FlowLine(V) {
@@ -975,7 +1058,7 @@ class AxWiz {
                 Fields: [{Id: "n", Kind: "note",
                           L: "Add a dialog or a tool window first (Add > A window, or the + beside the window tabs), "
                            . "then come back and say what opens it."}],
-                Buttons: ["Right you are"], CancelIndex: 0})
+                Buttons: ["OK"], CancelIndex: 0})
         ; the window being edited is the obvious target, unless it is the one
         ; the script starts with
         target := (s.P.W.Kind != "main") ? s.P.W.Name : wins[1]
@@ -1301,8 +1384,71 @@ class AxWiz {
             out.Push([wins.Length " windows", "More than one window, sharing the same values", ""])
         if (pages > 1)
             out.Push([pages " pages", "Pages down the side, one shown at a time", ""])
+        ; What it is BUILT with, as well as what it does. The tags above answer
+        ; "how much of this is code"; a card also has to answer "is this the one
+        ; with the ribbon in it" from across the gallery, which nothing did --
+        ; the two templates with the most in them had no tags at all.
+        for x in AxWiz.Built(m, wins)
+            out.Push(x)
         if (out.Length = 1 && out[1][3] = "nc")
             out := []                      ; an empty page has no code, and that says nothing
+        return out
+    }
+    ; The notable things in it: the big controls, and the libraries behind them.
+    ; Only the ones worth crossing a room for -- a tag on every button would be
+    ; a wall of grey, and a card has room for about five.
+    static Built(m, wins) {
+        static named := Map(
+            "Ribbon", "Ribbon", "FileExplorer", "File view", "FileView", "File view",
+            "FileTree", "File view", "DataView", "Data view", "ListView", "Data view",
+            "TreeView", "Data view", "CodeEditor", "Code editor", "Canvas", "Canvas",
+            "Chart", "Charts", "Game", "Game", "Console", "Console", "ActiveX", "Embedded",
+            "Grid", "Grid", "TileGrid", "Tile grid", "Steps", "Steps", "Calendar", "Calendar",
+            "RichText", "Rich text", "Audio", "Audio", "Thumbs", "Thumbnails")
+        static why := Map(
+            "Ribbon", "A ribbon: tabs over grouped panels, like Office",
+            "File view", "Files and folders, browsed and shown",
+            "Data view", "A sortable, filterable table of rows",
+            "Code editor", "A syntax-highlighted code box",
+            "Canvas", "A drawing surface",
+            "Charts", "Lines, bars and pies",
+            "Game", "A tile map with sprites on it",
+            "Console", "A terminal-looking output box",
+            "Embedded", "Another program's window, inside this one",
+            "Grid", "Controls laid out in a grid",
+            "Tile grid", "Tiles that reflow to the width",
+            "Steps", "A step-by-step flow",
+            "Calendar", "Dates, picked from a month",
+            "Rich text", "Formatted text, edited in place",
+            "Audio", "Sound played from the window",
+            "Thumbnails", "Pictures as a contact sheet")
+        seen := Map(), out := []
+        Walk(n) {
+            if !(n is Map)
+                return
+            t := String(AxJson.Get(n, "type", ""))
+            if named.Has(t)
+                seen[named[t]] := true
+            kids := AxJson.Get(n, "kids", "")
+            if (kids is Array)
+                for k in kids
+                    Walk(k)
+        }
+        for w in wins
+            Walk(AxJson.Get(w, "root", ""))
+        for name in seen
+            out.Push([name, why.Has(name) ? why[name] : name, ""])
+        ; and what it reaches outside AutoHotkey for
+        ad := Trim(String(AxJson.Get(m, "adaptors", "")))
+        if (ad != "") {
+            out.Push([".NET", "Calls the .NET Framework through AHK#", ""])
+            if InStr(ad, "| nuget |")
+                out.Push(["NuGet", "Fetches a package from nuget.org as it runs", ""])
+            if InStr(ad, "@async")
+                out.Push(["Background", "Work on a thread pool: the window keeps answering", ""])
+        }
+        if (Trim(String(AxJson.Get(m, "packages", ""))) != "" && ad = "")
+            out.Push(["Libraries", "Uses a library installed through Aris", ""])
         return out
     }
     static _HasCode(n) {

@@ -7,6 +7,7 @@
 #Include %A_LineFile%\..\AxStudio.Flow.ahk
 #Include %A_LineFile%\..\AxStudio.Bind.ahk
 #Include %A_LineFile%\..\AxStudio.Assets.ahk
+#Include %A_LineFile%\..\..\lib\components\CodeEditor\AxCodeEditor.Ahk.ahk
 
 ; Part of AxStudio, not a program on its own.
 if (A_LineFile = A_ScriptFullPath) {
@@ -140,19 +141,19 @@ class AxLint {
                               Msg: "The right-click menu " m.Name " opens on " m.On ", and there is no control called that",
                               Hint: "Logic > Menus: say what it opens on."})
         ; a macro reaching into another window's elements needs the UIA library
-        if AxAuto2.UsesUia(p) && !AxPkg.Installed(AxPkg.ProjDir(p)).Has(AxPkg.UiaLib)
+        if AxAuto2.UsesUia(p) && !AxPkg.Have(p).Has(AxPkg.UiaLib)
             out.Push({Sev: "error", Win: main, Node: "",
                       Msg: "A macro works on another window's elements, and " AxPkg.UiaLib " is not installed for this project",
                       Hint: "App > Libraries installs it."})
         ; adaptors into .NET need AHK# beside the project, and a library's
         ; own adaptors need that library
-        have := AxPkg.Installed(AxPkg.ProjDir(p))
+        have := AxPkg.Have(p)
         for lib in AxPkg.Used(p)
             if !have.Has(lib) && (lib = AxNet.Lib || (lib = AxPkg.UiaLib && !AxAuto2.UsesUia(p)))
                 out.Push({Sev: "error", Win: main, Node: "",
                           Msg: (lib = AxNet.Lib ? "Adaptors into .NET need AHK# (" lib ")" : "Steps in other programs need " lib)
                              . ", and it is not installed for this project",
-                          Hint: "App > Libraries > In this program shows it; open it and press Install."})
+                          Hint: "App > Libraries, find it, and press Install and use it -- that saves the project and fetches Aris too if they are needed."})
     }
     static _ModeStep(p, main, m, step, states, out) {
         t := Trim(step)
@@ -180,12 +181,39 @@ class AxLint {
     ; Everything in the generated file is a global in one script: two windows
     ; cannot both have a `list1`, and no control can be called the same as a
     ; function the studio is about to write.
+    ; Every global function AutoHotkey has, read off the same list the code
+    ; editor autocompletes against. Entries there are Name(params) for a
+    ; function and Name(params)|Class for a method -- only the first kind is a
+    ; global a control could take away.
+    static _builtins := ""
+    static Builtins() {
+        if (AxLint._builtins != "")
+            return AxLint._builtins
+        out := Map()
+        out.CaseSense := "Off"
+        txt := ""
+        try txt := AxCodeEditorAhk.Funcs
+        for line in StrSplit(StrReplace(String(txt), "`r", ""), "`n") {
+            if (InStr(line, "|") || !RegExMatch(line, "^([A-Za-z_]\w*)\(", &m))
+                continue
+            out[m[1]] := true
+        }
+        return AxLint._builtins := out
+    }
     static _Names(p, out) {
         seen := Map()
         seen.CaseSense := "Off"
         reserved := Map()
         reserved.CaseSense := "Off"
         reserved["g"] := "the main window"
+        ; AutoHotkey's own functions. A control called log becomes `global log`
+        ; in the script, and `log` IS Log() -- AutoHotkey's names are case
+        ; insensitive, so the logarithm is gone and every mention of the
+        ; control is a Func with no properties. It is a horrible way to find
+        ; out, and the answer is always "rename it", so it is said here while
+        ; the control can still be clicked on.
+        for nm in AxLint.Builtins()
+            reserved[nm] := "an AutoHotkey function"
         ; Run adds a debug block to the script (see AxStudio.Debug.ahk), and a
         ; control sharing one of its names breaks F5 while leaving Export fine
         ; -- which is a confusing way to find out.
@@ -431,7 +459,7 @@ class AxLint {
                       Hint: f.Line})
         ; a library's step needs the library, installed beside the project
         ; (the macros' ui steps are checked once, in _Assets)
-        if IsObject(st := AxPkg.Step(f.Verb)) && !AxPkg.Installed(AxPkg.ProjDir(p)).Has(st.Lib)
+        if IsObject(st := AxPkg.Step(f.Verb)) && !AxPkg.Have(p).Has(st.Lib)
             out.Push({Sev: "error", Win: w, Node: "",
                       Msg: "A rule uses " st.Lib ", which is not installed for this project",
                       Hint: f.Line "  --  App > Libraries installs it"})

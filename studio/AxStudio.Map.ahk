@@ -61,7 +61,7 @@ class AxMap {
            .   '<span class="axm-btn" data-mdo="out" data-tip="Smaller">&#x2212;</span>'
            .   '<span class="axm-btn" data-mdo="in" data-tip="Bigger">+</span>'
            .   '<span class="axm-btn" data-mdo="fit" data-tip="All of it in view">Fit</span>'
-           .   '<span class="axm-btn" data-mdo="clear" data-tip="Nothing picked, nothing filtered (Esc)">Clear</span>'
+           .   '<span class="axm-btn" data-mdo="clear" data-tip="Nothing selected, no filter (Esc)">Clear</span>'
            .   '</span>'
            .   '<span class="axm-count" id="axmCount"></span>'
            .   '<span class="axm-btn axm-ponly" data-mdo="rebuild" data-tip="Read the program again">Read again</span>'
@@ -276,10 +276,8 @@ class AxMapGraph {
         ; name -> the library (App > Libraries), so a call into one is on the map
         this.LibFns := Map(), this.LibFns.CaseSense := false
         this.LibCls := Map(), this.LibCls.CaseSense := false
-        dir := AxPkg.ProjDir(p)
-        if (dir != "")
-            for lib in AxPkg.Needed(p)
-                for it in AxPkg.Api(dir, lib)
+        for lib in AxPkg.Needed(p)
+            for it in AxPkg.ApiOf(p, lib)
                     if (it.Kind = "function")
                         this.LibFns[it.Name] := lib
                     else if (it.Kind = "class")

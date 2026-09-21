@@ -153,7 +153,7 @@ class AxGallery {
         e := AxPkg.Find(name)
         if !IsObject(e) || j > e.Snippets.Length
             return
-        if AxPkg.Installed(AxPkg.ProjDir(s.P)).Has(name)
+        if AxPkg.Have(s.P).Has(name)
             return AxPkgUi.Write(s, e.Snippets[j].Code, e)
         AxPkgUi.Sel := name
         s.GoSec("libraries", "app")

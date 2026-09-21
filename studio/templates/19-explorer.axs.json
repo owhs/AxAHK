@@ -1,0 +1,325 @@
+{
+ "format": "axstudio/2",
+ "name": "File explorer",
+ "desc": "A file window driven entirely by rules: where it went, what was picked, what was opened and what was dropped on it are all events it raises, and go up, go back, show a folder, sort by size and show only what matches are all rule verbs. Counting what is picked is a flowchart on the Steps tab -- a repeat with a branch in it.",
+ "uid": 7,
+ "cur": 1,
+ "vars": "where = \"\"\nchosen = 0\nopened = \"\"\nfilter = \"\"\nfolders = 0\ndocuments = 0\nsaid <- (chosen ? chosen \" selected\" : \"Nothing selected\")\ncounted <- (folders || documents ? folders \" folder\" (folders = 1 ? \"\" : \"s\") \" and \" documents \" file\" (documents = 1 ? \"\" : \"s\") : \"\")\nanything <- (chosen > 0)",
+ "files": "",
+ "includes": "",
+ "args": "",
+ "modes": "",
+ "tray": "",
+ "compile": "",
+ "conds": "",
+ "strings": "",
+ "timers": "",
+ "events": "",
+ "watchers": "",
+ "macros": "",
+ "settings": "",
+ "windows": [
+  {
+   "name": "Main",
+   "kind": "main",
+   "inputs": "",
+   "outputs": "",
+   "title": "Files",
+   "width": 1120,
+   "height": 720,
+   "minwidth": 620,
+   "minheight": 420,
+   "theme": "dark",
+   "stylesheet": "win11",
+   "accent": "",
+   "tint": "",
+   "tintstrength": 0.18,
+   "nav": 0,
+   "headings": "",
+   "escapecloses": 0,
+   "resizable": 1,
+   "icon": "EC50",
+   "menus": "",
+   "status": "msg | Double-click a folder to go in; Backspace comes out | grow icon=EC50\nwhere |  | right dim",
+   "titleitems": "",
+   "titleshow": 1,
+   "titlecenter": 0,
+   "maximizebox": 1,
+   "minimizebox": 1,
+   "roundcorners": 1,
+   "snaplayouts": 1,
+   "bordercolor": "",
+   "snapborder": "",
+   "alwaysontop": 0,
+   "noactivate": 0,
+   "exitonclose": 1,
+   "opacity": "",
+   "appname": "",
+   "focusring": "",
+   "allowzoom": 0,
+   "nativecontextmenu": 0,
+   "composited": 0,
+   "backcolor": "",
+   "winx": "",
+   "winy": "",
+   "tooltipdelay": "",
+   "useaccent": 1,
+   "appid": "",
+   "frame": 1,
+   "pagescroll": 1,
+   "importlayout": "",
+   "importresize": "",
+   "startstate": "",
+   "startpos": "",
+   "taborder": "",
+   "defaultbtn": "",
+   "cancelbtn": "",
+   "menubar": "",
+   "statusbar": "",
+   "look": "",
+   "css": "",
+   "flows": "; --- what the explorer tells us. `path`, `items`, `item` and `paths`\n; --- are the event's own names; = means worked out rather than said.\nfiles WentTo -> assign where =path\nfiles WentTo -> status where =path\nfiles Picked -> assign chosen =items.Length\nfiles Opened -> assign opened =item.Name\nfiles Opened -> status msg =(\"Opened \" item.Name)\nfiles Dropped -> status msg =(paths.Length \" dropped on \" onto.Name)\nfiles ModeChanged -> status msg =(\"Showing \" viewMode)\n; --- and what we tell it\nupBtn Click -> goup files\nbackBtn Click -> goback files\nfwdBtn Click -> goforward files\nhomeBtn Click -> goto files %A_MyDocuments%\ndeskBtn Click -> goto files %A_Desktop%\nrefreshBtn Click -> refresh files\niconsBtn Click -> viewmode files icons\nlistBtn Click -> viewmode files details\nbigBtn Click -> viewsort files size -1\nallBtn Click -> pickall files\nfilterBox Change -> viewfilter files {filterBox}",
+   "states": "",
+   "binds": "filterBox <-> filter\nsumLabel.Text <- said\ncountLabel.Text <- counted\ncountBtn.Enabled <- anything",
+   "hotkeys": "",
+   "init": "",
+   "script": "; Nothing is wired by hand any more: the explorer's own events are rules\n; on the Logic tab, and what the window says about itself is worked out\n; from the values. The one handler is Count what is picked, and it is\n; written in step shapes so it opens as a flowchart.\n;\n; The same window over something else entirely -- nothing below the\n; source changes, because the view never asks what kind of thing it is:\n;   files.Component.State.SetSource(AxFileZip(A_Desktop \"\\theme.zip\"))\n;   files.Component.State.SetSource(AxFileReg())\n",
+   "root": {
+    "id": "root",
+    "type": "Root",
+    "name": "",
+    "arg": "",
+    "layout": {},
+    "props": {},
+    "events": [],
+    "kids": [
+     {
+      "id": "n1",
+      "type": "InfoBar",
+      "name": "tip",
+      "arg": "The explorer raises its own events, so all of this is rules on the Logic tab: where it went, what was picked, what was opened, what was dropped on it. The buttons drive it back the same way -- go up, go back, show a folder, sort by size, show only what matches. The one handler left is a flowchart on the Steps tab: a repeat with a branch in it.",
+      "layout": {},
+      "props": {
+       "title": "A file window, driven by rules."
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n2",
+      "type": "Button",
+      "name": "backBtn",
+      "arg": "Back",
+      "layout": {},
+      "props": {
+       "icon": "E72B",
+       "tip": "Where you were before"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n3",
+      "type": "Button",
+      "name": "fwdBtn",
+      "arg": "Forward",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E72A"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n4",
+      "type": "Button",
+      "name": "upBtn",
+      "arg": "Up",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E70E",
+       "tip": "Out of this folder"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n5",
+      "type": "Button",
+      "name": "homeBtn",
+      "arg": "Documents",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8B7"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n6",
+      "type": "Button",
+      "name": "deskBtn",
+      "arg": "Desktop",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E7F4"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n7",
+      "type": "Button",
+      "name": "refreshBtn",
+      "arg": "Read it again",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E72C"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n8",
+      "type": "Edit",
+      "name": "filterBox",
+      "arg": "",
+      "layout": {
+       "place": "same",
+       "w": 200
+      },
+      "props": {
+       "placeholder": "Show only what matches..."
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n1",
+      "type": "FileExplorer",
+      "name": "files",
+      "arg": "{Source: AxFileLocal(), Path: A_MyDocuments, Name: \"files\",\n Pinned: [A_Desktop], Sort: {Key: \"modified\", Dir: -1}}",
+      "layout": {
+       "fill": 1,
+       "grow": 1,
+       "h": 340
+      },
+      "props": {
+       "places": "240",
+       "preview": "300"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n9",
+      "type": "Button",
+      "name": "iconsBtn",
+      "arg": "Icons",
+      "layout": {},
+      "props": {
+       "icon": "E80A"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n10",
+      "type": "Button",
+      "name": "listBtn",
+      "arg": "Details",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8A4"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n11",
+      "type": "Button",
+      "name": "bigBtn",
+      "arg": "Biggest first",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8CB"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n12",
+      "type": "Button",
+      "name": "allBtn",
+      "arg": "Select everything",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E8B3"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n13",
+      "type": "Button",
+      "name": "countBtn",
+      "arg": "Count what is picked",
+      "layout": {
+       "place": "same"
+      },
+      "props": {
+       "icon": "E9D5"
+      },
+      "events": [
+       {
+        "name": "Click",
+        "code": "folders := 0\ndocuments := 0\nfor item in files.Component.Selected() {\n    if (item.Kind = \"folder\") {\n        folders += 1\n    } else {\n        documents += 1\n    }\n}\nAxBindSync()\ng.Status(\"msg\", \"Counted \" (folders + documents) \" of them\")"
+       }
+      ],
+      "kids": []
+     },
+     {
+      "id": "n14",
+      "type": "Text",
+      "name": "sumLabel",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "style": "opacity:.7"
+      },
+      "events": [],
+      "kids": []
+     },
+     {
+      "id": "n15",
+      "type": "Text",
+      "name": "countLabel",
+      "arg": "",
+      "layout": {},
+      "props": {
+       "style": "opacity:.7"
+      },
+      "events": [],
+      "kids": []
+     }
+    ]
+   }
+  }
+ ]
+}

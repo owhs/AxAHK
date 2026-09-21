@@ -477,6 +477,141 @@ class AxDataView {
         return this
     }
     Rows => this._srcRows
+
+    ; --- rows, one at a time ------------------------------------------
+    ; SetRows takes the whole lot and starts again, which is right when the
+    ; data is handed over in one piece and useless for everything else: a row
+    ; arriving, a row going, a table being filled from a folder. Without these
+    ; the only way to add one row was to copy every row out, push, and hand
+    ; the lot back -- three lines of code for the commonest thing a table
+    ; does, and nothing the studio's rules or steps could say at all. Every
+    ; other list control in this library has had them all along.
+    ;
+    ; Reload rather than SetRows: it keeps what was picked, ticked and opened,
+    ; which is what you want when one row moves.
+    AddRow(row, at := 0) {
+        rows := this._srcRows.Clone()
+        if (at >= 1 && at <= rows.Length)
+            rows.InsertAt(at, row)
+        else
+            rows.Push(row)
+        return this.Reload(rows)
+    }
+    ; by its Key, or by what a column holds -- RemoveRow("a"), RemoveRow("Bob", "name")
+    RemoveRow(value, key := "") {
+        rows := [], gone := false
+        for r in this._srcRows {
+            if (!gone && AxDataView._Is(r, value, key)) {
+                gone := true
+                continue
+            }
+            rows.Push(r)
+        }
+        return gone ? this.Reload(rows) : this
+    }
+    RemoveSelected() {
+        keys := Map()
+        for r in this.Selected()
+            keys[String(AxDataView._Key(r))] := true
+        if !keys.Count
+            return this
+        rows := []
+        for r in this._srcRows
+            if !keys.Has(String(AxDataView._Key(r)))
+                rows.Push(r)
+        return this.SetRows(rows)
+    }
+    Clear() => this.SetRows([])
+    ; one row by its Key, or "" -- so a step can read a cell out of the table
+    Row(value, key := "") {
+        for r in this._srcRows
+            if AxDataView._Is(r, value, key)
+                return r
+        return ""
+    }
+    static _Key(r) => AxDataView._Cell(r, "Key")
+    static _Is(r, value, key) => String(AxDataView._Cell(r, key != "" ? key : "Key")) = String(value)
+    static _Cell(r, key) {
+        if !IsObject(r)
+            return ""
+        if (r is Map)
+            return r.Has(key) ? r[key] : ""
+        return r.HasOwnProp(key) ? r.%key% : ""
+    }
+
+    ; --- a table filled from somewhere else ----------------------------
+    ; The three the other list controls have, so a rule or a step can say
+    ; "fill it from this folder" and "keep it in this file" without code.
+    FillFolder(dir, pattern := "*.*") {
+        rows := []
+        loop files RTrim(dir, "\") "\" pattern, "F"
+            rows.Push({Key: A_LoopFileFullPath, name: A_LoopFileName, size: A_LoopFileSize + 0,
+                       modified: FormatTime(A_LoopFileTimeModified, "yyyy-MM-dd HH:mm"),
+                       kind: AxDataView._Kind(A_LoopFileExt)})
+        if !this.Cols.Length
+            this.SetColumns([{Key: "name", Title: "Name", Width: 280, Icon: true},
+                             {Key: "size", Title: "Size", Width: 110, Align: "right", Sort: "number"},
+                             {Key: "modified", Title: "Modified", Width: 150},
+                             {Key: "kind", Title: "Kind", Width: 120}])
+        return this.SetRows(rows)
+    }
+    static _Kind(ext) => (ext = "") ? "File" : StrUpper(ext) " file"
+    ; Tab separated, the first line the column titles: what a spreadsheet
+    ; opens and what the list view already writes.
+    ToText() {
+        out := ""
+        for c in this.Cols
+            out .= (out = "" ? "" : "`t") c.Title
+        for r in this._srcRows {
+            line := ""
+            for c in this.Cols
+                line .= (line = "" ? "" : "`t") StrReplace(StrReplace(String(AxDataView._Cell(r, c.Key)), "`t", " "), "`n", " ")
+            out .= "`n" line
+        }
+        return out
+    }
+    FromText(text) {
+        lines := StrSplit(StrReplace(String(text), "`r", ""), "`n")
+        if !lines.Length
+            return this.SetRows([])
+        titles := StrSplit(lines[1], "`t")
+        cols := [], keys := []
+        for i, t in titles {
+            k := RegExReplace(StrLower(Trim(t)), "[^a-z0-9]", "")
+            if (k = "")
+                k := "c" i
+            keys.Push(k)
+            cols.Push({Key: k, Title: Trim(t), Width: 160})
+        }
+        rows := []
+        loop lines.Length - 1 {
+            raw := lines[A_Index + 1]
+            if (Trim(raw) = "")
+                continue
+            cells := StrSplit(raw, "`t")
+            r := {Key: "r" rows.Length + 1}
+            for i, k in keys
+                r.%k% := (i <= cells.Length) ? cells[i] : ""
+            rows.Push(r)
+        }
+        this.SetColumns(cols)
+        return this.SetRows(rows)
+    }
+    SaveTo(path) {
+        try {
+            f := FileOpen(path, "w", "UTF-8")
+            f.Write(this.ToText())
+            f.Close()
+            return true
+        }
+        return false
+    }
+    LoadFrom(path) {
+        if !FileExist(path)
+            return false
+        this.FromText(FileRead(path, "UTF-8"))
+        return true
+    }
     Reload(rows := "") {
         keep := {Sel: Map(), Chk: Map(), Open: Map(), Cur: "", Anchor: ""}
         for n, node in this._nodes {

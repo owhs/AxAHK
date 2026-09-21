@@ -383,7 +383,7 @@ class AxLook {
             s.SetExtraCss("axdSpecCss", AxStudio.Unleak(comp spec own, comp spec, "#axdSpec") comp spec)
             AxLook.ShowLooks(s, el, o)
         } catch as e
-            s.EventLogger("Look preview: " e.Message)
+            s.WriteLog("Look preview: " e.Message)
     }
     ; A colour left to the look shows the look's colour, read off the window in
     ; the middle, instead of an empty hatch: the swatch and, faintly, its hex.
@@ -451,13 +451,16 @@ class AxLook {
     static AccentCss(hex) {
         ; .accent twice: see AxStudio's canvas accent
         return ".btn.accent.accent{background:" hex ";border-color:" hex ";color:" (AxWindow._Luma(hex) > 0.45 ? "#000" : "#fff") "}"
-             . ".switch input:checked+.sw-track{background:" hex ";border-color:" hex "}"
-             . ".check input:checked+.box{background:" hex ";border-color:" hex "}"
-             . ".radio input:checked+.ring{border-color:" hex "}"
-             . ".segmented .seg.active{background:" hex "}"
-             . ".progress .bar,.nav-item.active:before,.tab.active:after,.dd-item.selected:before,"
-             . ".list-item.selected:before{background:" hex "}"
-             . ".link,.hyperlink{color:" hex "}"
+             ; each selector carries its own class twice for the same reason:
+             ; the studio's live sheet names these through a body class, and
+             ; that beats a bare one
+             . ".switch input:checked+.sw-track.sw-track{background:" hex ";border-color:" hex "}"
+             . ".check input:checked+.box.box{background:" hex ";border-color:" hex "}"
+             . ".radio input:checked+.ring.ring{border-color:" hex "}"
+             . ".segmented .seg.active.active{background:" hex "}"
+             . ".progress .bar.bar,.nav-item.active.active:before,.tab.active.active:after,"
+             . ".dd-item.selected.selected:before,.list-item.selected.selected:before{background:" hex "}"
+             . ".link.link,.hyperlink.hyperlink{color:" hex "}"
              . ".textbox input:focus{border-bottom-color:" hex "}"
     }
     ; A window's worth of everything a sheet styles.

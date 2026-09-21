@@ -22,6 +22,7 @@
 ;      studio\AxStudio.Bind.ahk       data binding, and the engine it needs
 ;      studio\templates\*.axs.json    the starting points, as project files
 ;      studio\AxStudio.Gen.ahk        tree -> canvas markup, tree -> AutoHotkey
+;      studio\AxStudio.RibbonUi.ahk   building a ribbon by pointing at it
 ;      studio\AxStudio.Panes.ahk      toolbox, outline, properties, events
 ;      studio\AxStudio.App.ahk        the window and its commands
 ;      studio\AxStudio.Pkg.ahk        libraries, through Aris (packages\patch.json over its list)
@@ -63,6 +64,7 @@
 #Include %A_LineFile%\..\AxStudio.Acts.ahk
 #Include %A_LineFile%\..\AxStudio.Flow.ahk
 #Include %A_LineFile%\..\AxStudio.Bind.ahk
+#Include %A_LineFile%\..\AxStudio.RibbonUi.ahk
 #Include %A_LineFile%\..\AxStudio.Panes.ahk
 #Include %A_LineFile%\..\AxStudio.Look.ahk
 #Include %A_LineFile%\..\AxStudio.Auto.ahk

@@ -343,7 +343,7 @@ class AxData {
     static Why(s, V, grid) {
         switch V["src"] {
         case "csv":
-            return (Trim(V["file"]) = "") ? "Say which file." : ""
+            return (Trim(V["file"]) = "") ? "Choose a file." : ""
         case "folder":
             return (Trim(V["dir"]) = "") ? "Say which folder." : ""
         case "json":

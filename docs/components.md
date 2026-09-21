@@ -6,6 +6,8 @@ gives you the object behind them, with its own methods and events.
 
 - [Data view](#data-view): a list, a tree and a grouped table in one
 - [List view and tree view](#list-view-and-tree-view): AutoHotkey's own, with their own methods
+- [File view](#file-view): a file window in parts, over the disk, the registry, a zip or nothing at all
+- [Ribbon](#ribbon): tabs over grouped panels, one line, a strip, or tabs in the title bar
 - [Code editor](#code-editor)
 - [Rich text editor](#rich-text-editor)
 - [Colour picker](#colour-picker)
@@ -98,6 +100,265 @@ Both also accept plain text. For a list view, the first line is the column
 titles and each line after it a row, with cells split by `|`. For a tree
 view, one item per line, indented under its parent. `[x] ` at the start of a
 line ticks it.
+
+## File view
+
+```ahk
+st := AxFileState({Name: "files", Source: AxFileLocal(A_MyDocuments)})
+
+g.AddFileTools("State=files")          ; back, forward, up, search, the knobs
+g.AddFilePath("State=files")           ; breadcrumbs, or a path box
+g.AddFileTree("w220 State=files")      ; the folders
+g.AddFileView("Fill State=files")      ; the files
+g.AddFilePreview("w300 State=files")   ; what the one you picked is
+g.AddFileStatus("State=files")         ; how many, how big
+```
+
+or, for the usual arrangement without the argument:
+
+```ahk
+g.AddFileExplorer("Fill h420 Preview=300", {Source: AxFileLocal()})
+```
+
+One idea runs through it: a **state** knows where you are and what you are
+looking at, and the **parts** draw it. The parts never talk to each other and
+none of them owns the state, so you can use one of them, or all six, or write
+a seventh, and the rest carry on. `example/Files.ahk` shows every shape of it.
+
+### Where the files come from
+
+A **source** answers a handful of questions about a tree of things that have
+names, and the view asks nothing else — which is why the same view draws your
+disk, a made-up drive, the registry and the inside of a `.zip`.
+
+| | |
+|---|---|
+| `AxFileLocal(root := "")` | the disk. No root starts at the drives, each carrying its label, capacity and how full it is |
+| `AxFileVirtual(tree, opts)` | a tree you hand it: invented, fetched from an API, or cached |
+| `AxFileReg(root := "")` | the registry. Keys list as folders, values as files. Read only |
+| `AxFileZip(path)` | inside an archive, through the shell's own reader |
+
+Writing one is `List(path)` and, if its paths are not separated the way the
+default expects, `Parent` and `Join`. Everything else — `Crumbs`, `Branches`,
+`Item`, `Exists` — already has a sensible version.
+`lib/components/FileSource/AxFileSource.ahk` states the whole contract at the
+top of the file.
+
+An item is `{Key, Name, Path, Kind, Icon, Size, Modified, Type, Hidden, Kids,
+Data}` plus **anything else you put on it**, which a column can then show. A
+source that knows about owners, ratings or play counts simply says so.
+
+### The state
+
+```ahk
+st.Go(path)   st.Back()   st.Forward()   st.Up()   st.Home()   st.Refresh()
+st.SetMode("details" | "list" | "tiles" | "icons" | "thumbs")
+st.SetSort(key, dir?)   st.SetGroup(key)   st.SetFilter(text)
+st.Show("hidden" | "checks" | "tree" | "preview", on)   st.Toggle("hidden")
+st.IconSize(96)   st.SelectAll()   st.Invert()   st.Selected()   st.Checked()
+st.SetSource(AxFileZip("backup.zip"))        ; the whole view, somewhere else
+```
+
+Events: `OnPath`, `OnItems`, `OnSelect`, `OnActivate`, `OnCheck`, `OnEdit`,
+`OnDrop`, `OnMenu`, `OnError`, `OnMode`.
+
+Ticking is not selecting: you tick a set to act on and you select to look at,
+and `OnCheck` and `OnSelect` are two events.
+
+### The columns
+
+A column says what to read and how to draw it:
+
+```ahk
+{Key: "used",   Title: "Space", Width: 160, Render: "bar", Max: 100,
+ Format: (v, it, st) => AxWindow.FileSize(it.Free) " free",
+ Color:  (v, it, st) => (v > 90) ? "#e57373" : ""}
+{Key: "rating", Title: "Rating", Width: 110, Render: "rating", Edit: true}
+{Key: "tags",   Title: "Tags",   Width: 180, Render: "chips"}
+{Key: "note",   Title: "Note",   Width: 200, Edit: "text"}
+{Key: "kind",   Title: "Kind",   Width: 130, Html: (it, c, st) => "<b>…</b>"}
+```
+
+`Render` is one of `name`, `text`, `size`, `date`, `bar`, `progress`,
+`rating`, `chips`, `swatch`, `toggle`, `spark`, `icon`, `path`. `Edit` is
+`true` or `"text" | "number" | "rating" | "choice"` (with `Options`) and makes
+the cell take typing; the change reaches `OnEdit` with the item, the column
+and the new value. `Value` reads something that is not on the item and `Html`
+returns your own markup for the cell.
+
+**Every one of these is called through a local variable inside the
+component**, because `c.Format(a, b)` is a *method* call in v2 and would hand
+the column in as a first argument. If you write a callback that a column
+stores, give it the parameters listed above and no more.
+
+### What the user can do
+
+- **Five shapes**: details (a table with sortable, resizable, hideable
+  columns), list, tiles, icons and thumbnails, at any icon size.
+- **The keyboard**, in the view: arrows, Home, End, Page Up and Page Down,
+  Enter to open, Backspace to go up, Space to tick, F5 to refresh, F2 to
+  rename, and a few letters to jump to a name.
+- **The keyboard, in the tree**: arrows move and go, right opens a branch and
+  steps in, left closes it and steps out, Enter toggles, and a few letters
+  jump to a name.
+- **The path bar's two faces**: a trail of steps, each with a chevron that
+  drops the folders beside it so you can step sideways from halfway along;
+  click the empty stretch after the last step and it becomes the path as
+  text, with the caret in it.
+- **Drag** items onto a folder, and **drop** real files in from anywhere else
+  in Windows. Neither moves anything by itself: `OnDrop` says what landed
+  where and your code decides.
+- **Hidden items**, greyed rather than gone, behind one toggle.
+
+### The preview pane
+
+The pane knows nothing about files. It asks a list of renderers, in order,
+which of them will take this item, and the first that says yes draws it. A new
+kind of preview is one call and no edits to the component:
+
+```ahk
+AxFilePreview.Register("pdf",
+    (it, st) => AxFileSource.Ext(it.Name) = "pdf",
+    (it, st, w) => '<embed src="' AxSys.FileUrl(it.Path) '">',
+    40)                                  ; lower goes first; built-ins sit at 100
+```
+
+`AxFilePreview.Facts(it, st)` is the properties table the built-in renderers
+end with, and it shows whatever extra properties the source put on the item.
+
+## Ribbon
+
+```ahk
+rib := g.AddRibbon("vrib Fill", {
+    Mode: "office",                      ; office | simple | strip | titlebar
+    Style: "fluent",                     ; fluent | classic | flat | outlined
+    Density: "comfortable",              ; comfortable | compact | roomy
+    File: {Label: "File", Color: "#60cdff"},
+    QuickAccess: ["save", "undo", "redo"],
+    Tabs: [
+      {Id: "home", Title: "Home", Key: "H", Groups: [
+        {Id: "clip", Title: "Clipboard", Launcher: true, Items: [
+          {Id: "paste", Label: "Paste", Icon: "E77F", Size: "large", Kind: "split",
+           Menu: [["Keep formatting", ""], ["Text only", ""]]},
+          {Id: "copy", Label: "Copy", Icon: "E8C8", Key: "C"}]},
+        {Id: "font", Title: "Font", Items: [
+          {Id: "bold", Label: "Bold", Icon: "E8DD", Kind: "toggle", Key: "1"},
+          {Kind: "sep"},
+          {Id: "colour", Label: "Colour", Icon: "E790", Kind: "color"}]}]}],
+    OnCommand: (id, it, r) => Do(id)})
+```
+
+Four **shapes**, four **styles** and three **densities**, over one description
+of the commands. `SetMode`, `SetStyle` and `SetDensity` swap between them while
+the window is open and nothing else changes.
+
+| Mode | |
+|---|---|
+| `office` | tabs over grouped panels, each group titled, with a launcher arrow |
+| `simple` | tabs over one compact line of commands |
+| `strip` | no tabs at all: one persistent line of grouped commands |
+| `titlebar` | the tabs live in the window's own title bar, the panel under it |
+
+| Style | |
+|---|---|
+| `fluent` | one flat surface, the live tab marked by an accent rule |
+| `classic` | the 2007 look: the live tab is the top of the panel, outlined |
+| `flat` | no surface, one hairline under the lot |
+| `outlined` | every group in a box of its own |
+
+`Tab:` names the tab it opens on; without it, the first one that is neither
+hidden nor contextual.
+
+**The handlers go in the config.** `ctl.Component` is blank until the window is
+ready, so a ribbon wired up in the statement that creates it passes
+`OnCommand`, `OnToggle`, `OnTab`, `OnLauncher`, `OnCollapse` and `OnInput`
+there. All six are also methods, for wiring it later.
+
+### In the studio
+
+A ribbon is three levels deep, and typing that tree into one box is a format
+rather than an interface. So the designer shows it as a tree: every tab, group
+and item is a row to select, rename, move, copy or delete, and the selected one
+puts its own properties underneath — the same field editors as everything else,
+so a glyph comes from the glyph picker and a colour from the colour picker. The
+canvas draws the tab being edited, live, as it is changed.
+
+The expression stays the truth. It is read without being evaluated, changed,
+and written straight back, so **As text** is never out of step with the tree
+and a ribbon built by pointing is the same ribbon someone else typed. Code
+inside it — a `Click` written as a fat arrow, a handler named in the config —
+survives a round trip exactly as written. When the whole expression is code
+(`MakeTabs()`), the tree says so rather than throwing it away.
+
+**What an item does is an event, not a field.** "When it is used" writes a
+`Command:<id>` handler on the control, which the generator turns into one
+`OnCommand` that dispatches by id — so a ribbon button gets the same code
+editor, the same Steps view and the same rules as a plain button:
+
+```ahk
+rib_Command(id, item, rib) {
+    switch id {
+    case "paste": return rib_Command_paste(id, item, rib)
+    case "copy":  return rib_Command_copy(id, item, rib)
+    }
+}
+```
+
+### The items
+
+`Kind` is `button` (the default), `toggle`, `split`, `menu`, `check`,
+`gallery`, `color`, `input`, `label`, `sep` or `spacer`; `Size` is `small` (the
+default) or `large`. Every item takes `Id`, `Label`, `Icon`, `Tip`, `Key`,
+`Disabled`, `Hidden` and `Checked`, and is read and patched by id from
+anywhere: `rib.Check("bold")`, `rib.Enable("paste", false)`,
+`rib.SetItem("find", {Label: "Search"})`.
+
+### What the user can do
+
+- **Double-click a tab** to roll the ribbon up, and again to bring it back.
+  Click a tab while it is rolled up and the panel floats over the page until
+  you click away. (Trident replaces the tab element between the two clicks, so
+  the gesture is counted in the component rather than left to `dblclick`.)
+- **Alt for the key tips**, then the letter. The page has a single wildcard
+  keydown hook and an app may already own it, so the ribbon borrows it only
+  while the tips are up and hands it straight back. Bind Alt yourself:
+  `g.On("keydown", "*", (el, ev) => (ev.keyCode = 18 ? rib.ToggleKeyTips() : ""))`
+- **Contextual tabs**: declared with the rest and shown when they apply —
+  `rib.ShowContext("pictools", true)` brings up its coloured band.
+- **Narrow the window** and groups fold, right to left. A folded group is not
+  clipped and it is not flattened onto a menu: it becomes one button with its
+  own name, and clicking it drops **the group itself** — the same panel markup,
+  in a popover under the button. `rib.OpenGroup("clip")` opens one by hand.
+  Narrower still and the folded buttons come off the row onto the **More**
+  button at the end, which is a full-height button in the row rather than
+  something floated over it.
+
+  The row is folded by measuring, not by arithmetic: the widths are taken,
+  groups are folded from the right, and then the result is measured again and
+  folded further until it really fits. A constant for "how wide a folded group
+  is" is wrong at some font, density or stylesheet, and a row that is 9px too
+  wide is a clipped group.
+
+### Colour
+
+Nothing here is painted in a colour of its own. The surface is a translucent
+tint over whatever the stylesheet provides, so all twelve themes keep their own
+character, and the accent material — the File tab, the rule under the live tab,
+the tick boxes — is taken from the **window's** accent at render time:
+
+```ahk
+g.SetAccent("#e8b44a")        ; the ribbon follows
+rib.SetColor("#c27bdb")       ; or override just the ribbon
+```
+
+A component stylesheet is only recoloured by `AxSys.RecolourCss` once the app
+has set an accent of its own, so a theme with a gold or green accent would
+otherwise be stuck with a blue File tab. The ribbon reads `win.Accent` (falling
+back to the theme's default) and paints those few elements itself.
+
+`Flush` (on by default) bleeds the ribbon to the window edge by cancelling the
+page's padding, including the `.ax-line` margin under it, so the content starts
+immediately below the band; `Inset` leaves the margins alone.
 
 ## Code editor
 

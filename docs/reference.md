@@ -32,6 +32,7 @@ pieces fit; the big controls have their own page, [components](components.md).
 | `Maximized` | `false` | Open maximised |
 | `NoActivate` | `false` | Come up without taking focus |
 | `EscapeCloses` | `false` | Escape closes the window |
+| `CtrlWCloses` | `false` | Ctrl+W closes the window, the same way Alt+F4 does (`OnBeforeClose` sees `"system"`) |
 | `ExitOnClose` | `true` | The script exits when the window closes |
 | `Frame` | `true` | `false`: no title bar is added, the page brings its own `#titlebar` |
 | `Headings` | automatic | Show each page's name as a heading |

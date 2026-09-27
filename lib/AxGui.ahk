@@ -81,9 +81,11 @@ class AxGui extends AxWindow {
         this._cur := IsObject(container) ? container : (this._pages.Length ? this._pages[-1] : this._root)
         return this
     }
-    AddPage(id, title := "", icon := "") {
+    ; foot: true puts the page at the bottom of the rail, below a gap -- where
+    ; Windows keeps Settings -- rather than in the list with the others
+    AddPage(id, title := "", icon := "", foot := false) {
         p := AxGui.Container(this, "page", id)
-        p.Title := title, p.Icon := icon
+        p.Title := title, p.Icon := icon, p.Foot := foot
         this._pages.Push(p)
         this._cur := p
         return p
@@ -309,6 +311,8 @@ class AxGui extends AxWindow {
         this.BodyClass("sheet-" AxGui.SheetName(name), true)
         this.SetBackColor(this.ThemeBack(this.Theme))
         this.SetAccent(this.Accent)                 ; the new sheet's own accent, unless one was chosen
+        if this.Ready
+            this.TitleAlign()                       ; the new sheet pads the bar and the rail its own way
         return this
     }
     ; HTML for the whole page (embedded stylesheet, no external files).
@@ -329,7 +333,7 @@ class AxGui extends AxWindow {
         if (this._pages.Length && this.ShowNav) {
             nav := ""
             for p in this._pages
-                nav .= p.Id ":" StrReplace(StrReplace(p.Title, ",", " "), ":", " ") ":" p.Icon ","
+                nav .= p.Id ":" StrReplace(StrReplace(p.Title, ",", " "), ":", " ") ":" p.Icon (p.HasOwnProp("Foot") && p.Foot ? ":foot" : "") ","
             body .= '<ax-nav pages="' AxTags.E(RTrim(nav, ",")) '"></ax-nav>'
         }
         content := this._root.InnerHtml()
@@ -563,6 +567,25 @@ class AxGui extends AxWindow {
         }
         return this
     }
+    ; NavAuto (option, in pixels at 100% scaling): below that window width the
+    ; rail folds to its icons, and it opens again above it -- as Settings does.
+    ; Off (0) unless asked for; a rail the script hid stays hidden.
+    _OnSize(mm, w, h) {
+        super._OnSize(mm, w, h)
+        this._NavAuto()
+    }
+    _NavAuto() {
+        at := this._opts.HasOwnProp("NavAuto") ? this._opts.NavAuto : 0
+        if !at || !this.Ready || this.Closing || this.NavMode() = "hidden"
+            return
+        try {
+            WinGetClientPos(, , &cw, , this.Hwnd)
+            dpi := DllCall("GetDpiForWindow", "Ptr", this.Hwnd, "UInt") || 96
+            want := cw * 96 / dpi < at ? "compact" : "full"
+            if want != this.NavMode()
+                this.NavMode(want)
+        }
+    }
     ; The page rail: "full" (icons and names), "compact" (icons only),
     ; "hidden", or "toggle" -- full and compact in turn, what a burger in the
     ; title bar wants. Returns the mode now in force.
@@ -665,6 +688,12 @@ class AxGui extends AxWindow {
           setH(g, target - (u.el === g ? 0 : px(gs.marginTop) + px(gs.marginBottom)));
         }
       }
+    } else {
+      // No room left: the page scrolls and each keeps its least (hN). Still a
+      // real height, not only min-height -- a grid or editor sizes its insides
+      // as a percentage of it, and against a min-height alone they came out 0.
+      for (i = 0; i < units.length; i++)
+        for (j = 0; j < units[i].grow.length; j++) setH(units[i].grow[j], units[i].grow[j].offsetHeight);
     }
     B.axSig = sigOf(B, units);
   }

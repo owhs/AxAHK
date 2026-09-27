@@ -423,3 +423,13 @@ body.sheet-instrument .axtb-burger i { height: 1px; }
 body.sheet-instrument #axPop { border-radius: 3px; padding: 12px 14px; font-size: 12px; }
 body.sheet-instrument.theme-dark #axPop  { background: #232220; color: #e6e3dd; border: 1px solid rgba(255,255,255,.07); box-shadow: 0 12px 28px rgba(0,0,0,.5); }
 body.sheet-instrument.theme-light #axPop { background: #ffffff; color: #23211e; border: 1px solid rgba(0,0,0,.09); box-shadow: 0 12px 28px rgba(0,0,0,.12); }
+
+/* ---------------------------------------------------- thin scrollbars (ui/scroll.js)
+   the overlay bar is .ax-sb-bar inside a 14px hit strip (.ax-sb-v / .ax-sb-h);
+   :hover is on the strip, .drag while it is held */
+body.sheet-instrument .ax-sb-v .ax-sb-bar { width: 2px; border-radius: 1px; opacity: .55; background: #c8a15a; }
+body.sheet-instrument .ax-sb-h .ax-sb-bar { height: 2px; border-radius: 1px; opacity: .55; background: #c8a15a; }
+body.sheet-instrument .ax-sb-v:hover .ax-sb-bar, body.sheet-instrument .ax-sb-v.drag .ax-sb-bar { width: 4px; border-radius: 2px; opacity: 1; }
+body.sheet-instrument .ax-sb-h:hover .ax-sb-bar, body.sheet-instrument .ax-sb-h.drag .ax-sb-bar { height: 4px; border-radius: 2px; opacity: 1; }
+body.sheet-instrument .ax-sb-v:hover, body.sheet-instrument .ax-sb-h:hover, body.sheet-instrument .ax-sb-v.drag, body.sheet-instrument .ax-sb-h.drag { background: transparent; }
+body.sheet-instrument.theme-light .ax-sb-v .ax-sb-bar, body.sheet-instrument.theme-light .ax-sb-h .ax-sb-bar { background: #9a7434; }

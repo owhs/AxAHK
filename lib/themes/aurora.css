@@ -317,3 +317,13 @@ body.sheet-aurora .axtb-item.pop-open { background: rgba(255,255,255,.12); }
 body.sheet-aurora #axPop { border-radius: 12px; padding: 12px 14px; }
 body.sheet-aurora.theme-dark #axPop  { background: #12151d; color: #e7ecf7; border: 1px solid rgba(255,255,255,.09); box-shadow: 0 18px 44px rgba(0,0,0,.6); }
 body.sheet-aurora.theme-light #axPop { background: #ffffff; color: #1b2233; border: 1px solid rgba(20,30,60,.10); box-shadow: 0 18px 44px rgba(30,44,80,.16); }
+
+/* ---------------------------------------------------- thin scrollbars (ui/scroll.js)
+   the overlay bar is .ax-sb-bar inside a 14px hit strip (.ax-sb-v / .ax-sb-h);
+   :hover is on the strip, .drag while it is held */
+body.sheet-aurora .ax-sb-v .ax-sb-bar { width: 5px; border-radius: 3px; opacity: .55; background: #5b8cff; }
+body.sheet-aurora .ax-sb-h .ax-sb-bar { height: 5px; border-radius: 3px; opacity: .55; background: #5b8cff; }
+body.sheet-aurora .ax-sb-v:hover .ax-sb-bar, body.sheet-aurora .ax-sb-v.drag .ax-sb-bar { width: 8px; border-radius: 4px; opacity: 1; box-shadow: 0 0 8px rgba(91,140,255,.75); }
+body.sheet-aurora .ax-sb-h:hover .ax-sb-bar, body.sheet-aurora .ax-sb-h.drag .ax-sb-bar { height: 8px; border-radius: 4px; opacity: 1; box-shadow: 0 0 8px rgba(91,140,255,.75); }
+body.sheet-aurora .ax-sb-v:hover, body.sheet-aurora .ax-sb-h:hover, body.sheet-aurora .ax-sb-v.drag, body.sheet-aurora .ax-sb-h.drag { background: rgba(255,255,255,.035); border-radius: 7px; }
+body.sheet-aurora.theme-light .ax-sb-v:hover, body.sheet-aurora.theme-light .ax-sb-h:hover { background: rgba(0,0,0,.035); }

@@ -221,8 +221,13 @@ class AxWindowTitlebar {
     ; rather than written into each stylesheet, since every sheet pads the
     ; bar and the rail differently. AxGui.NavMode() calls this again, because
     ; folding the rail moves its icons.
+    ; The window's own icon lines up over the rail's icons the same way, so
+    ; the icon, the rail and its selection read as one column.
     TitleAlign() {
-        if (!IsObject(this.Doc) || !this.HasOwnProp("_tb"))
+        if !IsObject(this.Doc)
+            return this
+        try AxWindowTitlebar.AlignIcon(this.Doc.getElementById("axAppIcon"), this.Doc.querySelector("#sidebar .nav-item .ico"))
+        if !this.HasOwnProp("_tb")
             return this
         for it in this._tb
             if (it.Side = "left" && !it.Hidden) {
@@ -243,7 +248,22 @@ class AxWindowTitlebar {
         if (IsObject(icon) && icon.offsetWidth > 0) || !IsObject(ico) || !ico.offsetWidth
             return
         lines := el.querySelector(".axtb-burger")
-        a := (IsObject(lines) ? lines : el).getBoundingClientRect()
+        AxWindowTitlebar._Nudge(el, IsObject(lines) ? lines : el, ico)
+    }
+    ; icon: the title bar's app icon; ico: the first icon in the rail. A rail
+    ; that is hidden (or absent) leaves the icon where the sheet put it.
+    static AlignIcon(icon, ico) {
+        if !IsObject(icon)
+            return
+        icon.style.marginLeft := ""
+        if !icon.offsetWidth || !IsObject(ico) || !ico.offsetWidth
+            return
+        img := icon.querySelector("img")
+        AxWindowTitlebar._Nudge(icon, IsObject(img) ? img : icon, ico)
+    }
+    ; move el sideways so the centre of what (inside it) sits over the centre of ico's glyph
+    static _Nudge(el, what, ico) {
+        a := what.getBoundingClientRect()
         b := ico.getBoundingClientRect()
         try {                                   ; the glyph, not its box: a box can be wider
             r := ico.ownerDocument.body.createTextRange()

@@ -98,6 +98,13 @@ class AxScreenPick {
         for m in msgs
             OnMessage(m, route)
         DllCall("user32\SetCapture", "Ptr", s.Hwnd)
+        ; Windows sends the wheel to the window under the cursor, not to the
+        ; capture window, so WM_MOUSEWHEEL never reached us and the program
+        ; underneath scrolled instead. Hotkeys catch it anywhere and swallow it.
+        wheelUp := (*) => AxScreenPick._Zoom(s, 1)
+        wheelDn := (*) => AxScreenPick._Zoom(s, -1)
+        Hotkey("*WheelUp", wheelUp, "On")
+        Hotkey("*WheelDown", wheelDn, "On")
 
         tick := ObjBindMethod(AxScreenPick, "_Tick", s)
         SetTimer(tick, 16)
@@ -131,6 +138,8 @@ class AxScreenPick {
             }
         } finally {
             SetTimer(tick, 0)
+            try Hotkey("*WheelUp", "Off")
+            try Hotkey("*WheelDown", "Off")
             DllCall("user32\ReleaseCapture")
             for m in msgs
                 OnMessage(m, route, 0)

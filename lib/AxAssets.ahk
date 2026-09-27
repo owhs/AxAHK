@@ -40,6 +40,7 @@
 ;@Ahk2Exe-AddResource %U_AxLib%\ui\frame.html, AX_UI_FRAME_HTML
 ;@Ahk2Exe-AddResource %U_AxLib%\ui\resize.html, AX_UI_RESIZE_HTML
 ;@Ahk2Exe-AddResource %U_AxLib%\ui\overlays.html, AX_UI_OVERLAYS_HTML
+;@Ahk2Exe-AddResource %U_AxLib%\ui\scroll.js, AX_UI_SCROLL_JS
 ;@Ahk2Exe-AddResource %U_AxLib%\icons\info.png, AX_ICONS_INFO_PNG
 ;@Ahk2Exe-AddResource %U_AxLib%\icons\warning.png, AX_ICONS_WARNING_PNG
 ;@Ahk2Exe-AddResource %U_AxLib%\icons\error.png, AX_ICONS_ERROR_PNG

@@ -76,6 +76,8 @@ class AxWindowOverlays {
     ; Dialog(text, title, buttons, opts) -> {Button, Value}   (blocks, modal)
     ;   buttons: array of labels, first = default/primary, e.g. ["Save","Cancel"]
     ;   opts: Kind ("info"|"question"|"warning"|"error"|"success"), Input (bool),
+    ;         Check ("Don't ask again": a checkbox; the result's Checked says if it was ticked),
+    ;         Html (markup shown under the text: a list, pictures -- the caller escapes it),
     ;         Default (initial input text), Placeholder, Danger (index of a red
     ;         button), Cancel (index returned on Escape; default = last button)
     Dialog(text, title := "", buttons := "", opts := "") {
@@ -94,11 +96,20 @@ class AxWindowOverlays {
         this.El("axDlg").className := "kind-" o("Kind", "info")
         this.El("axDlgTitle").innerText := title
         this.El("axDlgTitle").style.display := (title = "" ? "none" : "block")
-        this.El("axDlgText").innerText := text
+        if (o("Html", "") != "")                       ; rich content (a list, pictures): markup of the caller's own, text above it
+            this.El("axDlgText").innerHTML := AxWindow._Esc(text) (text != "" ? "<br>" : "") opts.Html
+        else
+            this.El("axDlgText").innerText := text
         inp := this.El("axDlgInput")
         inp.style.display := d.Input ? "block" : "none"
         inp.value := o("Default", "")
         inp.placeholder := o("Placeholder", "")
+        try {
+            chk := o("Check", "")
+            this.El("axDlgCheck").style.display := chk != "" ? "block" : "none"
+            this.El("axDlgCheckText").innerText := chk
+            this.El("axDlgCheckBox").checked := false
+        }
         html := "", danger := o("Danger", 0)
         for i, label in buttons {
             cls := "axdlg-btn" (i = 1 ? " primary" : "") (i = danger ? " danger" : "")
@@ -117,10 +128,12 @@ class AxWindowOverlays {
         while !d.Done && !this.Closing
             Sleep 20
         this._dlg := ""
+        checked := false
+        try checked := !!this.El("axDlgCheckBox").checked
         try this.El("axDlgOverlay").style.display := "none"
         if (!this.Closing && IsObject(d.Prev))
             try d.Prev.focus()
-        return {Button: d.Button, Value: d.Value}
+        return {Button: d.Button, Value: d.Value, Checked: checked}
     }
     ; the button the keyboard is on: wraps round, marked "kb", and focused
     _DlgFocus(i) {
@@ -187,6 +200,7 @@ class AxWindowOverlays {
         try d.Value := this.El("axDlgInput").value
         d.Button := (i >= 1 && i <= d.Buttons.Length) ? d.Buttons[i] : ""
         d.Done := true
+        try this.Doc.parentWindow.axSbDrop(this.El("axDlg"))
     }
     ; ------------------------------------------------------ native notification
     ; Notify(title, text, kind := "info", opts := "") — a Windows notification.
@@ -232,6 +246,8 @@ class AxWindowOverlays {
             return
         try {
             head := doc.getElementsByTagName("head").item(0)
+            if !IsObject(head)                      ; a page with no <head>: its overlays were left unstyled (a stray text box)
+                head := doc.documentElement.insertBefore(doc.createElement("head"), doc.body)
             s := doc.createElement("style")
             s.type := "text/css"
             head.insertBefore(s, head.firstChild)   ; first in <head> so page CSS can override
@@ -351,6 +367,20 @@ class AxWindowOverlays {
             x := (level > 1) ? Max(4, x - mw - this._ctxParentW) : Max(4, vw - mw - 4)
         if (y + mh > vh - 4)
             y := Max(4, vh - mh - 4)
+        ; Trident paints a scrolling element's scrollbar above every layer: a
+        ; menu reaching into one moves to its left (a submenu flips to the
+        ; parent's left side), the way tooltips do
+        ; (sampled across its last 24px too: its very edge can overhang the
+        ; scroller's margin and land on the page behind it)
+        m.style.display := "none"
+        for py in [y + 2, y + mh / 2, y + mh - 2]
+            for dx in [1, 9, 17, 25] {
+                if !IsObject(sb := this._ScrollbarAt(x + mw - dx, py))
+                    continue
+                x := (level > 1) ? Max(4, x - mw - this._ctxParentW) : Max(4, sb.left - mw - 2)
+                break
+            }
+        m.style.display := "block"
         m.style.left := Round(x) "px", m.style.top := Round(y) "px"
         this._ctxLevels.Push({Id: m.id, List: list, Cursor: 0, ParentId: parentId})
         this._ctxOpen := true
@@ -684,8 +714,55 @@ class AxWindowOverlays {
             if (y + th > vh - 4)
                 y := r.top - th - 8
             x := Max(4, Min(x, vw - tw - 4))
+            ; Trident paints an element's own scrollbar above everything, even a
+            ; fixed layer with a higher z-index: a tip that would reach into one
+            ; moves to its left, so it is never cut off by it
+            tip.style.display := "none"
+            loop 2 {
+                sb := this._ScrollbarAt(x + tw - 1, A_Index = 1 ? y + 2 : y + th - 2)
+                if IsObject(sb)
+                    x := Max(4, sb.left - tw - 4)
+            }
             tip.style.left := x "px", tip.style.top := y "px"
+            tip.style.display := "block"
         }
+    }
+    ; are the native bars hidden for the thin overlay ones (ui\scroll.js)?
+    _ThinBars() {
+        try return InStr(" " this.Doc.documentElement.className " ", " ax-thin ") > 0
+        return false
+    }
+    ; the vertical scrollbar strip {left, right} of whatever scrolls at a point, or ""
+    _ScrollbarAt(px, py) {
+        if this._ThinBars()                     ; overlay bars (ui\scroll.js) sit under the layers: nothing to dodge
+            return ""
+        try el := this.Doc.elementFromPoint(px, py)
+        catch
+            return ""
+        loop 40 {
+            if !IsObject(el)
+                return ""
+            try {
+                if (el.scrollHeight > el.clientHeight + 1 && el.clientWidth > 0) {
+                    r := el.getBoundingClientRect()
+                    left := r.left + el.clientLeft + el.clientWidth, right := r.right - el.clientLeft
+                    ; an auto-hiding scrollbar (win11) takes no width until the
+                    ; mouse comes near, then overlays the content: the strip it
+                    ; appears in counts all the same
+                    if (right - left < 6) {
+                        ov := ""
+                        try ov := el.currentStyle.overflowY
+                        if (ov = "auto" || ov = "scroll")
+                            left := right - 17                 ; the bar's width in page pixels
+                    }
+                    if (right - left >= 6 && px >= left - 1 && px <= right)
+                        return {left: left, right: right}
+                }
+                el := el.parentElement
+            } catch
+                return ""
+        }
+        return ""
     }
     _HideTip(forget) {
         SetTimer(this._tipShowFn, 0)
@@ -813,6 +890,7 @@ class AxWindowOverlays {
         try {
             pop := this.El("axPop")
             AxWindow._SetClass(pop, "open", false)
+            try this.Doc.parentWindow.axSbDrop(pop)      ; its scrollbar goes with it (see scroll.js)
             if immediate {
                 SetTimer(this._popHideFn, 0)
                 pop.style.display := "none"

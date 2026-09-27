@@ -892,8 +892,12 @@ class AxFileView {
         ; real files dropped on it from anywhere else in Windows
         if (this.Cfg.HasOwnProp("Drop") ? this.Cfg.Drop : true)
             w.DropZone(id, (files, *) => this._Dropped(files), {Expand: false})
-        this._scrollFn := (*) => this._Sync()
-        try w.El(id "_scroll").attachEvent("onscroll", this._scrollFn)
+        ; the header follows the body's horizontal scroll -- in the page when
+        ; it can: an AHK handler per scroll event makes the list lag
+        if !(HasMethod(w, "_SyncScrollX") && w._SyncScrollX(id "_scroll", id "_headwrap")) {
+            this._scrollFn := (*) => this._Sync()
+            try w.El(id "_scroll").attachEvent("onscroll", this._scrollFn)
+        }
     }
     _Sync() {
         try this.W.El(this.Id "_headwrap").scrollLeft := this.W.El(this.Id "_scroll").scrollLeft

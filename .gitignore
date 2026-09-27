@@ -41,3 +41,5 @@ _*
 studio/data/
 !_all.ahk
 !AstHost.exe
+
+projects/

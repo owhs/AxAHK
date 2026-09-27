@@ -699,3 +699,15 @@ body.sheet-win365.theme-dark #axPop {
     background: #292827; color: #f0eeec; border: 1px solid #3b3a39;
     box-shadow: 0 8px 16px rgba(0,0,0,.45), 0 0 2px rgba(0,0,0,.4);
 }
+
+/* ---------------------------------------------------- thin scrollbars (ui/scroll.js)
+   the overlay bar is .ax-sb-bar inside a 14px hit strip (.ax-sb-v / .ax-sb-h);
+   :hover is on the strip, .drag while it is held */
+body.sheet-win365 .ax-sb-v .ax-sb-bar { width: 6px; border-radius: 3px; opacity: 1; background: #4a4846; }
+body.sheet-win365 .ax-sb-h .ax-sb-bar { height: 6px; border-radius: 3px; opacity: 1; background: #4a4846; }
+body.sheet-win365 .ax-sb-v:hover .ax-sb-bar, body.sheet-win365 .ax-sb-v.drag .ax-sb-bar { width: 8px; border-radius: 4px; background: #797775; }
+body.sheet-win365 .ax-sb-h:hover .ax-sb-bar, body.sheet-win365 .ax-sb-h.drag .ax-sb-bar { height: 8px; border-radius: 4px; background: #797775; }
+body.sheet-win365 .ax-sb-v:hover, body.sheet-win365 .ax-sb-h:hover, body.sheet-win365 .ax-sb-v.drag, body.sheet-win365 .ax-sb-h.drag { background: transparent; }
+body.sheet-win365.theme-light .ax-sb-v .ax-sb-bar, body.sheet-win365.theme-light .ax-sb-h .ax-sb-bar { background: #c8c6c4; }
+body.sheet-win365.theme-light .ax-sb-v:hover .ax-sb-bar, body.sheet-win365.theme-light .ax-sb-h:hover .ax-sb-bar,
+body.sheet-win365.theme-light .ax-sb-v.drag .ax-sb-bar, body.sheet-win365.theme-light .ax-sb-h.drag .ax-sb-bar { background: #8a8886; }

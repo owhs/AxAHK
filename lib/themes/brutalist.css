@@ -589,3 +589,17 @@ body.sheet-brutalist .axtb-burger i:nth-child(3) { top: 8px; }
 body.sheet-brutalist #axPop { border-radius: 0; padding: 12px 14px; font-size: 13px; }
 body.sheet-brutalist.theme-dark #axPop  { background: #1f2124; color: #dfe3e8; border: 1px solid #3f434a; box-shadow: 0 12px 28px rgba(0,0,0,.6); }
 body.sheet-brutalist.theme-light #axPop { background: #ffffff; color: #1f2124; border: 1px solid #c3c9d1; box-shadow: 0 12px 28px rgba(0,0,0,.16); }
+
+/* ---------------------------------------------------- thin scrollbars (ui/scroll.js)
+   the overlay bar is .ax-sb-bar inside a 14px hit strip (.ax-sb-v / .ax-sb-h);
+   :hover is on the strip, .drag while it is held */
+body.sheet-brutalist .ax-sb-v .ax-sb-bar { width: 8px; border-radius: 0; opacity: 1; background: #3f434a; border: 1px solid #5a606a; }
+body.sheet-brutalist .ax-sb-h .ax-sb-bar { height: 8px; border-radius: 0; opacity: 1; background: #3f434a; border: 1px solid #5a606a; }
+body.sheet-brutalist .ax-sb-v:hover .ax-sb-bar, body.sheet-brutalist .ax-sb-v.drag .ax-sb-bar { width: 10px; background: #10b981; border-color: #0d9c6d; }
+body.sheet-brutalist .ax-sb-h:hover .ax-sb-bar, body.sheet-brutalist .ax-sb-h.drag .ax-sb-bar { height: 10px; background: #10b981; border-color: #0d9c6d; }
+body.sheet-brutalist .ax-sb-v:hover, body.sheet-brutalist .ax-sb-v.drag { border-left: 1px solid #2a2d32; border-radius: 0; background: transparent; }
+body.sheet-brutalist .ax-sb-h:hover, body.sheet-brutalist .ax-sb-h.drag { border-top: 1px solid #2a2d32; border-radius: 0; background: transparent; }
+body.sheet-brutalist.theme-light .ax-sb-v .ax-sb-bar, body.sheet-brutalist.theme-light .ax-sb-h .ax-sb-bar { background: #c3c9d1; border-color: #a9b0ba; }
+body.sheet-brutalist.theme-light .ax-sb-v:hover .ax-sb-bar, body.sheet-brutalist.theme-light .ax-sb-h:hover .ax-sb-bar,
+body.sheet-brutalist.theme-light .ax-sb-v.drag .ax-sb-bar, body.sheet-brutalist.theme-light .ax-sb-h.drag .ax-sb-bar { background: #10b981; border-color: #0d9c6d; }
+body.sheet-brutalist.theme-light .ax-sb-v:hover, body.sheet-brutalist.theme-light .ax-sb-h:hover { border-color: #b9bec6; }

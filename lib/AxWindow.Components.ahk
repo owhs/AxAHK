@@ -612,8 +612,14 @@ class AxWindowComponents {
         inp := hk.querySelector("input")
         if AxWindow._IsModVK(vk) {                       ; modifier alone: preview
             inp.value := disp "…"
+            if !this.HasOwnProp("_ihkMods") || !this._ihkMods.Length
+                this._ihkMods := [], this._ihkOther := false
+            n := AxWindow._ModName(vk)
+            if !AxWindow._Has(this._ihkMods, n)
+                this._ihkMods.Push(n)
             return
         }
+        this._ihkOther := true                           ; a real key: an ordinary combination
         if (vk = 8 && mods = "") {                         ; Backspace clears
             this._SetHotkeyValue(hk, "", "")
             return
@@ -631,9 +637,28 @@ class AxWindowComponents {
         this._SetHotkeyValue(hk, mods key, disp (StrLen(name) = 1 ? StrUpper(name) : name))
     }
     _HotkeyVKUp(hk, vk) {
-        ; modifiers released without a key: restore the stored value
-        if AxWindow._IsModVK(vk) && !GetKeyState("Ctrl", "P") && !GetKeyState("Alt", "P") && !GetKeyState("Shift", "P") && !GetKeyState("LWin", "P") && !GetKeyState("RWin", "P")
-            try hk.querySelector("input").value := AxWindow.HotkeyDisplay(AxWindow._Attr(hk, "data-value"))
+        if !AxWindow._IsModVK(vk) || GetKeyState("Ctrl", "P") || GetKeyState("Alt", "P") || GetKeyState("Shift", "P") || GetKeyState("LWin", "P") || GetKeyState("RWin", "P")
+            return
+        ; every modifier is up. Two or more pressed together, with no other key:
+        ; that is the shortcut (Ctrl, then Alt -> "^Alt", as AutoHotkey writes
+        ; it). One alone is too easy to press by accident, so it is not taken.
+        mods := this.HasOwnProp("_ihkMods") ? this._ihkMods : [], other := this.HasOwnProp("_ihkOther") && this._ihkOther
+        this._ihkMods := [], this._ihkOther := false
+        if (mods.Length >= 2 && !other) {
+            sym := Map("Ctrl", "^", "Alt", "!", "Shift", "+", "Win", "#"), last := mods[mods.Length], pre := "", disp := ""
+            for i, m in mods
+                if (i < mods.Length)
+                    pre .= sym[m], disp .= m " + "
+            return this._SetHotkeyValue(hk, pre (last = "Win" ? "LWin" : last), disp last)
+        }
+        try hk.querySelector("input").value := AxWindow.HotkeyDisplay(AxWindow._Attr(hk, "data-value"))
+    }
+    static _ModName(vk) => (vk = 17 || vk = 162 || vk = 163) ? "Ctrl" : (vk = 18 || vk = 164 || vk = 165) ? "Alt" : (vk = 16 || vk = 160 || vk = 161) ? "Shift" : "Win"
+    static _Has(arr, v) {
+        for x in arr
+            if (x = v)
+                return true
+        return false
     }
     _SetHotkeyValue(hk, value, display) {
         inp := hk.querySelector("input")
@@ -647,6 +672,8 @@ class AxWindowComponents {
     ; scroller its menu overlaps (-ms-overflow-style keeps the scroll position).
     _ShieldScrollers(dd) {
         this._UnshieldScrollers()
+        if this._ThinBars()                         ; no native bars to paint over it
+            return
         try {
             menu := dd.querySelector(".dd-menu")
             m := menu.getBoundingClientRect()

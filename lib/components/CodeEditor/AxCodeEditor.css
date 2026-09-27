@@ -35,7 +35,11 @@
 .axce-under { position: absolute; left: 0; top: 0; right: 0; z-index: 0; }
 .axce-under > div { position: absolute; }
 .axce-ed { position: relative; z-index: 1; min-height: 100%; padding: 6px 12px 40px 8px; box-sizing: border-box;
-    outline: none; white-space: pre; tab-size: 4; background: transparent; cursor: text; }
+    outline: none; white-space: pre; tab-size: 4; background: transparent; cursor: text;
+    /* base.css gives html/body word-wrap: break-word, and in Trident that breaks a
+       long line even under white-space: pre -- the text wrapped with Wrap off, and
+       the line numbers (fitted only when wrapping) slid away from their lines */
+    word-wrap: normal; overflow-wrap: normal; }
 .axce.axce-wrap .axce-ed { white-space: pre-wrap; word-wrap: break-word; }
 /* no min-height or width on a line: in Trident that gives it "layout", and a
    block with layout inside an editable area is picked as an object, hatched frame and all */

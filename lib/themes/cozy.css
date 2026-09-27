@@ -418,3 +418,15 @@ body.sheet-cozy.theme-dark .filelist, body.sheet-cozy.theme-dark .dv-bodywrap {
     scrollbar-highlight-color: #241f22; scrollbar-3dlight-color: #241f22;
     scrollbar-darkshadow-color: #241f22;
 }
+
+/* ---------------------------------------------------- thin scrollbars (ui/scroll.js)
+   the overlay bar is .ax-sb-bar inside a 14px hit strip (.ax-sb-v / .ax-sb-h);
+   :hover is on the strip, .drag while it is held */
+body.sheet-cozy .ax-sb-v .ax-sb-bar { width: 8px; border-radius: 6px; opacity: .85; background: #5a4d54; }
+body.sheet-cozy .ax-sb-h .ax-sb-bar { height: 8px; border-radius: 6px; opacity: .85; background: #5a4d54; }
+body.sheet-cozy .ax-sb-v:hover .ax-sb-bar, body.sheet-cozy .ax-sb-v.drag .ax-sb-bar { width: 11px; border-radius: 7px; opacity: 1; background: #ff8a5c; }
+body.sheet-cozy .ax-sb-h:hover .ax-sb-bar, body.sheet-cozy .ax-sb-h.drag .ax-sb-bar { height: 11px; border-radius: 7px; opacity: 1; background: #ff8a5c; }
+body.sheet-cozy .ax-sb-v:hover, body.sheet-cozy .ax-sb-h:hover, body.sheet-cozy .ax-sb-v.drag, body.sheet-cozy .ax-sb-h.drag { background: transparent; }
+body.sheet-cozy.theme-light .ax-sb-v .ax-sb-bar, body.sheet-cozy.theme-light .ax-sb-h .ax-sb-bar { background: #e8cdbd; }
+body.sheet-cozy.theme-light .ax-sb-v:hover .ax-sb-bar, body.sheet-cozy.theme-light .ax-sb-h:hover .ax-sb-bar,
+body.sheet-cozy.theme-light .ax-sb-v.drag .ax-sb-bar, body.sheet-cozy.theme-light .ax-sb-h.drag .ax-sb-bar { background: #ff8a5c; }

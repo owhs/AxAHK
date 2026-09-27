@@ -380,7 +380,7 @@ class AxWindowBars {
                 d.Id := "p" i
             sb.Parts.Push(d)
             h .= '<div class="axsb-part' (d.Grow ? " grow" : "") (d.Align = "right" ? " right" : "")
-              .  (d.Dim ? " dim" : "") (d.Click ? " action" : "") '" id="' AxWindow._Esc(sb.Id "_" d.Id) '"'
+              .  (d.Dim ? " dim" : "") (d.Click ? " action" : "") (AxWindow._SbEmpty(d) ? " empty" : "") '" id="' AxWindow._Esc(sb.Id "_" d.Id) '"'
               .  ' data-p="' AxWindow._Esc(d.Id) '"'
               .  (d.Width != "" ? ' style="width:' d.Width 'px;flex:none"' : "")
               .  (d.Tip != "" ? ' data-tip="' AxWindow._Esc(d.Tip) '"' : "") '>'
@@ -390,6 +390,16 @@ class AxWindowBars {
             h .= '<div class="axsb-grip ico" id="' AxWindow._Esc(sb.Id "_grip") '">&#xE76F;</div>'
         try this.El(sb.Id).innerHTML := h
         return this
+    }
+    ; a part with nothing in it (no text, icon or bar) takes no room: an empty
+    ; "Saved 12:04" slot waiting for its first save left a gap at the edge
+    static _SbEmpty(d) => d.Text = "" && d.Icon = "" && d.Progress = ""
+    _SbFill(p) {
+        try {
+            el := this.El(this._sb.Id "_" p.Id)
+            el.innerHTML := this._SbInner(p)
+            AxWindow._SetClass(el, "empty", AxWindow._SbEmpty(p))
+        }
     }
     _SbInner(d) {
         s := (d.Icon != "") ? '<span class="ico">&#x' AxWindow._Esc(d.Icon) ';</span>' : ""
@@ -405,7 +415,7 @@ class AxWindowBars {
         if !IsSet(text)
             return p.Text
         p.Text := text, p.Progress := ""
-        try this.El(this._sb.Id "_" p.Id).innerHTML := this._SbInner(p)
+        this._SbFill(p)
         return this
     }
     ; StatusIcon("msg", "E930") — the glyph in front of the text ("" removes it)
@@ -414,7 +424,7 @@ class AxWindowBars {
         if !p
             return this
         p.Icon := glyph
-        try this.El(this._sb.Id "_" p.Id).innerHTML := this._SbInner(p)
+        this._SbFill(p)
         return this
     }
     ; StatusProgress("job", 45) — a slim bar inside the part; "" restores text
@@ -423,7 +433,7 @@ class AxWindowBars {
         if !p
             return this
         p.Progress := (percent = "") ? "" : Min(100, Max(0, percent))
-        try this.El(this._sb.Id "_" p.Id).innerHTML := this._SbInner(p)
+        this._SbFill(p)
         return this
     }
     ShowStatusBar(on := true) {

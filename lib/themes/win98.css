@@ -634,3 +634,44 @@ body.theme-dark .segmented .seg.active {
 body.theme-dark.inactive #titlebar, body.inactive.theme-dark #titlebar {
     background: #4a4a4a; background-image: linear-gradient(90deg, #4a4a4a, #6e6e6e); color: #b0b0b0;
 }
+
+/* the real bars: this sheet keeps Trident's own scrollbars (see ui/scroll.js) */
+.ax-sb-probe { width: 2px; height: 1px; }       /* classic: ui/scroll.js draws the whole bar, styled below */
+
+/* The real Windows 9x bar. Trident's own draws the Windows 10 kind whatever
+   the scrollbar-*-colors say, so it is drawn here: raised buttons with solid
+   black arrows, a dithered track, a raised thumb. 16px, like the original. */
+html.ax-classic body.sheet-win98 .ax-sb {
+    background: #dfdfdf url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAATSURBVBhXYzhw4MB/EGAAESAOAIF7Dndi7/qzAAAAAElFTkSuQmCC) repeat;
+}
+html.ax-classic body.sheet-win98 .ax-sb-up, html.ax-classic body.sheet-win98 .ax-sb-dn,
+html.ax-classic body.sheet-win98 .ax-sb .ax-sb-bar {
+    background: #c0c0c0; border: 1px solid; border-color: #dfdfdf #000 #000 #dfdfdf;
+    box-shadow: inset -1px -1px #808080, inset 1px 1px #fff; box-sizing: border-box; border-radius: 0;
+}
+html.ax-classic body.sheet-win98 .ax-sb-up.down, html.ax-classic body.sheet-win98 .ax-sb-dn.down {
+    border-color: #808080; box-shadow: none;
+}
+/* the arrows: solid triangles, 7 wide 4 tall, nudged 1px down-right when pressed */
+html.ax-classic body.sheet-win98 .ax-sb-up:before, html.ax-classic body.sheet-win98 .ax-sb-dn:before {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 0; height: 0; border: 4px solid transparent;
+}
+html.ax-classic body.sheet-win98 .ax-sb-v .ax-sb-up:before { margin: -6px 0 0 -4px; border-bottom-color: #000; }
+html.ax-classic body.sheet-win98 .ax-sb-v .ax-sb-dn:before { margin: -2px 0 0 -4px; border-top-color: #000; }
+html.ax-classic body.sheet-win98 .ax-sb-h .ax-sb-up:before { margin: -4px 0 0 -6px; border-right-color: #000; }
+html.ax-classic body.sheet-win98 .ax-sb-h .ax-sb-dn:before { margin: -4px 0 0 -2px; border-left-color: #000; }
+html.ax-classic body.sheet-win98 .ax-sb-up.down:before, html.ax-classic body.sheet-win98 .ax-sb-dn.down:before { left: 55%; top: 55%; }
+
+/* dark: the same bevels in the sheet's dark greys */
+html.ax-classic body.sheet-win98.theme-dark .ax-sb {
+    background: #333 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAVSURBVBhXY9DS0vrv5eX1nwFEgDgAN8gGtbKRz5MAAAAASUVORK5CYII=) repeat;
+}
+html.ax-classic body.sheet-win98.theme-dark .ax-sb-up, html.ax-classic body.sheet-win98.theme-dark .ax-sb-dn,
+html.ax-classic body.sheet-win98.theme-dark .ax-sb .ax-sb-bar {
+    background: #4a4a4a; border-color: #6e6e6e #000 #000 #6e6e6e; box-shadow: inset -1px -1px #262626, inset 1px 1px #5c5c5c;
+}
+html.ax-classic body.sheet-win98.theme-dark .ax-sb-up.down, html.ax-classic body.sheet-win98.theme-dark .ax-sb-dn.down { border-color: #262626; box-shadow: none; }
+html.ax-classic body.sheet-win98.theme-dark .ax-sb-v .ax-sb-up:before { border-bottom-color: #e8e8e8; }
+html.ax-classic body.sheet-win98.theme-dark .ax-sb-v .ax-sb-dn:before { border-top-color: #e8e8e8; }
+html.ax-classic body.sheet-win98.theme-dark .ax-sb-h .ax-sb-up:before { border-right-color: #e8e8e8; }
+html.ax-classic body.sheet-win98.theme-dark .ax-sb-h .ax-sb-dn:before { border-left-color: #e8e8e8; }

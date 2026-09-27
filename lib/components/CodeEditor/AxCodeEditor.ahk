@@ -110,7 +110,7 @@ class AxCodeEditor {
             . ' data-theme="' E(o("theme", "auto")) '" style="' E(o("style", "")) '">'
             . '<div class="axce-main"><div class="axce-gut" id="' E(id) '_gut">' nums '</div>'
             . '<div class="axce-scroll" id="' E(id) '_scroll"><div class="axce-under" id="' E(id) '_under"></div>'
-            . '<div class="axce-ed" id="' E(id) '_ed" spellcheck="false"'
+            . '<div class="axce-ed" id="' E(id) '_ed" data-selectable="1" spellcheck="false"'
             . ' style="font-size:' o("fontSize", 13) 'px;line-height:' Round(o("fontSize", 13) * 1.5) 'px">' lines '</div></div></div>'
             . '<div class="axce-find" id="' E(id) '_find"><div class="axce-frow"><input id="' E(id) '_fq" placeholder="Find, or :line">'
             . '<span data-f="case" title="Match case">Aa</span><span data-f="prev" title="Previous">&#x2191;</span>'

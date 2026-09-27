@@ -667,3 +667,16 @@ body.theme-light.inactive .axtb-item { color: rgba(0,0,0,.4); }
     box-shadow: 0 8px 16px rgba(0,0,0,.4);
 }
 body.theme-light #axPop { background: #f9f9f9; color: #1b1b1b; border-color: rgba(0,0,0,.0578); box-shadow: 0 8px 16px rgba(0,0,0,.14); }
+
+/* ---------------------------------------------------- thin scrollbars (ui/scroll.js)
+   the overlay bar is .ax-sb-bar inside a 14px hit strip (.ax-sb-v / .ax-sb-h);
+   :hover is on the strip, .drag while it is held */
+.ax-sb-v .ax-sb-bar { width: 3px; border-radius: 2px; opacity: .8; background: rgba(255,255,255,.42); }
+.ax-sb-h .ax-sb-bar { height: 3px; border-radius: 2px; opacity: .8; background: rgba(255,255,255,.42); }
+.ax-sb-v:hover .ax-sb-bar, .ax-sb-v.drag .ax-sb-bar { width: 7px; border-radius: 4px; opacity: 1; background: rgba(255,255,255,.6); }
+.ax-sb-h:hover .ax-sb-bar, .ax-sb-h.drag .ax-sb-bar { height: 7px; border-radius: 4px; opacity: 1; background: rgba(255,255,255,.6); }
+.ax-sb-v:hover, .ax-sb-h:hover, .ax-sb-v.drag, .ax-sb-h.drag { background: rgba(255,255,255,.045); border-radius: 7px; }
+body.theme-light .ax-sb-v .ax-sb-bar, body.theme-light .ax-sb-h .ax-sb-bar { background: rgba(0,0,0,.36); }
+body.theme-light .ax-sb-v:hover .ax-sb-bar, body.theme-light .ax-sb-h:hover .ax-sb-bar,
+body.theme-light .ax-sb-v.drag .ax-sb-bar, body.theme-light .ax-sb-h.drag .ax-sb-bar { background: rgba(0,0,0,.52); }
+body.theme-light .ax-sb-v:hover, body.theme-light .ax-sb-h:hover, body.theme-light .ax-sb-v.drag, body.theme-light .ax-sb-h.drag { background: rgba(0,0,0,.04); }

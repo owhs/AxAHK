@@ -741,3 +741,16 @@ body.sheet-precision #axPop {
 }
 body.sheet-precision.theme-dark #axPop  { background: #1e2024; color: #d9dce1; border: 1px solid #3a3e46; box-shadow: 0 10px 24px rgba(0,0,0,.55); }
 body.sheet-precision.theme-light #axPop { background: #ffffff; color: #17181b; border: 1px solid #ccd1d8; box-shadow: 0 10px 24px rgba(15,20,30,.16); }
+
+/* ---------------------------------------------------- thin scrollbars (ui/scroll.js)
+   the overlay bar is .ax-sb-bar inside a 14px hit strip (.ax-sb-v / .ax-sb-h);
+   :hover is on the strip, .drag while it is held */
+body.sheet-precision .ax-sb-v .ax-sb-bar { width: 2px; border-radius: 0; opacity: .9; background: #3a3f47; }
+body.sheet-precision .ax-sb-h .ax-sb-bar { height: 2px; border-radius: 0; opacity: .9; background: #3a3f47; }
+body.sheet-precision .ax-sb-v:hover .ax-sb-bar, body.sheet-precision .ax-sb-v.drag .ax-sb-bar { width: 5px; opacity: 1; background: #10b981; }
+body.sheet-precision .ax-sb-h:hover .ax-sb-bar, body.sheet-precision .ax-sb-h.drag .ax-sb-bar { height: 5px; opacity: 1; background: #10b981; }
+body.sheet-precision .ax-sb-v:hover, body.sheet-precision .ax-sb-v.drag { background: transparent; border-left: 1px solid rgba(255,255,255,.06); border-radius: 0; }
+body.sheet-precision .ax-sb-h:hover, body.sheet-precision .ax-sb-h.drag { background: transparent; border-top: 1px solid rgba(255,255,255,.06); border-radius: 0; }
+body.sheet-precision.theme-light .ax-sb-v .ax-sb-bar, body.sheet-precision.theme-light .ax-sb-h .ax-sb-bar { background: #b8bec7; }
+body.sheet-precision.theme-light .ax-sb-v:hover .ax-sb-bar, body.sheet-precision.theme-light .ax-sb-h:hover .ax-sb-bar { background: #0a7f5c; }
+body.sheet-precision.theme-light .ax-sb-v:hover, body.sheet-precision.theme-light .ax-sb-h:hover { border-color: rgba(0,0,0,.08); }

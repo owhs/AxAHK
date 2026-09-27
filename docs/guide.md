@@ -335,7 +335,8 @@ feature.)
   `g.SetIcon()` changes the tray, taskbar and title bar together.
 - **Focus.** `NoActivate: true` brings the window up without taking focus,
   for tool windows and anything that runs in the background.
-- **Escape and closing.** `EscapeCloses: true`; `ExitOnClose: false` keeps the
+- **Escape and closing.** `EscapeCloses: true`; `CtrlWCloses: true` makes
+  Ctrl+W close it the way Alt+F4 does; `ExitOnClose: false` keeps the
   script running when the window closes; `g.OnClose(fn)`. To ask first, see
   below.
 - **Zoom.** Ctrl+wheel and Ctrl+plus are blocked, so the page can't be zoomed

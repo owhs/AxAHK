@@ -1021,8 +1021,11 @@ class AxDataView {
             w.On("click", id b, fn)
         w.On("contextmenu", id "_head", (el, ev) => this.ColumnMenu(ev.clientX, ev.clientY))
         ; the header has to follow the body's horizontal scroll
-        this._scrollFn := (*) => this._SyncScroll()
-        try w.El(id "_scroll").attachEvent("onscroll", this._scrollFn)
+        ; (in the page when it can: an AHK handler per scroll event lags)
+        if !(HasMethod(w, "_SyncScrollX") && w._SyncScrollX(id "_scroll", id "_headwrap")) {
+            this._scrollFn := (*) => this._SyncScroll()
+            try w.El(id "_scroll").attachEvent("onscroll", this._scrollFn)
+        }
     }
     _SyncScroll() {
         try this.W.El(this.Id "_headwrap").scrollLeft := this.W.El(this.Id "_scroll").scrollLeft

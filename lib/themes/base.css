@@ -27,6 +27,8 @@
    hides it, and so must the one in a dialog. */
 #axDlgInput::-ms-clear{display:none}
 #axDlgBtns{display:flex;justify-content:flex-end;margin-top:18px}
+#axDlgCheck{display:none;margin-top:14px;font-size:13px;cursor:default;-ms-user-select:none;user-select:none}
+#axDlgCheck input{vertical-align:-2px;margin:0 8px 0 0}
 .axdlg-btn{padding:7px 16px;margin-left:8px;font-size:12px;background:#2a2e3a;color:#e6e8ef;border:1px solid #363b4a;border-radius:6px;cursor:default}
 .axdlg-btn:hover{background:#343a4a}.axdlg-btn:active{transform:scale(.97)}
 .axdlg-btn.primary{background:#4c6ef5;border-color:#4c6ef5;color:#fff}.axdlg-btn.primary:hover{background:#5c7cff}
@@ -34,6 +36,15 @@
 #axToast{position:fixed;display:none;left:50%;bottom:22px;transform:translateX(-50%);z-index:100002;padding:9px 16px;font-size:12px;background:#2a2e3a;color:#fff;border:1px solid #363b4a;border-left:3px solid #4c6ef5;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:80%}
 #axToast.kind-success{border-left-color:#5cb85c}#axToast.kind-warning{border-left-color:#f0ad4e}#axToast.kind-error{border-left-color:#d9534f}
 ahkscript,script{display:none}
+/* Text never spills out of its box. A word too long for its line breaks
+   instead of running past the edge, and single-line text that doesn't fit
+   ends in "…" (.ax-ellipsis, or any component label below). In Trident a
+   flex child is only as narrow as its text allows unless it is given a
+   basis of 0 -- .ax-shrink does that for a row's text column. */
+html,body{word-wrap:break-word;overflow-wrap:break-word}
+.ax-ellipsis{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ax-shrink{-ms-flex:1 1 0%;flex:1 1 0%;min-width:0;overflow:hidden}
+.axav-n,.axav-n b,.axav-n small,.axcal-rchip b,.dv-count,.dv-page,.dv-status{overflow:hidden;text-overflow:ellipsis;min-width:0}
 html,body{-ms-content-zooming:none;-ms-touch-action:pan-x pan-y;touch-action:pan-x pan-y}
 #titlebar{height:32px;display:flex;align-items:center;padding-left:12px;cursor:default;-ms-user-select:none;user-select:none}
 #titleText{flex:1;font-size:12px}
@@ -152,3 +163,9 @@ body.axtb-center #axTbLeft{display:flex;flex:1;min-width:0}
 body.ax-dirty #titleText::before{content:"\25CF\00A0";opacity:.75}
 /* the dialog button the keyboard is on (arrow keys, Tab) */
 .axdlg-btn.kb{box-shadow:0 0 0 2px #60cdff}body.theme-light .axdlg-btn.kb{box-shadow:0 0 0 2px #005fb8}.axdlg-btn:focus{outline:none}
+.axsb-part.empty{display:none!important}
+#sidebar{display:-ms-flexbox;display:flex;-ms-flex-direction:column;flex-direction:column;overflow:hidden}
+.nav-gap{-ms-flex:1 1 auto;flex:1 1 auto;min-height:8px}
+
+/* until the ready callbacks have drawn the pages (AxWindow: ax-boot) */
+body.ax-boot #content,body.ax-boot .page{visibility:hidden}

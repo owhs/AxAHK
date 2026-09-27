@@ -371,16 +371,19 @@ class AxTags {
         switch tag {
         ; ---------------------------------------------------------- layout
         case "ax-nav":
-            h := '<div id="sidebar"' (A(el, "style") != "" ? ' style="' E(A(el, "style")) '"' : "") '>'
+            h := '<div id="sidebar"' (A(el, "style") != "" ? ' style="' E(A(el, "style")) '"' : "") '>', foot := ""
             for o in AxTags.Options(A(el, "pages")) {
-                ; value = pageId:Label:Glyph  (Options already split on the first colon)
-                lab := o[2], glyph := ""
+                ; value = pageId:Label:Glyph[:foot]  (Options already split on the first colon)
+                lab := o[2], glyph := "", atFoot := false
                 p := InStr(lab, ":")
                 if p
                     glyph := SubStr(lab, p + 1), lab := SubStr(lab, 1, p - 1)
-                h .= '<div class="nav-item" data-page="' E(o[1]) '" id="nav_' E(o[1]) '">' Ico(glyph) E(lab) '</div>'
+                if (SubStr(glyph, -5) = ":foot")
+                    glyph := SubStr(glyph, 1, -5), atFoot := true
+                item := '<div class="nav-item' (atFoot ? " nav-foot" : "") '" data-page="' E(o[1]) '" id="nav_' E(o[1]) '">' Ico(glyph) E(lab) '</div>'
+                atFoot ? (foot .= item) : (h .= item)
             }
-            return h inner '</div>'
+            return h (foot != "" ? '<div class="nav-gap"></div>' foot : "") inner '</div>'
         case "ax-content":
             return '<div id="content"' (A(el, "style") != "" ? ' style="' E(A(el, "style")) '"' : "")
                  . (Has(el, "shell") ? ' data-shell="1"' : "") '>' inner '</div>'

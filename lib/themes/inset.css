@@ -566,3 +566,15 @@ body.sheet-inset.theme-light .axtb-item.pop-open {
 body.sheet-inset #axPop { border-radius: 4px; padding: 12px 14px; font-size: 12px; }
 body.sheet-inset.theme-dark #axPop  { background: #272a2e; color: #dfe3e9; border: 1px solid #3e4249; box-shadow: 0 10px 26px rgba(0,0,0,.55); }
 body.sheet-inset.theme-light #axPop { background: #ffffff; color: #1d2126; border: 1px solid #d5dae2; box-shadow: 0 10px 26px rgba(0,0,0,.14); }
+
+/* ---------------------------------------------------- thin scrollbars (ui/scroll.js)
+   the overlay bar is .ax-sb-bar inside a 14px hit strip (.ax-sb-v / .ax-sb-h);
+   :hover is on the strip, .drag while it is held */
+body.sheet-inset .ax-sb-v, body.sheet-inset .ax-sb-h { background: rgba(0,0,0,.28); border-radius: 7px; box-shadow: inset 0 1px 2px rgba(0,0,0,.45); }
+body.sheet-inset .ax-sb-v .ax-sb-bar { right: 4px; top: 3px; bottom: 3px; width: 6px; border-radius: 3px; opacity: .9; background: #4a4f57; }
+body.sheet-inset .ax-sb-h .ax-sb-bar { bottom: 4px; left: 3px; right: 3px; height: 6px; border-radius: 3px; opacity: .9; background: #4a4f57; }
+body.sheet-inset .ax-sb-v:hover .ax-sb-bar, body.sheet-inset .ax-sb-v.drag .ax-sb-bar { width: 6px; opacity: 1; background: #10b981; }
+body.sheet-inset .ax-sb-h:hover .ax-sb-bar, body.sheet-inset .ax-sb-h.drag .ax-sb-bar { height: 6px; opacity: 1; background: #10b981; }
+body.sheet-inset.theme-light .ax-sb-v, body.sheet-inset.theme-light .ax-sb-h { background: rgba(0,0,0,.06); box-shadow: inset 0 1px 2px rgba(0,0,0,.12); }
+body.sheet-inset.theme-light .ax-sb-v .ax-sb-bar, body.sheet-inset.theme-light .ax-sb-h .ax-sb-bar { background: #b4bbc6; }
+body.sheet-inset.theme-light .ax-sb-v:hover .ax-sb-bar, body.sheet-inset.theme-light .ax-sb-h:hover .ax-sb-bar { background: #10b981; }

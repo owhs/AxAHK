@@ -77,6 +77,7 @@ class AxWindow {
         this.MinHeight         := o("MinHeight", 200)
         this.BackColor         := o("BackColor", "1b1e27")
         this.EscapeCloses      := o("EscapeCloses", false)
+        this.CtrlWCloses       := o("CtrlWCloses", false)      ; Ctrl+W closes the window, as Alt+F4 does (tabs and editors teach it)
         this.ExitOnClose       := o("ExitOnClose", true)
         this.NativeContextMenu := o("NativeContextMenu", false)   ; keep IE's own right-click menu?
         this.SnapLayouts       := o("SnapLayouts", true)
@@ -109,12 +110,20 @@ class AxWindow {
         this.StartMaximized    := o("Maximized", this.HasOwnProp("StartMaximized") ? this.StartMaximized : false)
         this.MinimizeBox       := o("MinimizeBox", true)        ; WS_MINIMIZEBOX + the frame button
         this.UseAccent         := o("UseAccent", true)          ; emit accent-colour CSS (retro stylesheets turn this off)
-        this.AllowZoom         := o("AllowZoom", false)         ; Ctrl+wheel / Ctrl+plus-minus / pinch zoom of the page
+        ; "thin": drawn bars (ui\scroll.js; the sheet picks thin or classic, and whether they stay up)
+        ; | "always": the page's bar stays up, with a gutter | "auto": it fades when idle | "native": Trident's own
+        this.Scrollbars        := o("Scrollbars", "thin")
+        ; rows off screen hidden while scrolling (see CullRows); false turns it off, a selector string replaces the list
+        ; (AxGui runs this again in Show(): rows added with CullRows before then are kept)
+        c := o("Cull", true)
+        if !this.HasOwnProp("_cullSel")
+            this._cullSel := c = true ? AxWindow.CullDefault : c = false ? "" : c
+        this.AllowZoom         := o("AllowZoom", false)       ; Ctrl+wheel / Ctrl+plus-minus / pinch zoom of the page
         this.FocusRing         := o("FocusRing", "accent")      ; keyboard focus ring: "accent" | "contrast" | "none" | "#rrggbb"
         this.AppName           := o("AppName", "")              ; registers an AppUserModelID so notifications carry this name
         this.AppId             := o("AppId", "")                ; ... optional explicit AUMID (default derived from AppName)
         if (this.AppName != "")
-            AxSys.RegisterApp(this.AppName, this.AppId)
+            AxSys.RegisterApp(this.AppName, this.AppId, (this.Icon != "auto" && this.Icon != "" && FileExist(this.Icon)) ? this.Icon : "")   ; notifications carry the window's own icon
         this.Components        := o("Components", true)         ; expand <ax-*> tags (see AxTags.ahk)
         this.Chrome := {Titlebar: "titlebar", Min: "btnMin", Max: "btnMax", Close: "btnClose", Resize: "rz"}
         if opts.HasOwnProp("Chrome")
@@ -223,12 +232,46 @@ class AxWindow {
             this.WB.Navigate("about:blank")               ; HtmlString is written on DocumentComplete
     }
     ; ---------------------------------------------------------------- window
+    ; The middle of the work area of the monitor under the mouse (where the
+    ; person is looking), kept inside it. Show() does this when no X / Y is given.
+    CenterOnScreen() {
+        try {
+            WinGetPos(, , &w, &h, this.Gui.Hwnd)
+            CoordMode "Mouse", "Screen"
+            MouseGetPos(&mx, &my)
+            mon := MonitorGetPrimary()
+            loop MonitorGetCount() {
+                MonitorGet(A_Index, &ml, &mt, &mr, &mb)
+                if (mx >= ml && mx < mr && my >= mt && my < mb)
+                    mon := A_Index
+            }
+            MonitorGetWorkArea(mon, &l, &t, &r, &b)
+            w := Min(w, r - l), h := Min(h, b - t)
+            WinMove(l + (r - l - w) // 2, t + (b - t - h) // 2, w, h, this.Gui.Hwnd)
+        }
+    }
     Show() {
         pos := (this.X != "" ? " x" this.X : "") (this.Y != "" ? " y" this.Y : "")
         ; NoActivate leaves the user's foreground window alone -- for a tool or
         ; palette window, and for anything running in the background
-        this.Gui.Show((this.NoActivate ? "NoActivate " : "") (this.StartMaximized ? "Maximize " : "")
-                    . "w" this.Width " h" this.Height pos)
+        ; once placed, showing again (from a tray, after Hide) keeps the size and place it had
+        ; Not Gui.Show there: with no size it works one out again from the client
+        ; area, and on a frameless window each call made it a frame bigger (a
+        ; tray click on an open window grew it every time). ShowWindow never resizes.
+        if this.HasOwnProp("_placed") {
+            h := this.Gui.Hwnd
+            if DllCall("IsIconic", "Ptr", h)
+                DllCall("ShowWindow", "Ptr", h, "Int", this.NoActivate ? 4 : 9)       ; SW_SHOWNOACTIVATE / SW_RESTORE
+            else if !DllCall("IsWindowVisible", "Ptr", h)
+                DllCall("ShowWindow", "Ptr", h, "Int", this.NoActivate ? 8 : 5)       ; SW_SHOWNA / SW_SHOW
+            if !this.NoActivate
+                try WinActivate(h)
+        } else
+            this.Gui.Show((this.NoActivate ? "NoActivate " : "") (this.StartMaximized ? "Maximize " : "")
+                        . "w" this.Width " h" this.Height pos)
+        if (this.X = "" && this.Y = "" && !this.StartMaximized && !this.HasOwnProp("_placed"))
+            this.CenterOnScreen()
+        this._placed := true
         SetTimer(this._revealFn, -3000)          ; safety net if DocumentComplete never fires
         this.SetRoundCorners(this.RoundCorners)   ; Win11 rounds by default: "false" must ask for square
         AxSys.Shadow(this.Gui.Hwnd)
@@ -526,7 +569,7 @@ class AxWindow {
     ; OnBeforeClose(fn): fn(win, why) runs before the window closes, however
     ; the close was asked for -- return true to keep the window open. why:
     ;   "button"  the title bar's close button    "icon"    the icon, double-clicked
-    ;   "system"  Alt+F4, the taskbar, the system menu's Close (WM_CLOSE)
+    ;   "system"  Alt+F4, the taskbar, the system menu's Close (WM_CLOSE), Ctrl+W with CtrlWCloses
     ;   "escape"  Escape, with EscapeCloses       "exit"    the tray's Exit or Reload
     ;   "code"    win.Close() from the script;    win.Close(true) asks nobody
     OnBeforeClose(fn) {
@@ -567,7 +610,7 @@ class AxWindow {
                          title, btns, {Kind: "warning", Cancel: btns.Length})
         switch r.Button {
         case "Save":
-            ok := AxGuiCompat.CallFit(this._saveFn, [this])
+            ok := AxWindow._CallFit(this._saveFn, [this])
             if (ok is Integer && ok = 0)            ; not saved after all: stay
                 return true
             this.Dirty := false
@@ -579,6 +622,28 @@ class AxWindow {
     }
     ; Every OnBeforeClose, in turn, until one keeps the window. A window that
     ; is minimised comes back first, so the question can be seen.
+    ; fn(args*), with as many of args as fn takes (a handler may want none, or
+    ; only the window). AxWindow's own: it runs without AxGui, which has the
+    ; same thing for Gui-style code (AxGuiCompat.CallFit).
+    static _CallFit(fn, args) {
+        if (fn is Func && !(fn is BoundFunc)) {
+            try {
+                if (!fn.IsVariadic && args.Length > fn.MaxParams)
+                    args.Length := fn.MaxParams
+                while (args.Length < fn.MinParams)
+                    args.Push("")
+            }
+            return fn(args*)
+        }
+        loop {
+            try return (at := A_LineNumber, fn(args*))
+            catch Error as e {
+                if (args.Length <= 1 || !InStr(e.Message, "Too many parameters") || e.File != A_LineFile || e.Line != at)
+                    throw e
+                args.Length := args.Length - 1
+            }
+        }
+    }
     _Allowed(why) {
         if (!this._beforeCbs.Length || !this.Ready)    ; no page yet: nothing to ask in
             return true
@@ -592,7 +657,7 @@ class AxWindow {
         keep := false
         try {
             for fn in this._beforeCbs.Clone()
-                if AxGuiCompat.CallFit(fn, [this, why]) {
+                if AxWindow._CallFit(fn, [this, why]) {
                     keep := true
                     break
                 }
@@ -1140,6 +1205,11 @@ class AxWindow {
         if !this.AllowZoom
             try  DPI := A_ScreenDPI / 96 * 100
               ,  this.WB.ExecWB(63, 2, Round(A_ScreenDPI / 96 * DPI), 0)             ; OLECMDID_OPTICAL_ZOOM -> 100%             
+        ; The frame shows now; the pages only once the ready callbacks have
+        ; filled them in -- a script that draws its pages there (most do)
+        ; otherwise flashed them half-built for a frame. Hidden, not removed:
+        ; the callbacks still measure what is laid out.
+        this.BodyClass("ax-boot", true)
         this._RevealAx()
         ; IOleInPlaceActiveObject of the browser: key messages are routed
         ; through its TranslateAccelerator (see _SubclassProc)
@@ -1147,15 +1217,25 @@ class AxWindow {
         catch
             this._activeObj := ""
         this._InstallSubclasses()
-        this._InstallDropTarget()          ; no-op unless a DropZone was registered
+        this._InstallWheel()
+        if (this.Scrollbars != "native") {
+            if (this.Scrollbars = "always" || this.Scrollbars = "auto")
+                this._RunJs('window.axSbAlways = "' this.Scrollbars '";')
+            this._RunJs(AxWindow.ReadLib("ui\scroll.js"))
+        }
+        this._InstallDropTarget()         ; no-op unless a DropZone was registered
         this._UpdateMaxRect()
         if this._dirty                      ; set before the page was there
             this.BodyClass("ax-dirty", true)
         this.Ready := true
+        try this.TitleAlign()               ; the bar's icon over the rail's (the page is laid out now)
         ; the first callback is AxGui's _Wire, which shows the window before it
         ; puts the pages back; after it they are back whatever it did
-        for cb in this._readyCbs
-            cb(this), this._FillPages()
+        try {
+            for cb in this._readyCbs
+                cb(this), this._FillPages()
+        } finally
+            this.BodyClass("ax-boot", false)
     }
     ; --- frame injection ---------------------------------------------------
     _InjectFrame() {
@@ -1420,7 +1500,7 @@ class AxWindow {
             css .= b "," pre ".group>.legend," pre "#axDlgBtns{background:" bg "}"
             if light {
                 c1 := AxWindow._Mix("#fbfbfb", tint, st * 0.6), c2 := AxWindow._Mix("#f9f9f9", tint, st * 0.6)
-                css .= pre ".card," pre ".expander," pre ".tile," pre ".sort-list .drag-item," pre ".dd-value," pre ".btn," pre ".list," pre ".hex,"
+                css .= pre ".card," pre ".expander," pre ".tile," pre ".sort-list .drag-item," pre ".dd-value," pre ".btn:not(.accent):not(.subtle)," pre ".list," pre ".hex,"
                     .  pre ".textbox input," pre ".textbox textarea," pre ".searchbox input," pre ".numberbox input," pre ".passwordbox input{background:" c1 "}"
                     .  pre ".dd-menu," pre "#axCtx," pre "#axDlg," pre "#axToast," pre "#axTip{background:" c2 "}"
             } else {
@@ -1682,6 +1762,11 @@ class AxWindow {
                 return true
             }
         }
+        if (key = 87 && this.CtrlWCloses && ev.ctrlKey && !ev.altKey && !ev.shiftKey) {     ; Ctrl+W
+            ev.returnValue := false
+            this.Close(false, "system")
+            return true
+        }
         if this._dlg {                               ; a dialog has the keyboard: arrows, Tab, Enter, Space
             if this._DlgKey(ev) {
                 ev.returnValue := false
@@ -1712,39 +1797,157 @@ class AxWindow {
         r := el.getBoundingClientRect()
         return x >= r.left && x < r.right && y >= r.top && y < r.bottom
     }
-    _WheelMsg(wParam, lParam) {
-        if !IsObject(this.Doc)
-            return false
+    ; This used to run in AHK on every WM_MOUSEWHEEL: elementFromPoint plus a
+    ; COM round trip per ancestor, before Trident saw the wheel at all, which
+    ; made every scrolling pane lag. In the page it costs next to nothing.
+    _InstallWheel() {
+        static js := "
+        (
+            (function () {
+                if (window.axWheel) { return; }
+                window.axWheel = true;
+                /* rows sliding under a still cursor fire mouseover/mouseout for
+                   each one, and every one is a round trip to AHK (tooltips,
+                   popovers): while the wheel turns they stop here */
+                var at = 0;
+                function mute(e) { if (new Date().getTime() - at < 150) { e.stopPropagation(); } }
+                window.addEventListener("mouseover", mute, true);
+                window.addEventListener("mouseout", mute, true);
+                /* Trident's own wheel scrolling animates at about half the
+                   frame rate a plain scrollTop write manages (measured: ~32 ms
+                   a frame against 16.6), so every wheel is taken here and
+                   eased to its target one frame at a time. The innermost box
+                   that can still move that way scrolls; a popup keeps the
+                   wheel even at its ends, so nothing leaks to the page behind. */
+                var root = document.documentElement, STEP = 100, anim = [];
+                function page(el) { return el === root || el === document.body; }
+                function canMove(el, dy) {
+                    if (el.scrollHeight <= el.clientHeight + 1) { return false; }
+                    if (!page(el)) { var o = (el.currentStyle || window.getComputedStyle(el)).overflowY; if (o !== "auto" && o !== "scroll") { return false; } }
+                    var top = page(el) ? (root.scrollTop || document.body.scrollTop) : el.scrollTop;
+                    var max = (page(el) ? Math.max(root.scrollHeight, document.body.scrollHeight) : el.scrollHeight) - el.clientHeight;
+                    return dy < 0 ? top > 0 : top < max - 1;
+                }
+                function getTop(el) { return page(el) ? (root.scrollTop || document.body.scrollTop) : el.scrollTop; }
+                function setTop(el, v) { if (page(el)) { root.scrollTop = v; document.body.scrollTop = v; } else { el.scrollTop = v; } }
+                function tick() {
+                    var still = [];
+                    for (var i = 0; i < anim.length; i++) {
+                        var a = anim[i], now = getTop(a.el);
+                        if (a.el.axWheelTo == null) { continue; }                           /* taken over (a touchpad step) */
+                        if (Math.abs(now - a.set) > 2) { a.el.axWheelTo = null; continue; }   /* moved by something else: let go */
+                        var d = a.el.axWheelTo - now, s = Math.abs(d) < 1.5 ? d : d * 0.3;
+                        setTop(a.el, now + s); a.set = getTop(a.el);
+                        if (Math.abs(a.el.axWheelTo - a.set) >= 1 && a.set !== now) { still.push(a); } else { a.el.axWheelTo = null; }
+                    }
+                    anim = still;
+                    if (anim.length) { window.requestAnimationFrame(tick); }
+                }
+                document.addEventListener("mousewheel", function (e) {
+                    at = new Date().getTime();
+                    if (e.ctrlKey || e.defaultPrevented || e.shiftKey) { return; }
+                    var dy = -e.wheelDelta / 120 * STEP, el = e.target || e.srcElement, box = null, popup = false, n = 0, c;
+                    for (; el && el.nodeType === 1 && n < 60; el = el.parentNode, n++) {
+                        c = " " + el.className + " ";
+                        var pop = el.id === "axCtx" || c.indexOf(" dd-menu ") >= 0 || c.indexOf(" ac-menu ") >= 0;
+                        if (canMove(el, dy)) { box = page(el) ? root : el; break; }
+                        if (pop) { popup = true; break; }
+                    }
+                    if (!box) { if (popup) { e.preventDefault(); } return; }
+                    /* a touchpad (or a free-spinning wheel) sends many small
+                       deltas, not 120-unit notches: follow those 1:1 at once,
+                       easing them would make the fingers feel behind */
+                    if (e.wheelDelta % 120 !== 0) {
+                        box.axWheelTo = null;
+                        setTop(box, getTop(box) - e.wheelDelta);
+                        e.preventDefault(); e.stopPropagation();
+                        return;
+                    }
+                    var from = box.axWheelTo != null ? box.axWheelTo : getTop(box);
+                    var max = (box === root ? Math.max(root.scrollHeight, document.body.scrollHeight) : box.scrollHeight) - box.clientHeight;
+                    box.axWheelTo = Math.max(0, Math.min(max, from + dy));
+                    var found = false;
+                    for (var i = 0; i < anim.length; i++) { if (anim[i].el === box) { found = true; } }
+                    if (!found) { anim.push({ el: box, set: getTop(box) }); if (anim.length === 1) { window.requestAnimationFrame(tick); } }
+                    e.preventDefault(); e.stopPropagation();
+                }, false);
+            })();
+        )"
+        this._RunJs(js)
+        this._ApplyCull()
+    }
+    ; CullRows(".my-row"): a long list of rich rows (switches, icons, badges)
+    ; scrolls at a few frames a second in Trident, which repaints and
+    ; composites every row on every step, on screen or not. Rows further than
+    ; a screen from view are set visibility:hidden while it scrolls (the layout
+    ; is kept, so nothing moves): on a 190-row page, 114 ms a frame -> ~38.
+    ; Pages with fewer than 100 matching rows are left alone (checking every
+    ; frame cost a 40-card page more than it saved).
+    ; On by default for the library's own blocks (CullDefault; opts.Cull: false
+    ; turns it off). CullRows(sel) adds a page's own rows to the list; it holds
+    ; for rows drawn later too. CullRows("") turns it off.
+    ; (not DataView/FileView rows: a grid of hundreds of light rows cost more
+    ; to check every frame than hiding them saved -- it made them laggier)
+    static CullDefault := ".card, .card-row, .list-item, .tile"
+    CullRows(selector) {
+        cur := this.HasOwnProp("_cullSel") ? this._cullSel : AxWindow.CullDefault    ; (before the window is made: on top of the defaults)
+        this._cullSel := selector = "" ? "" : cur = "" ? selector : cur ", " selector
+        return this._ApplyCull()
+    }
+    _ApplyCull() {
+        selector := this.HasOwnProp("_cullSel") ? this._cullSel : ""
+        this._RunJs('window.axCullSel = "' StrReplace(StrReplace(selector, "\", "\\"), '"', '\"') '";')
+        return this._RunJs("
+        (
+            (function () {
+                var root = document.documentElement, st = window.axCull;
+                if (!st) {
+                    st = window.axCull = { sel: "", frame: 0, hidden: [] };
+                    var run = function () {
+                        st.frame = 0;
+                        var still = [], i, r, b, vh = root.clientHeight, keep;
+                        var rows = st.sel ? document.querySelectorAll(st.sel) : [];
+                        /* a short page costs more to check each frame than it
+                           saves: only long lists (100+ rows) are culled */
+                        if (rows.length < 100) { for (i = 0; i < st.hidden.length; i++) { st.hidden[i].style.visibility = ""; st.hidden[i].axCulled = false; } st.hidden = []; return; }
+                        for (i = 0; i < rows.length; i++) {
+                            r = rows[i]; b = r.getBoundingClientRect();
+                            keep = b.bottom > -vh && b.top < 2 * vh;
+                            if (keep && r.axCulled) { r.style.visibility = ""; r.axCulled = false; }
+                            else if (!keep && !r.axCulled && !r.contains(document.activeElement)) { r.style.visibility = "hidden"; r.axCulled = true; }
+                            if (r.axCulled) { still.push(r); }
+                        }
+                        st.hidden = still;
+                    };
+                    st.queue = function () { if (!st.frame) { st.frame = window.requestAnimationFrame(run); } };
+                    document.addEventListener("scroll", st.queue, true);
+                    window.addEventListener("resize", st.queue, false);
+                    /* a redraw brings its rows in visible: sort them out again */
+                    if (window.MutationObserver) { new MutationObserver(st.queue).observe(document.body, { childList: true, subtree: true }); }
+                }
+                st.sel = window.axCullSel || "";
+                st.queue();
+            })();
+        )")
+    }
+    ; run a script in the page, now; true when it ran
+    _RunJs(code) {
         try {
-            delta := (wParam >> 16) & 0xFFFF, delta := delta > 0x7FFF ? delta - 0x10000 : delta
-            x := lParam & 0xFFFF, y := (lParam >> 16) & 0xFFFF
-            x := x > 0x7FFF ? x - 0x10000 : x, y := y > 0x7FFF ? y - 0x10000 : y
-            pt := Buffer(8), NumPut("Int", x, "Int", y, pt)
-            DllCall("ScreenToClient", "Ptr", this.Gui.Hwnd, "Ptr", pt)
-            scale := A_ScreenDPI / 96
-            el := this.Doc.elementFromPoint(NumGet(pt, 0, "Int") / scale, NumGet(pt, 4, "Int") / scale)
-            box := "", popup := false
-            loop 16 {
-                if !IsObject(el)
-                    break
-                cls := " " el.className " "
-                if (el.id = "axCtx" || InStr(cls, " dd-menu ") || InStr(cls, " ac-menu ")) {
-                    box := el, popup := true
-                    break
-                }
-                if (InStr(cls, " list ") || InStr(cls, " console ") || InStr(cls, " sort-list ")) {
-                    box := el
-                    break
-                }
-                el := el.parentElement
-            }
-            if !IsObject(box)
-                return false
-            before := box.scrollTop
-            box.scrollTop := before + Round(-delta / 120 * 48)
-            return popup || box.scrollTop != before      ; a list passes the wheel on only when it could not scroll
+            d := this.Doc
+            s := d.createElement("script")
+            s.text := code
+            head := d.getElementsByTagName("head").item(0)
+            head.appendChild(s)
+            head.removeChild(s)
+            return true
         }
         return false
+    }
+    ; keep a header's scrollLeft on a body's, in the page: an AHK onscroll
+    ; handler costs a COM round trip per scroll event and makes the pane lag
+    _SyncScrollX(fromId, toId) {
+        return this._RunJs('(function(){var f=document.getElementById("' fromId '"),t=document.getElementById("' toId '");'
+            . 'if(!f||!t||f.axSx){return;}f.axSx=1;f.addEventListener("scroll",function(){t.scrollLeft=f.scrollLeft;},false);})();')
     }
     _KeyPressHandler() {
         allow := true
@@ -1943,6 +2146,10 @@ class AxWindow {
         return cb
     }
     static _SubclassProc(hWnd, uMsg, wParam, lParam, uId, refData) {
+        ; every message of every child window comes through here: the ones
+        ; nothing below looks at (paints, timers, mouse moves...) leave first
+        if !(uMsg = 0x14 || uMsg = 0x87 || uMsg = 0x84 || uMsg = 0x20A || uMsg = 0x119 || (uMsg >= 0x100 && uMsg <= 0x109))
+            return DllCall("comctl32\DefSubclassProc", "Ptr", hWnd, "UInt", uMsg, "Ptr", wParam, "Ptr", lParam, "Ptr")
         if (uMsg = 0x14)                                     ; WM_ERASEBKGND: never paint white
             return 1
         if (uMsg = 0x87)                                     ; WM_GETDLGCODE: keep arrows/Tab/chars away from
@@ -1958,8 +2165,6 @@ class AxWindow {
             if (uMsg = 0x119)                                   ; WM_GESTURE (pinch/zoom)
                 return 0
         }
-        if (uMsg = 0x20A && AxWindow._byHwnd.Has(refData) && AxWindow._byHwnd[refData]._WheelMsg(wParam, lParam))
-            return 0                                             ; wheel consumed by a popup / scrollable box
         ; Alt, Alt+letter and F10 belong to the menu bar when there is one
         if ((uMsg = 0x104 || uMsg = 0x105 || uMsg = 0x100) && AxWindow._byHwnd.Has(refData)
             && AxWindow._byHwnd[refData]._MenuKey(uMsg, wParam))

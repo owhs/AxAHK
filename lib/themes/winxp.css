@@ -566,3 +566,59 @@ body.theme-dark .axdlg-btn.danger, body.theme-dark .axdlg-btn.danger:hover {
 body.theme-dark .axdlg-btn.danger, body.theme-dark .axdlg-btn.danger:hover { color: #ff9c9c; }
 body.theme-dark #axDlgInput { background: #2a2a2a; color: #eaeaea; border-color: #555; }
 body.theme-dark #axDlgInput:focus { border-color: #6a6a6a; }
+
+/* the real bars: this sheet keeps Trident's own scrollbars (see ui/scroll.js) */
+.ax-sb-probe { width: 2px; height: 1px; }       /* classic: ui/scroll.js draws the whole bar, styled below */
+
+/* The Luna bar. Trident's own draws the Windows 10 kind whatever the
+   scrollbar-*-colors say, so it is drawn here: soft blue rounded buttons and
+   thumb, a ridged grip, a cream track. Dark keeps the blue, dimmed. */
+html.ax-classic body.sheet-winxp .ax-sb-v { background: linear-gradient(to right, #eeede5 0%, #fdfdfa 100%); }
+html.ax-classic body.sheet-winxp .ax-sb-h { background: linear-gradient(to bottom, #eeede5 0%, #fdfdfa 100%); }
+html.ax-classic body.sheet-winxp .ax-sb-up, html.ax-classic body.sheet-winxp .ax-sb-dn,
+html.ax-classic body.sheet-winxp .ax-sb .ax-sb-bar {
+    border: 1px solid #a4b9ea; border-radius: 3px; box-sizing: border-box; overflow: hidden;
+    background: linear-gradient(to right, #dde7fe 0%, #c6d6fc 55%, #b7cbf7 100%);
+}
+html.ax-classic body.sheet-winxp .ax-sb-h .ax-sb-up, html.ax-classic body.sheet-winxp .ax-sb-h .ax-sb-dn,
+html.ax-classic body.sheet-winxp .ax-sb-h .ax-sb-bar { background: linear-gradient(to bottom, #dde7fe 0%, #c6d6fc 55%, #b7cbf7 100%); }
+html.ax-classic body.sheet-winxp .ax-sb-up:hover, html.ax-classic body.sheet-winxp .ax-sb-dn:hover,
+html.ax-classic body.sheet-winxp .ax-sb .ax-sb-bar:hover, html.ax-classic body.sheet-winxp .ax-sb.drag .ax-sb-bar {
+    border-color: #8fa9e6; background: #d9e5fe;
+}
+html.ax-classic body.sheet-winxp .ax-sb-up.down, html.ax-classic body.sheet-winxp .ax-sb-dn.down { background: #a9bef2; border-color: #7f9ad8; }
+/* the arrows: dark blue triangles */
+html.ax-classic body.sheet-winxp .ax-sb-up:before, html.ax-classic body.sheet-winxp .ax-sb-dn:before {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 0; height: 0; border: 4px solid transparent;
+}
+html.ax-classic body.sheet-winxp .ax-sb-v .ax-sb-up:before { margin: -6px 0 0 -4px; border-bottom-color: #4d6185; }
+html.ax-classic body.sheet-winxp .ax-sb-v .ax-sb-dn:before { margin: -2px 0 0 -4px; border-top-color: #4d6185; }
+html.ax-classic body.sheet-winxp .ax-sb-h .ax-sb-up:before { margin: -4px 0 0 -6px; border-right-color: #4d6185; }
+html.ax-classic body.sheet-winxp .ax-sb-h .ax-sb-dn:before { margin: -4px 0 0 -2px; border-left-color: #4d6185; }
+/* the grip: four ridges in the middle of the thumb */
+html.ax-classic body.sheet-winxp .ax-sb .ax-sb-bar:before {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px;
+    background: repeating-linear-gradient(to bottom, #eef4fe 0, #eef4fe 1px, #8cb0f8 1px, #8cb0f8 2px);
+}
+html.ax-classic body.sheet-winxp .ax-sb-h .ax-sb-bar:before { background: repeating-linear-gradient(to right, #eef4fe 0, #eef4fe 1px, #8cb0f8 1px, #8cb0f8 2px); }
+
+/* dark: Luna at night -- the same shapes in a dimmed blue on charcoal */
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-v { background: linear-gradient(to right, #262626 0%, #313131 100%); }
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-h { background: linear-gradient(to bottom, #262626 0%, #313131 100%); }
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-up, html.ax-classic body.sheet-winxp.theme-dark .ax-sb-dn,
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb .ax-sb-bar {
+    border-color: #5f729e; background: linear-gradient(to right, #5a6b92 0%, #4a5a7e 55%, #3f4e6f 100%);
+}
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-h .ax-sb-up, html.ax-classic body.sheet-winxp.theme-dark .ax-sb-h .ax-sb-dn,
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-h .ax-sb-bar { background: linear-gradient(to bottom, #5a6b92 0%, #4a5a7e 55%, #3f4e6f 100%); }
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-up:hover, html.ax-classic body.sheet-winxp.theme-dark .ax-sb-dn:hover,
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb .ax-sb-bar:hover, html.ax-classic body.sheet-winxp.theme-dark .ax-sb.drag .ax-sb-bar {
+    border-color: #7d92c4; background: #62749e;
+}
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-up.down, html.ax-classic body.sheet-winxp.theme-dark .ax-sb-dn.down { background: #3a4866; border-color: #53658f; }
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-v .ax-sb-up:before { border-bottom-color: #dbe3f5; }
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-v .ax-sb-dn:before { border-top-color: #dbe3f5; }
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-h .ax-sb-up:before { border-right-color: #dbe3f5; }
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-h .ax-sb-dn:before { border-left-color: #dbe3f5; }
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb .ax-sb-bar:before { background: repeating-linear-gradient(to bottom, #8193bd 0, #8193bd 1px, #34405c 1px, #34405c 2px); }
+html.ax-classic body.sheet-winxp.theme-dark .ax-sb-h .ax-sb-bar:before { background: repeating-linear-gradient(to right, #8193bd 0, #8193bd 1px, #34405c 1px, #34405c 2px); }

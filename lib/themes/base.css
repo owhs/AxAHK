@@ -169,3 +169,6 @@ body.ax-dirty #titleText::before{content:"\25CF\00A0";opacity:.75}
 
 /* until the ready callbacks have drawn the pages (AxWindow: ax-boot) */
 body.ax-boot #content,body.ax-boot .page{visibility:hidden}
+/* dialog buttons: a long label wraps inside its button, which grows to fit (every theme); too many wrap to a second row */
+#axDlgBtns{-ms-flex-wrap:wrap;flex-wrap:wrap}
+#axDlgBtns .axdlg-btn{height:auto;min-height:32px;line-height:18px;padding-top:6px;padding-bottom:6px;margin-top:3px;margin-bottom:3px;white-space:normal;box-sizing:border-box;max-width:100%;-ms-flex-preferred-size:auto;flex-basis:auto;display:-ms-flexbox;display:flex;-ms-flex-align:center;align-items:center;-ms-flex-pack:center;justify-content:center;text-align:center}

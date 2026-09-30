@@ -103,6 +103,10 @@ class AxWindow {
         this.Y                 := o("Y", "")
         this.NoActivate        := o("NoActivate", false)        ; come up without taking focus
         this.Resizable         := o("Resizable", true)          ; WS_THICKFRAME + resize hotspots
+        ; dragging the left/top edge without judder (AxWindow.SmoothResize.ahk);
+        ; false leaves those drags to Windows, as the right/bottom ones are
+        this.SmoothResize      := o("SmoothResize", true)
+        this._srOn := false, this._srActive := false, this._srAnchor := false, this._srHost := "", this._srBorderCss := ""
         this.MaximizeBox       := o("MaximizeBox", true)        ; WS_MAXIMIZEBOX: taskbar/system menu/Snap + the frame button
         ; comes up maximised, rather than maximised after. AxGui builds its
         ; window in Show(), running this again: a StartMaximized set on it
@@ -334,7 +338,7 @@ class AxWindow {
         static brushes := Map()
         hex := LTrim(hex, "#")
         this.BackColor := hex
-        try this.Gui.BackColor := hex
+        try this.Gui.BackColor := this._srOn ? AxWindowSmoothResize.SrKey : hex   ; SmoothResize: the Gui's own is the colour key
         try {
             rgb := Integer("0x" hex)
             colorref := ((rgb & 0xFF) << 16) | (rgb & 0xFF00) | (rgb >> 16)
@@ -552,6 +556,8 @@ class AxWindow {
     ; "NW","NE","SW","SE" or "" for move.
     Drag(edge := "") {
         static ht := Map("", 2, "W", 10, "E", 11, "N", 12, "NW", 13, "NE", 14, "S", 15, "SW", 16, "SE", 17)
+        if (edge != "" && this._SrDrag(edge))                   ; left/top edges: SmoothResize
+            return
         DllCall("user32\ReleaseCapture")
         PostMessage(0xA1, ht[StrUpper(edge)], 0, , this.Gui)   ; WM_NCLBUTTONDOWN
     }
@@ -739,6 +745,8 @@ class AxWindow {
         try ComObjConnect(this.WB, "")
         this._RemoveDropTarget()
         AxWindow._byHwnd.Delete(this.Gui.Hwnd)
+        if IsObject(this._srHost)
+            this._srHost.Destroy()
         for h in this._subclassed
             try DllCall("comctl32\RemoveWindowSubclass", "Ptr", h, "Ptr", AxWindow._SubclassCb(), "Ptr", 1)
         try this.Gui.Destroy()
@@ -1228,6 +1236,7 @@ class AxWindow {
         if this._dirty                      ; set before the page was there
             this.BodyClass("ax-dirty", true)
         this.Ready := true
+        try this._SrSetup()                 ; SmoothResize: colour key, page-drawn border (before the window shows)
         try this.TitleAlign()               ; the bar's icon over the rail's (the page is laid out now)
         ; the first callback is AxGui's _Wire, which shows the window before it
         ; puts the pages back; after it they are back whatever it did
@@ -2029,10 +2038,15 @@ class AxWindow {
         return false
     }
     _UpdateBorder() {
-        AxSys.Border(this.Gui.Hwnd, this.IsSnapped() ? this.SnapBorder : this.BorderColor)
+        color := this.IsSnapped() ? this.SnapBorder : this.BorderColor
+        if this._srOn {                                  ; SmoothResize: the page draws it, not Windows
+            AxSys.Border(this.Gui.Hwnd, "none")
+            this._SrBorder(color)
+        } else
+            AxSys.Border(this.Gui.Hwnd, color)
     }
     _OnSize(mm, w, h) {
-        if this.Closing || mm = -1
+        if this.Closing || mm = -1 || this._srActive
             return
         this._UpdateBorder()
         try this.Ax.Move(, , w, h)
@@ -2062,7 +2076,7 @@ class AxWindow {
             if this._menuWaits                           ; closing: a click's menu arriving late is not opened
                 return 0
         case 0x83:                                       ; WM_NCCALCSIZE: client = whole window
-            if w
+            if w                                         ; (during a SmoothResize drag, _SrSubProc answers first)
                 return 0
         case 0x24:                                       ; WM_GETMINMAXINFO
             return this._MinMaxInfo(l, hwnd)
@@ -2470,6 +2484,7 @@ class AxWindow {
 #Include %A_LineFile%\..\AxWindow.Embed.ahk
 #Include %A_LineFile%\..\AxWindow.Media.ahk
 #Include %A_LineFile%\..\AxWindow.DragDrop.ahk
+#Include %A_LineFile%\..\AxWindow.SmoothResize.ahk
 
 AxWindow.Mixin(AxWindowComponents)
 AxWindow.Mixin(AxWindowOverlays)
@@ -2478,3 +2493,4 @@ AxWindow.Mixin(AxWindowTitlebar)
 AxWindow.Mixin(AxWindowEmbed)
 AxWindow.Mixin(AxWindowMedia)
 AxWindow.Mixin(AxWindowDragDrop)
+AxWindow.Mixin(AxWindowSmoothResize)

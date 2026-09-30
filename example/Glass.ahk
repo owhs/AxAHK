@@ -86,6 +86,12 @@ class GlassGui extends AxGui {
         this._lit := false
     }
 
+    ; SmoothResize colour-keys the window for good; the glass is the window's
+    ; frame drawn by DWM behind our black, which a layered window loses. The
+    ; left/top edges are left to Windows here.
+    _SrSetup() {
+    }
+
     ; ------------------------------------------------------------ switches
     ; Each one changes only what it has to: nothing here forces the page to
     ; repaint, and a material change touches the backdrop alone.

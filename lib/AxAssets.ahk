@@ -37,6 +37,12 @@
 ;@Ahk2Exe-AddResource %U_AxLib%\themes\precision.css, AX_THEMES_PRECISION_CSS
 ;@Ahk2Exe-AddResource %U_AxLib%\themes\inset.css, AX_THEMES_INSET_CSS
 ;@Ahk2Exe-AddResource %U_AxLib%\themes\brutalist.css, AX_THEMES_BRUTALIST_CSS
+;@Ahk2Exe-AddResource %U_AxLib%\themes\macos.css, AX_THEMES_MACOS_CSS
+;@Ahk2Exe-AddResource %U_AxLib%\themes\riso.css, AX_THEMES_RISO_CSS
+;@Ahk2Exe-AddResource %U_AxLib%\themes\blueprint.css, AX_THEMES_BLUEPRINT_CSS
+;@Ahk2Exe-AddResource %U_AxLib%\themes\aero.css, AX_THEMES_AERO_CSS
+;@Ahk2Exe-AddResource %U_AxLib%\themes\deco.css, AX_THEMES_DECO_CSS
+;@Ahk2Exe-AddResource %U_AxLib%\themes\crt.css, AX_THEMES_CRT_CSS
 ;@Ahk2Exe-AddResource %U_AxLib%\ui\frame.html, AX_UI_FRAME_HTML
 ;@Ahk2Exe-AddResource %U_AxLib%\ui\resize.html, AX_UI_RESIZE_HTML
 ;@Ahk2Exe-AddResource %U_AxLib%\ui\overlays.html, AX_UI_OVERLAYS_HTML

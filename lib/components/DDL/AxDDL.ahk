@@ -77,6 +77,7 @@ class AxDDL {
                 win._CloseDropdown()
                 AxWindow._SetClass(t, "open", true)
                 win._ddOpen := t
+                win._PlaceDropdown(t)                          ; against the window: never clipped, flips up if short
                 win._ShieldScrollers(t)
                 try h := t.querySelector(".dd-menu").offsetHeight     ; settle layout before the first paint
             }

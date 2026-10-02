@@ -247,6 +247,30 @@ class AxSys {
         r := Integer("0x" SubStr(hex, 1, 2)), g := Integer("0x" SubStr(hex, 3, 2)), b := Integer("0x" SubStr(hex, 5, 2))
         return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
     }
+    ; WCAG relative luminance (0..1) and contrast ratio (1..21)
+    static RelLum(hex) {
+        v := Integer("0x" LTrim(hex, "#")), out := 0
+        for i, w in [0.2126, 0.7152, 0.0722] {
+            ch := ((v >> (16 - 8 * (i - 1))) & 0xFF) / 255
+            out += w * (ch <= 0.03928 ? ch / 12.92 : ((ch + 0.055) / 1.055) ** 2.4)
+        }
+        return out
+    }
+    static Contrast(a, b) {
+        x := AxSys.RelLum(a), y := AxSys.RelLum(b)
+        return (Max(x, y) + 0.05) / (Min(x, y) + 0.05)
+    }
+    ; col, moved toward black (on a light bg) or white (on a dark one) until it
+    ; reads on bg at the given ratio (4.5: the WCAG floor for body text; 3: large text)
+    static Readable(col, bg, need := 4.5) {
+        toBlack := AxSys.RelLum(bg) > 0.4, c := col
+        loop 20 {
+            if (AxSys.Contrast(c, bg) >= need)
+                break
+            c := AxSys.Mix(col, toBlack ? "#000000" : "#ffffff", A_Index * 0.05)
+        }
+        return c
+    }
     static Mix(a, b, t) {
         a := LTrim(a, "#"), b := LTrim(b, "#"), out := "#"
         loop 3 {

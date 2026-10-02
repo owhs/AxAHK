@@ -106,7 +106,11 @@ class AxWindow {
         ; dragging the left/top edge without judder (AxWindow.SmoothResize.ahk);
         ; false leaves those drags to Windows, as the right/bottom ones are
         this.SmoothResize      := o("SmoothResize", true)
-        this._srOn := false, this._srActive := false, this._srAnchor := false, this._srHost := "", this._srBorderCss := ""
+        this._srOn := false, this._srActive := false, this._srOverlay := "", this._srCorner := 0, this._srAnchor := false
+        this._srBrKey := 0, this._srBrBg := 0, this._srQuad := "", this._srShot := "", this._srCornerOut := []   ; while a smooth drag is on
+        this._srG := [0, 0], this._srSnap := "", this._srCanvas := "", this._srNativeTop := "", this._srNativeGrab := 0
+        if !this.HasOwnProp("_sizeCbs")
+            this._sizeCbs := []      ; Size handlers (AxGui.Compat), run from _OnSize
         this.MaximizeBox       := o("MaximizeBox", true)        ; WS_MAXIMIZEBOX: taskbar/system menu/Snap + the frame button
         ; comes up maximised, rather than maximised after. AxGui builds its
         ; window in Show(), running this again: a StartMaximized set on it
@@ -338,7 +342,7 @@ class AxWindow {
         static brushes := Map()
         hex := LTrim(hex, "#")
         this.BackColor := hex
-        try this.Gui.BackColor := this._srOn ? AxWindowSmoothResize.SrKey : hex   ; SmoothResize: the Gui's own is the colour key
+        try this.Gui.BackColor := hex
         try {
             rgb := Integer("0x" hex)
             colorref := ((rgb & 0xFF) << 16) | (rgb & 0xFF00) | (rgb >> 16)
@@ -465,6 +469,7 @@ class AxWindow {
         return this
     }
     SetRoundCorners(on := true) {
+        this.RoundCorners := on                      ; (a smooth drag leaves the corners see-through only when rounded)
         AxSys.RoundCorners(this.Gui.Hwnd, on)
         return this
     }
@@ -745,8 +750,8 @@ class AxWindow {
         try ComObjConnect(this.WB, "")
         this._RemoveDropTarget()
         AxWindow._byHwnd.Delete(this.Gui.Hwnd)
-        if IsObject(this._srHost)
-            this._srHost.Destroy()
+        if IsObject(this._srOverlay)
+            this._srOverlay.Destroy()
         for h in this._subclassed
             try DllCall("comctl32\RemoveWindowSubclass", "Ptr", h, "Ptr", AxWindow._SubclassCb(), "Ptr", 1)
         try this.Gui.Destroy()
@@ -1088,6 +1093,7 @@ class AxWindow {
         return this
     }
     _FireLook() {
+        this._TokRefresh()                           ; ThemedCss sheets (AxWindow.Bands.ahk)
         if !this.HasOwnProp("_lookCbs")
             return this
         for fn in this._lookCbs.Clone()
@@ -1182,6 +1188,7 @@ class AxWindow {
         }
         this._InjectFrame()
         this._TbRender()                             ; anything TitleBar() asked for
+        this._ActRender()                            ; ... and Actions()
         this._MakeFocusable()
         this.BodyClass("noresize", !this.Resizable), this.BodyClass("nomax", !this.MaximizeBox), this.BodyClass("nomin", !this.MinimizeBox)
         if (this.Title = "") {
@@ -1236,7 +1243,8 @@ class AxWindow {
         if this._dirty                      ; set before the page was there
             this.BodyClass("ax-dirty", true)
         this.Ready := true
-        try this._SrSetup()                 ; SmoothResize: colour key, page-drawn border (before the window shows)
+        try this._SrSetup()                 ; SmoothResize: left/top drags from now on
+        try this._TokRefresh()              ; ThemedCss: worked out with the theme as it now is
         try this.TitleAlign()               ; the bar's icon over the rail's (the page is laid out now)
         ; the first callback is AxGui's _Wire, which shows the window before it
         ; puts the pages back; after it they are back whatever it did
@@ -1379,6 +1387,7 @@ class AxWindow {
                 this._MakeFocusable(el)
             }
         }
+        this._ActRender()                            ; header buttons on the pages just filled
         return this
     }
     _WireChrome() {
@@ -1510,7 +1519,7 @@ class AxWindow {
             if light {
                 c1 := AxWindow._Mix("#fbfbfb", tint, st * 0.6), c2 := AxWindow._Mix("#f9f9f9", tint, st * 0.6)
                 css .= pre ".card," pre ".expander," pre ".tile," pre ".sort-list .drag-item," pre ".dd-value," pre ".btn:not(.accent):not(.subtle)," pre ".list," pre ".hex,"
-                    .  pre ".textbox input," pre ".textbox textarea," pre ".searchbox input," pre ".numberbox input," pre ".passwordbox input{background:" c1 "}"
+                    .  pre ".textbox input," pre ".textbox textarea," pre ".searchbox input," pre ".numberbox input," pre ".passwordbox input," pre ".axcp-fbox{background:" c1 "}"
                     .  pre ".dd-menu," pre "#axCtx," pre "#axDlg," pre "#axToast," pre "#axTip{background:" c2 "}"
             } else {
                 css .= pre ".dd-menu," pre "#axCtx," pre "#axToast," pre "#axTip{background:" AxWindow._Mix("#2c2c2c", tint, st) "}"
@@ -1694,7 +1703,7 @@ class AxWindow {
             ; single click, so the class is set here and cleared on mouseup
             if AxWindow._IsLeft(ev) {
                 pb := this._ClosestClass(el, "btn")
-                for c in ["axdlg-btn", "winbtn", "axtb-item", "seg", "tab", "spin", "chip", "imgbox"]
+                for c in ["axdlg-btn", "winbtn", "axtb-item", "ax-act", "seg", "tab", "spin", "chip", "imgbox"]
                     if !pb
                         pb := this._ClosestClass(el, c)
                 if pb {
@@ -1861,6 +1870,15 @@ class AxWindow {
                         var pop = el.id === "axCtx" || c.indexOf(" dd-menu ") >= 0 || c.indexOf(" ac-menu ") >= 0;
                         if (canMove(el, dy)) { box = page(el) ? root : el; break; }
                         if (pop) { popup = true; break; }
+                    }
+                    /* an open drop-down list is pinned to the window (_PlaceDropdown):
+                       the page must not slide out from under it */
+                    if (!popup && document.querySelector(".dropdown.open, .autocomplete.open")) {
+                        for (el = e.target || e.srcElement, n = 0; el && el.nodeType === 1 && n < 60; el = el.parentNode, n++) {
+                            c = " " + el.className + " ";
+                            if (c.indexOf(" dd-menu ") >= 0 || c.indexOf(" ac-menu ") >= 0) { popup = true; break; }
+                        }
+                        if (!popup) { e.preventDefault(); return; }
                     }
                     if (!box) { if (popup) { e.preventDefault(); } return; }
                     /* a touchpad (or a free-spinning wheel) sends many small
@@ -2038,18 +2056,23 @@ class AxWindow {
         return false
     }
     _UpdateBorder() {
-        color := this.IsSnapped() ? this.SnapBorder : this.BorderColor
-        if this._srOn {                                  ; SmoothResize: the page draws it, not Windows
-            AxSys.Border(this.Gui.Hwnd, "none")
-            this._SrBorder(color)
-        } else
-            AxSys.Border(this.Gui.Hwnd, color)
+        if this._srActive                                ; mid-drag: as it was (a drag is not a snap)
+            return
+        AxSys.Border(this.Gui.Hwnd, this.IsSnapped() ? this.SnapBorder : this.BorderColor)
     }
+    ; Every size change -- Windows' own, and each step of a SmoothResize drag,
+    ; at the size seen -- comes here, so whatever lays the page out on a
+    ; resize keeps up during the drag.
     _OnSize(mm, w, h) {
-        if this.Closing || mm = -1 || this._srActive
+        if this.Closing
+            return
+        for cb in this._sizeCbs                          ; OnEvent("Size") through AxGui.Compat
+            try cb(this, mm, w, h)
+        if (mm = -1)
             return
         this._UpdateBorder()
-        try this.Ax.Move(, , w, h)
+        if !this._srActive                               ; a smooth drag places the page itself
+            try this.Ax.Move(, , w, h)
         this._LayoutEmbeds()
         this.CloseContextMenu()
         this._CloseDropdown()
@@ -2080,7 +2103,7 @@ class AxWindow {
                 return 0
         case 0x24:                                       ; WM_GETMINMAXINFO
             return this._MinMaxInfo(l, hwnd)
-        case 0x86:                                       ; WM_NCACTIVATE: skip frame repaint
+        case 0x86:                                       ; WM_NCACTIVATE
             this.BodyClass("inactive", !w)
             if !w {
                 this.CloseContextMenu()
@@ -2088,7 +2111,12 @@ class AxWindow {
                 this._HotkeyCapture("")
                 this._MbBlur()                       ; an Alt-revealed bar hides again
             }
-            return 1
+            ; DWM must hear it, or the window keeps the smaller, inactive
+            ; shadow while focused; -1: update the state, paint no frame
+            ; (Windows would otherwise draw a classic one over the page)
+            return DllCall("DefWindowProc", "Ptr", hwnd, "UInt", 0x86, "Ptr", w, "Ptr", -1, "Ptr")
+        case 0x85:                                       ; WM_NCPAINT: there is no frame to paint
+            return 0
         case 0x84:                                       ; WM_NCHITTEST
             if this._InMaxRect(l)
                 return 9                                 ; HTMAXBUTTON -> Snap Layouts flyout
@@ -2313,7 +2341,7 @@ class AxWindow {
             return
         AxWindow._hooked := true
         route := ObjBindMethod(AxWindow, "_Route")
-        for msg in [0x83, 0x24, 0x86, 0x84, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0x233,
+        for msg in [0x83, 0x24, 0x86, 0x85, 0x84, 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0x233,
                     0x100, 0x104, 0x105, 0x313]
             OnMessage(msg, route)
     }
@@ -2481,16 +2509,20 @@ class AxWindow {
 #Include %A_LineFile%\..\AxWindow.Overlays.ahk
 #Include %A_LineFile%\..\AxWindow.Bars.ahk
 #Include %A_LineFile%\..\AxWindow.Titlebar.ahk
+#Include %A_LineFile%\..\AxWindow.Actions.ahk
 #Include %A_LineFile%\..\AxWindow.Embed.ahk
 #Include %A_LineFile%\..\AxWindow.Media.ahk
 #Include %A_LineFile%\..\AxWindow.DragDrop.ahk
 #Include %A_LineFile%\..\AxWindow.SmoothResize.ahk
+#Include %A_LineFile%\..\AxWindow.Bands.ahk
 
 AxWindow.Mixin(AxWindowComponents)
 AxWindow.Mixin(AxWindowOverlays)
 AxWindow.Mixin(AxWindowBars)
 AxWindow.Mixin(AxWindowTitlebar)
+AxWindow.Mixin(AxWindowActions)
 AxWindow.Mixin(AxWindowEmbed)
 AxWindow.Mixin(AxWindowMedia)
 AxWindow.Mixin(AxWindowDragDrop)
 AxWindow.Mixin(AxWindowSmoothResize)
+AxWindow.Mixin(AxWindowBands)

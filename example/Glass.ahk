@@ -201,12 +201,9 @@ class GlassGui extends AxGui {
 
     _OnMsg(w, l, msg, hwnd) {
         if (this.Material != "none") {
-            ; the base answers WM_NCACTIVATE itself to skip a frame repaint, so
-            ; DWM would never hear the window is active and the backdrop would
-            ; stay in its flat, inactive look. -1: update, paint nothing.
-            if (msg = 0x86)
-                DllCall("DefWindowProc", "Ptr", hwnd, "UInt", 0x86, "Ptr", w, "Ptr", -1)
-            else if (msg = 0x84) {
+            ; (WM_NCACTIVATE: the base tells DWM itself now, so the backdrop
+            ; takes its active look without help from here)
+            if (msg = 0x84) {
                 r := super._OnMsg(w, l, msg, hwnd)          ; the maximize button first (Snap Layouts)
                 return (r != "") ? r : this._GlassHit(l)
             }

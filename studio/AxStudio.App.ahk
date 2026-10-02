@@ -70,7 +70,7 @@ if (A_LineFile = A_ScriptFullPath) {
 ; =============================================================================
 
 class AxStudio extends AxGui {
-    static Ver := "0.9"                 ; the studio's release (version.json "axstudio")
+    static Ver := "0.92"                 ; the studio's release (version.json "axstudio")
     StudioVer() => AxStudio.Ver
     ; When this window started, and the newest of the studio's and the
     ; library's files at that moment -- so About can say the code on disk has
@@ -1126,6 +1126,7 @@ class AxStudio extends AxGui {
           .      head AxGen.Canvas(P, page) '</div></div></div>' status
         this.El("axdFrame").innerHTML := h
         AxTags.Expand(this.Doc)
+        try AxGen.PlaceActions(this.Doc, IsObject(page) ? page.Kids : AxGen._Loose(P))   ; header buttons
         this.CanvasEditors()
         ; a burger first in a bar with no icon lines up over the rail, as it
         ; will in the window (AxWindow.Titlebar's TitleAlign)

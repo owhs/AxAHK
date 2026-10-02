@@ -121,7 +121,8 @@ ShowNotifyDismiss(reason) {
 Sheets := [["win11", "Windows 11"], ["win98", "Windows 98"], ["winxp", "Windows XP"],
            ["win365", "Windows 365"], ["cyber", "Cyber"], ["rpg", "RPG"], ["cozy", "Cozy"],
            ["aurora", "Aurora"], ["instrument", "Instrument"], ["precision", "Precision"],
-           ["inset", "Modern Inset"], ["brutalist", "Brutalist"]]
+           ["inset", "Modern Inset"], ["brutalist", "Brutalist"], ["macos", "macOS"], ["riso", "Riso Print"],
+           ["blueprint", "Blueprint"], ["aero", "Aero"], ["deco", "Art Deco"], ["crt", "Terminal"]]
 
 g.AddMenuBar([
     {Title: "&File", Items: [

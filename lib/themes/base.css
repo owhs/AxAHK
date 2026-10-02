@@ -120,6 +120,37 @@ body.axtb-center #axTbLeft{display:flex;flex:1;min-width:0}
 .axtb-item .ico{font-family:'Segoe Fluent Icons','Segoe MDL2 Assets';font-size:14px;line-height:1}
 .axtb-item img{display:block;max-height:20px;max-width:100%}
 .axtb-item .ax-svg,.axtb-item .ax-svg svg{display:block;line-height:0}
+/* header actions (AxWindow.Actions.ahk): the strip at the trailing end of an
+   expander's header or in a card's corner. Neutral greys over currentColor so
+   every sheet gets something sensible; a sheet may restyle .ax-act freely. */
+.ax-acts{display:inline-flex;align-items:center;flex:none;margin:0 10px 0 12px;white-space:nowrap;-ms-user-select:none;user-select:none;transition:opacity .12s}
+.ax-acts.corner{position:absolute;top:10px;right:10px;z-index:2;margin:0}
+.has-acts{position:relative}
+.card.has-acts > h3:first-of-type{padding-right:120px}
+.acts-reveal .ax-acts.reveal{opacity:0}
+.acts-reveal:hover .ax-acts.reveal,.acts-reveal .ax-acts.reveal:focus-within{opacity:1}
+.ax-act{position:relative;display:inline-flex;align-items:center;height:30px;min-width:30px;padding:0 8px;margin-left:4px;justify-content:center;border-radius:4px;cursor:default;font-size:13px;line-height:1;color:inherit;border:1px solid transparent;transition:background .1s,color .1s}
+.ax-act:hover{background:rgba(128,128,128,.16)}
+.ax-act.pressed{background:rgba(128,128,128,.10);opacity:.8}
+.ax-act.on,.ax-act.open,.ax-act.pop-open{background:rgba(128,128,128,.24)}
+.ax-act.disabled{opacity:.4}.ax-act.disabled:hover{background:none}
+.ax-act.has-text{border-color:rgba(128,128,128,.28);background:rgba(128,128,128,.07)}
+.ax-act.has-text:hover{background:rgba(128,128,128,.16)}
+.ax-act .ico{font-family:'Segoe Fluent Icons','Segoe MDL2 Assets';font-size:14px;line-height:1;font-style:normal}
+.ax-act.has-text .ax-act-ico{margin-right:7px}
+.ax-act.no-ico .ax-act-text{padding:0 3px}
+.ax-act-drop{font-size:9px !important;margin-left:7px;opacity:.75}
+.ax-act.done{color:#3fb950}
+.ax-act.primary{background:#4c6ef5;border-color:#4c6ef5;color:#fff}
+.ax-act.primary:hover{background:#5d7cf7}
+.ax-act.split{padding:0}
+.ax-act-main,.ax-act-arrow{display:inline-flex;align-items:center;height:100%;padding:0 8px;border-radius:3px}
+.ax-act-arrow{padding:0 7px;border-left:1px solid rgba(128,128,128,.30);border-radius:0 3px 3px 0}
+.ax-act-arrow .ax-act-drop{margin:0}
+.ax-act.split:hover{background:rgba(128,128,128,.07)}
+.ax-act-main:hover,.ax-act-arrow:hover{background:rgba(128,128,128,.16)}
+.ax-act.primary .ax-act-arrow{border-left-color:rgba(255,255,255,.35)}
+.ax-act-sep{display:inline-block;width:1px;height:16px;margin:0 6px;padding:0;border:0;background:rgba(128,128,128,.35) !important;pointer-events:none}
 /* the burger, and the cross it becomes when the item is "on" and asked to
    morph (Class: "morph") -- three rules, no glyph, crisp at any DPI */
 .axtb-burger{position:relative;display:block;width:15px;height:12px}
@@ -164,6 +195,21 @@ body.ax-dirty #titleText::before{content:"\25CF\00A0";opacity:.75}
 /* the dialog button the keyboard is on (arrow keys, Tab) */
 .axdlg-btn.kb{box-shadow:0 0 0 2px #60cdff}body.theme-light .axdlg-btn.kb{box-shadow:0 0 0 2px #005fb8}.axdlg-btn:focus{outline:none}
 .axsb-part.empty{display:none!important}
+/* The window's own status bar (one that is a child of body) is pinned to the
+   bottom by the browser itself, whatever height the sheet gives it. Left in
+   the flow under #shell, whose calc() assumes one height, it sat a pixel or
+   two off on sheets with another, and moved with every resize. */
+body>.axsb{position:fixed;left:0;right:0;bottom:0;z-index:30}
+/* A header band or footer (AxWindow.Bands.ahk): the window is a column -- the
+   band (title bar inside it), the page, the footer, the status bar -- and the
+   page takes what is left, whatever the band's height at this width and the
+   sheet's title bar, so the sheets' calc() reserves are set aside. */
+body.ax-flow{display:-ms-flexbox;display:flex;-ms-flex-direction:column;flex-direction:column}
+body.ax-flow>*{-ms-flex:none;flex:none}
+body.ax-flow>#shell{-ms-flex:1 1 0px;flex:1 1 0px;height:auto!important;min-height:0}
+body.ax-flow>.axsb{position:relative}
+#axHeader{position:relative;cursor:default;-ms-user-select:none;user-select:none}
+body.ax-header-under #axHeader>#titlebar{position:relative;z-index:2;background:transparent!important;border-color:transparent!important;box-shadow:none!important}
 #sidebar{display:-ms-flexbox;display:flex;-ms-flex-direction:column;flex-direction:column;overflow:hidden}
 .nav-gap{-ms-flex:1 1 auto;flex:1 1 auto;min-height:8px}
 

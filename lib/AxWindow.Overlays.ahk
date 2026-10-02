@@ -62,6 +62,7 @@ class AxWindowOverlays {
     CloseContextMenu() {
         this._BarMenuClosed()
         this._TbMenuClosed()
+        this._ActMenuClosed()
         SetTimer(this._ctxCloseFn, 0)
         this._CtxSwitchLater("", 0)
         this._ctxPin := "", this._ctxCloseLevel := 0

@@ -1,0 +1,194 @@
+/* @extends win11 */
+/* @accent-hue 44 14 */
+/* ============================================================================
+   deco.css — Art Deco: a 1928 hotel lobby. Black lacquer, gold foil, a
+   sunburst fanned out behind everything, capitals spaced wide enough to
+   walk between.
+
+   Rules of the sheet:
+     • GOLD IS FOIL, not a flat yellow: a gradient that catches the light
+       across a diagonal (dark, bright, dark, bright).
+     • FRAMES ARE DOUBLE: a gold rule, a sliver of black, another gold rule.
+       Single lines are for things that do not matter.
+     • CAPITALS, SPACED. Display type is a high-contrast serif (Bodoni,
+       Didot, falling back to Georgia); labels are spaced at .25em or more.
+     • SYMMETRY. Titles are centred and flanked by a small diamond.
+     • Corners are square; the geometry does the decorating.
+   Light is the same lobby by day: ivory plaster, black and gold.
+   Heights are win11's (title bar 32, menu bar 28, status bar 24): the #shell
+   sums stand.
+   ========================================================================= */
+
+body.sheet-deco { font-family: "Gill Sans MT", "Gill Sans", "Segoe UI", sans-serif; font-size: 13px; letter-spacing: .02em; }
+body.sheet-deco.theme-dark {
+    color: #eadfc4; background-color: #0c0b0d;
+    /* the sunburst: rays fanning up from below the page (an SVG: Trident has
+       no conic gradients), under a glow */
+    background-image: radial-gradient(ellipse at 50% 120%, rgba(212,175,55,.16) 0%, transparent 62%),
+                      url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100' preserveAspectRatio='none'%3E%3Cpath fill='%23d4af37' fill-opacity='.13' d='M100 118L-180 118L-180 102ZM100 118L-178 87L-176 71ZM100 118L-173 56L-169 40ZM100 118L-164 26L-159 11ZM100 118L-152 -3L-145 -17ZM100 118L-137 -31L-128 -44ZM100 118L-119 -57L-109 -69ZM100 118L-98 -80L-87 -91ZM100 118L-75 -101L-62 -110ZM100 118L-49 -119L-35 -127ZM100 118L-21 -134L-7 -141ZM100 118L8 -146L22 -151ZM100 118L38 -155L53 -158ZM100 118L69 -160L84 -162ZM100 118L100 -162L116 -162ZM100 118L131 -160L147 -158ZM100 118L162 -155L178 -151ZM100 118L192 -146L207 -141ZM100 118L221 -134L235 -127ZM100 118L249 -119L262 -110ZM100 118L275 -101L287 -91ZM100 118L298 -80L309 -69ZM100 118L319 -57L328 -44ZM100 118L337 -31L345 -17ZM100 118L352 -3L359 11ZM100 118L364 26L369 40ZM100 118L373 56L376 71ZM100 118L378 87L380 102Z'/%3E%3C/svg%3E");
+    background-size: auto, 100% 100%;
+}
+body.sheet-deco.theme-light {
+    color: #1c1a17; background-color: #f4eedf;
+    background-image: radial-gradient(ellipse at 50% 120%, rgba(180,140,40,.16) 0%, transparent 60%),
+                      url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100' preserveAspectRatio='none'%3E%3Cpath fill='%238a6a1f' fill-opacity='.12' d='M100 118L-180 118L-180 102ZM100 118L-178 87L-176 71ZM100 118L-173 56L-169 40ZM100 118L-164 26L-159 11ZM100 118L-152 -3L-145 -17ZM100 118L-137 -31L-128 -44ZM100 118L-119 -57L-109 -69ZM100 118L-98 -80L-87 -91ZM100 118L-75 -101L-62 -110ZM100 118L-49 -119L-35 -127ZM100 118L-21 -134L-7 -141ZM100 118L8 -146L22 -151ZM100 118L38 -155L53 -158ZM100 118L69 -160L84 -162ZM100 118L100 -162L116 -162ZM100 118L131 -160L147 -158ZM100 118L162 -155L178 -151ZM100 118L192 -146L207 -141ZM100 118L221 -134L235 -127ZM100 118L249 -119L262 -110ZM100 118L275 -101L287 -91ZM100 118L298 -80L309 -69ZM100 118L319 -57L328 -44ZM100 118L337 -31L345 -17ZM100 118L352 -3L359 11ZM100 118L364 26L369 40ZM100 118L373 56L376 71ZM100 118L378 87L380 102Z'/%3E%3C/svg%3E");
+    background-size: auto, 100% 100%;
+}
+/* the display face and the spaced capitals */
+body.sheet-deco h1, body.sheet-deco h2, body.sheet-deco #axDlgTitle, body.sheet-deco #titleText {
+    font-family: "Bodoni MT", Didot, "Bodoni 72", "Times New Roman", Georgia, serif; font-weight: normal; text-transform: uppercase;
+}
+body.sheet-deco h3, body.sheet-deco .caption, body.sheet-deco .btn, body.sheet-deco .axdlg-btn, body.sheet-deco .tab, body.sheet-deco .seg,
+body.sheet-deco .nav-item, body.sheet-deco .legend, body.sheet-deco .dv-hcell, body.sheet-deco .chip, body.sheet-deco .axmb-item {
+    text-transform: uppercase; letter-spacing: .22em;
+}
+
+/* --------------------------------------------------------------- the marquee */
+body.sheet-deco #titlebar { background: #0c0b0d; box-shadow: inset 0 -1px 0 #d4af37, inset 0 -3px 0 #0c0b0d, inset 0 -4px 0 #8a6a1f; }
+body.sheet-deco.theme-light #titlebar { background: #1c1a17; }
+body.sheet-deco #titleText { text-align: center; font-size: 14px; letter-spacing: .4em; color: #e9cf7a; }
+body.sheet-deco.theme-light #titleText, body.sheet-deco.theme-dark #titleText { color: #e9cf7a; }
+body.sheet-deco #titleText:before { content: "\25C6\00A0\00A0\00A0"; font-size: 8px; vertical-align: 2px; color: #d4af37; }
+body.sheet-deco #titleText:after { content: "\00A0\00A0\00A0\25C6"; font-size: 8px; vertical-align: 2px; color: #d4af37; }
+body.sheet-deco #titlebar .app-icon { color: #d4af37; }
+body.sheet-deco #titlebar .winbtn { color: #d4af37; font-size: 9px; transition: none; }
+body.sheet-deco #titlebar .winbtn:hover { background: rgba(212,175,55,.16); color: #f5d77a; }
+body.sheet-deco #titlebar #btnClose:hover { background: #7a1712; color: #f5d77a; }
+
+/* ------------------------------------------------------------------ the rail */
+body.sheet-deco #sidebar { width: 214px; padding: 14px 12px; border-right: 1px solid rgba(212,175,55,.4); }
+body.sheet-deco.theme-dark #sidebar { background: rgba(0,0,0,.2); }
+body.sheet-deco.theme-light #sidebar { background: rgba(28,26,23,.04); border-right-color: rgba(138,106,31,.45); }
+body.sheet-deco .nav-item { height: 34px; font-size: 10.5px; letter-spacing: .14em; border-radius: 0; transition: none; }
+body.sheet-deco.theme-dark .nav-item { color: #cbbf9f; }
+body.sheet-deco.theme-light .nav-item { color: #3a352c; }
+body.sheet-deco .nav-item .ico { color: #b8892b; }
+body.sheet-deco .nav-item:hover { background: rgba(212,175,55,.08); }
+body.sheet-deco.theme-dark .nav-item.active, body.sheet-deco.theme-light .nav-item.active { color: #0c0b0d;
+    background: linear-gradient(135deg, #8a6a1f 0%, #f5d77a 38%, #b8892b 58%, #f3dd8c 82%, #a07a25 100%); }
+body.sheet-deco .nav-item.active .ico { color: #0c0b0d; }
+body.sheet-deco .nav-item.active:before { display: none; }
+body.sheet-deco #content { background: transparent; }
+
+/* ----------------------------------------------------------------- the type */
+body.sheet-deco h1 { font-size: 30px; line-height: 38px; letter-spacing: .18em; text-align: center; margin: 6px 0 22px; padding-bottom: 10px;
+    color: #e9cf7a; border-bottom: 3px double #b8892b; }
+body.sheet-deco.theme-light h1 { color: #1c1a17; }
+body.sheet-deco h2 { font-size: 19px; letter-spacing: .14em; color: #d4af37; }
+body.sheet-deco.theme-light h2 { color: #7a5a14; }
+body.sheet-deco h3 { font-size: 11px; font-weight: 600; }
+body.sheet-deco .caption { font-size: 10px; font-weight: 600; color: #b8892b; }
+body.sheet-deco.theme-dark .hint, body.sheet-deco.theme-dark .card-row .desc, body.sheet-deco.theme-dark .tile .desc { color: #9d927a; }
+body.sheet-deco.theme-light .hint, body.sheet-deco.theme-light .card-row .desc, body.sheet-deco.theme-light .tile .desc { color: #6b6150; }
+body.sheet-deco .hint { font-style: italic; font-family: Georgia, serif; }
+body.sheet-deco .link, body.sheet-deco a { color: #d4af37; text-decoration: none; border-bottom: 1px solid rgba(212,175,55,.5); }
+body.sheet-deco.theme-light .link, body.sheet-deco.theme-light a { color: #7a5a14; }
+
+/* ------------------------------------------- panels: the double gold frame */
+body.sheet-deco .card, body.sheet-deco .expander, body.sheet-deco .tile, body.sheet-deco .infobar {
+    border-radius: 0; border: 1px solid #b8892b; padding: 16px 20px;
+    box-shadow: inset 0 0 0 3px #0c0b0d, inset 0 0 0 4px rgba(212,175,55,.55);
+}
+body.sheet-deco.theme-dark .card, body.sheet-deco.theme-dark .expander, body.sheet-deco.theme-dark .tile, body.sheet-deco.theme-dark .infobar { background: rgba(19,18,21,.78); }
+body.sheet-deco.theme-light .card, body.sheet-deco.theme-light .expander, body.sheet-deco.theme-light .tile, body.sheet-deco.theme-light .infobar {
+    background: #fbf7ec; box-shadow: inset 0 0 0 3px #fbf7ec, inset 0 0 0 4px rgba(138,106,31,.55); }
+body.sheet-deco .group { border-radius: 0; border: 3px double #b8892b; background: transparent; }
+body.sheet-deco fieldset.group > legend.legend { font-size: 10px; color: #d4af37; }
+body.sheet-deco.theme-light fieldset.group > legend.legend { color: #7a5a14; }
+body.sheet-deco .exp-body { background: transparent; border-top: 1px solid rgba(212,175,55,.35); border-radius: 0; }
+
+/* -------------------------------------------------------------- the fittings */
+body.sheet-deco .btn, body.sheet-deco .axdlg-btn {
+    height: 32px; line-height: 30px; border-radius: 0; font-size: 10px; padding: 0 20px; transition: none;
+    color: #d4af37; background: transparent; border: 1px solid #b8892b; box-shadow: inset 0 0 0 2px #0c0b0d, inset 0 0 0 3px rgba(212,175,55,.45);
+}
+body.sheet-deco.theme-light .btn, body.sheet-deco.theme-light .axdlg-btn { color: #1c1a17; box-shadow: inset 0 0 0 2px #f4eedf, inset 0 0 0 3px rgba(138,106,31,.45); }
+body.sheet-deco .btn:hover, body.sheet-deco .axdlg-btn:hover, body.sheet-deco .btn.accent, body.sheet-deco .axdlg-btn.primary {
+    color: #0c0b0d; box-shadow: none; border-color: #8a6a1f;
+    background: linear-gradient(135deg, #8a6a1f 0%, #f5d77a 38%, #b8892b 58%, #f3dd8c 82%, #a07a25 100%);
+}
+body.sheet-deco .btn.accent:hover, body.sheet-deco .axdlg-btn.primary:hover { background: linear-gradient(135deg, #a07a25 0%, #fbe7a0 40%, #c99a35 60%, #fbe7a0 85%, #a07a25 100%); }
+body.sheet-deco .btn.danger { color: #f5d77a; background: #6d1510; border-color: #b8892b; }
+body.sheet-deco .btn.subtle { border-color: transparent; box-shadow: none; }
+body.sheet-deco .btn:active, body.sheet-deco .btn.pressed { -ms-filter: none; opacity: .85; }
+body.sheet-deco .btn.icon { letter-spacing: 0; text-transform: none; }
+
+body.sheet-deco .textbox input, body.sheet-deco .textbox textarea, body.sheet-deco .searchbox input, body.sheet-deco .numberbox input,
+body.sheet-deco .passwordbox input, body.sheet-deco .hotkeybox input, body.sheet-deco .dd-value, body.sheet-deco #axDlgInput,
+body.sheet-deco .hex, body.sheet-deco .list, body.sheet-deco .filelist, body.sheet-deco .dv-frame {
+    border-radius: 0; box-shadow: none; border: none; border-bottom: 1px solid #b8892b;
+}
+body.sheet-deco.theme-dark .textbox input, body.sheet-deco.theme-dark .textbox textarea, body.sheet-deco.theme-dark .searchbox input,
+body.sheet-deco.theme-dark .numberbox input, body.sheet-deco.theme-dark .passwordbox input, body.sheet-deco.theme-dark .hotkeybox input,
+body.sheet-deco.theme-dark .dd-value, body.sheet-deco.theme-dark #axDlgInput, body.sheet-deco.theme-dark .hex { background: rgba(212,175,55,.06); color: #f3e7c6; }
+body.sheet-deco.theme-light .textbox input, body.sheet-deco.theme-light .textbox textarea, body.sheet-deco.theme-light .searchbox input,
+body.sheet-deco.theme-light .numberbox input, body.sheet-deco.theme-light .passwordbox input, body.sheet-deco.theme-light .hotkeybox input,
+body.sheet-deco.theme-light .dd-value, body.sheet-deco.theme-light #axDlgInput, body.sheet-deco.theme-light .hex { background: rgba(138,106,31,.07); color: #1c1a17; }
+body.sheet-deco.theme-dark .list, body.sheet-deco.theme-dark .filelist, body.sheet-deco.theme-dark .dv-frame { background: #131215; border: 1px solid rgba(212,175,55,.45); color: #eadfc4; }
+body.sheet-deco.theme-light .list, body.sheet-deco.theme-light .filelist, body.sheet-deco.theme-light .dv-frame { background: #fbf7ec; border: 1px solid rgba(138,106,31,.45); }
+body.sheet-deco .textbox input:focus, body.sheet-deco .textbox textarea:focus, body.sheet-deco .searchbox input:focus,
+body.sheet-deco .passwordbox input:focus, body.sheet-deco #axDlgInput:focus, body.sheet-deco .numberbox.focus input,
+body.sheet-deco .dropdown.open .dd-value { border-bottom: 3px double #f5d77a; }
+
+body.sheet-deco .sw-track { border-radius: 0; border: 1px solid #b8892b; background: transparent; }
+body.sheet-deco .sw-track:before { border-radius: 0; background: #b8892b; -ms-transform: rotate(45deg) scale(.8); transform: rotate(45deg) scale(.8); }
+body.sheet-deco .switch input:checked + .sw-track { background: linear-gradient(135deg, #8a6a1f 0%, #f5d77a 38%, #b8892b 58%, #f3dd8c 82%, #a07a25 100%); }
+body.sheet-deco .switch input:checked + .sw-track:before { background: #0c0b0d; }
+body.sheet-deco .check .box { border-radius: 0; border: 1px solid #b8892b; background: transparent; }
+body.sheet-deco .check input:checked + .box { color: #0c0b0d; background: linear-gradient(135deg, #8a6a1f 0%, #f5d77a 45%, #b8892b 100%); }
+/* radios are diamonds */
+body.sheet-deco .radio .ring { border-radius: 0; border: 1px solid #b8892b; background: transparent; -ms-transform: rotate(45deg) scale(.8); transform: rotate(45deg) scale(.8); }
+body.sheet-deco .radio input:checked + .ring { border: 1px solid #b8892b; background: transparent; box-shadow: inset 0 0 0 3px #0c0b0d, inset 0 0 0 9px #d4af37; }
+body.sheet-deco.theme-light .radio input:checked + .ring { box-shadow: inset 0 0 0 3px #f4eedf, inset 0 0 0 9px #8a6a1f; }
+body.sheet-deco .radio input:checked + .ring:after { display: none; }
+body.sheet-deco .progress { border-radius: 0; height: 6px; background: rgba(212,175,55,.15); }
+body.sheet-deco .progress .bar { border-radius: 0; background: linear-gradient(90deg, #8a6a1f 0%, #f5d77a 50%, #8a6a1f 100%); }
+body.sheet-deco input[type=range]::-ms-thumb { width: 14px; height: 14px; border-radius: 0; background: #d4af37; border: 1px solid #0c0b0d; }
+body.sheet-deco input[type=range]::-ms-fill-lower { background: #d4af37; }
+body.sheet-deco .tabs { border-bottom: 3px double #b8892b; }
+body.sheet-deco .tab { border-radius: 0; font-size: 10px; transition: none; }
+body.sheet-deco .tab.active { color: #d4af37; }
+body.sheet-deco.theme-light .tab.active { color: #7a5a14; }
+body.sheet-deco .tab.active:after { left: 50%; right: auto; width: 8px; height: 8px; margin-left: -4px; bottom: -6px; border-radius: 0; background: #d4af37; -ms-transform: rotate(45deg); transform: rotate(45deg); }
+body.sheet-deco .segmented { border-radius: 0; border: 1px solid #b8892b; background: transparent; padding: 0; }
+body.sheet-deco .segmented .seg { border-radius: 0; font-size: 10px; }
+body.sheet-deco .segmented .seg.active { color: #0c0b0d; background: linear-gradient(135deg, #8a6a1f 0%, #f5d77a 38%, #b8892b 58%, #f3dd8c 82%, #a07a25 100%); }
+body.sheet-deco .chip { border-radius: 0; font-size: 9px; background: transparent; border: 1px solid rgba(212,175,55,.6); }
+body.sheet-deco .chip.on { color: #0c0b0d; background: #d4af37; }
+body.sheet-deco .badge { border-radius: 0; background: #d4af37; color: #0c0b0d; }
+body.sheet-deco .rating .star.on { color: #d4af37; }
+body.sheet-deco .swatch { border-radius: 0; }
+
+/* ---------------------------------------------------- menus, bars, dialogs */
+body.sheet-deco .dd-menu, body.sheet-deco #axCtx, body.sheet-deco .axctx, body.sheet-deco #axPop {
+    border-radius: 0; background: #0f0e11; color: #eadfc4; border: 1px solid #b8892b;
+    box-shadow: inset 0 0 0 3px #0f0e11, inset 0 0 0 4px rgba(212,175,55,.5), 0 12px 30px rgba(0,0,0,.6);
+}
+body.sheet-deco .dd-item, body.sheet-deco .list-item, body.sheet-deco .axctx-item { border-radius: 0; }
+body.sheet-deco .dd-item:hover, body.sheet-deco .list-item:hover, body.sheet-deco .axctx-item:hover, body.sheet-deco .fl-row:hover { background: rgba(212,175,55,.14); }
+body.sheet-deco .dd-item.selected, body.sheet-deco .list-item.selected { color: #0c0b0d; background: linear-gradient(135deg, #8a6a1f 0%, #f5d77a 45%, #b8892b 100%); }
+body.sheet-deco .dd-item.selected:before, body.sheet-deco .list-item.selected:before { display: none; }
+body.sheet-deco .btn:focus, body.sheet-deco .dropdown:focus, body.sheet-deco .list:focus, body.sheet-deco .tab:focus,
+body.sheet-deco .seg:focus, body.sheet-deco .chip:focus, body.sheet-deco .axdlg-btn:focus { outline: 1px solid #f5d77a; }
+body.sheet-deco .axmb { background: #0c0b0d; border-bottom: 1px solid rgba(212,175,55,.45); }
+body.sheet-deco .axmb-item { border-radius: 0; font-size: 10px; color: #cbbf9f; }
+body.sheet-deco .axmb-item:hover, body.sheet-deco .axmb-item.open { background: rgba(212,175,55,.16); color: #f5d77a; }
+body.sheet-deco .axsb { background: #0c0b0d; color: #b8892b; border-top: 1px solid rgba(212,175,55,.45); letter-spacing: .12em; }
+body.sheet-deco .axsb-bar > i { background: #d4af37; }
+body.sheet-deco #axDlg { border-radius: 0; background: #0f0e11; color: #eadfc4; border: 1px solid #b8892b;
+    box-shadow: inset 0 0 0 4px #0f0e11, inset 0 0 0 5px rgba(212,175,55,.6), 0 20px 60px rgba(0,0,0,.7); }
+body.sheet-deco #axDlgTitle { text-align: center; font-size: 20px; letter-spacing: .2em; color: #e9cf7a; }
+body.sheet-deco #axDlgBtns { background: transparent; border-top: 1px solid rgba(212,175,55,.35); justify-content: center; }
+body.sheet-deco #axToast, body.sheet-deco #axTip { border-radius: 0; background: #0f0e11; color: #e9cf7a; border: 1px solid #b8892b; letter-spacing: .08em; }
+body.sheet-deco .dv-hcell { font-size: 9px; color: #d4af37; background: #0c0b0d; border-bottom: 3px double #b8892b; }
+body.sheet-deco .dv-cell { border-bottom: 1px solid rgba(212,175,55,.14); }
+body.sheet-deco .dv-row.selected > .dv-cell { background: rgba(212,175,55,.22); }
+body.sheet-deco .imgbox, body.sheet-deco .thumb, body.sheet-deco .dropzone, body.sheet-deco .console { border-radius: 0; }
+body.sheet-deco .dropzone { border: 3px double #b8892b; background: transparent; }
+body.sheet-deco #titlebar .axtb-item { border-radius: 0; color: #d4af37; }
+body.sheet-deco .axrich-footer { background: transparent; border-top: 3px double #b8892b; }
+body.sheet-deco.theme-dark, body.sheet-deco.theme-dark #content, body.sheet-deco.theme-dark .list, body.sheet-deco.theme-dark .dd-menu {
+    scrollbar-face-color: #2a2418; scrollbar-arrow-color: #d4af37; scrollbar-track-color: #0c0b0d; scrollbar-shadow-color: #8a6a1f;
+    scrollbar-highlight-color: #8a6a1f; scrollbar-3dlight-color: #0c0b0d; scrollbar-darkshadow-color: #0c0b0d;
+}
+body.sheet-deco .ax-sb-v .ax-sb-bar, body.sheet-deco .ax-sb-h .ax-sb-bar { border-radius: 0; opacity: .85; background: linear-gradient(135deg, #8a6a1f 0%, #f5d77a 50%, #8a6a1f 100%); }

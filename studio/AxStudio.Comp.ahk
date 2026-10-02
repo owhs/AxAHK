@@ -196,7 +196,8 @@ class AxComp {
             props.Push({K: AxJson.Get(p, "key", ""), L: AxJson.Get(p, "label", ""),
                         Kind: kind, Emit: emit,
                         W: AxJson.Get(p, "word", AxCat._Word(AxJson.Get(p, "key", ""))),
-                        Opts: AxJson.Get(p, "options", ""), Def: AxJson.Get(p, "default", "")})
+                        Opts: AxJson.Get(p, "options", ""), Def: AxJson.Get(p, "default", ""),
+                        Shape: AxJson.Get(p, "shape", "")})        ; an options list's columns (AxStudio.Grid.js)
         }
         e.PropList := props
         ev := []

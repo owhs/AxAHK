@@ -753,6 +753,7 @@ class AxWindowComponents {
                 this._CloseDropdown()
                 AxWindow._SetClass(ac, "open", true)
                 this._ddOpen := ac
+                this._PlaceDropdown(ac)
                 this._ShieldScrollers(ac)
                 ; Trident can paint a freshly shown scrollable popup before its
                 ; layout settles (looks translucent, hit-tests wrong): settle it now
@@ -884,8 +885,44 @@ class AxWindowComponents {
         box.innerHTML := items
         return this
     }
+    ; An open list is placed against the window, not inside its box: fixed,
+    ; so no scrolling page or card clips it or grows a scrollbar for it. It
+    ; opens below when it fits, else on whichever side has more room, and is
+    ; held to that room (scrolling inside itself) when even that is short.
+    _PlaceDropdown(dd) {
+        try {
+            menu := dd.querySelector(".dd-menu")
+            st := menu.style
+            st.position := "", st.left := "", st.top := "", st.bottom := "", st.width := "", st.maxHeight := "", st.overflowY := ""
+            box := (AxWindow._HasClass(dd, "autocomplete") ? dd.querySelector("input") : dd.querySelector(".dd-value"))
+            if !IsObject(box)
+                box := dd
+            r := box.getBoundingClientRect()
+            vh := this.Doc.documentElement.clientHeight
+            vw := this.Doc.documentElement.clientWidth
+            gap := 4, edge := 8
+            st.position := "fixed"
+            st.width := Round(r.right - r.left) "px"
+            want := menu.scrollHeight + 2
+            below := vh - r.bottom - gap - edge
+            above := r.top - gap - edge
+            up := (want > below) && (above > below)
+            room := up ? above : below
+            if (want > room)
+                st.maxHeight := Max(80, Round(room)) "px", st.overflowY := "auto"
+            h := Min(want, Max(80, room))
+            st.top := Round(up ? r.top - gap - h : r.bottom + gap) "px"
+            st.left := Round(Max(edge, Min(r.left, vw - edge - (r.right - r.left)))) "px"
+            AxWindow._SetClass(dd, "flip", up)
+        }
+    }
     _CloseDropdown() {
         if IsObject(this._ddOpen) {
+            try {
+                st := this._ddOpen.querySelector(".dd-menu").style
+                st.position := "", st.left := "", st.top := "", st.bottom := "", st.width := "", st.maxHeight := "", st.overflowY := ""
+            }
+            try AxWindow._SetClass(this._ddOpen, "flip", false)
             try this._ddOpen.querySelector(".dd-menu").style.display := ""
             try AxWindow._SetClass(this._ddOpen, "open", false)
         }

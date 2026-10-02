@@ -350,6 +350,13 @@ body.theme-light .infobar.info .ico { color: #005fb8; }
 /* badge / chip */
 .badge {min-width: 18px; height: 18px; line-height: 18px; padding: 0 6px; border-radius: 9px; font-size: 11px; text-align: center; background: rgba(255,255,255,.0837);}
 .badge.accent { background: #60cdff; color: #000; }
+.ax-act.primary { background: #60cdff; border-color: #60cdff; color: #000; }
+.ax-act.primary:hover { background: #5ab9e8; }
+body.theme-light .ax-act.primary { background: #005fb8; border-color: #005fb8; color: #fff; }
+body.theme-light .ax-act.primary:hover { background: #1a6fc0; }
+.ax-act.primary .ax-act-arrow { border-left-color: rgba(0,0,0,.25); }
+.ax-act.done { color: #6ccb5f; }
+body.theme-light .ax-act.done { color: #0f7b0f; }
 .badge.success { background: #6ccb5f; color: #000; } .badge.warning { background: #fce100; color: #000; } .badge.error { background: #ff99a4; color: #000; }
 .chip {height: 28px; line-height: 26px; padding: 0 12px; margin: 0 6px 6px 0; border-radius: 14px; background: rgba(255,255,255,.0605); border: 1px solid rgba(255,255,255,.0698);}
 .chip:hover { background: rgba(255,255,255,.0837); }

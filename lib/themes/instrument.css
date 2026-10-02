@@ -181,11 +181,11 @@ body.sheet-instrument.theme-dark .group > .legend { background: #201f1d; }
 body.sheet-instrument.theme-light .group > .legend { background: #f6f4ef; }
 body.sheet-instrument.theme-dark .caption, body.sheet-instrument.theme-dark .group > .legend,
 body.sheet-instrument.theme-dark .hint, body.sheet-instrument.theme-dark .card-row .desc {
-    color: rgba(230,227,221,.38);
+    color: rgba(230,227,221,.55);   /* quiet, but 3:1 on the page and on a tint */
 }
 body.sheet-instrument.theme-light .caption, body.sheet-instrument.theme-light .group > .legend,
 body.sheet-instrument.theme-light .hint, body.sheet-instrument.theme-light .card-row .desc {
-    color: rgba(35,33,30,.48);
+    color: rgba(35,33,30,.62);
 }
 body.sheet-instrument .hint { font-size: 11px; text-transform: none; letter-spacing: .01em; }
 body.sheet-instrument .card-row .desc { font-size: 11px; }
@@ -294,6 +294,8 @@ body.sheet-instrument .switch input:checked + .sw-track:before { background: #c8
 body.sheet-instrument .chip.on, body.sheet-instrument .segmented .seg.active {
     background: transparent; border: 1px solid #c8a15a; color: #c8a15a;
 }
+/* the dark sheet's gold is too pale to read on the light page */
+body.sheet-instrument.theme-light .chip.on, body.sheet-instrument.theme-light .segmented .seg.active { border-color: #7d5e26; color: #7d5e26; }
 body.sheet-instrument .badge.accent { background: transparent; border: 1px solid #c8a15a; color: #c8a15a; }
 body.sheet-instrument .progress { border-radius: 0; background: rgba(255,255,255,.07); }
 body.sheet-instrument .progress .bar, body.sheet-instrument .progress.indeterminate .bar { background: #c8a15a; }

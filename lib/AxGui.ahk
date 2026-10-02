@@ -51,7 +51,7 @@
 ; =============================================================================
 class AxGui extends AxWindow {
     ; the library's release (github.com/owhs/axahk, version.json "axahk")
-    static Version := "1.0"
+    static Version := "1.05"
     __New(opts := "") {
         if !IsObject(opts)
             opts := {}
@@ -172,7 +172,13 @@ class AxGui extends AxWindow {
                             "instrument", ["edeae4", "1b1a18"],
                             "precision",  ["eceef1", "18191c"],
                             "inset",      ["e8eaee", "1a1c1f"],
-                            "brutalist",  ["b9bec6", "222428"])
+                            "brutalist",  ["b9bec6", "222428"],
+                            "macos",      ["ffffff", "1e1e1e"],
+                            "riso",       ["f3ede1", "17132b"],
+                            "blueprint",  ["f2f7fb", "0f3b6f"],
+                            "aero",       ["dff2ff", "062c47"],
+                            "deco",       ["f4eedf", "0c0b0d"],
+                            "crt",        ["fbfdf6", "0d0800"])
     ; The accent each stylesheet paints with when none is chosen, light and
     ; dark: what its accent button and its switch are filled with. The
     ; component packs are written in Fluent blue and take this in its place,
@@ -188,7 +194,13 @@ class AxGui extends AxWindow {
                               "instrument", ["#9a7434", "#c8a15a"],
                               "precision",  ["#0a7f5c", "#10b981"],
                               "inset",      ["#10b981", "#10b981"],
-                              "brutalist",  ["#10b981", "#10b981"])
+                              "brutalist",  ["#10b981", "#10b981"],
+                              "macos",      ["#007aff", "#0a84ff"],
+                              "riso",       ["#ff48b0", "#ff6ac1"],
+                              "blueprint",  ["#0e5aa8", "#7fd4ff"],
+                              "aero",       ["#1b8fd6", "#3aa6ec"],
+                              "deco",       ["#8a6a1f", "#d4af37"],
+                              "crt",        ["#2b2b2b", "#ffb000"])
     DefaultAccent(mode) {
         n := AxGui.SheetName(this.HasOwnProp("Stylesheet") ? this.Stylesheet : "win11")
         pair := AxGui.SheetAccent.Has(n) ? AxGui.SheetAccent[n] : AxGui.SheetAccent["win11"]
@@ -213,12 +225,21 @@ class AxGui extends AxWindow {
     ; Sheets that keep the Windows 11 rounded window corner. Everything else is
     ; square: a bevel, a hard rim or a painted band all read wrong with a
     ; rounded DWM corner clipping them.
-    static RoundSheets := Map("win11", true, "win365", true)
+    static RoundSheets := Map("win11", true, "win365", true, "macos", true, "aero", true)
     static SheetRound(name) {
         if (name = "" || name = "win11")
             return true
         n := AxGui.SheetName(name)                 ; a path resolves to its base name
         return (n != "win11") && AxGui.RoundSheets.Has(n)
+    }
+    ; The page itself, where it is not the window colour: brutalist's window
+    ; colour is its rim, and a tint mixed from the rim turned its light page a
+    ; muddy grey-pink. Without an entry the page is the window colour.
+    static SheetPage := Map("brutalist", ["f1f2f4", "141517"])
+    PageBack(mode) {
+        n := AxGui.SheetName(this.HasOwnProp("Stylesheet") ? this.Stylesheet : "win11")
+        c := AxGui.SheetPage.Has(n) ? AxGui.SheetPage[n] : AxGui.SheetBack.Has(n) ? AxGui.SheetBack[n] : AxGui.SheetBack["win11"]
+        return (mode = "light") ? c[1] : c[2]
     }
     ThemeBack(mode) {
         n := AxGui.SheetName(this.HasOwnProp("Stylesheet") ? this.Stylesheet : "win11")
@@ -263,7 +284,7 @@ class AxGui extends AxWindow {
         ; the sheet's own background, not a guess: every sheet registers its
         ; light and dark pair in SheetBack, so a new one is tinted correctly
         ; without being added to a list here
-        pair := AxGui.SheetBack.Has(n) ? AxGui.SheetBack[n] : AxGui.SheetBack["win11"]
+        pair := AxGui.SheetPage.Has(n) ? AxGui.SheetPage[n] : AxGui.SheetBack.Has(n) ? AxGui.SheetBack[n] : AxGui.SheetBack["win11"]
         base := "#" (light ? pair[1] : pair[2])
         i := light ? 1 : 2
         ; A sheet whose surfaces are not made out of its own background says so
@@ -281,22 +302,30 @@ class AxGui extends AxWindow {
             ch := M(chrome, tint, t * 0.8)
             css .= b " #sidebar," b " .axmb," b " .axsb," b " .axsb-part{background:" ch "}"
         }
-        css .= b "," b " .group>.legend," b " .tab," b " .tab-panel," b " .btn,"
+        ; Resting states only: a picked segment, the active tab, an accent
+        ; button, a hovered caption button keep the sheet's own colour. This
+        ; rule outranks them, and painting them the page colour wiped them out.
+        r := ":not(:hover):not(.active):not(.on):not(.selected):not(.accent):not(.primary)"
+        css .= b "," b " .group>.legend," b " .tab" r "," b " .tab-panel," b " .btn" r ","
             .  (chrome != "" ? "" : b " .axmb," b " .axsb," b " .axsb-part,")
             .  b " #axCtx," b " .axctx," b " #axDlg,"
-            .  b " .axdlg-btn," b " .tile," b " .chip," b " .dropzone," b " .winbtn,"
+            .  b " .axdlg-btn" r "," b " .tile" r "," b " .chip" r "," b " .dropzone," b " .winbtn" r ","
             .  b " .exp-header .chev," b " .numberbox .spin," b " .dd-value:after,"
-            .  b " .segmented .seg," b " .imgbox," b " .thumb," b " .dv-hcell,"
+            .  b " .segmented .seg" r "," b " .imgbox" r "," b " .thumb" r "," b " .dv-hcell,"
             ; #content only. The title bar and the task pane are chrome, not
             ; surfaces: they follow the accent, and a flat tint over them wipes
             ; out Luna's gradient and 9x's caption entirely.
             .  b " #content{background:" bg "}"
             .  b " .card," b " .expander," b " .dv-row.group>.dv-cell{background:" pn "}"
-            .  b " input," b " textarea," b " .textbox input," b " .textbox textarea,"
+            ; text boxes, not every <input>: a slider or a tick box painted as a
+            ; well came out as a dark box round the control
+            .  b " input[type=text]," b " input[type=number]," b " input[type=password]," b " input[type=search],"
+            .  b " textarea," b " .textbox input," b " .segmented," b " .axcp-fbox," b " .textbox textarea,"
             .  b " .searchbox input," b " .numberbox input," b " .passwordbox input,"
             .  b " .hotkeybox input," b " .list," b " .dd-value," b " .dd-menu," b " .progress,"
             .  b " .sort-list .drag-item," b " .filelist," b " .dv-frame," b " .hex,"
             .  b " .sw-track," b " .badge{background:" wl "}"
+            .  b " .slider input{background:transparent}"     ; a sheet's own input rule must not box it either
         return css
     }
     ; swap the whole look at runtime: SetStylesheet("win98" | "winxp" | "win11" | path)
@@ -572,16 +601,21 @@ class AxGui extends AxWindow {
     ; Off (0) unless asked for; a rail the script hid stays hidden.
     _OnSize(mm, w, h) {
         super._OnSize(mm, w, h)
-        this._NavAuto()
+        this._NavAuto(mm = -1 ? "" : w)
     }
-    _NavAuto() {
+    ; w: the width seen, in Gui px (during a SmoothResize drag the window itself
+    ; is grown, so its client is not what to go by); "" measures the window
+    _NavAuto(w := "") {
         at := this._opts.HasOwnProp("NavAuto") ? this._opts.NavAuto : 0
         if !at || !this.Ready || this.Closing || this.NavMode() = "hidden"
             return
         try {
-            WinGetClientPos(, , &cw, , this.Hwnd)
-            dpi := DllCall("GetDpiForWindow", "Ptr", this.Hwnd, "UInt") || 96
-            want := cw * 96 / dpi < at ? "compact" : "full"
+            if (w = "") {
+                WinGetClientPos(, , &cw, , this.Hwnd)
+                dpi := DllCall("GetDpiForWindow", "Ptr", this.Hwnd, "UInt") || 96
+                w := cw * 96 / dpi
+            }
+            want := w < at ? "compact" : "full"
             if want != this.NavMode()
                 this.NavMode(want)
         }
@@ -1024,6 +1058,17 @@ class AxGui extends AxWindow {
         }
         Use() {
             this.G._cur := this
+            return this
+        }
+        ; buttons at the end of this box's header (AxWindow.Actions.ahk):
+        ;   g.AddExpander("vspecs", "Specs").Actions([{Glyph: "E8C8", Text: "Copy", Copy: Text}])
+        Actions(items, opts := "") {
+            this.G.Actions(this.Id, items, opts)
+            return this
+        }
+        ; fn(name, win) whenever one of those buttons (or a menu entry of theirs) is pressed
+        OnAction(fn) {
+            this.G.OnAction(this.Id, fn)
             return this
         }
         ; A container is an element too, and clicking a card, a setting row or

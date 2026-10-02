@@ -458,6 +458,7 @@ body.sheet-brutalist.theme-light .infobar.info { background: #aee2ee; }
 body.sheet-brutalist .infobar.info .ico { color: #22d3ee; }
 body.sheet-brutalist .infobar.warning { background: rgba(240,180,41,.12); border-color: #f0b429; }
 body.sheet-brutalist .infobar.warning .ico { color: #f0b429; }
+body.sheet-brutalist.theme-light .infobar.warning .ico, body.sheet-brutalist.theme-light .infobar.warning .close { color: #8a5a00; }
 body.sheet-brutalist .infobar.error { background: rgba(211,47,47,.14); border-color: #d32f2f; }
 body.sheet-brutalist .infobar.error .ico { color: #ef6f6f; }
 body.sheet-brutalist #axToast.kind-success { border-left: 4px solid #10b981; }

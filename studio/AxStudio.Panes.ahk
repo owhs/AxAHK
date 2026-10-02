@@ -945,6 +945,7 @@ class AxPanes {
             for pr in e.PropList
                 if !(n.Type = "Radio" && pr.K = "group")
                 body .= add({Id: "p_c_" pr.K, L: pr.L, Kind: pr.Kind, Opts: AxPanes.ChoiceOpts(pr),
+                             Shape: (pr.HasOwnProp("Shape") && pr.Shape != "") ? pr.Shape : "vl",
                              Get: AxPanes.PropGet(n, pr.K), Set: AxPanes.PropSet(n, pr.K),
                              Each: AxPanes.PropEach(pr.K), SameType: n.Type})
             if (body != "")

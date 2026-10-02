@@ -18,7 +18,12 @@
         "kind": "text",
         "default": ""
       },
+      "props": [
+        { "key": "actions", "label": "Header buttons", "kind": "options", "shape": "act", "emit": "none" }
+      ],
       "events": [
+        { "name": "Action", "sig": "name, win", "wire": "OnAction", "filter": "name",
+          "word": "has a header button pressed", "help": "A header button, or an entry of its menu, was pressed: name says which" },
         "Click",
         "DoubleClick",
         "ContextMenu",

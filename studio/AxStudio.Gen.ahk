@@ -123,6 +123,8 @@ class AxGen {
                 v := n.Prop(pr.K, "")
                 if (canvas && pr.HasOwnProp("NoCanvas") && pr.NoCanvas)
                     continue
+                if (pr.Emit = "none")                   ; written as code of its own (header buttons)
+                    continue
                 if (pr.Emit = "flag") {
                     if (v != "" && v != 0 && v != "0")
                         p.Push(pr.W)
@@ -174,6 +176,107 @@ class AxGen {
             return out
         }
         return v
+    }
+    ; ------------------------------------------------- header buttons
+    ; A box's "Header buttons" list, one per line: icon : label : does.
+    ;   label   shown beside the icon; "(Refresh)" is a tooltip only
+    ;   does    ""                  tell the Action event (and its rules)
+    ;           copy [text]         the box's own text, or the text given
+    ;           menu A, B           a menu; each entry tells Action its name
+    ;           split A, B          a split button: the face tells Action, the arrow is the menu
+    ;           toggle              stays pressed until pressed again
+    ;           primary ...         accent-coloured, before any of the above
+    ;   "-"     a separator
+    ; Returns [{Glyph, Text, Tip, Name, Copy, Menu, Split, Toggle, Primary, Sep}].
+    static ActList(n) {
+        out := []
+        for line in StrSplit(StrReplace(n.Prop("actions", ""), "`r", ""), "`n") {
+            if (Trim(line) = "")
+                continue
+            p := StrSplit(line, ":", " `t", 3)
+            g := p[1], l := p.Length > 1 ? p[2] : "", does := p.Length > 2 ? p[3] : ""
+            if (g = "-" && l = "") {
+                out.Push({Sep: true})
+                continue
+            }
+            it := {Glyph: g, Text: l, Tip: "", Copy: "", Menu: "", Split: false, Toggle: false, Primary: false, Sep: false}
+            if RegExMatch(l, "^\((.*)\)$", &m)
+                it.Text := "", it.Tip := Trim(m[1])
+            it.Name := it.Text != "" ? it.Text : it.Tip != "" ? it.Tip : g
+            if RegExMatch(does, "i)^primary\b\s*(.*)$", &m)
+                it.Primary := true, does := m[1]
+            if RegExMatch(does, "i)^copy\b\s*(.*)$", &m)
+                it.Copy := (m[1] = "") ? true : m[1]
+            else if RegExMatch(does, "i)^(menu|split)\b\s*(.*)$", &m) {
+                it.Menu := []
+                for x in StrSplit(m[2], ",", " `t")
+                    if (x != "")
+                        it.Menu.Push(x)
+                it.Split := (StrLower(m[1]) = "split")
+            } else if RegExMatch(does, "i)^toggle\b")
+                it.Toggle := true
+            out.Push(it)
+        }
+        return out
+    }
+    ; the same list as AutoHotkey: the argument to .Actions(...)
+    static ActCode(n) {
+        list := AxGen.ActList(n)
+        if !list.Length
+            return ""
+        out := ""
+        for it in list {
+            if it.Sep {
+                out .= (out = "" ? "" : ", ") '"-"'
+                continue
+            }
+            f := ""
+            add := (k, v) => f .= (f = "" ? "" : ", ") k ": " v
+            if (it.Glyph != "")
+                add("Glyph", AxGen.S(it.Glyph))
+            if (it.Text != "")
+                add("Text", AxGen.S(it.Text))
+            if (it.Tip != "")
+                add("Tip", AxGen.S(it.Tip))
+            if (it.Name != (it.Text != "" ? it.Text : it.Tip != "" ? it.Tip : it.Glyph))
+                add("Name", AxGen.S(it.Name))
+            if (it.Copy = true && !(it.Copy is String))
+                add("Copy", "true")
+            else if (it.Copy != "")
+                add("Copy", AxGen.S(it.Copy))
+            if IsObject(it.Menu) {
+                m := ""
+                for x in it.Menu
+                    m .= (m = "" ? "" : ", ") AxGen.S(x)
+                add("Menu", "[" m "]")
+            }
+            if it.Split
+                add("Split", "true")
+            if it.Toggle
+                add("Toggle", "true")
+            if it.Primary
+                add("Primary", "true")
+            out .= (out = "" ? "" : ", ") "{" f "}"
+        }
+        return "[" out "]"
+    }
+    ; The strips on a page the studio drew: the same markup the window will
+    ; put there, placed where it will place it. The canvas is never shown as a
+    ; window, so nothing would render them otherwise.
+    static PlaceActions(doc, nodes) {
+        for n in nodes {
+            if (n.Box && Trim(n.Prop("actions", "")) != "") {
+                host := doc.getElementById("d_" n.Id)
+                if IsObject(host) {
+                    html := ""
+                    for it in AxGen.ActList(n)
+                        html .= AxWindowActions.ItemHtml(AxWindowActions.Norm(it.Sep ? "-" : it))
+                    try AxWindowActions.Place(host, "d_" n.Id, html)
+                }
+            }
+            if n.Kids.Length
+                AxGen.PlaceActions(doc, n.Kids)
+        }
     }
     static ArgIsRaw(n) {
         e := AxCat.Has(n.Type) ? AxCat.Get(n.Type) : ""
@@ -1039,6 +1142,8 @@ class AxGen {
                 out .= pad var " := " call nl
             else
                 out .= pad call nl
+            if (var != "" && (acts := AxGen.ActCode(n)) != "")
+                out .= pad var ".Actions(" acts ")" nl
             AxGen._Events(state, n, var)
             ; rules can name an event the control has no handler for: that
             ; still has to be wired, or the rules never run

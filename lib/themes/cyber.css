@@ -378,6 +378,7 @@ body.sheet-cyber.theme-light .infobar { background: #ffffff; border: 1px solid #
 body.sheet-cyber .infobar .close { border-radius: 0; }
 body.sheet-cyber .infobar.success .ico { color: #00d8ff; }
 body.sheet-cyber .infobar.warning .ico { color: #ffb020; }
+body.sheet-cyber.theme-light .infobar.warning .ico, body.sheet-cyber.theme-light .infobar.warning .close { color: #8a5a00; }
 body.sheet-cyber .infobar.error .ico   { color: #ff2d78; }
 body.sheet-cyber .infobar.info .ico    { color: #00d8ff; }
 body.sheet-cyber.theme-dark .infobar.warning { border-color: #4a3712; }

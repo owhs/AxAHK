@@ -1,0 +1,226 @@
+/* @extends win11 */
+/* @accent-hue 200 30 */
+/* ============================================================================
+   blueprint.css — the window as a technical drawing. Dark is a cyanotype:
+   white line work on Prussian blue, gridded. Light is the whiteprint (diazo)
+   copy of it: blue lines on a pale grid.
+
+   Rules of the sheet:
+     • LINE WORK ONLY. Things are drawn, not filled: 1px rules, hairline boxes
+       with crop marks at their corners. A fill means "selected" or "pressed".
+     • THE GRID is the paper: a 10px minor and a 50px major grid behind
+       everything, never on top of anything.
+     • LETTERING is a drafting hand: monospace capitals, spaced out, for every
+       label; body text stays plain.
+     • The title bar is the drawing's title block (DWG No.).
+     • Square corners. Measured things do not have round ones.
+   Heights are win11's (title bar 32, menu bar 28, status bar 24): the #shell
+   sums stand.
+   ========================================================================= */
+
+body.sheet-blueprint { font-family: "Segoe UI", sans-serif; font-size: 13px; }
+body.sheet-blueprint.theme-dark {
+    color: #e6f2ff; background-color: #0f3b6f;
+    background-image:
+        linear-gradient(rgba(255,255,255,.13) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.13) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+}
+body.sheet-blueprint.theme-light {
+    color: #123f78; background-color: #f2f7fb;
+    background-image:
+        linear-gradient(rgba(18,63,120,.12) 1px, transparent 1px), linear-gradient(90deg, rgba(18,63,120,.12) 1px, transparent 1px),
+        linear-gradient(rgba(18,63,120,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(18,63,120,.05) 1px, transparent 1px);
+    background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+}
+/* the lettering */
+body.sheet-blueprint h1, body.sheet-blueprint h2, body.sheet-blueprint h3, body.sheet-blueprint .caption,
+body.sheet-blueprint .btn, body.sheet-blueprint .axdlg-btn, body.sheet-blueprint .tab, body.sheet-blueprint .seg,
+body.sheet-blueprint .nav-item, body.sheet-blueprint #titleText, body.sheet-blueprint .legend, body.sheet-blueprint .dv-hcell,
+body.sheet-blueprint .chip, body.sheet-blueprint .badge, body.sheet-blueprint #axDlgTitle, body.sheet-blueprint .axmb-item, body.sheet-blueprint .axsb {
+    font-family: "Cascadia Mono", Consolas, "Lucida Console", monospace; text-transform: uppercase; letter-spacing: .12em;
+}
+
+/* --------------------------------------------------------- the title block */
+body.sheet-blueprint #titlebar { background: transparent; box-shadow: inset 0 -1px 0 currentColor, inset 0 -4px 0 rgba(255,255,255,0); }
+body.sheet-blueprint.theme-dark #titlebar { background: rgba(10,40,78,.85); box-shadow: inset 0 -1px 0 #e6f2ff, inset 0 -3px 0 #0f3b6f, inset 0 -4px 0 rgba(230,242,255,.5); }
+body.sheet-blueprint.theme-light #titlebar { background: rgba(242,247,251,.9); box-shadow: inset 0 -1px 0 #123f78, inset 0 -3px 0 #f2f7fb, inset 0 -4px 0 rgba(18,63,120,.45); }
+body.sheet-blueprint #titleText { font-size: 11px; }
+body.sheet-blueprint #titleText:before { content: "DWG No. 01 \2014  "; opacity: .6; }
+body.sheet-blueprint.theme-dark #titleText { color: #e6f2ff; }
+body.sheet-blueprint.theme-light #titleText { color: #123f78; }
+body.sheet-blueprint #titlebar .app-icon { color: #7fd4ff; }
+body.sheet-blueprint #titlebar .winbtn { width: 26px; height: 22px; line-height: 20px; margin-right: 6px; box-sizing: border-box; border: 1px solid currentColor; font-size: 9px; transition: none; }
+body.sheet-blueprint.theme-dark #titlebar .winbtn { color: #e6f2ff; }
+body.sheet-blueprint.theme-light #titlebar .winbtn { color: #123f78; }
+body.sheet-blueprint.theme-dark #titlebar .winbtn:hover { background: rgba(230,242,255,.16); }
+body.sheet-blueprint.theme-light #titlebar .winbtn:hover { background: rgba(18,63,120,.1); }
+body.sheet-blueprint #titlebar #btnClose:hover { background: #ff5a4f; border-color: #ff5a4f; color: #fff; }
+
+/* ------------------------------------------------------------------ the rail */
+body.sheet-blueprint #sidebar { width: 210px; padding: 12px 10px; }
+body.sheet-blueprint.theme-dark #sidebar { border-right: 1px solid rgba(230,242,255,.55); background: rgba(10,40,78,.55); }
+body.sheet-blueprint.theme-light #sidebar { border-right: 1px solid rgba(18,63,120,.5); background: rgba(242,247,251,.75); }
+body.sheet-blueprint .nav-item { height: 30px; font-size: 11px; border-radius: 0; margin-bottom: 2px; transition: none; }
+body.sheet-blueprint.theme-dark .nav-item { color: #cfe5ff; }
+body.sheet-blueprint.theme-light .nav-item { color: #123f78; }
+body.sheet-blueprint.theme-dark .nav-item:hover { background: rgba(230,242,255,.08); }
+body.sheet-blueprint.theme-light .nav-item:hover { background: rgba(18,63,120,.06); }
+body.sheet-blueprint .nav-item.active { box-shadow: inset 0 0 0 1px currentColor; }
+body.sheet-blueprint.theme-dark .nav-item.active { background: rgba(230,242,255,.1); color: #ffffff; }
+body.sheet-blueprint.theme-light .nav-item.active { background: rgba(18,63,120,.08); color: #0b2b55; }
+/* a leader arrow points at the chosen sheet of the set */
+body.sheet-blueprint .nav-item.active:before { top: 50%; bottom: auto; left: -9px; width: 0; height: 0; margin-top: -5px; border-radius: 0;
+    background: transparent; border-left: 7px solid #7fd4ff; border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+body.sheet-blueprint.theme-light .nav-item.active:before { border-left-color: #0e5aa8; }
+body.sheet-blueprint #content { background: transparent; }
+
+/* ----------------------------------------------------------------- lettering */
+body.sheet-blueprint h1 { font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: .2em; padding-bottom: 6px; margin-bottom: 16px; border-bottom: 1px solid currentColor; }
+body.sheet-blueprint h2 { font-size: 15px; font-weight: 600; letter-spacing: .16em; }
+body.sheet-blueprint h3 { font-size: 12px; font-weight: 600; }
+body.sheet-blueprint .caption { font-size: 10px; font-weight: 600; letter-spacing: .18em; }
+body.sheet-blueprint.theme-dark .caption, body.sheet-blueprint.theme-dark .hint, body.sheet-blueprint.theme-dark .card-row .desc, body.sheet-blueprint.theme-dark .tile .desc { color: #9cc7ef; }
+body.sheet-blueprint.theme-light .caption, body.sheet-blueprint.theme-light .hint, body.sheet-blueprint.theme-light .card-row .desc, body.sheet-blueprint.theme-light .tile .desc { color: #4a72a3; }
+body.sheet-blueprint .hint { font-family: "Cascadia Mono", Consolas, monospace; font-size: 11px; font-style: italic; }
+body.sheet-blueprint .link, body.sheet-blueprint a { text-decoration: underline; }
+body.sheet-blueprint.theme-dark .link, body.sheet-blueprint.theme-dark a { color: #7fd4ff; }
+body.sheet-blueprint.theme-light .link, body.sheet-blueprint.theme-light a { color: #0e5aa8; }
+
+/* ------------------------------------------- parts: hairline boxes, crop marks */
+body.sheet-blueprint .card, body.sheet-blueprint .expander, body.sheet-blueprint .tile, body.sheet-blueprint .infobar {
+    border-radius: 0; box-shadow: none; position: relative; background-repeat: no-repeat;
+}
+body.sheet-blueprint.theme-dark .card, body.sheet-blueprint.theme-dark .expander, body.sheet-blueprint.theme-dark .tile, body.sheet-blueprint.theme-dark .infobar {
+    border: 1px solid rgba(230,242,255,.7); background-color: rgba(15,59,111,.82);
+}
+body.sheet-blueprint.theme-light .card, body.sheet-blueprint.theme-light .expander, body.sheet-blueprint.theme-light .tile, body.sheet-blueprint.theme-light .infobar {
+    border: 1px solid rgba(18,63,120,.6); background-color: rgba(250,252,254,.88);
+}
+/* registration marks: a short tick past each corner */
+body.sheet-blueprint .card:before, body.sheet-blueprint .tile:before {
+    content: ""; position: absolute; left: -6px; top: -6px; right: -6px; bottom: -6px; pointer-events: none; opacity: .7;
+    background-image: linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor),
+                      linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor);
+    background-size: 5px 1px, 1px 5px, 5px 1px, 1px 5px, 5px 1px, 1px 5px, 5px 1px, 1px 5px;
+    background-position: left 0 top 5px, left 5px top 0, right 0 top 5px, right 5px top 0, left 0 bottom 5px, left 5px bottom 0, right 0 bottom 5px, right 5px bottom 0;
+    background-repeat: no-repeat;
+}
+body.sheet-blueprint .group { border-radius: 0; background: transparent; border: 1px solid currentColor; }
+body.sheet-blueprint fieldset.group > legend.legend { font-size: 10px; letter-spacing: .2em; }
+body.sheet-blueprint .exp-body { border-radius: 0; background: transparent; border-top: 1px solid rgba(128,170,220,.45); }
+
+/* ------------------------------------------------------------------ controls */
+body.sheet-blueprint .btn, body.sheet-blueprint .axdlg-btn { border-radius: 0; font-size: 11px; height: 30px; line-height: 28px; background: transparent; box-shadow: none; transition: none; }
+body.sheet-blueprint.theme-dark .btn, body.sheet-blueprint.theme-dark .axdlg-btn { color: #e6f2ff; border: 1px solid #e6f2ff; }
+body.sheet-blueprint.theme-light .btn, body.sheet-blueprint.theme-light .axdlg-btn { color: #123f78; border: 1px solid #123f78; }
+body.sheet-blueprint.theme-dark .btn:hover, body.sheet-blueprint.theme-dark .axdlg-btn:hover { background: rgba(230,242,255,.12); }
+body.sheet-blueprint.theme-light .btn:hover, body.sheet-blueprint.theme-light .axdlg-btn:hover { background: rgba(18,63,120,.07); }
+body.sheet-blueprint.theme-dark .btn.accent, body.sheet-blueprint.theme-dark .axdlg-btn.primary { background: #e6f2ff; color: #0f3b6f; }
+body.sheet-blueprint.theme-light .btn.accent, body.sheet-blueprint.theme-light .axdlg-btn.primary { background: #123f78; color: #f2f7fb; }
+body.sheet-blueprint .btn.danger { background: transparent; color: #ff8a80; border-color: #ff8a80; }
+body.sheet-blueprint.theme-light .btn.danger { color: #c62828; border-color: #c62828; }
+body.sheet-blueprint .btn.subtle { border-color: transparent; }
+body.sheet-blueprint .btn:active, body.sheet-blueprint .btn.pressed { -ms-transform: translate(1px,1px); transform: translate(1px,1px); }
+body.sheet-blueprint .btn.icon { font-family: "Segoe Fluent Icons", "Segoe MDL2 Assets"; text-transform: none; letter-spacing: 0; }
+
+/* fields: a box drawn round where the value goes */
+body.sheet-blueprint .textbox input, body.sheet-blueprint .textbox textarea, body.sheet-blueprint .searchbox input,
+body.sheet-blueprint .numberbox input, body.sheet-blueprint .passwordbox input, body.sheet-blueprint .hotkeybox input,
+body.sheet-blueprint .dd-value, body.sheet-blueprint #axDlgInput, body.sheet-blueprint .hex, body.sheet-blueprint .list,
+body.sheet-blueprint .filelist, body.sheet-blueprint .dv-frame {
+    border-radius: 0; box-shadow: none; font-family: "Cascadia Mono", Consolas, monospace; font-size: 12px;
+}
+body.sheet-blueprint.theme-dark .textbox input, body.sheet-blueprint.theme-dark .textbox textarea, body.sheet-blueprint.theme-dark .searchbox input,
+body.sheet-blueprint.theme-dark .numberbox input, body.sheet-blueprint.theme-dark .passwordbox input, body.sheet-blueprint.theme-dark .hotkeybox input,
+body.sheet-blueprint.theme-dark .dd-value, body.sheet-blueprint.theme-dark #axDlgInput, body.sheet-blueprint.theme-dark .hex, body.sheet-blueprint.theme-dark .list,
+body.sheet-blueprint.theme-dark .filelist, body.sheet-blueprint.theme-dark .dv-frame {
+    background: rgba(10,40,78,.85); color: #ffffff; border: 1px solid rgba(230,242,255,.7);
+}
+body.sheet-blueprint.theme-light .textbox input, body.sheet-blueprint.theme-light .textbox textarea, body.sheet-blueprint.theme-light .searchbox input,
+body.sheet-blueprint.theme-light .numberbox input, body.sheet-blueprint.theme-light .passwordbox input, body.sheet-blueprint.theme-light .hotkeybox input,
+body.sheet-blueprint.theme-light .dd-value, body.sheet-blueprint.theme-light #axDlgInput, body.sheet-blueprint.theme-light .hex, body.sheet-blueprint.theme-light .list,
+body.sheet-blueprint.theme-light .filelist, body.sheet-blueprint.theme-light .dv-frame {
+    background: #ffffff; color: #0b2b55; border: 1px solid rgba(18,63,120,.6);
+}
+body.sheet-blueprint .textbox input:focus, body.sheet-blueprint .textbox textarea:focus, body.sheet-blueprint .searchbox input:focus,
+body.sheet-blueprint .passwordbox input:focus, body.sheet-blueprint #axDlgInput:focus, body.sheet-blueprint .numberbox.focus input,
+body.sheet-blueprint .dropdown.open .dd-value { border-style: dashed; border-color: #7fd4ff; }
+body.sheet-blueprint.theme-light .textbox input:focus, body.sheet-blueprint.theme-light .textbox textarea:focus,
+body.sheet-blueprint.theme-light .searchbox input:focus, body.sheet-blueprint.theme-light #axDlgInput:focus { border-color: #0e5aa8; }
+
+body.sheet-blueprint .sw-track { border-radius: 0; border: 1px solid currentColor; background: transparent; }
+body.sheet-blueprint .sw-track:before { border-radius: 0; background: currentColor; }
+body.sheet-blueprint.theme-dark .switch input:checked + .sw-track { background: #7fd4ff; border-color: #7fd4ff; }
+body.sheet-blueprint.theme-light .switch input:checked + .sw-track { background: #0e5aa8; border-color: #0e5aa8; }
+body.sheet-blueprint .switch input:checked + .sw-track:before { background: #0f3b6f; }
+body.sheet-blueprint.theme-light .switch input:checked + .sw-track:before { background: #ffffff; }
+body.sheet-blueprint .check .box { border-radius: 0; background: transparent; }
+body.sheet-blueprint.theme-dark .check .box { border: 1px solid #e6f2ff; }
+body.sheet-blueprint.theme-light .check .box { border: 1px solid #123f78; }
+body.sheet-blueprint .check input:checked + .box { background: transparent; color: #7fd4ff; }
+body.sheet-blueprint.theme-light .check input:checked + .box { color: #0e5aa8; }
+body.sheet-blueprint .radio .ring { border: 1px solid currentColor; background: transparent; }
+body.sheet-blueprint .radio input:checked + .ring { border: 1px solid currentColor; background: transparent; box-shadow: inset 0 0 0 3px #0f3b6f, inset 0 0 0 9px #7fd4ff; }
+body.sheet-blueprint.theme-light .radio input:checked + .ring { box-shadow: inset 0 0 0 3px #ffffff, inset 0 0 0 9px #0e5aa8; }
+body.sheet-blueprint .radio input:checked + .ring:after { display: none; }
+body.sheet-blueprint .progress { border-radius: 0; height: 8px; background: transparent; border: 1px solid currentColor; }
+body.sheet-blueprint .progress .bar { border-radius: 0; background: repeating-linear-gradient(45deg, #7fd4ff 0, #7fd4ff 2px, transparent 2px, transparent 5px); }
+body.sheet-blueprint.theme-light .progress .bar { background: repeating-linear-gradient(45deg, #0e5aa8 0, #0e5aa8 2px, transparent 2px, transparent 5px); }
+body.sheet-blueprint input[type=range]::-ms-thumb { border-radius: 0; width: 10px; height: 18px; background: #7fd4ff; border: 1px solid #ffffff; }
+body.sheet-blueprint input[type=range]::-ms-fill-lower { background: #7fd4ff; }
+body.sheet-blueprint .tabs { border-bottom: 1px solid currentColor; }
+body.sheet-blueprint .tab { border-radius: 0; font-size: 11px; transition: none; }
+body.sheet-blueprint .tab.active { box-shadow: inset 0 0 0 1px currentColor; }
+body.sheet-blueprint .tab.active:after { display: none; }
+body.sheet-blueprint .segmented { border-radius: 0; border: 1px solid currentColor; background: transparent; padding: 0; }
+body.sheet-blueprint .segmented .seg { border-radius: 0; font-size: 11px; }
+body.sheet-blueprint.theme-dark .segmented .seg.active { background: #e6f2ff; color: #0f3b6f; }
+body.sheet-blueprint.theme-light .segmented .seg.active { background: #123f78; color: #f2f7fb; }
+body.sheet-blueprint .chip { border-radius: 0; font-size: 10px; background: transparent; border: 1px solid currentColor; }
+body.sheet-blueprint .chip.on { background: #7fd4ff; color: #0f3b6f; border-color: #7fd4ff; }
+body.sheet-blueprint .badge { border-radius: 0; }
+body.sheet-blueprint .swatch { border-radius: 0; }
+
+/* -------------------------------------------------------- menus, lists, grid */
+body.sheet-blueprint .dd-menu, body.sheet-blueprint #axCtx, body.sheet-blueprint .axctx, body.sheet-blueprint #axPop { border-radius: 0; }
+body.sheet-blueprint.theme-dark .dd-menu, body.sheet-blueprint.theme-dark #axCtx, body.sheet-blueprint.theme-dark .axctx, body.sheet-blueprint.theme-dark #axPop {
+    background: #0c3361; color: #e6f2ff; border: 1px solid #e6f2ff; box-shadow: 4px 4px 0 rgba(0,0,0,.25);
+}
+body.sheet-blueprint.theme-light .dd-menu, body.sheet-blueprint.theme-light #axCtx, body.sheet-blueprint.theme-light .axctx, body.sheet-blueprint.theme-light #axPop {
+    background: #ffffff; color: #123f78; border: 1px solid #123f78; box-shadow: 4px 4px 0 rgba(18,63,120,.15);
+}
+body.sheet-blueprint .dd-item, body.sheet-blueprint .list-item, body.sheet-blueprint .axctx-item { border-radius: 0; }
+body.sheet-blueprint.theme-dark .dd-item:hover, body.sheet-blueprint.theme-dark .list-item:hover, body.sheet-blueprint.theme-dark .axctx-item:hover { background: rgba(230,242,255,.12); }
+body.sheet-blueprint.theme-light .dd-item:hover, body.sheet-blueprint.theme-light .list-item:hover, body.sheet-blueprint.theme-light .axctx-item:hover { background: rgba(18,63,120,.07); }
+body.sheet-blueprint.theme-dark .dd-item.selected, body.sheet-blueprint.theme-dark .list-item.selected { background: #e6f2ff; color: #0f3b6f; }
+body.sheet-blueprint.theme-light .dd-item.selected, body.sheet-blueprint.theme-light .list-item.selected { background: #123f78; color: #f2f7fb; }
+body.sheet-blueprint .dd-item.selected:before, body.sheet-blueprint .list-item.selected:before { display: none; }
+body.sheet-blueprint .btn:focus, body.sheet-blueprint .dropdown:focus, body.sheet-blueprint .list:focus, body.sheet-blueprint .tab:focus,
+body.sheet-blueprint .seg:focus, body.sheet-blueprint .chip:focus, body.sheet-blueprint .axdlg-btn:focus { outline: 1px dashed #7fd4ff; }
+body.sheet-blueprint .dv-hcell { font-size: 10px; border-bottom: 1px solid currentColor; background: transparent; }
+body.sheet-blueprint .dv-cell { border-bottom: 1px dotted rgba(128,170,220,.5); }
+body.sheet-blueprint.theme-dark .dv-row.selected > .dv-cell { background: rgba(127,212,255,.25); }
+body.sheet-blueprint.theme-light .dv-row.selected > .dv-cell { background: rgba(14,90,168,.14); }
+
+/* ---------------------------------------------------------- bars and dialogs */
+body.sheet-blueprint .axmb { border-bottom: 1px solid rgba(128,170,220,.55); background: transparent; }
+body.sheet-blueprint .axmb-item { border-radius: 0; font-size: 11px; }
+body.sheet-blueprint .axsb { font-size: 10px; background: transparent; border-top: 1px solid currentColor; }
+body.sheet-blueprint #axDlg { border-radius: 0; box-shadow: 8px 8px 0 rgba(0,0,0,.25); }
+body.sheet-blueprint.theme-dark #axDlg { background: #0f3b6f; color: #e6f2ff; border: 1px solid #e6f2ff; }
+body.sheet-blueprint.theme-light #axDlg { background: #f7fbfe; color: #123f78; border: 1px solid #123f78; }
+body.sheet-blueprint #axDlgTitle { font-size: 15px; border-bottom: 1px solid currentColor; padding-bottom: 6px; }
+body.sheet-blueprint #axDlgBtns { background: transparent; border-top: 1px solid rgba(128,170,220,.55); }
+body.sheet-blueprint #axToast, body.sheet-blueprint #axTip { border-radius: 0; font-family: "Cascadia Mono", Consolas, monospace; }
+body.sheet-blueprint.theme-dark #axToast, body.sheet-blueprint.theme-dark #axTip { background: #0c3361; color: #e6f2ff; border: 1px solid #e6f2ff; }
+body.sheet-blueprint.theme-light #axToast, body.sheet-blueprint.theme-light #axTip { background: #ffffff; color: #123f78; border: 1px solid #123f78; }
+body.sheet-blueprint .imgbox, body.sheet-blueprint .thumb, body.sheet-blueprint .dropzone, body.sheet-blueprint .console { border-radius: 0; }
+body.sheet-blueprint #titlebar .axtb-item { border-radius: 0; }
+body.sheet-blueprint .axrich-footer { background: transparent; border-top: 1px solid rgba(128,170,220,.55); }
+
+body.sheet-blueprint.theme-dark, body.sheet-blueprint.theme-dark #content, body.sheet-blueprint.theme-dark .list, body.sheet-blueprint.theme-dark .dd-menu {
+    scrollbar-face-color: #0f3b6f; scrollbar-arrow-color: #e6f2ff; scrollbar-track-color: #0c3361; scrollbar-shadow-color: #e6f2ff;
+    scrollbar-highlight-color: #e6f2ff; scrollbar-3dlight-color: #0c3361; scrollbar-darkshadow-color: #0c3361;
+}
+body.sheet-blueprint .ax-sb-v .ax-sb-bar, body.sheet-blueprint .ax-sb-h .ax-sb-bar { border-radius: 0; background: transparent; border: 1px solid currentColor; opacity: .8; }

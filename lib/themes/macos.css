@@ -1,0 +1,395 @@
+/* @extends win11 */
+/* @accent-hue 211 30 */
+/* ============================================================================
+   macos.css — a Mac window, as of Sequoia. Not a costume of one: the parts
+   that make a Mac window read as a Mac window, and nothing else.
+
+   Rules of the sheet, so later edits do not undo it:
+
+     • The traffic lights are on the LEFT, 12px, and their glyphs only show
+       while the pointer is over them -- a Mac window at rest has three dots
+       and a centred title, nothing more. The window buttons are moved with
+       flex order, so the frame markup stays the one every sheet shares.
+     • Surfaces are separated by HAIRLINES and by a change of material, not
+       by boxes: the title bar, the sidebar and the content are three
+       materials with a 1px line between them.
+     • Controls are SMALL and quiet: 26px push buttons, a raised white face
+       on a soft shadow, 6px corners. Only the default button and a checked
+       control are filled, and they are filled with the accent.
+     • Focus is a soft, wide ring in the accent (3px at 45%), never a dotted
+       outline.
+     • Selection in a list or a menu is the accent, full bleed, with white
+       text -- the one place colour is loud.
+
+   ------------------------------------------------------------ personalisation
+   @accent-hue 211 (give or take 30): system blue is the accent material, so
+   SetAccent turns the Mac graphite, pink or green the way System Settings
+   does, and leaves the greys and the traffic lights alone.
+
+   The title bar is 38px, the menu bar 28 and the status bar 24, so all four
+   #shell sums are restated, and so is the height AxRich.css gives a rich
+   dialog's content.
+   ========================================================================= */
+
+/* ------------------------------------------------------------- the material */
+body.sheet-macos {
+    font-family: -apple-system, "SF Pro Text", "Inter", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+    font-size: 13px; line-height: 18px; letter-spacing: -.003em;
+}
+body.sheet-macos.theme-light { background: #ffffff; color: #1d1d1f; }
+body.sheet-macos.theme-dark  { background: #1e1e1e; color: #f5f5f7; }
+
+/* --------------------------------------------------------------- the frame */
+body.sheet-macos #titlebar { height: 38px; padding: 0 0 0 14px; }
+body.sheet-macos.theme-light #titlebar { background: #f6f6f6; border-bottom: 1px solid rgba(0,0,0,.09); }
+body.sheet-macos.theme-dark #titlebar  { background: #2a2a2c; border-bottom: 1px solid rgba(0,0,0,.55); }
+body.sheet-macos #titlebar .app-icon { display: none; }
+/* the title, truly centred: as wide on its right as the lights are on its left */
+body.sheet-macos #titleText { -ms-flex-order: 5; order: 5; text-align: center; margin-right: 66px; font-size: 13px; font-weight: 600; }
+body.sheet-macos.theme-light #titleText { color: #3a3a3c; }
+body.sheet-macos.theme-dark #titleText  { color: #d8d8da; }
+body.sheet-macos.inactive #titleText { opacity: .45; }
+body.sheet-macos #axTbLeft { -ms-flex-order: 4; order: 4; }
+body.sheet-macos #axTbRight { -ms-flex-order: 6; order: 6; }
+
+/* the traffic lights */
+body.sheet-macos #titlebar .winbtn {
+    width: 12px; height: 12px; line-height: 12px; margin: 0 8px 0 0; padding: 0; border-radius: 50%;
+    font-size: 0; color: rgba(0,0,0,.55); box-sizing: border-box; transition: none;
+}
+body.sheet-macos #btnClose { -ms-flex-order: 1; order: 1; background: #ff5f57; border: .5px solid #e2463f; }
+body.sheet-macos #btnMin   { -ms-flex-order: 2; order: 2; background: #febc2e; border: .5px solid #e1a116; }
+body.sheet-macos #btnMax   { -ms-flex-order: 3; order: 3; background: #28c840; border: .5px solid #1aab29; margin-right: 0; }
+body.sheet-macos #titlebar .winbtn:hover, body.sheet-macos #titlebar .winbtn.hover { color: rgba(0,0,0,.6); }
+body.sheet-macos #btnClose:hover, body.sheet-macos #btnClose.hover { background: #ff5f57; color: rgba(70,0,0,.75); }
+body.sheet-macos #btnMin:hover, body.sheet-macos #btnMin.hover { background: #febc2e; }
+body.sheet-macos #btnMax:hover, body.sheet-macos #btnMax.hover { background: #28c840; }
+body.sheet-macos #titlebar:hover .winbtn { font-size: 7px; font-weight: bold; }
+body.sheet-macos #titlebar .winbtn.pressed { -ms-filter: none; filter: none; opacity: .75; }
+/* away from the window, the lights go out */
+body.sheet-macos.inactive #titlebar .winbtn { background: #d7d7d9; border-color: #c4c4c6; }
+body.sheet-macos.theme-dark.inactive #titlebar .winbtn { background: #4a4a4c; border-color: #3c3c3e; }
+body.sheet-macos.inactive #titlebar:hover #btnClose { background: #ff5f57; border-color: #e2463f; }
+body.sheet-macos.inactive #titlebar:hover #btnMin { background: #febc2e; border-color: #e1a116; }
+body.sheet-macos.inactive #titlebar:hover #btnMax { background: #28c840; border-color: #1aab29; }
+
+/* ------------------------------------------------------------ the reserves */
+body.sheet-macos #shell { height: calc(100% - 38px); }
+body.sheet-macos.has-menubar #shell { height: calc(100% - 66px); }
+body.sheet-macos.has-statusbar #shell { height: calc(100% - 62px); }
+body.sheet-macos.has-menubar.has-statusbar #shell { height: calc(100% - 90px); }
+body.sheet-macos.axrich-dlg #content { height: calc(100% - 38px); }
+
+/* ----------------------------------------------------------------- the rail */
+body.sheet-macos #sidebar { width: 210px; padding: 10px 10px; }
+body.sheet-macos.theme-light #sidebar { background: #f0f0f2; border-right: 1px solid rgba(0,0,0,.08); }
+body.sheet-macos.theme-dark #sidebar  { background: #262628; border-right: 1px solid rgba(0,0,0,.5); }
+body.sheet-macos .nav-item { height: 28px; margin-bottom: 1px; padding: 0 8px; border-radius: 6px; font-size: 13px; transition: none; }
+body.sheet-macos .nav-item .ico { width: 20px; font-size: 14px; margin-right: 8px; color: #007aff; }
+body.sheet-macos.theme-dark .nav-item .ico { color: #0a84ff; }
+body.sheet-macos.theme-light .nav-item { color: #1d1d1f; }
+body.sheet-macos.theme-dark .nav-item  { color: #e5e5e7; }
+body.sheet-macos.theme-light .nav-item:hover { background: rgba(0,0,0,.045); }
+body.sheet-macos.theme-dark .nav-item:hover  { background: rgba(255,255,255,.06); }
+body.sheet-macos.theme-light .nav-item.active { background: rgba(0,0,0,.09); }
+body.sheet-macos.theme-dark .nav-item.active  { background: rgba(255,255,255,.12); }
+body.sheet-macos .nav-item.active:before { display: none; }
+
+/* ----------------------------------------------------------- the workspace */
+/* (the 6px right/bottom inset keeps Trident's native scrollbar off the
+   resize hotspots -- see win11.css) */
+body.sheet-macos #content { margin: 0 6px 6px 0; padding: 18px 26px 24px 24px; }
+
+/* ----------------------------------------------------------------- writing */
+body.sheet-macos h1 { font-size: 26px; line-height: 32px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 14px; }
+body.sheet-macos h2 { font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -.01em; margin: 20px 0 8px; }
+body.sheet-macos h3 { font-size: 13px; font-weight: 600; margin: 16px 0 6px; }
+body.sheet-macos .caption { font-size: 11px; font-weight: 600; letter-spacing: .02em; }
+body.sheet-macos .hint { font-size: 11px; line-height: 15px; }
+body.sheet-macos.theme-light .caption, body.sheet-macos.theme-light .hint,
+body.sheet-macos.theme-light .card-row .desc, body.sheet-macos.theme-light .tile .desc,
+body.sheet-macos.theme-light .fl-meta, body.sheet-macos.theme-light .dropzone .dz-desc { color: #86868b; }
+body.sheet-macos.theme-dark .caption, body.sheet-macos.theme-dark .hint,
+body.sheet-macos.theme-dark .card-row .desc, body.sheet-macos.theme-dark .tile .desc,
+body.sheet-macos.theme-dark .fl-meta, body.sheet-macos.theme-dark .dropzone .dz-desc { color: #98989d; }
+body.sheet-macos .link, body.sheet-macos .hyperlink, body.sheet-macos a { color: #007aff; text-decoration: none; }
+body.sheet-macos.theme-dark .link, body.sheet-macos.theme-dark .hyperlink, body.sheet-macos.theme-dark a { color: #0a84ff; }
+body.sheet-macos .link:hover { text-decoration: underline; }
+
+/* -------------------------------------------------- grouped forms (Settings) */
+body.sheet-macos .card, body.sheet-macos .expander, body.sheet-macos .tile {
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 10px; box-shadow: none;
+}
+body.sheet-macos.theme-light .card, body.sheet-macos.theme-light .expander,
+body.sheet-macos.theme-light .tile { background: #f5f5f7; border: 1px solid rgba(0,0,0,.06); }
+body.sheet-macos.theme-dark .card, body.sheet-macos.theme-dark .expander,
+body.sheet-macos.theme-dark .tile { background: #2c2c2e; border: 1px solid rgba(255,255,255,.06); }
+body.sheet-macos .card-row { min-height: 40px; }
+body.sheet-macos .card.hot { box-shadow: 0 0 0 3px rgba(0,122,255,.45); }
+body.sheet-macos .group { border-radius: 10px; padding: 18px 14px 12px; margin: 14px 0; }
+body.sheet-macos.theme-light .group { background: #f5f5f7; border: 1px solid rgba(0,0,0,.06); }
+body.sheet-macos.theme-dark .group  { background: #2c2c2e; border: 1px solid rgba(255,255,255,.06); }
+body.sheet-macos .group > .legend { font-size: 11px; font-weight: 600; }
+body.sheet-macos.theme-light .group > .legend { background: #f5f5f7; color: #86868b; }
+body.sheet-macos.theme-dark .group > .legend  { background: #2c2c2e; color: #98989d; }
+body.sheet-macos .exp-header { min-height: 40px; }
+body.sheet-macos .exp-header .chev { border-radius: 6px; }
+body.sheet-macos.theme-light .exp-body { background: #ffffff; border-top: 1px solid rgba(0,0,0,.06); border-radius: 0 0 10px 10px; }
+body.sheet-macos.theme-dark .exp-body  { background: #232325; border-top: 1px solid rgba(255,255,255,.06); border-radius: 0 0 10px 10px; }
+
+/* ---------------------------------------------------------------- controls */
+/* the push button: a raised white face, a hairline and a soft shadow */
+body.sheet-macos .btn {
+    height: 26px; line-height: 24px; min-width: 70px; padding: 0 14px; border-radius: 6px;
+    font-size: 13px; font-weight: 400; transition: none;
+}
+body.sheet-macos.theme-light .btn { color: #1d1d1f; background: #ffffff; border: 1px solid rgba(0,0,0,.12); box-shadow: 0 1px 1px rgba(0,0,0,.08); }
+body.sheet-macos.theme-dark .btn  { color: #f5f5f7; background: #5a5a5e; border: 1px solid rgba(255,255,255,.04); box-shadow: 0 1px 1px rgba(0,0,0,.4); }
+body.sheet-macos.theme-light .btn:hover { background: #ffffff; }
+body.sheet-macos.theme-dark .btn:hover  { background: #636367; }
+body.sheet-macos.theme-light .btn:active, body.sheet-macos.theme-light .btn.pressed { background: #e8e8ea; }
+body.sheet-macos.theme-dark .btn:active, body.sheet-macos.theme-dark .btn.pressed   { background: #747478; }
+body.sheet-macos .btn.accent, body.sheet-macos .axdlg-btn.primary {
+    color: #ffffff; border-color: #0064d6;
+    background: #007aff; background: linear-gradient(180deg, #2a8cff 0%, #007aff 100%);
+}
+body.sheet-macos.theme-dark .btn.accent, body.sheet-macos.theme-dark .axdlg-btn.primary { border-color: #0a84ff; background: #0a84ff; }
+body.sheet-macos .btn.accent:active, body.sheet-macos .btn.accent.pressed { background: #0062cc; }
+body.sheet-macos .btn.danger { color: #ffffff; background: #ff3b30; border-color: #e0291f; }
+body.sheet-macos .btn.subtle { background: transparent; border-color: transparent; box-shadow: none; }
+body.sheet-macos.theme-light .btn.subtle:hover { background: rgba(0,0,0,.05); }
+body.sheet-macos.theme-dark .btn.subtle:hover  { background: rgba(255,255,255,.08); }
+body.sheet-macos .btn.disabled { opacity: .4; }
+body.sheet-macos .btn.icon { width: 28px; min-width: 28px; padding: 0; }
+
+/* fields: white, a hairline, and the wide soft ring when you are in them */
+body.sheet-macos .textbox input, body.sheet-macos .textbox textarea,
+body.sheet-macos .searchbox input, body.sheet-macos .numberbox input,
+body.sheet-macos .passwordbox input, body.sheet-macos .hotkeybox input,
+body.sheet-macos .dd-value, body.sheet-macos #axDlgInput, body.sheet-macos .hex {
+    height: 26px; line-height: 24px; border-radius: 6px; font-size: 13px; padding: 0 8px; transition: box-shadow .12s ease;
+}
+body.sheet-macos.theme-light .textbox input, body.sheet-macos.theme-light .textbox textarea,
+body.sheet-macos.theme-light .searchbox input, body.sheet-macos.theme-light .numberbox input,
+body.sheet-macos.theme-light .passwordbox input, body.sheet-macos.theme-light .hotkeybox input,
+body.sheet-macos.theme-light #axDlgInput, body.sheet-macos.theme-light .hex,
+body.sheet-macos.theme-light .list, body.sheet-macos.theme-light .filelist, body.sheet-macos.theme-light .dv-frame {
+    background: #ffffff; color: #1d1d1f; border: 1px solid rgba(0,0,0,.14); box-shadow: inset 0 1px 1px rgba(0,0,0,.04);
+}
+body.sheet-macos.theme-dark .textbox input, body.sheet-macos.theme-dark .textbox textarea,
+body.sheet-macos.theme-dark .searchbox input, body.sheet-macos.theme-dark .numberbox input,
+body.sheet-macos.theme-dark .passwordbox input, body.sheet-macos.theme-dark .hotkeybox input,
+body.sheet-macos.theme-dark #axDlgInput, body.sheet-macos.theme-dark .hex,
+body.sheet-macos.theme-dark .list, body.sheet-macos.theme-dark .filelist, body.sheet-macos.theme-dark .dv-frame {
+    background: #2a2a2c; color: #f5f5f7; border: 1px solid rgba(255,255,255,.1); box-shadow: none;
+}
+/* the pop-up button: a push button with the double chevron Windows calls a dropdown */
+body.sheet-macos.theme-light .dd-value { background: #ffffff; color: #1d1d1f; border: 1px solid rgba(0,0,0,.12); box-shadow: 0 1px 1px rgba(0,0,0,.08); }
+body.sheet-macos.theme-dark .dd-value  { background: #5a5a5e; color: #f5f5f7; border: 1px solid rgba(255,255,255,.04); box-shadow: 0 1px 1px rgba(0,0,0,.4); }
+body.sheet-macos .textbox textarea { height: auto; padding: 6px 8px; line-height: 18px; }
+body.sheet-macos .textbox input:focus, body.sheet-macos .textbox textarea:focus,
+body.sheet-macos .searchbox input:focus, body.sheet-macos .passwordbox input:focus,
+body.sheet-macos .hotkeybox input:focus, body.sheet-macos .hotkeybox.recording input,
+body.sheet-macos #axDlgInput:focus, body.sheet-macos .numberbox.focus input,
+body.sheet-macos .dropdown.open .dd-value {
+    border-color: rgba(0,122,255,.7); box-shadow: 0 0 0 3px rgba(0,122,255,.38);
+}
+body.sheet-macos .searchbox input { border-radius: 8px; }
+body.sheet-macos .searchbox .ico, body.sheet-macos .hotkeybox .kb { top: 6px; }
+body.sheet-macos .numberbox .spin { border-radius: 4px; }
+body.sheet-macos .passwordbox .reveal { border-radius: 4px; top: 3px; height: 20px; line-height: 20px; }
+
+/* the switch: green-free since Big Sur -- the accent */
+body.sheet-macos .switch { height: 22px; }
+body.sheet-macos .switch input { width: 38px; height: 22px; }
+body.sheet-macos .sw-track { width: 38px; height: 22px; border-radius: 11px; border: none; transition: background .18s ease; }
+body.sheet-macos.theme-light .sw-track { background: #e3e3e6; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }
+body.sheet-macos.theme-dark .sw-track  { background: #3a3a3c; }
+body.sheet-macos .sw-track:before {
+    left: 2px; top: 2px; width: 18px; height: 18px; background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0,0,0,.28), 0 0 0 .5px rgba(0,0,0,.06);
+    transition: left .18s cubic-bezier(.3,.7,.4,1);
+}
+body.sheet-macos .switch:hover .sw-track:before { width: 18px; height: 18px; top: 2px; }
+body.sheet-macos .switch input:checked + .sw-track { background: #007aff; }
+body.sheet-macos.theme-dark .switch input:checked + .sw-track { background: #0a84ff; }
+body.sheet-macos .switch input:checked + .sw-track:before { left: 18px; background: #ffffff; }
+body.sheet-macos .sw-label { margin-left: 10px; }
+
+body.sheet-macos .check .box { width: 14px; height: 14px; border-radius: 4px; line-height: 13px; font-size: 9px; }
+body.sheet-macos.theme-light .check .box { background: #ffffff; border: 1px solid rgba(0,0,0,.22); box-shadow: 0 1px 1px rgba(0,0,0,.06); }
+body.sheet-macos.theme-dark .check .box  { background: #5a5a5e; border: 1px solid rgba(255,255,255,.06); }
+body.sheet-macos .check input:checked + .box { background: #007aff; border-color: #0064d6; color: #ffffff; }
+body.sheet-macos .radio .ring { width: 14px; height: 14px; }
+body.sheet-macos.theme-light .radio .ring { background: #ffffff; border: 1px solid rgba(0,0,0,.22); }
+body.sheet-macos.theme-dark .radio .ring  { background: #5a5a5e; border: 1px solid rgba(255,255,255,.06); }
+body.sheet-macos .radio input:checked + .ring { border: 4px solid #007aff; background: #ffffff; }
+body.sheet-macos .radio input:checked + .ring:after { display: none; }
+body.sheet-macos .check .lbl, body.sheet-macos .radio .lbl { margin-left: 8px; }
+
+body.sheet-macos input[type=range]::-ms-track { height: 4px; }
+body.sheet-macos input[type=range]::-ms-fill-lower { background: #007aff; border-radius: 2px; }
+body.sheet-macos input[type=range]::-ms-thumb {
+    box-sizing: border-box; width: 20px; height: 20px; border-radius: 50%;
+    background: #ffffff; border: .5px solid rgba(0,0,0,.12); box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+body.sheet-macos.theme-light input[type=range]::-ms-fill-upper { background: #dcdce0; border-radius: 2px; }
+body.sheet-macos.theme-dark input[type=range]::-ms-fill-upper { background: #48484a; border-radius: 2px; }
+
+body.sheet-macos .progress { height: 6px; border-radius: 3px; }
+body.sheet-macos.theme-light .progress { background: #e3e3e6; }
+body.sheet-macos.theme-dark .progress  { background: #3a3a3c; }
+body.sheet-macos .progress .bar, body.sheet-macos .progress.indeterminate .bar { background: #007aff; border-radius: 3px; }
+body.sheet-macos .ring-spinner { border-color: rgba(128,128,128,.25); border-top-color: #8e8e93; }
+
+/* tabs are a segmented control, centred over what they switch */
+body.sheet-macos .tabs { border-bottom: none; margin-bottom: 14px; display: -ms-inline-flexbox; display: inline-flex; padding: 2px; border-radius: 7px; }
+body.sheet-macos.theme-light .tabs { background: #e8e8eb; }
+body.sheet-macos.theme-dark .tabs  { background: #2c2c2e; }
+body.sheet-macos .tab { padding: 3px 14px; border-radius: 5px; font-size: 13px; margin: 0; transition: none; }
+body.sheet-macos.theme-light .tab:hover { background: rgba(0,0,0,.04); }
+body.sheet-macos.theme-dark .tab:hover  { background: rgba(255,255,255,.05); }
+body.sheet-macos.theme-light .tab.active { background: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,.14), 0 0 0 .5px rgba(0,0,0,.05); }
+body.sheet-macos.theme-dark .tab.active  { background: #636366; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+body.sheet-macos .tab.active:after { display: none; }
+body.sheet-macos .segmented { border-radius: 7px; padding: 2px; border: none; }
+body.sheet-macos.theme-light .segmented { background: #e8e8eb; }
+body.sheet-macos.theme-dark .segmented  { background: #2c2c2e; }
+body.sheet-macos .segmented .seg { height: 22px; line-height: 22px; border-radius: 5px; padding: 0 12px; font-size: 13px; }
+body.sheet-macos.theme-light .segmented .seg.active { background: #ffffff; color: #1d1d1f; box-shadow: 0 1px 2px rgba(0,0,0,.14); }
+body.sheet-macos.theme-dark .segmented .seg.active  { background: #636366; color: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+body.sheet-macos .chip { height: 24px; line-height: 22px; border-radius: 12px; padding: 0 10px; font-size: 12px; }
+body.sheet-macos.theme-light .chip { background: #ececef; border: 1px solid transparent; }
+body.sheet-macos.theme-dark .chip  { background: #3a3a3c; border: 1px solid transparent; }
+body.sheet-macos .chip.on { background: #007aff; color: #ffffff; }
+body.sheet-macos .badge { border-radius: 9px; font-weight: 600; }
+body.sheet-macos .badge.accent { background: #ff3b30; color: #ffffff; }
+body.sheet-macos .rating .star.on { color: #ff9f0a; }
+body.sheet-macos .swatch { border-radius: 50%; }
+body.sheet-macos .swatch.selected { border-color: #007aff; }
+body.sheet-macos .infobar { border-radius: 10px; padding: 10px 14px; }
+body.sheet-macos.theme-light .infobar { background: #f5f5f7; border: 1px solid rgba(0,0,0,.06); }
+body.sheet-macos.theme-dark .infobar  { background: #2c2c2e; border: 1px solid rgba(255,255,255,.06); }
+body.sheet-macos .infobar .close { border-radius: 50%; }
+
+/* ------------------------------------------------- menus: vibrant, accent-lit */
+body.sheet-macos .dd-menu, body.sheet-macos #axCtx, body.sheet-macos .axctx {
+    border-radius: 9px; padding: 5px; border: .5px solid rgba(0,0,0,.18);
+}
+body.sheet-macos.theme-light .dd-menu, body.sheet-macos.theme-light #axCtx, body.sheet-macos.theme-light .axctx {
+    background: rgba(246,246,248,.97); color: #1d1d1f; box-shadow: 0 10px 30px rgba(0,0,0,.18), 0 0 0 .5px rgba(0,0,0,.05);
+}
+body.sheet-macos.theme-dark .dd-menu, body.sheet-macos.theme-dark #axCtx, body.sheet-macos.theme-dark .axctx {
+    background: rgba(44,44,46,.97); color: #f5f5f7; border-color: rgba(255,255,255,.12); box-shadow: 0 10px 30px rgba(0,0,0,.5);
+}
+body.sheet-macos .list { border-radius: 8px; }
+body.sheet-macos .dd-item, body.sheet-macos .axctx-item { height: 22px; line-height: 22px; border-radius: 4px; font-size: 13px; }
+body.sheet-macos .list-item { height: 26px; line-height: 26px; border-radius: 5px; font-size: 13px; }
+body.sheet-macos .dd-item:hover, body.sheet-macos .axctx-item:hover { background: #007aff; color: #ffffff; }
+body.sheet-macos.theme-light .list-item:hover, body.sheet-macos.theme-light .fl-row:hover { background: rgba(0,0,0,.04); }
+body.sheet-macos.theme-dark .list-item:hover, body.sheet-macos.theme-dark .fl-row:hover { background: rgba(255,255,255,.05); }
+body.sheet-macos .dd-item.selected, body.sheet-macos .list-item.selected { background: #007aff; color: #ffffff; }
+body.sheet-macos .dd-item.selected:before, body.sheet-macos .list-item.selected:before { display: none; }
+body.sheet-macos .axctx-sep { margin: 5px 9px; height: 1px; }
+body.sheet-macos.theme-light .axctx-sep { background: rgba(0,0,0,.1); }
+body.sheet-macos.theme-dark .axctx-sep  { background: rgba(255,255,255,.12); }
+body.sheet-macos .btn:focus, body.sheet-macos .dropdown:focus, body.sheet-macos .list:focus,
+body.sheet-macos .tab:focus, body.sheet-macos .seg:focus, body.sheet-macos .chip:focus,
+body.sheet-macos .swatch:focus, body.sheet-macos .axdlg-btn:focus {
+    outline: none; box-shadow: 0 0 0 3px rgba(0,122,255,.45);
+}
+
+/* -------------------------------------------------------------- window bars */
+body.sheet-macos .axmb { height: 28px; padding: 0 8px; font-size: 13px; }
+body.sheet-macos.theme-light .axmb { background: #f6f6f6; border-bottom: 1px solid rgba(0,0,0,.08); }
+body.sheet-macos.theme-dark .axmb  { background: #2a2a2c; border-bottom: 1px solid rgba(0,0,0,.5); }
+body.sheet-macos .axmb-item { height: 22px; line-height: 22px; border-radius: 4px; padding: 0 9px; }
+body.sheet-macos .axmb-item:hover, body.sheet-macos .axmb-item.open { background: #007aff; color: #ffffff; }
+body.sheet-macos .axsb { height: 24px; padding: 0 8px 0 14px; font-size: 11px; }
+body.sheet-macos.theme-light .axsb { background: #f6f6f6; color: #86868b; border-top: 1px solid rgba(0,0,0,.08); }
+body.sheet-macos.theme-dark .axsb  { background: #2a2a2c; color: #98989d; border-top: 1px solid rgba(0,0,0,.5); }
+body.sheet-macos .axsb-part { border-left: none; }
+body.sheet-macos .axsb-bar { height: 4px; border-radius: 2px; }
+body.sheet-macos .axsb-bar > i { background: #007aff; }
+
+/* ------------------------------------------------- dialogs: the sheet + alert */
+body.sheet-macos #axDlgOverlay { background: rgba(0,0,0,.18); }
+body.sheet-macos #axDlg { width: 380px; padding: 22px 22px 18px; border-radius: 12px; text-align: left; }
+body.sheet-macos.theme-light #axDlg { background: #f2f2f4; border: .5px solid rgba(0,0,0,.15); box-shadow: 0 22px 60px rgba(0,0,0,.28); }
+body.sheet-macos.theme-dark #axDlg  { background: #2c2c2e; border: .5px solid rgba(255,255,255,.12); box-shadow: 0 22px 60px rgba(0,0,0,.6); }
+body.sheet-macos #axDlgTitle { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+body.sheet-macos #axDlgBtns { margin: 18px 0 0; padding: 0; border-top: none; background: transparent; justify-content: flex-end; }
+body.sheet-macos .axdlg-btn { flex: none; min-width: 76px; height: 26px; line-height: 24px; border-radius: 6px; font-size: 13px; margin-left: 8px; }
+body.sheet-macos.theme-light .axdlg-btn { color: #1d1d1f; background: #ffffff; border: 1px solid rgba(0,0,0,.12); box-shadow: 0 1px 1px rgba(0,0,0,.08); }
+body.sheet-macos.theme-dark .axdlg-btn  { color: #f5f5f7; background: #5a5a5e; border: 1px solid rgba(255,255,255,.04); }
+body.sheet-macos .axdlg-btn.danger { color: #ffffff; background: #ff3b30; border-color: #e0291f; }
+/* the notification banner, top-right in spirit */
+body.sheet-macos #axToast { border-radius: 14px; padding: 12px 16px; font-size: 13px; }
+body.sheet-macos.theme-light #axToast { background: rgba(246,246,248,.97); color: #1d1d1f; border: .5px solid rgba(0,0,0,.12); box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+body.sheet-macos.theme-dark #axToast  { background: rgba(44,44,46,.97); color: #f5f5f7; border: .5px solid rgba(255,255,255,.12); box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+body.sheet-macos #axTip { border-radius: 5px; padding: 3px 7px; font-size: 11px; }
+body.sheet-macos.theme-light #axTip { background: #f6f6f6; color: #1d1d1f; border: .5px solid rgba(0,0,0,.2); box-shadow: 0 3px 8px rgba(0,0,0,.15); }
+body.sheet-macos.theme-dark #axTip  { background: #3a3a3c; color: #f5f5f7; border: .5px solid rgba(255,255,255,.15); }
+
+/* --------------------------------------------- the grid: Finder's list view */
+body.sheet-macos .dv-frame { border-radius: 8px; }
+body.sheet-macos .dv-hcell { height: 26px; font-size: 11px; font-weight: 600; }
+body.sheet-macos.theme-light .dv-hcell { background: #ffffff; color: #6e6e73; border-bottom: 1px solid rgba(0,0,0,.08); }
+body.sheet-macos.theme-dark .dv-hcell  { background: #232325; color: #98989d; border-bottom: 1px solid rgba(255,255,255,.08); }
+body.sheet-macos .dv-cell { height: 24px; font-size: 13px; border-bottom: none; }
+body.sheet-macos.theme-light .dv-row:nth-child(even) > .dv-cell { background: #f5f5f7; }
+body.sheet-macos.theme-dark .dv-row:nth-child(even) > .dv-cell  { background: #262628; }
+body.sheet-macos .dv-row.selected > .dv-cell, body.sheet-macos .dv-row.selected:nth-child(even) > .dv-cell { background: #007aff; color: #ffffff; }
+body.sheet-macos .dv-check { border-radius: 4px; }
+body.sheet-macos .dv-check.on, body.sheet-macos .dv-check.some { background: #007aff; border-color: #0064d6; color: #ffffff; }
+body.sheet-macos .dv-sort { color: #86868b; }
+
+/* ------------------------------------------ pictures, drop zones and files */
+body.sheet-macos .imgbox, body.sheet-macos .thumb, body.sheet-macos .filelist { border-radius: 8px; }
+body.sheet-macos .imgbox.round { border-radius: 50%; }
+body.sheet-macos .imgbox.button:hover, body.sheet-macos .thumb:hover { box-shadow: 0 0 0 3px rgba(0,122,255,.45); }
+body.sheet-macos .sort-list .drag-item { border-radius: 8px; margin-bottom: 4px; }
+body.sheet-macos .drag-ghost { box-shadow: 0 12px 28px rgba(0,0,0,.25); }
+body.sheet-macos .fl-row { border-radius: 5px; }
+body.sheet-macos .dropzone { border-radius: 12px; border-width: 2px; }
+body.sheet-macos .dropzone.dragover { border-style: solid; border-color: #007aff; background: rgba(0,122,255,.08); }
+body.sheet-macos .console { border-radius: 8px; font-family: "SF Mono", Menlo, Consolas, monospace; }
+
+/* --------------------------------------------------------- title-bar items */
+body.sheet-macos #titlebar .axtb-item { height: 26px; min-width: 26px; border-radius: 6px; }
+body.sheet-macos.theme-light #titlebar .axtb-item { color: #6e6e73; }
+body.sheet-macos.theme-dark #titlebar .axtb-item  { color: #a1a1a6; }
+body.sheet-macos.theme-light #titlebar .axtb-item:hover { background: rgba(0,0,0,.06); }
+body.sheet-macos.theme-dark #titlebar .axtb-item:hover  { background: rgba(255,255,255,.08); }
+body.sheet-macos #titlebar .axtb-item.on, body.sheet-macos #titlebar .axtb-item.open,
+body.sheet-macos #titlebar .axtb-item.pop-open { background: rgba(0,0,0,.1); }
+body.sheet-macos.theme-dark #titlebar .axtb-item.on, body.sheet-macos.theme-dark #titlebar .axtb-item.open,
+body.sheet-macos.theme-dark #titlebar .axtb-item.pop-open { background: rgba(255,255,255,.14); }
+body.sheet-macos #axPop { border-radius: 12px; padding: 12px 14px; font-size: 13px; }
+body.sheet-macos.theme-light #axPop { background: rgba(246,246,248,.98); color: #1d1d1f; border: .5px solid rgba(0,0,0,.15); box-shadow: 0 10px 30px rgba(0,0,0,.18); }
+body.sheet-macos.theme-dark #axPop  { background: rgba(44,44,46,.98); color: #f5f5f7; border: .5px solid rgba(255,255,255,.12); box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+body.sheet-macos .axrich-footer { padding: 12px 20px; }
+body.sheet-macos.theme-light .axrich-footer { background: #f6f6f6; border-top: 1px solid rgba(0,0,0,.08); }
+body.sheet-macos.theme-dark .axrich-footer  { background: #2a2a2c; border-top: 1px solid rgba(0,0,0,.5); }
+
+/* -------------------------------------------------------------- scrollbars */
+body.sheet-macos.theme-light, body.sheet-macos.theme-light #content,
+body.sheet-macos.theme-light .list, body.sheet-macos.theme-light .dd-menu,
+body.sheet-macos.theme-light .filelist, body.sheet-macos.theme-light .dv-bodywrap {
+    scrollbar-face-color: #c1c1c5; scrollbar-arrow-color: #ffffff;
+    scrollbar-track-color: #ffffff; scrollbar-shadow-color: #ffffff;
+    scrollbar-highlight-color: #ffffff; scrollbar-3dlight-color: #ffffff; scrollbar-darkshadow-color: #ffffff;
+}
+body.sheet-macos.theme-dark, body.sheet-macos.theme-dark #content,
+body.sheet-macos.theme-dark .list, body.sheet-macos.theme-dark .dd-menu,
+body.sheet-macos.theme-dark .filelist, body.sheet-macos.theme-dark .dv-bodywrap {
+    scrollbar-face-color: #5b5b5f; scrollbar-arrow-color: #1e1e1e;
+    scrollbar-track-color: #1e1e1e; scrollbar-shadow-color: #1e1e1e;
+    scrollbar-highlight-color: #1e1e1e; scrollbar-3dlight-color: #1e1e1e; scrollbar-darkshadow-color: #1e1e1e;
+}
+/* the overlay bars (ui/scroll.js): thin, grey, fatter under the pointer */
+body.sheet-macos .ax-sb-v .ax-sb-bar { width: 7px; border-radius: 4px; opacity: .55; background: #7d7d82; }
+body.sheet-macos .ax-sb-h .ax-sb-bar { height: 7px; border-radius: 4px; opacity: .55; background: #7d7d82; }
+body.sheet-macos .ax-sb-v:hover .ax-sb-bar, body.sheet-macos .ax-sb-v.drag .ax-sb-bar { width: 10px; border-radius: 5px; opacity: .8; }
+body.sheet-macos .ax-sb-h:hover .ax-sb-bar, body.sheet-macos .ax-sb-h.drag .ax-sb-bar { height: 10px; border-radius: 5px; opacity: .8; }
+body.sheet-macos .ax-sb-v:hover, body.sheet-macos .ax-sb-h:hover, body.sheet-macos .ax-sb-v.drag, body.sheet-macos .ax-sb-h.drag { background: transparent; }

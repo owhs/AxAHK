@@ -433,6 +433,7 @@ body.sheet-inset.theme-light .infobar.info { background: #aee2ee; }
 body.sheet-inset .infobar.info .ico { color: #22d3ee; }
 body.sheet-inset .infobar.warning { background: rgba(240,180,41,.12); }
 body.sheet-inset .infobar.warning .ico { color: #f0b429; }
+body.sheet-inset.theme-light .infobar.warning .ico, body.sheet-inset.theme-light .infobar.warning .close { color: #8a5a00; }
 body.sheet-inset .infobar.error { background: rgba(211,74,69,.14); }
 body.sheet-inset .infobar.error .ico { color: #e57a76; }
 body.sheet-inset #axToast.kind-success { border-left: 3px solid #10b981; }

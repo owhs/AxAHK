@@ -103,6 +103,25 @@ class AxGuiCompat {
             fn := AxGuiCompat.Named(self, fn)
         if (StrLower(name) = "close")
             return self.OnClose((w) => fn(w))
+        ; Size goes through the window's own size handling, which also runs on
+        ; each step of a SmoothResize drag (the Gui gets no Size event then)
+        if (StrLower(name) = "size") {
+            if !self.HasOwnProp("_sizeCbs")
+                self._sizeCbs := []
+            for i, cb in self._sizeCbs
+                if (cb.HasOwnProp("Fn") && cb.Fn = fn) {
+                    self._sizeCbs.RemoveAt(i)
+                    break
+                }
+            if add {
+                cb := {Fn: fn, Call: (o, ww, mm, w, h) => o.Fn.Call(self, mm, w, h)}
+                if (add < 0)
+                    self._sizeCbs.InsertAt(1, cb)
+                else
+                    self._sizeCbs.Push(cb)
+            }
+            return self
+        }
         self.Gui.OnEvent(name, (gg, args*) => fn(self, args*), add)
         return self
     }

@@ -35,7 +35,9 @@ var AXG = {
         c:   { cols: [["c", "Colour"]], noun: "colour" },
         n:   { cols: [["l", "Control"]], noun: "control" },
         st:  { cols: [["l", "Step"]], noun: "step" },
-        ld:  { cols: [["l", "Step"], ["v", "A line under it"]], noun: "step" }
+        ld:  { cols: [["l", "Step"], ["v", "A line under it"]], noun: "step" },
+        /* header buttons: icon : label : what it does (copy, menu A, B, toggle...) */
+        act: { cols: [["g", "Icon"], ["l", "Label"], ["v", "Does"]], noun: "button" }
     },
     /* a macro step's glyph, from its first word */
     STEPGLYPH: { key: "E765", down: "E74B", up: "E74A", text: "E8D2", wait: "E916", click: "E8B0", dblclick: "E8B0",
@@ -104,6 +106,7 @@ var AXG = {
         if (shape === "c") { r.c = String(line).replace(/^\s+|\s+$/g, ""); return r; }
         if (shape === "n" || shape === "st") { r.l = String(line).replace(/^\s+|\s+$/g, ""); return r; }
         if (shape === "lg") { r.l = p[0]; r.g = p.length > 1 ? p[1] : ""; return r; }
+        if (shape === "act") { r.g = p[0]; r.l = p.length > 1 ? p[1] : ""; r.v = p.length > 2 ? p.slice(2).join(":") : ""; return r; }
         if (shape === "ld") { r.l = p[0]; r.v = p.length > 1 ? p.slice(1).join(":") : ""; return r; }
         if (p.length === 1) { r.l = p[0]; return r; }
         r.v = p[0]; r.l = p[1];
@@ -116,6 +119,7 @@ var AXG = {
         if (shape === "c") { return t(r.c); }
         if (shape === "n" || shape === "st") { return t(r.l); }
         if (shape === "lg") { return t(r.l) + (t(r.g) ? ":" + t(r.g) : ""); }
+        if (shape === "act") { return (t(r.g) || t(r.l) || t(r.v)) ? t(r.g) + ":" + t(r.l) + (t(r.v) ? ":" + t(r.v) : "") : ""; }
         if (shape === "ld") { return t(r.l) + (t(r.v) ? ":" + t(r.v) : ""); }
         var v = t(r.v), l = t(r.l), g = t(r.g);
         if (shape === "vlg") { return (v || l) + ":" + l + (g ? ":" + g : ""); }
@@ -172,7 +176,8 @@ var AXG = {
                     h += '<span class="axd-ledglyph"' + (at ? ' style="margin-left:' + (at * 18) + 'px"' : '') + '>&#x' + this.stepGlyph(r.l) + ';</span>';
                 }
                 h += '<input class="axd-ledin" data-i="' + i + '" data-k="' + k + '" value="' + this.esc(r[k])
-                   + '" placeholder="' + (k === "v" ? (st.shape === "ld" ? "" : "same") : k === "g" ? "E713" : k === "c" ? "#0078d4" : "")
+                   + '" placeholder="' + (st.shape === "act" ? (k === "v" ? "copy / menu A, B / toggle" : k === "l" ? "(tip only)" : "E8C8")
+                       : k === "v" ? (st.shape === "ld" ? "" : "same") : k === "g" ? "E713" : k === "c" ? "#0078d4" : "")
                    + '" spellcheck="false" autocomplete="off"></span>';
             }
             h += '<span class="axd-ledx" data-led-del="' + i + '" title="Remove it">&#xE711;</span></div>';
